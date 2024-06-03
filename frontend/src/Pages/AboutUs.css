@@ -1,139 +1,140 @@
 .aboutUs {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  background-color: #000;
-  color: #fff;
-  padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: #000;
+    color: #fff;
+    padding: 20px 0;
 }
 
 .aboutContainer {
-  width: 100%;
-  max-width: 1200px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  background-color: #111;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  margin: 40px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    background-color: #111;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    margin: 40px;
 }
 
 .aboutDesc {
-  padding: 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
 }
 
 .aboutUsText {
-  width: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 19px;
+    width: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
 }
 
 .aboutContainer > h1 {
-  font-size: 48px;
-  font-weight: bold;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    font-size: 48px;
+    font-weight: bold;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .aboutUsImage {
-  width: 750px;
-  width: 100%;
+    width: 750px;
+    width: 100%;
 }
 
 .about-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .about-container p,
 .about-container ul {
-  font-size: 18px;
-  line-height: 1.6;
+    font-size: 18px;
+    line-height: 1.6;
 }
 
 .about-container h2 {
-  font-size: 32px;
-  font-weight: bold;
-  margin-top: 20px;
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 20px;
 }
 
 .about-container ul {
-  list-style-type: none;
-  padding: 0;
+    list-style-type: none;
+    padding: 0;
 }
 
 .about-container li {
-  margin-bottom: 15px;
-  position: relative;
-  padding-left: 20px;
+    margin-bottom: 15px;
+    position: relative;
+    padding-left: 20px;
 }
 
 .about-container li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: #ff6f61;
-  font-size: 24px;
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #ff6f61;
+    font-size: 24px;
 }
 
 .about-container strong {
-  color: #ff6f61;
+    color: #ff6f61;
 }
 
 .offer-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
 .offer-card {
-  background-color: #222;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border-radius: 10px;
-  padding: 20px;
-  width: calc(33.333% - 20px);
-  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.9);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: #222;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: 10px;
+    padding: 20px;
+    width: calc(33.333% - 20px);
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.9);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-top {
-  flex: 1;
+    flex: 1;
 }
+
 .card-bottom {
-  flex: 1;
+    flex: 1;
 }
 
 .offer-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .offer-card h3 {
-  font-size: 24px;
-  font-weight: bold;
-  margin-top: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
 }
 
 .offer-card p {
-  font-size: 16px;
-  margin-top: 10px;
+    font-size: 16px;
+    margin-top: 10px;
 }
 
 .aboutUs__animations .aboutUs__animation {
-  max-width: 250px;
-  width: 100%;
+    max-width: 250px;
+    width: 100%;
 }

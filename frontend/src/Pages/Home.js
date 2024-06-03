@@ -6,16 +6,16 @@ import List from "../Components/List";
 import Footer from "../Components/Footer";
 
 const Home = () => {
-  return (
-    <div className="home">
-      <NavBar />
-      <Featured type={"series"} />
-      <List />
-      <List />
-      <List />
-      <Footer />
-    </div>
-  );
+    return (
+        <div className="home">
+            <NavBar/>
+            <Featured type={"series"}/>
+            <List/>
+            <List/>
+            <List/>
+            <Footer/>
+        </div>
+    );
 };
 
 export default Home;

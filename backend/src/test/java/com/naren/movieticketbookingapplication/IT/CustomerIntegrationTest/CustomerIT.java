@@ -28,11 +28,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CustomerIT {
 
-    @Autowired
-    private WebTestClient webTestClient;
     private static final Faker FAKER = new Faker();
     private static final String API_PATH = "/api/v1/customers";
-
+    @Autowired
+    private WebTestClient webTestClient;
     @Autowired
     private RoleRepository roleRepository;
 
