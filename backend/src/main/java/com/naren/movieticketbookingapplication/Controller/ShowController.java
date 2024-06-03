@@ -1,9 +1,9 @@
 package com.naren.movieticketbookingapplication.Controller;
 
-import com.naren.movieticketbookingapplication.Entity.Show;
-import com.naren.movieticketbookingapplication.Record.ShowRegistration;
-import com.naren.movieticketbookingapplication.Record.ShowUpdation;
-import com.naren.movieticketbookingapplication.Service.ShowService;
+import com.naren.movieticketbookingapplication.Entity.Movie;
+import com.naren.movieticketbookingapplication.Record.MovieRegistration;
+import com.naren.movieticketbookingapplication.Record.MovieUpdation;
+import com.naren.movieticketbookingapplication.Service.MovieService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,52 +14,52 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 @Slf4j
-public class ShowController {
+public class MovieController {
 
-    private final ShowService showService;
+    private final MovieService movieService;
 
-    public ShowController(ShowService showService) {
-        this.showService = showService;
+    public MovieController(MovieService movieService) {
+        this.movieService = movieService;
     }
 
-    @PostMapping("/shows")
-    public ResponseEntity<Show> createShow(@RequestBody ShowRegistration registration) {
-        log.info("Received request to create show with registration: {}", registration);
-        showService.addShow(registration);
-        log.info("Show created successfully");
+    @PostMapping("/movies")
+    public ResponseEntity<Movie> createMovie(@RequestBody MovieRegistration registration) {
+        log.info("Received request to create movie with registration: {}", registration);
+        movieService.addMovie(registration);
+        log.info("Movie created successfully");
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/shows/{id}")
-    public ResponseEntity<Show> getShowById(@PathVariable("id") Long showId) {
-        log.info("Received request to retrieve show with ID: {}", showId);
-        Show show = showService.getShowById(showId);
-        log.info("Retrieved show: {}", show);
-        return new ResponseEntity<>(show, HttpStatus.OK);
+    @GetMapping("/movies/{id}")
+    public ResponseEntity<Movie> getMovieById(@PathVariable("id") Long movieId) {
+        log.info("Received request to retrieve movie with ID: {}", movieId);
+        Movie movie = movieService.getMovieById(movieId);
+        log.info("Retrieved movie: {}", movie);
+        return new ResponseEntity<>(movie, HttpStatus.OK);
     }
 
-    @GetMapping("/shows")
-    public ResponseEntity<List<Show>> showList() {
-        log.info("Received request to retrieve list of shows");
-        List<Show> shows = showService.getShowList();
-        log.info("Retrieved list of shows: {}", shows);
-        return new ResponseEntity<>(shows, HttpStatus.OK);
+    @GetMapping("/movies")
+    public ResponseEntity<List<Movie>> movieList() {
+        log.info("Received request to retrieve list of movies");
+        List<Movie> movies = movieService.getMovieList();
+        log.info("Retrieved list of movies: {}", movies);
+        return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
-    @PutMapping("/shows/{id}")
-    public ResponseEntity<Show> updateShow(@RequestBody ShowUpdation update,
-                                           @PathVariable("id") Long showId) {
-        log.info("Received request to update show with ID: {}", showId);
-        showService.updateShow(update, showId);
-        log.info("Show updated successfully");
+    @PutMapping("/movies/{id}")
+    public ResponseEntity<Movie> updateMovie(@RequestBody MovieUpdation update,
+                                             @PathVariable("id") Long movieId) {
+        log.info("Received request to update movie with ID: {}", movieId);
+        movieService.updateMovie(update, movieId);
+        log.info("Movie updated successfully");
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/shows/{id}")
-    public void deleteShow(@PathVariable("id") Long showId) {
-        log.info("Received request to delete show with ID: {}", showId);
-        showService.removeShow(showId);
-        log.info("Show deleted successfully");
+    @DeleteMapping("/movies/{id}")
+    public void deleteMovie(@PathVariable("id") Long movieId) {
+        log.info("Received request to delete movie with ID: {}", movieId);
+        movieService.removeMovie(movieId);
+        log.info("Movie deleted successfully");
     }
 
 }
