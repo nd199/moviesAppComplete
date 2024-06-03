@@ -1,5 +1,5 @@
 .home {
-  background-color: var(--main-color);
-  position: relative;
-  overflow: hidden;
+    background-color: var(--main-color);
+    position: relative;
+    overflow: hidden;
 }

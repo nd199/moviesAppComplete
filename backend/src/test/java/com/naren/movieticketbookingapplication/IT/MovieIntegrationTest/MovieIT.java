@@ -22,11 +22,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MovieIT {
 
-    @Autowired
-    private WebTestClient webTestClient;
     private static final String API_PATH = "api/v1/movies";
     private static final Faker FAKER = new Faker();
     private static final Random RANDOM = new Random();
+    @Autowired
+    private WebTestClient webTestClient;
     private MovieRegistration registration;
 
     @BeforeEach
