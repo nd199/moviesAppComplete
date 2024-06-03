@@ -26,11 +26,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class MovieServiceImplTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(MovieServiceImplTest.class);
     @Mock
     private MovieDao movieDao;
     private MovieService underTest;
-
-    private static final Logger logger = LoggerFactory.getLogger(MovieServiceImplTest.class);
 
     @BeforeEach
     void setUp() {
