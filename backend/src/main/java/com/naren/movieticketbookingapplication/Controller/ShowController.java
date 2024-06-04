@@ -1,9 +1,9 @@
 package com.naren.movieticketbookingapplication.Controller;
 
-import com.naren.movieticketbookingapplication.Entity.Movie;
-import com.naren.movieticketbookingapplication.Record.MovieRegistration;
-import com.naren.movieticketbookingapplication.Record.MovieUpdation;
-import com.naren.movieticketbookingapplication.Service.MovieService;
+import com.naren.movieticketbookingapplication.Entity.Show;
+import com.naren.movieticketbookingapplication.Record.ShowRegistration;
+import com.naren.movieticketbookingapplication.Record.ShowUpdation;
+import com.naren.movieticketbookingapplication.Service.ShowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,52 +14,52 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 @Slf4j
-public class MovieController {
+public class ShowController {
 
-    private final MovieService movieService;
+    private final ShowService movieService;
 
-    public MovieController(MovieService movieService) {
+    public ShowController(ShowService movieService) {
         this.movieService = movieService;
     }
 
-    @PostMapping("/movies")
-    public ResponseEntity<Movie> createMovie(@RequestBody MovieRegistration registration) {
+    @PostMapping("/shows")
+    public ResponseEntity<Show> createShow(@RequestBody ShowRegistration registration) {
         log.info("Received request to create movie with registration: {}", registration);
-        movieService.addMovie(registration);
-        log.info("Movie created successfully");
+        movieService.addShow(registration);
+        log.info("Show created successfully");
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/movies/{id}")
-    public ResponseEntity<Movie> getMovieById(@PathVariable("id") Long movieId) {
+    @GetMapping("/shows/{id}")
+    public ResponseEntity<Show> getShowById(@PathVariable("id") Long movieId) {
         log.info("Received request to retrieve movie with ID: {}", movieId);
-        Movie movie = movieService.getMovieById(movieId);
+        Show movie = movieService.getShowById(movieId);
         log.info("Retrieved movie: {}", movie);
         return new ResponseEntity<>(movie, HttpStatus.OK);
     }
 
-    @GetMapping("/movies")
-    public ResponseEntity<List<Movie>> movieList() {
-        log.info("Received request to retrieve list of movies");
-        List<Movie> movies = movieService.getMovieList();
-        log.info("Retrieved list of movies: {}", movies);
-        return new ResponseEntity<>(movies, HttpStatus.OK);
+    @GetMapping("/shows")
+    public ResponseEntity<List<Show>> movieList() {
+        log.info("Received request to retrieve list of shows");
+        List<Show> shows = movieService.getShowList();
+        log.info("Retrieved list of shows: {}", shows);
+        return new ResponseEntity<>(shows, HttpStatus.OK);
     }
 
-    @PutMapping("/movies/{id}")
-    public ResponseEntity<Movie> updateMovie(@RequestBody MovieUpdation update,
-                                             @PathVariable("id") Long movieId) {
+    @PutMapping("/shows/{id}")
+    public ResponseEntity<Show> updateShow(@RequestBody ShowUpdation update,
+                                           @PathVariable("id") Long movieId) {
         log.info("Received request to update movie with ID: {}", movieId);
-        movieService.updateMovie(update, movieId);
-        log.info("Movie updated successfully");
+        movieService.updateShow(update, movieId);
+        log.info("Show updated successfully");
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/movies/{id}")
-    public void deleteMovie(@PathVariable("id") Long movieId) {
+    @DeleteMapping("/shows/{id}")
+    public void deleteShow(@PathVariable("id") Long movieId) {
         log.info("Received request to delete movie with ID: {}", movieId);
-        movieService.removeMovie(movieId);
-        log.info("Movie deleted successfully");
+        movieService.removeShow(movieId);
+        log.info("Show deleted successfully");
     }
 
 }

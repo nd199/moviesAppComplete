@@ -21,6 +21,8 @@ public interface CustomerDao {
     void deleteCustomer(Customer customer);
 
     Optional<Customer> getCustomerByUsername(String email);
+
+    Optional<Customer> getCustomerByPhoneNumber(Long phoneNumber);
 }
 
 

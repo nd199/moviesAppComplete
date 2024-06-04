@@ -7,11 +7,15 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
+
+import static jakarta.persistence.CascadeType.*;
+
 
 @Entity
 @Table(name = "Customer", uniqueConstraints = {
@@ -23,6 +27,7 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@Slf4j
 public class Customer implements UserDetails {
     @Id
     @SequenceGenerator(name = "customer_id",
@@ -44,7 +49,7 @@ public class Customer implements UserDetails {
     @Column(name = "phone_number", nullable = false)
     private Long phoneNumber;
 
-    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = {DETACH, REFRESH, PERSIST, MERGE})
     @JsonIgnore
     private List<Movie> movies = new ArrayList<>();
 
@@ -143,11 +148,27 @@ public class Customer implements UserDetails {
     }
 
     public void removeMovie(Movie movie) {
-        if (movies.contains(movie) && movie != null) {
+        if (movie != null && movies.contains(movie)) {
             movies.remove(movie);
-            movie.setCustomer(null);
+            movie.setCustomer(null);  // Disassociate the movie from the customer
+            log.info("Removed movie with ID {} from customer with ID {}", movie.getMovie_id(), this.getCustomer_id());
+        } else {
+            log.warn("Attempted to remove a movie that is not associated with the customer or movie is null");
         }
     }
+
+    public void removeMovies(List<Movie> movies) {
+        Iterator<Movie> iterator = this.movies.iterator(); // Use this.movies to avoid ConcurrentModificationException
+        while (iterator.hasNext()) {
+            Movie movie = iterator.next();
+            if (movies.contains(movie)) {
+                iterator.remove();  // Safe removal using iterator
+                movie.setCustomer(null);
+                log.info("Removed movie with ID {} from customer with ID {}", movie.getMovie_id(), this.getCustomer_id());
+            }
+        }
+    }
+
 
     public void addRole(Role role) {
         this.roles.add(role);

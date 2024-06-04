@@ -93,7 +93,7 @@ public class JwtUtil {
             return isValid;
         } catch (Exception e) {
             log.error("Error validating JWT token: {}", e.getMessage());
-            return false; // Invalid token or parsing error
+            return false;
         }
     }
 

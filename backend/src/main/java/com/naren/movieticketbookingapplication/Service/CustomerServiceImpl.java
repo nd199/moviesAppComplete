@@ -13,7 +13,9 @@ import com.naren.movieticketbookingapplication.Exception.ResourceAlreadyExists;
 import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
+import com.naren.movieticketbookingapplication.Record.UserLogin;
 import com.naren.movieticketbookingapplication.jwt.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -73,6 +76,24 @@ public class CustomerServiceImpl implements CustomerService {
         if (role == null)
             throw new ResourceNotFoundException("Role cannot be null");
         roleService.deleteRole(id);
+    }
+
+    @Override
+    public Customer loginUser(UserLogin userLogin, HttpServletRequest request) {
+        Optional<Customer> customer = Optional.empty();
+
+        if (userLogin == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+        if (userLogin.email() == null) {
+            customer = customerDao.getCustomerByPhoneNumber(userLogin.phoneNumber());
+        } else if (userLogin.phoneNumber() == null) {
+            customer = customerDao.getCustomerByUsername(userLogin.email());
+        }
+
+        String AuthHeader = request.getHeader("Authorization");
+
+        return null;
     }
 
     @Override
@@ -200,6 +221,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerDao.getCustomer(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
 
+        removeAllMovies(customerId);
         customerDao.deleteCustomer(customer);
         log.info("Customer deleted successfully: {}", customer);
     }
@@ -239,5 +261,26 @@ public class CustomerServiceImpl implements CustomerService {
         customer.removeMovie(movie);
         customerDao.updateCustomer(customer);
         log.info("Movie removed from customer successfully: Customer={}, Movie={}", customer.getName(), movie.getName());
+    }
+
+    @Override
+    public void removeAllMovies(Long customerId) {
+
+        log.info("Fetching customer with ID {}", customerId);
+        Customer customer = customerDao.getCustomer(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
+
+        List<Movie> movies = customer.getMovies();
+
+        if (movies.isEmpty()) {
+            log.warn("Customer with ID {} is not subscribed to any movie", customerId);
+            throw new ResourceNotFoundException(
+                    "Customer " + customerId + " not subscribed to any movie");
+        }
+
+        log.info("Removing all movies from customer with ID {}", customerId);
+        customer.removeMovies(movies); // Ensure method name is correct
+        customerDao.updateCustomer(customer);  // Persist changes
+        log.info("Movies removed from customer successfully: Customer={}", customer.getName());
     }
 }

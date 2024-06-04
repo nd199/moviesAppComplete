@@ -5,7 +5,9 @@ import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
+import com.naren.movieticketbookingapplication.Record.UserLogin;
 import com.naren.movieticketbookingapplication.Service.CustomerService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,12 @@ public class CustomerController {
         ResponseEntity<?> response = customerService.registerUser(customerRegistration, Set.of("ROLE_ADMIN"));
         log.info("Admin registration response: {}", response);
         return response;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Customer> login(@RequestBody UserLogin userLogin, HttpServletRequest request) {
+        Customer response = customerService.loginUser(userLogin, request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/customers/{id}")
@@ -95,6 +103,14 @@ public class CustomerController {
         log.info("Removing movie with ID {} from customer with ID: {}", movieId, customerId);
         customerService.removeMovieFromCustomer(customerId, movieId);
         log.info("Movie with ID {} removed from customer with ID: {}", movieId, customerId);
+    }
+
+
+    @DeleteMapping("/customers/{customerId}/remove-all-movies")
+    public void removeAllMovies(@PathVariable Long customerId) {
+        log.info("Removing all movies from customer with ID: {}", customerId);
+        customerService.removeAllMovies(customerId);
+        log.info("All movies removed from customer with ID: {}", customerId);
     }
 
     @GetMapping("/roles")
