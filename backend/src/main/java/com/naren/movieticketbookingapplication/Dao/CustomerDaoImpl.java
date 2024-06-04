@@ -81,4 +81,9 @@ public class CustomerDaoImpl implements CustomerDao {
         log.info("Customer fetched by username '{}': {}", email, customer.orElse(null));
         return customer;
     }
+
+    @Override
+    public Optional<Customer> getCustomerByPhoneNumber(Long phoneNumber) {
+        return customerRepository.getCustomerByPhoneNumber(phoneNumber);
+    }
 }

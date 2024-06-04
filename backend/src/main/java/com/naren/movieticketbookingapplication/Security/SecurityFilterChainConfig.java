@@ -33,26 +33,30 @@ public class SecurityFilterChainConfig {
     @Bean
     public SecurityFilterChain customSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         log.info("Configuring custom Security Filter Chain...");
-        httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth ->
-                        auth
-                                .requestMatchers(HttpMethod.POST, "/api/v1/roles").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/roles").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/roles/{id}").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/customers", "/api/v1/movies", "api/v1/admins").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/movies", "api/v1/movies/{id}").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/v1/movies/{id}").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/movies/{id}").permitAll()
-                                .anyRequest().authenticated()
-                )
+        httpSecurity.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        // Public endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/v1/customers", "api/v1/admins").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/movies", "api/v1/movies/{id}").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "api/v1/customers/add-movie/{customerId}/{movieId}").permitAll()
+
+                        // Admin-only endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/v1/roles", "/api/v1/movies").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/roles").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/customers").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/customers/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/roles/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/movies/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/movies/{id}").hasRole("ADMIN")
+
+                        // Any other request requires authentication
+                        .anyRequest().authenticated())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(
-                        handler -> handler.authenticationEntryPoint(authenticationEntryPoint)
-                );
+                .exceptionHandling(handler -> handler.authenticationEntryPoint(authenticationEntryPoint));
         log.info("Custom Security Filter Chain configured successfully.");
         return httpSecurity.build();
     }
+
 }

@@ -3,8 +3,10 @@ package com.naren.movieticketbookingapplication;
 import com.github.javafaker.Faker;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Movie;
+import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Repo.CustomerRepository;
 import com.naren.movieticketbookingapplication.Repo.MovieRepository;
+import com.naren.movieticketbookingapplication.Repo.RoleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -27,10 +29,11 @@ public class MovieTicketBookingApplication {
 
     @Bean
     public CommandLineRunner commandLineRunner(CustomerRepository customerRepository,
-                                               MovieRepository movieRepository, PasswordEncoder encoder) {
+                                               MovieRepository movieRepository, PasswordEncoder encoder, RoleRepository roleRepository) {
         return args -> {
             createRandomCustomer(customerRepository, encoder);
             createRandomMovie(movieRepository);
+            createRole(roleRepository);
         };
     }
 
@@ -55,5 +58,12 @@ public class MovieTicketBookingApplication {
         movieRepository.save(movie);
 
         log.info("Created new movie: {}", movie);
+    }
+
+    private void createRole(RoleRepository roleRepository) {
+        Role user = new Role("ROLE_USER");
+        Role admin = new Role("ROLE_ADMIN");
+        roleRepository.save(user);
+        roleRepository.save(admin);
     }
 }

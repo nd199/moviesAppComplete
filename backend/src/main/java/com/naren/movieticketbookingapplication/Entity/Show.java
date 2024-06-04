@@ -1,4 +1,4 @@
-wpackage com.naren.movieticketbookingapplication.Entity;
+package com.naren.movieticketbookingapplication.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;

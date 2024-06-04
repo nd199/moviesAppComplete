@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Set;
 
 @Slf4j
@@ -32,14 +31,18 @@ public class CustomerUserDetailsService implements UserDetailsService {
                     log.error(errorMessage);
                     return new UsernameNotFoundException(errorMessage);
                 });
+
         Set<Role> roles = customer.getRoles();
-        String[] array = roles.stream().map(Role::getName)
+        String[] roleNames = roles.stream().map(Role::getName)
+                .map(role -> role.replaceFirst("ROLE_", ""))
                 .toArray(String[]::new);
         log.info("User details loaded successfully for username: {}", username);
+
+
         return org.springframework.security.core.userdetails.User
                 .withUsername(username)
                 .password(customer.getPassword())
-                .roles(Arrays.toString(array))
+                .roles(roleNames)
                 .build();
     }
 }
