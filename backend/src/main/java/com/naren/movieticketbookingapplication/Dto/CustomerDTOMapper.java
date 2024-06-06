@@ -25,7 +25,8 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                         .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()),
                 customer.getPhoneNumber(),
                 customer.getUsername(),
-                customer.getMovies()
+                customer.getMovies(),
+                customer.getIsEmailVerified()
         );
 
         log.debug("Mapped Customer to CustomerDTO: {}", customerDTO);

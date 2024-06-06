@@ -25,12 +25,7 @@ public class CustomerUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("Loading user details for username: {}", username);
 
-        Customer customer = customerDao.getCustomerByUsername(username)
-                .orElseThrow(() -> {
-                    String errorMessage = "Username " + username + " not found";
-                    log.error(errorMessage);
-                    return new UsernameNotFoundException(errorMessage);
-                });
+        Customer customer = customerDao.getCustomerByEmail(username);
 
         Set<Role> roles = customer.getRoles();
         String[] roleNames = roles.stream().map(Role::getName)

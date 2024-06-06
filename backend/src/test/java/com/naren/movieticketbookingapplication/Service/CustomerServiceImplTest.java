@@ -13,6 +13,7 @@ import com.naren.movieticketbookingapplication.Exception.ResourceAlreadyExists;
 import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
+import com.naren.movieticketbookingapplication.Utilities.EmailService;
 import com.naren.movieticketbookingapplication.jwt.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,13 +49,16 @@ class CustomerServiceImplTest {
     private JwtUtil jwtUtil;
     @Mock
     private MovieDao movieDao;
+
     private CustomerServiceImpl underTest;
+    @Mock
+    private EmailService emailService;
 
     @BeforeEach
     void setUp() {
         underTest = new CustomerServiceImpl(
                 customerDao, passwordEncoder, customerDTOMapper, roleService,
-                movieDao, jwtUtil);
+                movieDao, jwtUtil, emailService );
 
     }
 
@@ -189,7 +193,7 @@ class CustomerServiceImplTest {
     void updateCustomerSuccessful() {
         long customerId = 1;
         Customer customer = new Customer(customerId, "testName", "test@example.com", "oldPassword", 20220292232L);
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L);
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L, false);
 
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
         when(customerDao.existsByEmail(updateRequest.email())).thenReturn(false);
@@ -208,7 +212,7 @@ class CustomerServiceImplTest {
     @Test
     void updateCustomerNonExistingCustomerIdThrowsException() {
         long nonExistingCustomerId = 100;
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L);
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L, false);
 
         when(customerDao.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
 
@@ -229,7 +233,7 @@ class CustomerServiceImplTest {
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
         when(customerDao.existsByEmail("new@example.com")).thenReturn(true);
 
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", "new@example.com", 1234567890L);
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", "new@example.com", 1234567890L, false);
 
         assertThatThrownBy(() -> underTest.updateCustomer(updateRequest, customerId))
                 .isInstanceOf(ResourceAlreadyExists.class)
@@ -246,7 +250,7 @@ class CustomerServiceImplTest {
 
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
 
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", existingEmail, 1234567890L);
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", existingEmail, 1234567890L, false);
 
         assertThatThrownBy(() -> underTest.updateCustomer(updateRequest, customerId))
                 .isInstanceOf(RequestValidationException.class)

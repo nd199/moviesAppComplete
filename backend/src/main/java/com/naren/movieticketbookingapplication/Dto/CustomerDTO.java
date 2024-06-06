@@ -11,5 +11,5 @@ public record CustomerDTO(
         List<String> roles,
         Long phoneNumber,
         String userName,
-        List<Movie> movies) {
+        List<Movie> movies, Boolean isEmailVerified) {
 }

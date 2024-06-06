@@ -1,91 +1,87 @@
 package com.naren.movieticketbookingapplication.jwt;
 
 import com.naren.movieticketbookingapplication.Entity.Role;
-import com.naren.movieticketbookingapplication.Exception.AlgorithmNotSupportedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
 public class JwtUtil {
 
-    private static final SecretKey SECRET_KEY;
+    private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final SecretKey SECRET_KEY_FOR_EMAIL = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    static {
-        try {
-            SECRET_KEY = generateSecretKey();
-        } catch (NoSuchAlgorithmException e) {
-            throw new AlgorithmNotSupportedException("Algorithm not supported");
-        }
+    public String issueGeneralToken(String subject, String... scopes) {
+        return issueGeneralToken(subject, Map.of("scopes", scopes));
     }
 
-    private static SecretKey generateSecretKey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
-        return keyGenerator.generateKey();
-    }
-
-//
-//    public String issueToken(String subject, String... scopes) {
-//        return issueToken(subject, Map.of("scopes", scopes));
-//    }
-
-    public String issueToken(String subject, Map<String, Object> claims) {
+    public String issueGeneralToken(String subject, Map<String, Object> claims) {
         log.debug("Issuing JWT token for subject: {}", subject);
-        return Jwts.builder().claims(claims)
-                .subject(subject)
-                .issuer("codeNaren.com")
-                .issuedAt(Date.from(Instant.now()))
-                .expiration(Date.from(Instant.now().plus(15, ChronoUnit.DAYS)))
+        String token = Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuer("codeNaren.com")
+                .setIssuedAt(Date.from(Instant.now()))
+                .setExpiration(Date.from(Instant.now().plus(15, ChronoUnit.DAYS)))
                 .signWith(SECRET_KEY)
                 .compact();
+        log.debug("Issued token: {}", token);
+        return token;
     }
 
-    public String issueToken(String subject, Set<Role> roles) {
+    public String issueGeneralToken(String subject, Set<Role> roles, Long userId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("subject", subject);
         claims.put("roles", roles);
+        claims.put("reg-date", new Date(System.currentTimeMillis()));
+        claims.put("user-type", "regular");
+        claims.put("user-id", userId);
 
-        return Jwts
-                .builder()
-                .claims(claims)
-                .subject(subject)
-                .issuedAt(Date.from(Instant.now()))
-                .expiration(Date.from(Instant.now().plus(15, ChronoUnit.DAYS)))
+        String token = Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(Date.from(Instant.now()))
+                .setExpiration(Date.from(Instant.now().plus(15, ChronoUnit.DAYS)))
                 .signWith(SECRET_KEY)
                 .compact();
+        log.debug("Issued token: {}", token);
+        return token;
     }
 
-
-    private Claims getClaims(String token) {
-        log.debug("Parsing and verifying JWT token");
-        return Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
-    }
-
-    public String getSubject(String token) {
-        log.debug("Getting subject from JWT token");
-        return getClaims(token).getSubject();
-    }
-
-//    public Set<String> getRoles(String token) {
-//        //noinspection unchecked
-//        return (Set<String>) getClaims(token).get("roles");
-//    }
-
-    public boolean isTokenValid(String token, String userName) {
+    public Claims getClaims(String token, boolean isEmailToken) {
+        log.debug("Parsing and verifying JWT token: {}", token);
         try {
-            Claims claims = getClaims(token);
+            SecretKey key = isEmailToken ? SECRET_KEY_FOR_EMAIL : SECRET_KEY;
+            Claims claims = Jwts.parser()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            log.debug("Parsed claims: {}", claims);
+            return claims;
+        } catch (Exception e) {
+            log.error("Invalid JWT signature: {}", e.getMessage());
+            throw new RuntimeException("Invalid token or token has expired", e);
+        }
+    }
+
+    public String getSubject(String token, boolean isEmailToken) {
+        Claims claims = getClaims(token, isEmailToken);
+        log.debug("Getting subject from JWT token: {}", claims.getSubject());
+        return claims.getSubject();
+    }
+
+    public boolean isTokenValid(String token, String userName, boolean isEmailToken) {
+        try {
+            Claims claims = getClaims(token, isEmailToken);
             boolean isValid = claims.getSubject().equals(userName) && !isTokenExpired(claims);
             if (!isValid) {
                 log.warn("JWT token validation failed for subject: {}", userName);
@@ -104,5 +100,40 @@ public class JwtUtil {
             log.warn("JWT token has expired");
         }
         return isExpired;
+    }
+
+    public String issueGeneralToken(String subject, List<String> roles) {
+        return issueGeneralToken(subject, Map.of("roles", roles));
+    }
+
+    // For email verification with additional security
+    public String issueEmailToken(String subject, Long userId, Boolean isVerified, String verificationToken) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("subject", subject);
+        claims.put("reg-date", new Date(System.currentTimeMillis()));
+        claims.put("user-type", "regular");
+        claims.put("user-id", userId);
+        claims.put("verification-token", verificationToken);
+        claims.put("isVerified", isVerified);
+        claims.put("token-type", "email");
+
+        String token = Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(Date.from(Instant.now()))
+                .setExpiration(Date.from(Instant.now().plus(3, ChronoUnit.DAYS)))
+                .signWith(SECRET_KEY_FOR_EMAIL)
+                .compact();
+        log.debug("Issued email verification token: {}", token);
+        return token;
+    }
+
+    public String generateRandomVerificationToken() {
+        return UUID.randomUUID().toString();
+    }
+
+    public String extractVerificationToken(String token) {
+        Claims claims = getClaims(token, true);
+        log.debug("Extracting verification token from JWT token");
+        return (String) claims.get("verification-token");
     }
 }

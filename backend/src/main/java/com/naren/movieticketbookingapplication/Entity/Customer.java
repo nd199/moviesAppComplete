@@ -49,6 +49,12 @@ public class Customer implements UserDetails {
     @Column(name = "phone_number", nullable = false)
     private Long phoneNumber;
 
+    @Column(nullable = false)
+    private Boolean isEmailVerified;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = {DETACH, REFRESH, PERSIST, MERGE})
     @JsonIgnore
     private List<Movie> movies = new ArrayList<>();
@@ -80,6 +86,25 @@ public class Customer implements UserDetails {
         this.phoneNumber = phoneNumber;
     }
 
+    public Customer(Long customer_id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, String verificationToken, List<Movie> movies, Set<Role> roles) {
+        this.customer_id = customer_id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.isEmailVerified = isEmailVerified;
+        this.verificationToken = verificationToken;
+        this.movies = movies;
+        this.roles = roles;
+    }
+
+    public Customer(String email, String name, String password, Long phoneNumber, Boolean isEmailVerified) {
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.isEmailVerified = isEmailVerified;
+    }
 
     @Override
     public String toString() {

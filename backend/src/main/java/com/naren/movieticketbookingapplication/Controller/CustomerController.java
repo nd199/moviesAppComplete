@@ -5,9 +5,7 @@ import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
-import com.naren.movieticketbookingapplication.Record.UserLogin;
 import com.naren.movieticketbookingapplication.Service.CustomerService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,16 +51,18 @@ public class CustomerController {
         return response;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<Customer> login(@RequestBody UserLogin userLogin, HttpServletRequest request) {
-        Customer response = customerService.loginUser(userLogin, request);
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping("/customers/{id}")
     public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable("id") Long customerId) {
         log.info("Fetching customer by ID: {}", customerId);
         CustomerDTO customerDTO = customerService.getCustomerById(customerId);
+        log.info("Customer found: {}", customerDTO);
+        return new ResponseEntity<>(customerDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/customers/email/{email}")
+    public ResponseEntity<Customer> getCustomerByEmail(@PathVariable("email") String email) {
+        log.info("Fetching customer by email: {}", email);
+        Customer customerDTO = customerService.getCustomerByEmail(email);
         log.info("Customer found: {}", customerDTO);
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }

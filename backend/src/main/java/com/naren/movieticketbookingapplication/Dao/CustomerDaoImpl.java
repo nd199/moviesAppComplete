@@ -1,6 +1,7 @@
 package com.naren.movieticketbookingapplication.Dao;
 
 import com.naren.movieticketbookingapplication.Entity.Customer;
+import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import com.naren.movieticketbookingapplication.Repo.CustomerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ public class CustomerDaoImpl implements CustomerDao {
         customerRepository.save(customer);
         log.info("Customer added successfully: {}", customer);
     }
+
 
     @Override
     public Optional<Customer> getCustomer(Long customerId) {
@@ -75,15 +77,21 @@ public class CustomerDaoImpl implements CustomerDao {
     }
 
     @Override
-    public Optional<Customer> getCustomerByUsername(String email) {
+    public Customer getCustomerByEmail(String email) {
         log.info("Fetching customer by username (email): {}", email);
-        Optional<Customer> customer = customerRepository.findCustomerByEmail(email);
-        log.info("Customer fetched by username '{}': {}", email, customer.orElse(null));
+        Customer customer = customerRepository.getCustomerByEmail(email).orElseThrow(() ->
+                new ResourceNotFoundException("Customer not found"));
+        log.info("Customer fetched by email '{}': {}", email, customer);
         return customer;
     }
 
     @Override
     public Optional<Customer> getCustomerByPhoneNumber(Long phoneNumber) {
         return customerRepository.getCustomerByPhoneNumber(phoneNumber);
+    }
+
+    @Override
+    public Customer getCustomerByVerificationToken(String verificationToken) {
+        return customerRepository.findCustomerByVerificationToken(verificationToken);
     }
 }

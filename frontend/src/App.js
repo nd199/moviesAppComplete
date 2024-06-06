@@ -4,7 +4,6 @@ import AboutUs from "./Pages/AboutUs";
 import Movies from "./Pages/Movies";
 import Shows from "./Pages/Shows";
 import VideoFullScreen from "./Pages/VideoFullScreen";
-
 import {BrowserRouter as Router, Route, Routes,} from "react-router-dom";
 
 function AppWithNavigation() {

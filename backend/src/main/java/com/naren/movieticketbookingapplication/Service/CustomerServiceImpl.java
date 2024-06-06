@@ -13,9 +13,8 @@ import com.naren.movieticketbookingapplication.Exception.ResourceAlreadyExists;
 import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
-import com.naren.movieticketbookingapplication.Record.UserLogin;
+import com.naren.movieticketbookingapplication.Utilities.EmailService;
 import com.naren.movieticketbookingapplication.jwt.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -41,14 +39,18 @@ public class CustomerServiceImpl implements CustomerService {
     private final RoleService roleService;
     private final MovieDao movieDao;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
 
-    public CustomerServiceImpl(CustomerDao customerDao, PasswordEncoder passwordEncoder, CustomerDTOMapper customerDTOMapper, RoleService roleService, MovieDao movieDao, JwtUtil jwtUtil) {
+    public CustomerServiceImpl(CustomerDao customerDao, PasswordEncoder passwordEncoder,
+                               CustomerDTOMapper customerDTOMapper, RoleService roleService,
+                               MovieDao movieDao, JwtUtil jwtUtil, EmailService emailService) {
         this.customerDao = customerDao;
         this.passwordEncoder = passwordEncoder;
         this.customerDTOMapper = customerDTOMapper;
         this.roleService = roleService;
         this.movieDao = movieDao;
         this.jwtUtil = jwtUtil;
+        this.emailService = emailService;
     }
 
     @Override
@@ -58,6 +60,22 @@ public class CustomerServiceImpl implements CustomerService {
         if (roleService.existsByName(role))
             throw new ResourceAlreadyExists("Role already exists");
         roleService.saveRole(role);
+    }
+
+    @Override
+    public Customer getCustomerByEmail(String email) {
+        return customerDao.getCustomerByEmail(email);
+    }
+
+    @Override
+    public boolean verifyEmail(String verificationToken) {
+        Customer customer = customerDao.getCustomerByVerificationToken(verificationToken);
+        if (customer != null && !customer.getIsEmailVerified()) {
+            customer.setIsEmailVerified(true);
+            customerDao.updateCustomer(customer);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -78,30 +96,18 @@ public class CustomerServiceImpl implements CustomerService {
         roleService.deleteRole(id);
     }
 
-    @Override
-    public Customer loginUser(UserLogin userLogin, HttpServletRequest request) {
-        Optional<Customer> customer = Optional.empty();
+    //Registration
 
-        if (userLogin == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        }
-        if (userLogin.email() == null) {
-            customer = customerDao.getCustomerByPhoneNumber(userLogin.phoneNumber());
-        } else if (userLogin.phoneNumber() == null) {
-            customer = customerDao.getCustomerByUsername(userLogin.email());
-        }
-
-        String AuthHeader = request.getHeader("Authorization");
-
-        return null;
-    }
 
     @Override
     public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration,
                                           Set<String> roleNames) {
 
+        //Create Customer from registration request
+
         Customer registeredCustomer = registerCustomer(customerRegistration);
 
+        //get the Roles
         Set<Role> roles = new HashSet<>();
 
         for (String roleName : roleNames) {
@@ -112,14 +118,35 @@ public class CustomerServiceImpl implements CustomerService {
             roles.add(role);
         }
 
+        //add Role to the customer
+
         roles.forEach(registeredCustomer::addRole);
 
+
+        //Generate Verification Token
+        String verificationToken = jwtUtil.generateRandomVerificationToken();
+        registeredCustomer.setVerificationToken(verificationToken);
+        registeredCustomer.setIsEmailVerified(false);
+
+        //add Customer to repo
         customerDao.addCustomer(registeredCustomer);
 
-        String token = jwtUtil.issueToken(registeredCustomer.getUsername(), roles);
+        //Generate JWT Token
+        String authenticateToken = jwtUtil.issueGeneralToken(registeredCustomer.getEmail(), roles,
+                registeredCustomer.getCustomer_id());
+
+        String EmailVerificationToken = jwtUtil.issueEmailToken(
+                registeredCustomer.getEmail(), registeredCustomer.getCustomer_id(),
+                false, verificationToken);
+
+        //Send the Verification Email with JWT Token
+
+        String verificationURL = "http://localhost:8080/verify-email?token=" + EmailVerificationToken;
+        emailService.sendVerificationEmail(registeredCustomer.getEmail(), verificationURL);
+
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .header(HttpHeaders.AUTHORIZATION, token)
+                .header(HttpHeaders.AUTHORIZATION, authenticateToken)
                 .body("Customer registered successfully!");
     }
 
@@ -158,6 +185,9 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
 
+    ///Registration Ends
+
+
     @Override
     public CustomerDTO getCustomerById(Long customerId) {
         log.info("Fetching customer by ID: {}", customerId);
@@ -190,6 +220,11 @@ public class CustomerServiceImpl implements CustomerService {
         }
         if (request.phoneNumber() != null && !request.phoneNumber().equals(customer.getPhoneNumber())) {
             customer.setPhoneNumber(request.phoneNumber());
+            changes = true;
+        }
+
+        if (request.isVerified() != null && !request.isVerified().equals(customer.getIsEmailVerified())) {
+            customer.setIsEmailVerified(request.isVerified());
             changes = true;
         }
 

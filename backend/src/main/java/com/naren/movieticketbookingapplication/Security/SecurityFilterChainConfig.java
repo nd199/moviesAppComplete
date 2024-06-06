@@ -37,8 +37,10 @@ public class SecurityFilterChainConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers(HttpMethod.POST, "/api/v1/customers", "api/v1/admins").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/verify-email", "api/v1/customers/email/{email}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/movies", "api/v1/movies/{id}").permitAll()
                         .requestMatchers(HttpMethod.PUT, "api/v1/customers/add-movie/{customerId}/{movieId}").permitAll()
+                        .requestMatchers("/favicon.ico").permitAll()
 
                         // Admin-only endpoints
                         .requestMatchers(HttpMethod.POST, "/api/v1/roles", "/api/v1/movies").hasRole("ADMIN")

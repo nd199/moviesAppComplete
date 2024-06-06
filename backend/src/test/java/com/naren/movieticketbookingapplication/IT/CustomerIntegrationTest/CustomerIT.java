@@ -302,7 +302,7 @@ public class CustomerIT {
 
 
         CustomerUpdateRequest update = new
-                CustomerUpdateRequest(newName, registration.email(), registration.phoneNumber());
+                CustomerUpdateRequest(newName, registration.email(), registration.phoneNumber(), false);
 
 
         webTestClient.put()
@@ -331,7 +331,8 @@ public class CustomerIT {
                 customerId,
                 newName, registration.email(), List.of("ROLE_USER"), registration.phoneNumber(),
                 registration.email(),
-                List.of()
+                List.of(),
+                false
         );
 
         assertThat(actual).usingRecursiveComparison()

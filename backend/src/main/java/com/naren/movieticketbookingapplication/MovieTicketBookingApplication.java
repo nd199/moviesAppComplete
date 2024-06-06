@@ -43,7 +43,7 @@ public class MovieTicketBookingApplication {
         String password = encoder.encode(FAKER.internet().password(8, 12));
         Long phoneNumber = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
 
-        Customer customer = new Customer(customerName, customerEmail, password, phoneNumber);
+        Customer customer = new Customer(customerName, customerEmail, password, phoneNumber, false);
         customerRepository.save(customer);
 
         log.info("Created new customer: {}", customer);

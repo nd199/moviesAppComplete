@@ -5,8 +5,6 @@ import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
-import com.naren.movieticketbookingapplication.Record.UserLogin;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -31,13 +29,15 @@ public interface CustomerService {
 
     void addRole(Role role);
 
+    Customer getCustomerByEmail(String email);
+
+    boolean verifyEmail(String verificationToken);
+
     List<Role> getRoles();
 
     Role getRoleById(Long id);
 
     void removeRole(Long id);
-
-    Customer loginUser(UserLogin userLogin, HttpServletRequest request);
 
     void removeAllMovies(Long customerId);
 }
