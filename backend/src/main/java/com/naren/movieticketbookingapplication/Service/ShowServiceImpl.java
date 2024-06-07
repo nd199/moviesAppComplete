@@ -7,9 +7,9 @@ import com.naren.movieticketbookingapplication.Exception.ResourceAlreadyExists;
 import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import com.naren.movieticketbookingapplication.Record.ShowRegistration;
 import com.naren.movieticketbookingapplication.Record.ShowUpdation;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,7 +41,13 @@ public class ShowServiceImpl implements ShowService {
         return new Show(
                 registration.name(),
                 registration.cost(),
-                registration.rating()
+                registration.rating(),
+                registration.description(),
+                registration.poster(),
+                registration.ageRating(),
+                registration.year(),
+                registration.runtime(),
+                registration.genre()
         );
     }
 
@@ -97,10 +103,47 @@ public class ShowServiceImpl implements ShowService {
             changes = true;
             show.setRating(update.rating());
         }
+        if (update.description() != null && !update.description().equals(show.getDescription())) {
+            changes = true;
+            show.setDescription(update.description());
+        }
+        if (update.poster() != null && !update.poster().equals(show.getPoster())) {
+            changes = true;
+            show.setPoster(update.poster());
+        }
+        if (update.ageRating() != null && !update.ageRating().equals(show.getAgeRating())) {
+            changes = true;
+            show.setAgeRating(update.ageRating());
+        }
+        if (update.year() != null && !update.year().equals(show.getYear())) {
+            changes = true;
+            show.setYear(update.year());
+        }
+        if (update.runtime() != null && !update.runtime().equals(show.getRuntime())) {
+            changes = true;
+            show.setRuntime(update.runtime());
+        }
+        if (update.genre() != null && !update.genre().equals(show.getGenre())) {
+            changes = true;
+            show.setGenre(update.genre());
+        }
+
         if (!changes) {
             throw new RequestValidationException("No data changes found");
         }
         showDao.updateShow(show);
         log.info("Show updated successfully: {}", show);
+    }
+
+    @Override
+    public List<Show> getShowsByYear(Integer year) {
+        log.info("Fetching shows by year: {}", year);
+        return showDao.getShowsByYear(year);
+    }
+
+    @Override
+    public List<Show> getShowsByAgeRating(String ageRating) {
+        log.info("Fetching shows by age rating: {}", ageRating);
+        return showDao.getShowsByAgeRating(ageRating);
     }
 }

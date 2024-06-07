@@ -35,17 +35,58 @@ public class Movie {
     @Column(name = "rating", nullable = false)
     private Double rating;
 
+    @Column(nullable = false)
+    private String description;
+
+    @Column(nullable = false)
+    private String poster;
+
+    @Column(nullable = false)
+    private String ageRating;
+
+    @Column(nullable = false)
+    private Integer year;
+
+    @Column(nullable = false)
+    private String runtime;
+
+    @Column(nullable = false)
+    private String genre;
+
+
     @ManyToOne
     @JoinColumn(name = "customer_id",
             foreignKey = @ForeignKey(name = "fk_customer_movie_id"))
     @JsonBackReference
     private Customer customer;
 
-    public Movie(Long movie_id, String name, Double cost, Double rating) {
+    public Movie(Long movie_id, String name, Double cost, Double rating,
+                 String description, String poster, String ageRating,
+                 Integer year, String runtime, String genre) {
         this.movie_id = movie_id;
         this.name = name;
         this.cost = cost;
         this.rating = rating;
+        this.description = description;
+        this.poster = poster;
+        this.ageRating = ageRating;
+        this.year = year;
+        this.runtime = runtime;
+        this.genre = genre;
+    }
+
+    public Movie(String name, Double cost, Double rating, String description,
+                 String poster, String ageRating,
+                 Integer year, String runtime, String genre) {
+        this.name = name;
+        this.cost = cost;
+        this.rating = rating;
+        this.description = description;
+        this.poster = poster;
+        this.ageRating = ageRating;
+        this.year = year;
+        this.runtime = runtime;
+        this.genre = genre;
     }
 
     public Movie(String name, Double cost, Double rating) {
@@ -55,13 +96,19 @@ public class Movie {
     }
 
     @Override
-    public String
-    toString() {
+    public String toString() {
         return "Movie{" +
                 "movie_id=" + movie_id +
                 ", name='" + name + '\'' +
                 ", cost=" + cost +
                 ", rating=" + rating +
+                ", description='" + description + '\'' +
+                ", poster='" + poster + '\'' +
+                ", ageRating='" + ageRating + '\'' +
+                ", year=" + year +
+                ", runtime='" + runtime + '\'' +
+                ", genre='" + genre + '\'' +
+                ", customer=" + customer +
                 '}';
     }
 
@@ -70,11 +117,11 @@ public class Movie {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Movie movie = (Movie) o;
-        return Objects.equals(movie_id, movie.movie_id) && Objects.equals(name, movie.name) && Objects.equals(cost, movie.cost) && Objects.equals(rating, movie.rating);
+        return Objects.equals(movie_id, movie.movie_id) && Objects.equals(name, movie.name) && Objects.equals(cost, movie.cost) && Objects.equals(rating, movie.rating) && Objects.equals(description, movie.description) && Objects.equals(poster, movie.poster) && Objects.equals(ageRating, movie.ageRating) && Objects.equals(year, movie.year) && Objects.equals(runtime, movie.runtime) && Objects.equals(genre, movie.genre) && Objects.equals(customer, movie.customer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(movie_id, name, cost, rating);
+        return Objects.hash(movie_id, name, cost, rating, description, poster, ageRating, year, runtime, genre, customer);
     }
 }

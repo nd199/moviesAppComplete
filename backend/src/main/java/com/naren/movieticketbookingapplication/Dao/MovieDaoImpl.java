@@ -65,4 +65,16 @@ public class MovieDaoImpl implements MovieDao {
         log.info("Fetched {} movies", movieList.size());
         return movieList;
     }
+
+    @Override
+    public List<Movie> getMoviesByYear(Integer year) {
+        log.info("Fetching movies by year: {}", year);
+        return movieRepository.findByYear(year);
+    }
+
+    @Override
+    public List<Movie> getMoviesByAgeRating(String ageRating) {
+        log.info("Fetching movies by age rating: {}", ageRating);
+        return movieRepository.findByAgeRating(ageRating);
+    }
 }

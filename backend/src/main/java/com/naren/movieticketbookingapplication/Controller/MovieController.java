@@ -27,7 +27,7 @@ public class MovieController {
         log.info("Received request to create movie with registration: {}", registration);
         movieService.addMovie(registration);
         log.info("Movie created successfully");
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/movies/{id}")

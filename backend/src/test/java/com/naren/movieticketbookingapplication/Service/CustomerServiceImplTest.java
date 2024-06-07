@@ -63,7 +63,8 @@ class CustomerServiceImplTest {
         String email = "test@example.com";
         String password = "password";
         String encodedPassword = passwordEncoder.encode(password);
-        CustomerRegistration registration = new CustomerRegistration("testName", email, password, 20220292232L);
+        CustomerRegistration registration = new CustomerRegistration("test",
+                email, password,22222222222L, false, false);
 
         when(customerDao.existsByEmail(email)).thenReturn(false);
         when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
@@ -82,10 +83,12 @@ class CustomerServiceImplTest {
         verify(customerDao).addCustomer(customerArgumentCaptor.capture());
 
         Customer capturedCustomer = customerArgumentCaptor.getValue();
-        assertThat(capturedCustomer.getName()).isEqualTo("testName");
         assertThat(capturedCustomer.getEmail()).isEqualTo(email);
+        assertThat(capturedCustomer.getName()).isEqualTo("test");
         assertThat(capturedCustomer.getPassword()).isEqualTo(encodedPassword);
-        assertThat(capturedCustomer.getPhoneNumber()).isEqualTo(20220292232L);
+        assertThat(capturedCustomer.getPhoneNumber()).isEqualTo(22222222222L);
+        assertThat(capturedCustomer.getIsEmailVerified()).isEqualTo(false);
+        assertThat(capturedCustomer.getIsPhoneVerified()).isEqualTo(false);
         verify(roleService).findRoleByName("ROLE_USER");
         assertThat(capturedCustomer.getRoles()).contains(role);
     }
@@ -93,7 +96,7 @@ class CustomerServiceImplTest {
     @Test
     void registerUser_InvalidRoleName_ReturnsBadRequest() {
 
-        CustomerRegistration registration = new CustomerRegistration("John Doe", "johndoe@example.com", "password", 1234567890L);
+        CustomerRegistration registration = new CustomerRegistration("John Doe", "johndoe@example.com", "password", 1234567890L, false, false);
         Set<String> roleNames = new HashSet<>();
         roleNames.add("INVALID_ROLE");
 
@@ -109,7 +112,7 @@ class CustomerServiceImplTest {
 
     @Test
     void registerCustomerPersonalInfoInPasswordThrowsException() {
-        CustomerRegistration registration = new CustomerRegistration("testName", "testEmail", "testName123", 1234567890L);
+        CustomerRegistration registration = new CustomerRegistration("testName", "testEmail", "testName123", 1234567890L, false, false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(PasswordInvalidException.class)
@@ -120,7 +123,7 @@ class CustomerServiceImplTest {
 
     @Test
     void registerCustomerInvalidPasswordLengthThrowsException() {
-        CustomerRegistration registration = new CustomerRegistration("testName", "test@example.com", "pass", 20220292232L);
+        CustomerRegistration registration = new CustomerRegistration("testName", "test@example.com", "pass", 20220292232L, false, false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(PasswordInvalidException.class)
@@ -134,7 +137,7 @@ class CustomerServiceImplTest {
         String email = "test@example.com";
         when(customerDao.existsByEmail(email)).thenReturn(true);
 
-        CustomerRegistration registration = new CustomerRegistration("testName", email, "testpassword", 20220292232L);
+        CustomerRegistration registration = new CustomerRegistration("testName", email, "testpassword", 20220292232L, false, false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(ResourceAlreadyExists.class)
@@ -148,7 +151,7 @@ class CustomerServiceImplTest {
 
         CustomerRegistration registration =
                 new CustomerRegistration("testName", "test@example.com",
-                        "testPassword", 1234567890L);
+                        "testPassword", 1234567890L, false, false);
         when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(true);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
@@ -331,7 +334,7 @@ class CustomerServiceImplTest {
     @Test
     void addMovieToCustomer() {
         Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L);
-        Movie movie = new Movie(1L, "testName", 230.00, 9.00);
+        Movie movie = new Movie(1L, "testName", 230.00, 9.00, "none", "none", "none", 2000, "none", "none");
 
         when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
         when(movieDao.getMovieById(1L)).thenReturn(Optional.of(movie));
@@ -351,7 +354,7 @@ class CustomerServiceImplTest {
     @Test
     void addMovieToCustomerThrowsIfMovieExists() {
         Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L);
-        Movie movie = new Movie(1L, "testName", 230.00, 9.00);
+        Movie movie = new Movie(1L, "testName", 230.00, 9.00, "none", "none", "none", 2000, "none", "none");
 
         when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
         when(movieDao.getMovieById(1L)).thenReturn(Optional.of(movie));
@@ -368,7 +371,7 @@ class CustomerServiceImplTest {
     @Test
     void removeMovieFromCustomerRemovesMovieFromCustomer() {
         Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L);
-        Movie movie = new Movie(1L, "testMovie", 230.00, 9.00);
+        Movie movie = new Movie(1L, "testMovie", 230.00, 9.00, "none", "none", "none", 2000, "none", "none");
 
         when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
         when(movieDao.getMovieById(1L)).thenReturn(Optional.of(movie));
@@ -390,7 +393,7 @@ class CustomerServiceImplTest {
     @Test
     void removeMovieFromCustomerThrowsResourceNotFoundExceptionNotFound() {
         Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L);
-        Movie movie = new Movie(1L, "testMovie", 230.00, 9.00);
+        Movie movie = new Movie(1L, "testMovie", 230.00, 9.00, "none", "none", "none", 2000, "none", "none");
 
         when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
         when(movieDao.getMovieById(1L)).thenReturn(Optional.of(movie));

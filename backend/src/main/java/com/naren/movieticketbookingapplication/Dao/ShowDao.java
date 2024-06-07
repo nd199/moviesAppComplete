@@ -12,10 +12,14 @@ public interface ShowDao {
 
     Optional<Show> getShowById(Long id);
 
-    void updateShow(Show update);
+    void updateShow(Show show);
 
     boolean existsByName(String name);
 
     List<Show> getShowList();
+
+    List<Show> getShowsByYear(Integer year);
+
+    List<Show> getShowsByAgeRating(String ageRating);
 }
 

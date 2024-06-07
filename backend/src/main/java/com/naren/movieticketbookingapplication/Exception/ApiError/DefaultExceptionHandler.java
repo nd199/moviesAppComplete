@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
-@Slf4j  // Add this annotation to enable logging
+@Slf4j
 public class DefaultExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)

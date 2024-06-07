@@ -7,9 +7,9 @@ import com.naren.movieticketbookingapplication.Exception.ResourceAlreadyExists;
 import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import com.naren.movieticketbookingapplication.Record.MovieRegistration;
 import com.naren.movieticketbookingapplication.Record.MovieUpdation;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,7 +41,13 @@ public class MovieServiceImpl implements MovieService {
         return new Movie(
                 registration.name(),
                 registration.cost(),
-                registration.rating()
+                registration.rating(),
+                registration.description(),
+                registration.poster(),
+                registration.ageRating(),
+                registration.year(),
+                registration.runtime(),
+                registration.genre()
         );
     }
 
@@ -97,10 +103,47 @@ public class MovieServiceImpl implements MovieService {
             changes = true;
             movie.setRating(update.rating());
         }
+        if (update.description() != null && !update.description().equals(movie.getDescription())) {
+            changes = true;
+            movie.setDescription(update.description());
+        }
+        if (update.poster() != null && !update.poster().equals(movie.getPoster())) {
+            changes = true;
+            movie.setPoster(update.poster());
+        }
+        if (update.ageRating() != null && !update.ageRating().equals(movie.getAgeRating())) {
+            changes = true;
+            movie.setAgeRating(update.ageRating());
+        }
+        if (update.year() != null && !update.year().equals(movie.getYear())) {
+            changes = true;
+            movie.setYear(update.year());
+        }
+        if (update.runtime() != null && !update.runtime().equals(movie.getRuntime())) {
+            changes = true;
+            movie.setRuntime(update.runtime());
+        }
+        if (update.genre() != null && !update.genre().equals(movie.getGenre())) {
+            changes = true;
+            movie.setGenre(update.genre());
+        }
+
         if (!changes) {
             throw new RequestValidationException("No data changes found");
         }
         movieDao.updateMovie(movie);
         log.info("Movie updated successfully: {}", movie);
+    }
+
+    @Override
+    public List<Movie> getMoviesByYear(Integer year) {
+        log.info("Fetching movies by year: {}", year);
+        return movieDao.getMoviesByYear(year);
+    }
+
+    @Override
+    public List<Movie> getMoviesByAgeRating(String ageRating) {
+        log.info("Fetching movies by age rating: {}", ageRating);
+        return movieDao.getMoviesByAgeRating(ageRating);
     }
 }

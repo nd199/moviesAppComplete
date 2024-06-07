@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public interface MovieService {
-    void addMovie(MovieRegistration Registration);
+    void addMovie(MovieRegistration registration);
 
     void removeMovie(Long id);
 
@@ -17,4 +17,8 @@ public interface MovieService {
     List<Movie> getMovieList();
 
     void updateMovie(MovieUpdation update, Long movieId);
+
+    List<Movie> getMoviesByYear(Integer year);
+
+    List<Movie> getMoviesByAgeRating(String ageRating);
 }

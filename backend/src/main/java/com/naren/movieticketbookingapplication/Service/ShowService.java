@@ -6,9 +6,8 @@ import com.naren.movieticketbookingapplication.Record.ShowUpdation;
 
 import java.util.List;
 
-
 public interface ShowService {
-    void addShow(ShowRegistration Registration);
+    void addShow(ShowRegistration registration);
 
     void removeShow(Long id);
 
@@ -17,4 +16,8 @@ public interface ShowService {
     List<Show> getShowList();
 
     void updateShow(ShowUpdation update, Long showId);
+
+    List<Show> getShowsByYear(Integer year);
+
+    List<Show> getShowsByAgeRating(String ageRating);
 }
