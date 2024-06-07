@@ -146,4 +146,83 @@ public class ShowServiceImpl implements ShowService {
         log.info("Fetching shows by age rating: {}", ageRating);
         return showDao.getShowsByAgeRating(ageRating);
     }
+
+    @Override
+    public List<Show> findByRatingGreaterThanEqual(Double rating) {
+        log.info("Fetching shows with rating greater than or equal to: {}", rating);
+        return showDao.findByRatingGreaterThanEqual(rating);
+    }
+
+    @Override
+    public List<Show> findByRatingLessThanEqual(Double rating) {
+        log.info("Fetching shows with rating less than or equal to: {}", rating);
+        return showDao.findByRatingLessThanEqual(rating);
+    }
+
+    @Override
+    public List<Show> findByCostBetween(Double minCost, Double maxCost) {
+        log.info("Fetching shows with cost between {} and {}", minCost, maxCost);
+        return showDao.findByCostBetween(minCost, maxCost);
+    }
+
+    @Override
+    public List<Show> findAllByOrderByNameAsc() {
+        log.info("Fetching all shows ordered by name in ascending order");
+        return showDao.findAllByOrderByNameAsc();
+    }
+
+    @Override
+    public List<Show> findAllByOrderByNameDesc() {
+        log.info("Fetching all shows ordered by name in descending order");
+        return showDao.findAllByOrderByNameDesc();
+    }
+
+    @Override
+    public List<Show> findAllByOrderByCostAsc() {
+        log.info("Fetching all shows ordered by cost in ascending order");
+        return showDao.findAllByOrderByCostAsc();
+    }
+
+    @Override
+    public List<Show> findAllByOrderByCostDesc() {
+        log.info("Fetching all shows ordered by cost in descending order");
+        return showDao.findAllByOrderByCostDesc();
+    }
+
+    @Override
+    public List<Show> findAllByOrderByRatingAsc() {
+        log.info("Fetching all shows ordered by rating in ascending order");
+        return showDao.findAllByOrderByRatingAsc();
+    }
+
+    @Override
+    public List<Show> findAllByOrderByRatingDesc() {
+        log.info("Fetching all shows ordered by rating in descending order");
+        return showDao.findAllByOrderByRatingDesc();
+    }
+
+    @Override
+    public List<Show> findAllByOrderByYearAsc() {
+        log.info("Fetching all shows ordered by year in ascending order");
+        return showDao.findAllByOrderByYearAsc();
+    }
+
+    @Override
+    public List<Show> findAllByOrderByYearDesc() {
+        log.info("Fetching all shows ordered by year in descending order");
+        return showDao.findAllByOrderByYearDesc();
+    }
+
+    @Override
+    public List<Show> findAllByOrderByGenreAsc() {
+        log.info("Fetching all shows ordered by genre in ascending order");
+        return showDao.findAllByOrderByGenreAsc();
+    }
+
+    @Override
+    public List<Show> findAllByOrderByGenreDesc() {
+        log.info("Fetching all shows ordered by genre in descending order");
+        return showDao.findAllByOrderByGenreDesc();
+    }
+
 }

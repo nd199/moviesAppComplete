@@ -15,10 +15,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -174,6 +177,38 @@ class MovieServiceImplTest {
         assertThat(updatedMovie.getGenre()).isEqualTo(movieUpdation.genre());
     }
 
+
+    @Test
+    void testUpdateMovieNoChanges() {
+        Movie movie = new Movie();
+        MovieUpdation update = new MovieUpdation(null, null, null, null, null, null, null, null, null);
+        Long movieId = 1L;
+
+        when(movieDao.getMovieById(movieId)).thenReturn(java.util.Optional.ofNullable(movie));
+
+        assertThatThrownBy
+                (() -> underTest.updateMovie(update, movieId))
+                .hasMessage("No data changes found");
+
+        verify(movieDao, never()).updateMovie(movie);
+    }
+
+    @Test
+    void testUpdateMovieMovieNotFound() {
+        Long movieId = 1L;
+
+        when(movieDao.getMovieById(movieId)).thenReturn(java.util.Optional.empty());
+
+        assertThatThrownBy(() -> underTest.updateMovie(
+                new MovieUpdation("Hello", 100.0, 4.5, "New Description", "New Poster",
+                        "New Age Rating", 2000, "New Runtime", "New Genre"), movieId))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Movie not found");
+
+        verify(movieDao, never()).updateMovie(any());
+    }
+
+
     @Test
     void throwsIfNoChangesFoundForUpdation() {
         long id = 2;
@@ -210,5 +245,236 @@ class MovieServiceImplTest {
                 .hasMessageContaining("Movie not found");
 
         verify(movieDao, never()).updateMovie(any());
+    }
+
+    @Test
+    void testGetMoviesByYear() {
+        int year = 2021;
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
+                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+        );
+
+        when(movieDao.getMoviesByYear(year)).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.getMoviesByYear(year);
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testGetMoviesByAgeRating() {
+        String ageRating = "PG-13";
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
+                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+        );
+
+        when(movieDao.getMoviesByAgeRating(ageRating)).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.getMoviesByAgeRating(ageRating);
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindByRatingGreaterThanEqual() {
+        double rating = 4.5;
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
+                new Movie("Movie2", 10.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+        );
+
+        when(movieDao.findByRatingGreaterThanEqual(rating)).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findByRatingGreaterThanEqual(rating);
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindByRatingLessThanEqual() {
+        double rating = 4.5;
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie1", 10.0, 4.2, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
+                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+        );
+
+        when(movieDao.findByRatingLessThanEqual(rating)).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findByRatingLessThanEqual(rating);
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindByCostBetween() {
+        double minCost = 5.0;
+        double maxCost = 15.0;
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+        );
+
+        when(movieDao.findByCostBetween(minCost, maxCost)).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findByCostBetween(minCost, maxCost);
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindAllByOrderByNameAsc() {
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+        );
+
+        when(movieDao.findAllByOrderByNameAsc()).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findAllByOrderByNameAsc();
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindAllByOrderByNameDesc() {
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama"),
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action")
+        );
+
+        when(movieDao.findAllByOrderByNameDesc()).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findAllByOrderByNameDesc();
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindAllByOrderByCostAsc() {
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+        );
+
+        when(movieDao.findAllByOrderByCostAsc()).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findAllByOrderByCostAsc();
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindAllByOrderByCostDesc() {
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama"),
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action")
+        );
+
+        when(movieDao.findAllByOrderByCostDesc()).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findAllByOrderByCostDesc();
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindAllByOrderByRatingAsc() {
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+        );
+
+        when(movieDao.findAllByOrderByRatingAsc()).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findAllByOrderByRatingAsc();
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindAllByOrderByRatingDesc() {
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama"),
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action")
+        );
+
+        when(movieDao.findAllByOrderByRatingDesc()).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findAllByOrderByRatingDesc();
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindAllByOrderByYearAsc() {
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+        );
+
+        when(movieDao.findAllByOrderByYearAsc()).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findAllByOrderByYearAsc();
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindAllByOrderByYearDesc() {
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama"),
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action")
+        );
+
+        when(movieDao.findAllByOrderByYearDesc()).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findAllByOrderByYearDesc();
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindAllByOrderByGenreAsc() {
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+        );
+
+        when(movieDao.findAllByOrderByGenreAsc()).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findAllByOrderByGenreAsc();
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
+    }
+
+    @Test
+    void testFindAllByOrderByGenreDesc() {
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama"),
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action")
+        );
+
+        when(movieDao.findAllByOrderByGenreDesc()).thenReturn(expectedMovies);
+
+        List<Movie> actualMovies = underTest.findAllByOrderByGenreDesc();
+
+        assertEquals(expectedMovies.size(), actualMovies.size());
+        assertEquals(expectedMovies, actualMovies);
     }
 }

@@ -146,4 +146,82 @@ public class MovieServiceImpl implements MovieService {
         log.info("Fetching movies by age rating: {}", ageRating);
         return movieDao.getMoviesByAgeRating(ageRating);
     }
+
+    @Override
+    public List<Movie> findByRatingGreaterThanEqual(Double rating) {
+        log.info("Fetching movies with rating greater than or equal to: {}", rating);
+        return movieDao.findByRatingGreaterThanEqual(rating);
+    }
+
+    @Override
+    public List<Movie> findByRatingLessThanEqual(Double rating) {
+        log.info("Fetching movies with rating less than or equal to: {}", rating);
+        return movieDao.findByRatingLessThanEqual(rating);
+    }
+
+    @Override
+    public List<Movie> findByCostBetween(Double minCost, Double maxCost) {
+        log.info("Fetching movies with cost between {} and {}", minCost, maxCost);
+        return movieDao.findByCostBetween(minCost, maxCost);
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByNameAsc() {
+        log.info("Fetching all movies ordered by name in ascending order");
+        return movieDao.findAllByOrderByNameAsc();
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByNameDesc() {
+        log.info("Fetching all movies ordered by name in descending order");
+        return movieDao.findAllByOrderByNameDesc();
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByCostAsc() {
+        log.info("Fetching all movies ordered by cost in ascending order");
+        return movieDao.findAllByOrderByCostAsc();
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByCostDesc() {
+        log.info("Fetching all movies ordered by cost in descending order");
+        return movieDao.findAllByOrderByCostDesc();
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByRatingAsc() {
+        log.info("Fetching all movies ordered by rating in ascending order");
+        return movieDao.findAllByOrderByRatingAsc();
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByRatingDesc() {
+        log.info("Fetching all movies ordered by rating in descending order");
+        return movieDao.findAllByOrderByRatingDesc();
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByYearAsc() {
+        log.info("Fetching all movies ordered by year in ascending order");
+        return movieDao.findAllByOrderByYearAsc();
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByYearDesc() {
+        log.info("Fetching all movies ordered by year in descending order");
+        return movieDao.findAllByOrderByYearDesc();
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByGenreAsc() {
+        log.info("Fetching all movies ordered by genre in ascending order");
+        return movieDao.findAllByOrderByGenreAsc();
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByGenreDesc() {
+        log.info("Fetching all movies ordered by genre in descending order");
+        return movieDao.findAllByOrderByGenreDesc();
+    }
 }
