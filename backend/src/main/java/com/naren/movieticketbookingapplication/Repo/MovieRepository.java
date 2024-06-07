@@ -24,4 +24,23 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     List<Movie> findByCostBetween(Double minCost, Double maxCost);
 
+    List<Movie> findAllByOrderByNameAsc();
+
+    List<Movie> findAllByOrderByNameDesc();
+
+    List<Movie> findAllByOrderByCostAsc();
+
+    List<Movie> findAllByOrderByCostDesc();
+
+    List<Movie> findAllByOrderByRatingAsc();
+
+    List<Movie> findAllByOrderByRatingDesc();
+
+    List<Movie> findAllByOrderByYearAsc();
+
+    List<Movie> findAllByOrderByYearDesc();
+
+    List<Movie> findAllByOrderByGenreAsc();
+
+    List<Movie> findAllByOrderByGenreDesc();
 }

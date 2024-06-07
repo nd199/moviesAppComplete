@@ -8,6 +8,7 @@ import java.util.List;
 
 
 public interface MovieService {
+
     void addMovie(MovieRegistration registration);
 
     void removeMovie(Long id);
@@ -21,4 +22,30 @@ public interface MovieService {
     List<Movie> getMoviesByYear(Integer year);
 
     List<Movie> getMoviesByAgeRating(String ageRating);
+
+    List<Movie> findByRatingGreaterThanEqual(Double rating);
+
+    List<Movie> findByRatingLessThanEqual(Double rating);
+
+    List<Movie> findByCostBetween(Double minCost, Double maxCost);
+
+    List<Movie> findAllByOrderByNameAsc();
+
+    List<Movie> findAllByOrderByNameDesc();
+
+    List<Movie> findAllByOrderByCostAsc();
+
+    List<Movie> findAllByOrderByCostDesc();
+
+    List<Movie> findAllByOrderByRatingAsc();
+
+    List<Movie> findAllByOrderByRatingDesc();
+
+    List<Movie> findAllByOrderByYearAsc();
+
+    List<Movie> findAllByOrderByYearDesc();
+
+    List<Movie> findAllByOrderByGenreAsc();
+
+    List<Movie> findAllByOrderByGenreDesc();
 }

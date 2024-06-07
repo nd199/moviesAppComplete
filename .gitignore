@@ -13,5 +13,6 @@ frontend/node_modules/
 # Ignore build artifacts
 frontend/build/
 backend/target/
+backend/movieticketbookingapplication.iml
 
 >>>>>>> 4ee0c34 (backend and frontend ready just merging mut be done)
