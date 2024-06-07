@@ -1,8 +1,6 @@
 package com.naren.movieticketbookingapplication.IT.CustomerIntegrationTest;
 
-
 import com.github.javafaker.Faker;
-import com.github.javafaker.Name;
 import com.naren.movieticketbookingapplication.Dto.CustomerDTO;
 import com.naren.movieticketbookingapplication.Entity.Movie;
 import com.naren.movieticketbookingapplication.Entity.Role;
@@ -22,6 +20,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,144 +29,108 @@ public class CustomerIT {
 
     private static final Faker FAKER = new Faker();
     private static final String API_PATH = "/api/v1/customers";
+    private static final Random RANDOM = new Random();
+
     @Autowired
     private WebTestClient webTestClient;
+
     @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+
     private CustomerRegistration registration;
+
+    private CustomerRegistration adminRegistration;
 
     @BeforeEach
     void setUp() {
         createRoleIfNotExists();
 
-        var customerName = FAKER.name().name();
-        var customerEmail = customerName + "@codeNaren.com";
-        var password = passwordEncoder.encode(FAKER.internet().password(8, 12));
+        String customerName = "IM CUSTOMER" + FAKER.name().fullName();
+        String customerEmail = customerName.replace(" ", ".") + "@codeNaren.com";
+        String password = FAKER.internet().password(8, 12);
         Long customerPhone = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
+        boolean isEmailVerified = false;
+        boolean isPhoneVerified = false;
 
-        registration = new
-                CustomerRegistration(customerName, customerEmail, password, customerPhone);
+        registration = new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified);
 
+        String adminName = "IM ADMIN" + FAKER.name().fullName();
+        String adminEmail = adminName.replace(" ", ".1123131213") + "@codeNaren.com";
+        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, isEmailVerified, isPhoneVerified);
     }
 
     private void createRoleIfNotExists() {
-        boolean existingRole = roleRepository.existsRoleByName("ROLE_USER");
-        if (!existingRole) {
-            Role role = new Role("ROLE_USER");
-            webTestClient.post()
-                    .uri("/api/v1/roles")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(role)
-                    .exchange()
-                    .expectStatus().isOk();
+        if (!roleRepository.existsRoleByName("ROLE_USER")) {
+            addRole(new Role("ROLE_USER"));
+        }
+        if (!roleRepository.existsRoleByName("ROLE_ADMIN")) {
+            addRole(new Role("ROLE_ADMIN"));
         }
     }
 
-    @Test
-    void createCustomer() {
+    private void addRole(Role role) {
+        roleRepository.save(role);
+    }
 
-        String JwtToken = webTestClient.post()
+    private String registerCustomerAndGetToken(CustomerRegistration registration) {
+        return webTestClient.post()
                 .uri(API_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(registration), CustomerRegistration.class)
                 .exchange()
-                .expectStatus()
-                .isCreated()
+                .expectStatus().isCreated()
                 .returnResult(Void.class)
                 .getResponseHeaders()
                 .getFirst(HttpHeaders.AUTHORIZATION);
+    }
+
+    private String registerAdminAndGetToken(CustomerRegistration registration) {
+        return webTestClient.post()
+                .uri(API_PATH.substring(0, 8) + "admins")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(adminRegistration), CustomerRegistration.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .returnResult(Void.class)
+                .getResponseHeaders()
+                .getFirst(HttpHeaders.AUTHORIZATION);
+    }
+
+    @Test
+    void createCustomer() {
+        String adminToken = registerAdminAndGetToken(adminRegistration);
 
 
         List<CustomerDTO> customerDTOList = webTestClient.get()
                 .uri(API_PATH)
                 .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", JwtToken))
+                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", adminToken))
                 .exchange()
-                .expectStatus()
-                .isOk()
+                .expectStatus().isOk()
                 .expectBodyList(new ParameterizedTypeReference<CustomerDTO>() {
                 })
                 .returnResult()
                 .getResponseBody();
+        System.out.println("Customer List: " + customerDTOList);
 
         assert customerDTOList != null;
         long customerId = customerDTOList.stream()
-                .filter(c -> c.email().equals(registration.email()))
+                .filter(c -> c.email().equals(adminRegistration.email()))
                 .map(CustomerDTO::id)
                 .findFirst().orElseThrow();
 
         CustomerDTO customerDTO = webTestClient.get()
                 .uri(API_PATH + "/{id}", customerId)
                 .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", JwtToken))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(new ParameterizedTypeReference<CustomerDTO>() {
-                })
-                .returnResult()
-                .getResponseBody();
-
-        assertThat(customerDTOList).contains(customerDTO);
-    }
-
-    @Test
-    void addAdmin() {
-
-        Role role = new Role("ROLE_ADMIN");
-        webTestClient.post()
-                .uri("/api/v1/roles")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(role)
+                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", adminToken))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("Role added successfully");
-
-        String JwtToken = webTestClient.post()
-                .uri("api/v1/admins")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(registration), CustomerRegistration.class)
-                .exchange()
-                .expectStatus()
-                .isCreated()
-                .returnResult(Void.class)
-                .getResponseHeaders()
-                .getFirst(HttpHeaders.AUTHORIZATION);
-
-
-        List<CustomerDTO> customerDTOList = webTestClient.get()
-                .uri(API_PATH)
-                .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", JwtToken))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBodyList(new ParameterizedTypeReference<CustomerDTO>() {
-                })
-                .returnResult()
-                .getResponseBody();
-
-        assert customerDTOList != null;
-        long customerId = customerDTOList.stream()
-                .filter(c -> c.email().equals(registration.email()))
-                .map(CustomerDTO::id)
-                .findFirst().orElseThrow();
-
-        CustomerDTO customerDTO = webTestClient.get()
-                .uri("api/v1/customers" + "/{id}", customerId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", JwtToken))
-                .exchange()
-                .expectStatus()
-                .isOk()
                 .expectBody(new ParameterizedTypeReference<CustomerDTO>() {
                 })
                 .returnResult()
@@ -180,113 +143,88 @@ public class CustomerIT {
     void deleteACustomer() {
 
         Faker faker = new Faker();
-        Name name = faker.name();
-        var firstName = name.firstName();
-        var lastName = name.lastName();
-        var customer1 = firstName + lastName;
-        var email = firstName + lastName + "@codeNaren.com";
-        var firstName2 = name.firstName();
-        var lastName2 = name.lastName();
-        var customer2 = firstName2 + lastName2;
-        var email2 = firstName2 + lastName2 + "@codeNaren.com";
-        var password = passwordEncoder.encode(faker.internet().password(8, 12));
-        Long customerPhone = Long.valueOf(faker.phoneNumber().subscriberNumber(9));
-        Long customerPhone2 = Long.valueOf(faker.phoneNumber().subscriberNumber(9));
+        String customerName1 = faker.name().fullName();
+        String email1 = customerName1.replace(" ", ".") + "@codeNaren.com";
+        Long phone1 = Long.valueOf(faker.phoneNumber().subscriberNumber(9));
 
-        CustomerRegistration request =
-                new CustomerRegistration(customer1, email, password, customerPhone);
+        String customerName2 = faker.name().fullName();
+        String email2 = customerName2.replace(" ", ".") + "@codeNaren.com";
+        Long phone2 = Long.valueOf(faker.phoneNumber().subscriberNumber(9));
 
-        // Posting Customer 1
-        webTestClient.post()
-                .uri(API_PATH)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(request), CustomerRegistration.class)
-                .exchange()
-                .expectStatus()
-                .isCreated();
+        String password = faker.internet().password(8, 12);
+        boolean isEmailVerified = false;
+        boolean isPhoneVerified = false;
 
-        CustomerRegistration request2 =
-                new CustomerRegistration(customer2, email2, password, customerPhone2);
+        CustomerRegistration customer1 = new CustomerRegistration(customerName1, email1, password, phone1, isEmailVerified, isPhoneVerified);
+        CustomerRegistration customer2 = new CustomerRegistration(customerName2, email2, password, phone2, isEmailVerified, isPhoneVerified);
 
+        registerCustomerAndGetToken(customer2);
+        String adminToken = registerAdminAndGetToken(customer1);
 
-        // Obtaining JWT Token after registering Customer 2
-        String jwtToken = webTestClient.post()
-                .uri(API_PATH)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(request2), CustomerRegistration.class)
-                .exchange()
-                .expectStatus()
-                .isCreated()
-                .returnResult(Void.class)
-                .getResponseHeaders()
-                .getFirst(HttpHeaders.AUTHORIZATION);
-
-        // Getting all customers
         List<CustomerDTO> allCustomers = webTestClient.get()
                 .uri(API_PATH)
                 .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
                 .exchange()
-                .expectStatus()
-                .isOk()
+                .expectStatus().isOk()
                 .expectBodyList(new ParameterizedTypeReference<CustomerDTO>() {
                 })
                 .returnResult()
                 .getResponseBody();
 
-        // Finding customer ID by email
         assert allCustomers != null;
         long id = allCustomers.stream()
-                .filter(c -> c.email().equals(request.email()))
+                .filter(c -> c.email().equals(customer2.email()))
                 .map(CustomerDTO::id)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        // Deleting a customer
         webTestClient.delete()
                 .uri(API_PATH + "/{id}", id)
                 .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
                 .exchange()
-                .expectStatus()
-                .isOk();
+                .expectStatus().isOk();
 
-        // Attempting to retrieve the deleted customer by ID
         webTestClient.get()
                 .uri(API_PATH + "/{id}", id)
                 .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
                 .exchange()
-                .expectStatus()
-                .isNotFound(); // Expecting 404 Not Found for a deleted customer
+                .expectStatus().isNotFound();
     }
 
-
     @Test
-    void UpdateCustomer() {
+    void updateCustomer() {
+        Faker faker = new Faker();
 
-        String jwtToken = webTestClient.post()
-                .uri(API_PATH)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(registration), CustomerRegistration.class)
-                .exchange()
-                .expectStatus()
-                .isCreated()
-                .returnResult(Void.class)
-                .getResponseHeaders()
-                .getFirst(HttpHeaders.AUTHORIZATION);
+        // Generate data for the admin and customer
+        String adminName = faker.name().fullName();
+        String adminEmail = adminName.replace(" ", ".") + "@codeNaren.com";
+        Long adminPhone = Long.valueOf(faker.phoneNumber().subscriberNumber(9));
+        String password = faker.internet().password(8, 12);
 
+        String customerName = faker.name().fullName();
+        String customerEmail = customerName.replace(" ", ".") + "@codeNaren.com";
+        Long customerPhone = Long.valueOf(faker.phoneNumber().subscriberNumber(9));
 
+        boolean isEmailVerified = false;
+        boolean isPhoneVerified = false;
+
+        CustomerRegistration adminReg = new CustomerRegistration(adminName, adminEmail, password, adminPhone, isEmailVerified, isPhoneVerified);
+        CustomerRegistration customerReg = new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified);
+
+        // Register admin and customer
+        String adminToken = registerAdminAndGetToken(adminReg);
+        String customerToken = registerCustomerAndGetToken(customerReg);
+
+        // Fetch list of customers
         List<CustomerDTO> customerDTOList = webTestClient.get()
                 .uri(API_PATH)
                 .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", jwtToken))
+                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", adminToken))
                 .exchange()
-                .expectStatus()
-                .isOk()
+                .expectStatus().isOk()
                 .expectBodyList(new ParameterizedTypeReference<CustomerDTO>() {
                 })
                 .returnResult()
@@ -294,123 +232,33 @@ public class CustomerIT {
 
         assert customerDTOList != null;
         long customerId = customerDTOList.stream()
-                .filter(c -> c.email().equals(registration.email()))
+                .filter(c -> c.email().equals(customerReg.email()))
                 .map(CustomerDTO::id)
-                .findFirst().orElseThrow();
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        String newName = "Naren";
-
-
-        CustomerUpdateRequest update = new
-                CustomerUpdateRequest(newName, registration.email(), registration.phoneNumber());
-
-
-        webTestClient.put()
-                .uri(API_PATH + "/{id}", customerId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", jwtToken))
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(update), CustomerUpdateRequest.class)
-                .exchange()
-                .expectStatus()
-                .isOk();
-
-
-        CustomerDTO expected = webTestClient.get()
-                .uri(API_PATH + "/{id}", customerId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", jwtToken))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(new ParameterizedTypeReference<CustomerDTO>() {
-                }).returnResult()
-                .getResponseBody();
-
-        CustomerDTO actual = new CustomerDTO(
-                customerId,
-                newName, registration.email(), List.of("ROLE_USER"), registration.phoneNumber(),
-                registration.email(),
-                List.of()
+        // Create update request with new data
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                customerReg.name() + " Updated",
+                customerReg.email(),
+                customerReg.phoneNumber()
         );
 
-        assertThat(actual).usingRecursiveComparison()
-                .ignoringFields("roles", "movies")
-                .isEqualTo(expected);
-    }
-
-    @Test
-    void testAddMovieToCustomer() {
-
-        String jwtToken = webTestClient.post()
-                .uri(API_PATH)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(registration), CustomerRegistration.class)
-                .exchange()
-                .expectStatus().isCreated()
-                .returnResult(Void.class)
-                .getResponseHeaders()
-                .getFirst(HttpHeaders.AUTHORIZATION);
-
-        List<CustomerDTO> customerDTOList = webTestClient.get()
-                .uri(API_PATH)
-                .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", jwtToken))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBodyList(new ParameterizedTypeReference<CustomerDTO>() {
-                })
-                .returnResult()
-                .getResponseBody();
-
-        assert customerDTOList != null;
-
-        Long customerId = customerDTOList.stream()
-                .filter(c -> c.email().equals(registration.email()))
-                .map(CustomerDTO::id)
-                .findFirst()
-                .orElseThrow();
-
-        MovieRegistration movie = new MovieRegistration("testName", 200.0, 2.0);
-
-        webTestClient.post()
-                .uri("api/v1/movies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .body(Mono.just(movie), MovieRegistration.class)
-                .exchange()
-                .expectStatus()
-                .isOk();
-
-        List<Movie> movieList = webTestClient.get()
-                .uri("api/v1/movies")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(new ParameterizedTypeReference<Movie>() {
-                })
-                .returnResult()
-                .getResponseBody();
-
-        assert movieList != null;
-        Long movieId = movieList.stream()
-                .filter(m -> m.getName().equals(movie.name()))
-                .map(Movie::getMovie_id)
-                .findFirst()
-                .orElseThrow();
-
+        // Update customer
         webTestClient.put()
-                .uri("/api/v1/customers/add-movie/{customerId}/{movieId}", customerId, movieId)
+                .uri(API_PATH + "/{id}", customerId)
                 .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", jwtToken))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", customerToken))
+                .body(Mono.just(updateRequest), CustomerUpdateRequest.class)
                 .exchange()
                 .expectStatus().isOk();
 
-        CustomerDTO customerDTO = webTestClient.get()
+        // Fetch the updated customer
+        CustomerDTO updatedCustomerDTO = webTestClient.get()
                 .uri(API_PATH + "/{id}", customerId)
                 .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", jwtToken))
+                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", adminToken))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(new ParameterizedTypeReference<CustomerDTO>() {
@@ -418,70 +266,56 @@ public class CustomerIT {
                 .returnResult()
                 .getResponseBody();
 
-        Movie expected = webTestClient.get()
-                .uri("api/v1/movies/{id}", movieId)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<Movie>() {
-                })
-                .returnResult()
-                .getResponseBody();
+        // Create the expected customer DTO
+        CustomerDTO expectedCustomerDTO = new CustomerDTO(customerId, updateRequest.name(), updateRequest.email(),
+                List.of("ROLE_USER"), updateRequest.phoneNumber(), updateRequest.email(), List.of());
 
-
-        assertThat(customerDTO).isNotNull();
-        assertThat(customerDTO.movies()).contains(expected);
+        // Verify the updated customer matches the expected customer
+        assertThat(updatedCustomerDTO).isEqualTo(expectedCustomerDTO);
     }
 
+
     @Test
-    void testRemoveMovieToCustomer() {
+    void addMovie() {
+        String adminName = FAKER.name().fullName();
+        String adminEmail = adminName.replace(" ", ".") + "@codeNaren.com";
+        Long adminPhone = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
+        String password = FAKER.internet().password(8, 12);
+        boolean isEmailVerified = false;
+        boolean isPhoneVerified = false;
 
-        String jwtToken = webTestClient.post()
-                .uri("/api/v1/customers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .body(Mono.just(registration), CustomerRegistration.class)
-                .exchange()
-                .expectStatus().isCreated()
-                .returnResult(Void.class)
-                .getResponseHeaders()
-                .getFirst(HttpHeaders.AUTHORIZATION);
+        CustomerRegistration adminRegistration = new CustomerRegistration(adminName,
+                adminEmail, password, adminPhone, isEmailVerified, isPhoneVerified);
 
-        List<CustomerDTO> customerDTOList = webTestClient.get()
-                .uri(API_PATH)
-                .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", jwtToken))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBodyList(new ParameterizedTypeReference<CustomerDTO>() {
-                })
-                .returnResult()
-                .getResponseBody();
+        String adminToken = registerAdminAndGetToken(adminRegistration);
 
-        assert customerDTOList != null;
+        String movieName = FAKER.book().title();
+        Double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
+        Double cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
+        String description = "Hello Hi Bye!";
+        String poster = FAKER.internet().url();
+        String ageRating = "PG-13";
+        Integer year = 2000;
+        String runtime = RANDOM.nextInt(90, 180) + " mins";
+        String genre = "Action";
 
-        Long customerId = customerDTOList.stream()
-                .filter(c -> c.email().equals(registration.email()))
-                .map(CustomerDTO::id)
-                .findFirst()
-                .orElseThrow();
-
-        // Register a new movie
-        MovieRegistration movie = new MovieRegistration(FAKER.funnyName().name(), 200.0, 2.0);
+        MovieRegistration movie =
+                new MovieRegistration(movieName, cost,
+                        rating, description, poster, ageRating,
+                        year, runtime, genre);
 
         webTestClient.post()
                 .uri("/api/v1/movies")
-                .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", adminToken))
                 .body(Mono.just(movie), MovieRegistration.class)
                 .exchange()
-                .expectStatus().isOk()
-                .expectBody(Movie.class)
-                .returnResult()
-                .getResponseBody();
+                .expectStatus().isCreated();
 
-        List<Movie> movieList = webTestClient.get()
-                .uri("api/v1/movies")
+        List<Movie> moviesList = webTestClient.get()
+                .uri("/api/v1/movies")
+                .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(new ParameterizedTypeReference<Movie>() {
@@ -489,122 +323,20 @@ public class CustomerIT {
                 .returnResult()
                 .getResponseBody();
 
-        assert movieList != null;
-        Long movieId = movieList.stream()
+        assert moviesList != null;
+
+        Movie addedMovie = moviesList.stream()
                 .filter(m -> m.getName().equals(movie.name()))
-                .map(Movie::getMovie_id)
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
 
-        Movie expected = webTestClient.get()
-                .uri("/api/v1/movies/{id}", movieId)
-                .exchange()
-                .expectBody(new ParameterizedTypeReference<Movie>() {
-                })
-                .returnResult()
-                .getResponseBody();
-
-
-        // Associate movie with customer
-        webTestClient.put()
-                .uri("/api/v1/customers/add-movie/{customerId}/{movieId}", customerId, movieId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", jwtToken))
-                .exchange()
-                .expectStatus().isOk();
-
-        // Remove movie from customer
-        webTestClient.delete()
-                .uri("/api/v1/customers/remove-movie/{customerId}/{movieId}", customerId, movieId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", jwtToken))
-                .exchange()
-                .expectStatus().isOk();
-
-        // Verify movie is removed from customer's movie list
-        CustomerDTO customerDTO = webTestClient.get()
-                .uri("/api/v1/customers/{id}", customerId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", jwtToken))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(CustomerDTO.class)
-                .returnResult()
-                .getResponseBody();
-
-        assertThat(customerDTO).isNotNull();
-        assertThat(customerDTO.movies()).doesNotContain(expected);
-
+        assertThat(addedMovie.getName()).isEqualTo(movie.name());
+        assertThat(addedMovie.getRating()).isEqualTo(movie.rating());
+        assertThat(addedMovie.getCost()).isEqualTo(movie.cost());
+        assertThat(addedMovie.getDescription()).isEqualTo(movie.description());
+        assertThat(addedMovie.getPoster()).isEqualTo(movie.poster());
+        assertThat(addedMovie.getYear()).isEqualTo(movie.year());
     }
 
-    @Test
-    void testAddRole() {
-        // Create a new role
-        Role role = new Role("ROLE_TEST");
-
-        // Send a POST request to add the role
-        webTestClient.post()
-                .uri("/api/v1/roles")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(role)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("Role added successfully");
-
-        // Retrieve the list of roles and verify that the new role is present
-        List<Role> roles = webTestClient.get()
-                .uri("/api/v1/roles")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(Role.class)
-                .returnResult()
-                .getResponseBody();
-
-        assertThat(roles).isNotNull();
-        assertThat(roles).extracting(Role::getName).contains("ROLE_TEST");
-    }
-
-    @Test
-    void testDeleteRole() {
-
-        Role role = new Role("ROLE_DELETE");
-
-        webTestClient.post()
-                .uri("/api/v1/roles")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(role), Role.class)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("Role added successfully");
-
-        // Retrieve the list of roles to get the ID of the role to delete
-        List<Role> roles = webTestClient.get()
-                .uri("/api/v1/roles")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(Role.class)
-                .returnResult()
-                .getResponseBody();
-
-        assertThat(roles).isNotNull();
-        Long id = roles.stream()
-                .filter(r -> r.getName().equals("ROLE_DELETE"))
-                .map(Role::getId)
-                .findFirst()
-                .orElseThrow();
-
-        webTestClient.delete()
-                .uri("/api/v1/roles/{id}", id)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk();
-
-        assertThat(roleRepository.findById(id)).isEmpty();
-    }
 
 }

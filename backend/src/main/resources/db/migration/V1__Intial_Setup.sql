@@ -7,6 +7,7 @@ CREATE TABLE customer
     email        TEXT   NOT NULL,
     password     TEXT   NOT NULL,
     phone_number BIGINT NOT NULL,
+
     CONSTRAINT pk_customer PRIMARY KEY (customer_id)
 );
 

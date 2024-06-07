@@ -49,6 +49,13 @@ public class Customer implements UserDetails {
     @Column(name = "phone_number", nullable = false)
     private Long phoneNumber;
 
+    @Column(nullable = false)
+    private Boolean isEmailVerified;
+
+    @Column(nullable = false)
+    private Boolean isPhoneVerified;
+
+
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = {DETACH, REFRESH, PERSIST, MERGE})
     @JsonIgnore
     private List<Movie> movies = new ArrayList<>();
@@ -65,6 +72,20 @@ public class Customer implements UserDetails {
     @JsonBackReference
     private Set<Role> roles = new HashSet<>();
 
+    public Customer(Long customer_id, String name, String email,
+                    String password, Long phoneNumber, Boolean isEmailVerified,
+                    Boolean isPhoneVerified, List<Movie> movies, Set<Role> roles) {
+        this.customer_id = customer_id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.isEmailVerified = isEmailVerified;
+        this.isPhoneVerified = isPhoneVerified;
+        this.movies = movies;
+        this.roles = roles;
+    }
+
     public Customer(Long customer_id, String name, String email, String password, Long phoneNumber) {
         this.customer_id = customer_id;
         this.name = name;
@@ -73,13 +94,29 @@ public class Customer implements UserDetails {
         this.phoneNumber = phoneNumber;
     }
 
-    public Customer(String name, String email, String password, Long phoneNumber) {
+
+    public Customer(Long customer_id, String name, String email,
+                    String password, Long phoneNumber,
+                    Boolean isEmailVerified, Boolean isPhoneVerified) {
+        this.customer_id = customer_id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
+        this.isEmailVerified = isEmailVerified;
+        this.isPhoneVerified = isPhoneVerified;
     }
 
+    public Customer(String name, String email, String password,
+                    Long phoneNumber, Boolean isEmailVerified,
+                    Boolean isPhoneVerified) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.isEmailVerified = isEmailVerified;
+        this.isPhoneVerified = isPhoneVerified;
+    }
 
     @Override
     public String toString() {
@@ -89,20 +126,25 @@ public class Customer implements UserDetails {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", phoneNumber=" + phoneNumber +
+                ", isEmailVerified=" + isEmailVerified +
+                ", isPhoneVerified=" + isPhoneVerified +
+                ", movies=" + movies +
+                ", roles=" + roles +
                 '}';
     }
+
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return Objects.equals(customer_id, customer.customer_id) && Objects.equals(name, customer.name) && Objects.equals(email, customer.email) && Objects.equals(password, customer.password) && Objects.equals(phoneNumber, customer.phoneNumber);
+        return Objects.equals(customer_id, customer.customer_id) && Objects.equals(name, customer.name) && Objects.equals(email, customer.email) && Objects.equals(password, customer.password) && Objects.equals(phoneNumber, customer.phoneNumber) && Objects.equals(isEmailVerified, customer.isEmailVerified) && Objects.equals(isPhoneVerified, customer.isPhoneVerified) && Objects.equals(movies, customer.movies) && Objects.equals(roles, customer.roles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(customer_id, name, email, password, phoneNumber);
+        return Objects.hash(customer_id, name, email, password, phoneNumber, isEmailVerified, isPhoneVerified, movies, roles);
     }
 
     @Override
@@ -150,7 +192,7 @@ public class Customer implements UserDetails {
     public void removeMovie(Movie movie) {
         if (movie != null && movies.contains(movie)) {
             movies.remove(movie);
-            movie.setCustomer(null);  // Disassociate the movie from the customer
+            movie.setCustomer(null);
             log.info("Removed movie with ID {} from customer with ID {}", movie.getMovie_id(), this.getCustomer_id());
         } else {
             log.warn("Attempted to remove a movie that is not associated with the customer or movie is null");
@@ -158,13 +200,13 @@ public class Customer implements UserDetails {
     }
 
     public void removeMovies(List<Movie> movies) {
-        Iterator<Movie> iterator = this.movies.iterator(); // Use this.movies to avoid ConcurrentModificationException
+        Iterator<Movie> iterator = this.movies.iterator();
         while (iterator.hasNext()) {
             Movie movie = iterator.next();
             if (movies.contains(movie)) {
-                iterator.remove();  // Safe removal using iterator
+                iterator.remove();
                 movie.setCustomer(null);
-                log.info("Removed movie with ID {} from customer with ID {}", movie.getMovie_id(), this.getCustomer_id());
+                log.info("Removed movie with ID {} from customer with I-D {}", movie.getMovie_id(), this.getCustomer_id());
             }
         }
     }

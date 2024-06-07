@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestConfig.class)
@@ -28,9 +27,8 @@ class CustomerRepositoryTest extends AbstractTestContainers {
         var customerEmail = customerName + "@codeNaren.com";
         var password = FAKER.internet().password(8, 12);
         Long phoneNumber = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
-        customer = new Customer(customerName, customerEmail, password, phoneNumber);
+        customer = new Customer(customerEmail, customerName, password, phoneNumber, false, false);
     }
-
 
     @Test
     void existsByEmail() {

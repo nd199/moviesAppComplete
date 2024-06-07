@@ -17,7 +17,9 @@ public class RoleService {
     }
 
     void saveRole(Role role) {
-        roleRepository.save(role);
+        if (!roleRepository.existsRoleByName(role.getName())) {
+            roleRepository.save(role);
+        }
     }
 
     Role findRoleById(Long roleId) {

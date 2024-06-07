@@ -3,6 +3,12 @@ package com.naren.movieticketbookingapplication.Record;
 public record MovieRegistration(
         String name,
         Double cost,
-        Double rating
+        Double rating,
+        String description,
+        String poster,
+        String ageRating,
+        Integer year,
+        String runtime,
+        String genre
 ) {
 }

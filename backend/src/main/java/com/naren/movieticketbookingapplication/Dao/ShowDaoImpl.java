@@ -65,4 +65,16 @@ public class ShowDaoImpl implements ShowDao {
         log.info("Fetched {} shows", showList.size());
         return showList;
     }
+
+    @Override
+    public List<Show> getShowsByYear(Integer year) {
+        log.info("Fetching shows by year: {}", year);
+        return showRepository.findByYear(year);
+    }
+
+    @Override
+    public List<Show> getShowsByAgeRating(String ageRating) {
+        log.info("Fetching shows by age rating: {}", ageRating);
+        return showRepository.findByAgeRating(ageRating);
+    }
 }

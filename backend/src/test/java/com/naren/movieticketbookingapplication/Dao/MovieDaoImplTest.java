@@ -33,7 +33,7 @@ class MovieDaoImplTest {
         movie = new Movie(1L,
                 "Harry Potter",
                 200D,
-                5D);
+                5D, "none", "none", "none", 2000, "none", "none");
     }
 
     @AfterEach

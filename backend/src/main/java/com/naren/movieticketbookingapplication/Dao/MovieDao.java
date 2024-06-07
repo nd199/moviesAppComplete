@@ -17,5 +17,10 @@ public interface MovieDao {
     boolean existsByName(String name);
 
     List<Movie> getMovieList();
+
+    List<Movie> getMoviesByYear(Integer year);
+
+    List<Movie> getMoviesByAgeRating(String ageRating);
 }
+
 

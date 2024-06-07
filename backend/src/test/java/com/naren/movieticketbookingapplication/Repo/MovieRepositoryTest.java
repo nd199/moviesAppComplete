@@ -24,11 +24,19 @@ class MovieRepositoryTest {
     void existsByName() {
         Movie movie = new Movie(
                 "harryPotter",
-                200D, 5D
+                200D,
+                5D,
+                "Description",
+                "Poster",
+                "PG-13",
+                2022,
+                "120 mins",
+                "Fantasy"
         );
 
         underTest.save(movie);
 
         assertThat(underTest.existsByName(movie.getName())).isTrue();
     }
+
 }

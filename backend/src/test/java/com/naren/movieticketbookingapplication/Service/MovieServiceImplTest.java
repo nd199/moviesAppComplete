@@ -7,14 +7,13 @@ import com.naren.movieticketbookingapplication.Exception.ResourceAlreadyExists;
 import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import com.naren.movieticketbookingapplication.Record.MovieRegistration;
 import com.naren.movieticketbookingapplication.Record.MovieUpdation;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -24,9 +23,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@Slf4j
 class MovieServiceImplTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(MovieServiceImplTest.class);
     @Mock
     private MovieDao movieDao;
     private MovieService underTest;
@@ -38,7 +37,10 @@ class MovieServiceImplTest {
 
     @Test
     void addMovie() {
-        MovieRegistration registration = new MovieRegistration("testName", 300.23, 5.00);
+        MovieRegistration registration = new MovieRegistration(
+                "testName", 300.23, 5.00, "A great movie",
+                "http://poster.url", "PG-13", 2022,
+                "120 mins", "Action");
 
         when(movieDao.existsByName("testName")).thenReturn(false);
 
@@ -54,19 +56,27 @@ class MovieServiceImplTest {
         assertThat(captured.getName()).isEqualTo(registration.name());
         assertThat(captured.getCost()).isEqualTo(registration.cost());
         assertThat(captured.getRating()).isEqualTo(registration.rating());
+        assertThat(captured.getDescription()).isEqualTo(registration.description());
+        assertThat(captured.getPoster()).isEqualTo(registration.poster());
+        assertThat(captured.getAgeRating()).isEqualTo(registration.ageRating());
+        assertThat(captured.getYear()).isEqualTo(registration.year());
+        assertThat(captured.getRuntime()).isEqualTo(registration.runtime());
+        assertThat(captured.getGenre()).isEqualTo(registration.genre());
     }
 
     @Test
     void throwsMovieNameExists() {
-        MovieRegistration registration = new MovieRegistration("testName", 300.23, 5.00);
+        MovieRegistration registration = new MovieRegistration(
+                "testName", 300.23, 5.00, "A great movie",
+                "http://poster.url", "PG-13", 2022,
+                "120 mins", "Action");
 
         when(movieDao.existsByName("testName")).thenReturn(true);
 
         assertThatThrownBy(
                 () -> underTest.addMovie(registration))
                 .isInstanceOf(ResourceAlreadyExists.class)
-                .hasMessageContaining("Movie name %s already exists".formatted(registration.name())
-                );
+                .hasMessageContaining("Movie name %s already exists".formatted(registration.name()));
 
         verify(movieDao, never()).addMovie(any());
     }
@@ -74,7 +84,9 @@ class MovieServiceImplTest {
     @Test
     void removeMovie() {
         long id = 1;
-        Movie movie = new Movie("testName", 300.22, 5.00);
+        Movie movie = new Movie(id, "testName", 300.22, 5.00,
+                "A great movie", "http://poster.url", "PG-13",
+                2022, "120 mins", "Action");
 
         when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
 
@@ -99,7 +111,9 @@ class MovieServiceImplTest {
     @Test
     void getMovieById() {
         long id = 1;
-        Movie movie = new Movie("testName", 300.22, 5.00);
+        Movie movie = new Movie(id, "testName", 300.22, 5.00,
+                "A great movie", "http://poster.url", "PG-13",
+                2022, "120 mins", "Action");
 
         when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
 
@@ -116,7 +130,7 @@ class MovieServiceImplTest {
 
         assertThatThrownBy(() -> underTest.getMovieById(id))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Movie with ID '1' not found");
+                .hasMessageContaining("Movie with ID '%s' not found".formatted(id));
     }
 
     @Test
@@ -130,11 +144,16 @@ class MovieServiceImplTest {
     void updateMovie() {
         long id = 2;
 
-        Movie movie = new Movie(id, "testName", 200.0, 2.0);
+        Movie movie = new Movie(id, "testName22", 200.0, 2.0,
+                "A movie", "http://poster.url", "PG", 2000,
+                "100 mins", "Comedy");
 
         when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
 
-        MovieUpdation movieUpdation = new MovieUpdation("testName2", 300.00, 5.0);
+        MovieUpdation movieUpdation = new MovieUpdation(
+                "testName2", 300.00, 5.0, "An awesome movie",
+                "http://newposter.url", "R", 2021,
+                "130 mins", "Thriller");
 
         underTest.updateMovie(movieUpdation, id);
 
@@ -147,17 +166,28 @@ class MovieServiceImplTest {
         assertThat(updatedMovie.getName()).isEqualTo(movieUpdation.name());
         assertThat(updatedMovie.getCost()).isEqualTo(movieUpdation.cost());
         assertThat(updatedMovie.getRating()).isEqualTo(movieUpdation.rating());
+        assertThat(updatedMovie.getDescription()).isEqualTo(movieUpdation.description());
+        assertThat(updatedMovie.getPoster()).isEqualTo(movieUpdation.poster());
+        assertThat(updatedMovie.getAgeRating()).isEqualTo(movieUpdation.ageRating());
+        assertThat(updatedMovie.getYear()).isEqualTo(movieUpdation.year());
+        assertThat(updatedMovie.getRuntime()).isEqualTo(movieUpdation.runtime());
+        assertThat(updatedMovie.getGenre()).isEqualTo(movieUpdation.genre());
     }
 
     @Test
     void throwsIfNoChangesFoundForUpdation() {
         long id = 2;
 
-        Movie movie = new Movie(id, "testName", 200.0, 2.0);
+        Movie movie = new Movie(id, "testName", 200.0, 2.0,
+                "A movie", "http://poster.url", "PG", 2000,
+                "100 mins", "Comedy");
 
         when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
 
-        MovieUpdation movieUpdation = new MovieUpdation("testName", 200.0, 2.0);
+        MovieUpdation movieUpdation = new MovieUpdation(
+                "testName", 200.0, 2.0, "A movie",
+                "http://poster.url", "PG", 2000,
+                "100 mins", "Comedy");
 
         assertThatThrownBy(() -> underTest.updateMovie(movieUpdation, id))
                 .isInstanceOf(RequestValidationException.class)
@@ -170,7 +200,10 @@ class MovieServiceImplTest {
 
         when(movieDao.getMovieById(id)).thenReturn(Optional.empty());
 
-        MovieUpdation updation = new MovieUpdation("Name", 220.0, 3.30);
+        MovieUpdation updation = new MovieUpdation(
+                "Name", 220.0, 3.30, "A good movie",
+                "http://poster.url", "PG-13", 2020,
+                "110 mins", "Drama");
 
         assertThatThrownBy(() -> underTest.updateMovie(updation, id))
                 .isInstanceOf(ResourceNotFoundException.class)

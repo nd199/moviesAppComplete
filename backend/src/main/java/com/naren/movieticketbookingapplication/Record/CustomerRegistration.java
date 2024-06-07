@@ -5,6 +5,7 @@ public record CustomerRegistration(
         String name,
         String email,
         String password,
-        Long phoneNumber
-) {
+        Long phoneNumber,
+        boolean isEmailVerified,
+        boolean isPhoneVerified) {
 }

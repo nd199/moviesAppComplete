@@ -139,10 +139,9 @@ public class CustomerServiceImpl implements CustomerService {
         if (customerDao.existsByPhoneNumber(customerRegistration.phoneNumber())) {
             throw new ResourceAlreadyExists("Phone number already taken");
         }
-        return new Customer(customerRegistration.name(),
-                customerRegistration.email(),
+        return new Customer(customerRegistration.name(), customerRegistration.email(),
                 passwordEncoder.encode(customerRegistration.password()),
-                customerRegistration.phoneNumber());
+                customerRegistration.phoneNumber(), false, false);
     }
 
     private boolean validatePassword(String password, String name, String email, Long phoneNumber) {
@@ -221,7 +220,9 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerDao.getCustomer(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
 
-        removeAllMovies(customerId);
+        if (!customer.getMovies().isEmpty()) {
+            removeAllMovies(customerId);
+        }
         customerDao.deleteCustomer(customer);
         log.info("Customer deleted successfully: {}", customer);
     }
@@ -279,8 +280,8 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         log.info("Removing all movies from customer with ID {}", customerId);
-        customer.removeMovies(movies); // Ensure method name is correct
-        customerDao.updateCustomer(customer);  // Persist changes
+        customer.removeMovies(movies);
+        customerDao.updateCustomer(customer);
         log.info("Movies removed from customer successfully: Customer={}", customer.getName());
     }
 }
