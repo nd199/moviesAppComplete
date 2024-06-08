@@ -1,5 +1,8 @@
 server:
+  error:
+    include-message: always
   port: 8080
+
 spring:
   mvc:
     static-path-pattern: /**
@@ -9,17 +12,22 @@ spring:
     password: password
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
+  main:
+    web-application-type: servlet
+  devtools:
+    restart:
+      enabled: true
   mail:
     host: smtp.gmail.com
     port: 587
     username: codenaren@gmail.com
-    password: sugljpuestlecegt
+    password: password
     properties:
       mail:
         smtp:
