@@ -1,13 +1,14 @@
 import React, {useEffect, useState} from "react";
-import "./Navbar.css";
+import "./NavBar.css";
 import Lottie from "react-lottie";
 import popcornAnimation from "../animations/popcorn.json";
-import {ArrowDropDown, Notifications} from "@mui/icons-material";
+import {ArrowDropDown, Close, Menu, Notifications} from "@mui/icons-material";
 import {Link} from "react-router-dom";
 
 const NavBar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
     let dropdownTimeout;
 
     window.onscroll = () => {
@@ -38,6 +39,10 @@ const NavBar = () => {
         }, 20000);
     };
 
+    const toggleMenu = () => {
+        setMenuOpen(!menuOpen);
+    };
+
     return (
         <div className={isScrolled ? "nav-bar scrolled" : "nav-bar"}>
             <div className="nav-wrapper">
@@ -46,20 +51,20 @@ const NavBar = () => {
                         <Lottie options={defaultOptions} height={70} width={70}/>
                         <span className="title">CN.io</span>
                     </div>
-                    <div className="nav-links">
-                        <Link to={"/"}>
+                    <div className={menuOpen ? "nav-links open" : "nav-links"}>
+                        <Link to={"/"} onClick={() => setMenuOpen(false)}>
                             <span>Home</span>
                         </Link>
-                        <Link to={"/About"}>
+                        <Link to={"/About"} onClick={() => setMenuOpen(false)}>
                             <span>About Us</span>
                         </Link>
-                        <Link to={"/Movies"}>
+                        <Link to={"/Movies"} onClick={() => setMenuOpen(false)}>
                             <span>Movies</span>
                         </Link>
-                        <Link to={"/Shows"}>
+                        <Link to={"/Shows"} onClick={() => setMenuOpen(false)}>
                             <span>Shows</span>
                         </Link>
-                        <Link>
+                        <Link to={"/"} onClick={() => setMenuOpen(false)}>
                             <span>My WishList</span>
                         </Link>
                     </div>
@@ -75,7 +80,7 @@ const NavBar = () => {
                             <ArrowDropDown className="dropdown"/>
                         </div>
                         <span>kids</span>
-                        <Notifications/>
+                        <Notifications className="notify"/>
                         {dropdownOpen && (
                             <div className="profile-drop">
                                 <div className="options">
@@ -85,6 +90,9 @@ const NavBar = () => {
                                 </div>
                             </div>
                         )}
+                    </div>
+                    <div className="hamburger" onClick={toggleMenu}>
+                        {menuOpen ? <Close/> : <Menu/>}
                     </div>
                 </div>
             </div>
