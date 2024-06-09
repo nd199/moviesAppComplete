@@ -122,4 +122,10 @@ public class CustomerController {
     public void deleteRole(@PathVariable("id") Long id) {
         customerService.removeRole(id);
     }
+
+
+    @GetMapping("/customers/{isLoggedIn}")
+    public void loggedInCustomers(@PathVariable boolean isLoggedIn) {
+        customerService.getCustomersByIsLoggedIn(isLoggedIn);
+    }
 }

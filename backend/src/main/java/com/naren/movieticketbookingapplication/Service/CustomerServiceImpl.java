@@ -114,6 +114,8 @@ public class CustomerServiceImpl implements CustomerService {
 
         roles.forEach(registeredCustomer::addRole);
 
+        registeredCustomer.setIsLogged(true);
+
         customerDao.addCustomer(registeredCustomer);
 
         String token = jwtUtil.issueToken(registeredCustomer.getUsername(), roles);
@@ -141,7 +143,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
         return new Customer(customerRegistration.name(), customerRegistration.email(),
                 passwordEncoder.encode(customerRegistration.password()),
-                customerRegistration.phoneNumber(), false, false);
+                customerRegistration.phoneNumber(), false, false, false);
     }
 
     private boolean validatePassword(String password, String name, String email, Long phoneNumber) {
@@ -283,5 +285,16 @@ public class CustomerServiceImpl implements CustomerService {
         customer.removeMovies(movies);
         customerDao.updateCustomer(customer);
         log.info("Movies removed from customer successfully: Customer={}", customer.getName());
+    }
+
+    @Override
+    public List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn) {
+        log.info("Fetching customer That are logged in");
+        List<Customer> customers = customerDao.getCustomersByIsLoggedIn(isLoggedIn);
+        if (customers.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "No Customer logged In Application");
+        }
+        return customers;
     }
 }

@@ -40,4 +40,6 @@ public interface CustomerService {
     Customer loginUser(UserLogin userLogin, HttpServletRequest request);
 
     void removeAllMovies(Long customerId);
+
+    List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn);
 }
