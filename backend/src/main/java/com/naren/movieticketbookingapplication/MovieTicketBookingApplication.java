@@ -3,9 +3,11 @@ package com.naren.movieticketbookingapplication;
 import com.github.javafaker.Faker;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Movie;
+import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Entity.Show;
 import com.naren.movieticketbookingapplication.Repo.CustomerRepository;
 import com.naren.movieticketbookingapplication.Repo.MovieRepository;
+import com.naren.movieticketbookingapplication.Repo.RoleRepository;
 import com.naren.movieticketbookingapplication.Repo.ShowRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -30,6 +32,7 @@ public class MovieTicketBookingApplication {
     @Bean
     public CommandLineRunner commandLineRunner(CustomerRepository customerRepository,
                                                MovieRepository movieRepository, PasswordEncoder encoder,
+                                               RoleRepository roleRepository,
                                                ShowRepository showRepository) {
         return args -> {
             createRandomCustomer(customerRepository, encoder);
@@ -86,15 +89,15 @@ public class MovieTicketBookingApplication {
         log.info("Created new show: {}", show);
     }
 
-//    private void createRole(RoleRepository roleRepository) {
-//
-//        if (roleRepository.existsRoleByName("ROLE_USER")) {
-//            Role user = new Role("ROLE_USER");
-//            roleRepository.save(user);
-//        }
-//        if (roleRepository.existsRoleByName("ROLE_ADMIN")) {
-//            Role admin = new Role("ROLE_ADMIN");
-//            roleRepository.save(admin);
-//        }
-//    }
+    private void createRole(RoleRepository roleRepository) {
+
+        if (roleRepository.existsRoleByName("ROLE_USER")) {
+            Role user = new Role("ROLE_USER");
+            roleRepository.save(user);
+        }
+        if (roleRepository.existsRoleByName("ROLE_ADMIN")) {
+            Role admin = new Role("ROLE_ADMIN");
+            roleRepository.save(admin);
+        }
+    }
 }
