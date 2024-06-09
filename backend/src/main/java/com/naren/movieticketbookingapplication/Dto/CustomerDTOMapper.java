@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
 
-
     @Override
     public CustomerDTO apply(Customer customer) {
         log.debug("Mapping Customer to CustomerDTO: {}", customer);
@@ -25,7 +24,10 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                         .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()),
                 customer.getPhoneNumber(),
                 customer.getUsername(),
-                customer.getMovies()
+                customer.getMovies(),
+                customer.getIsEmailVerified(),
+                customer.getIsPhoneVerified(),
+                customer.getIsLogged()
         );
 
         log.debug("Mapped Customer to CustomerDTO: {}", customerDTO);

@@ -23,6 +23,8 @@ public interface CustomerDao {
     Optional<Customer> getCustomerByUsername(String email);
 
     Optional<Customer> getCustomerByPhoneNumber(Long phoneNumber);
+
+    List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn);
 }
 
 

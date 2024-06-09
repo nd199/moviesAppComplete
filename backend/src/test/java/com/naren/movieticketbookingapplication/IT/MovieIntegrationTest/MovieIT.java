@@ -56,11 +56,11 @@ public class MovieIT {
         boolean isEmailVerified = false;
         boolean isPhoneVerified = false;
 
-        customerRegistration = new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified);
+        customerRegistration = new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
 
         String adminName = "IM ADMIN " + FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".1123131213") + "@codeNaren.com";
-        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, isEmailVerified, isPhoneVerified);
+        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
 
         String movieName = FAKER.book().title();
         Double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;

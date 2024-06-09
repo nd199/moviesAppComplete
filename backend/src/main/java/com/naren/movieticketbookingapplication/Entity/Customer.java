@@ -1,6 +1,5 @@
 package com.naren.movieticketbookingapplication.Entity;
 
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -16,13 +15,10 @@ import java.util.*;
 
 import static jakarta.persistence.CascadeType.*;
 
-
 @Entity
 @Table(name = "Customer", uniqueConstraints = {
-        @UniqueConstraint(name = "email_id_unique",
-                columnNames = "email"),
-        @UniqueConstraint(name = "phone_number_unique",
-                columnNames = "phone_number")
+        @UniqueConstraint(name = "email_id_unique", columnNames = "email"),
+        @UniqueConstraint(name = "phone_number_unique", columnNames = "phone_number")
 })
 @Getter
 @Setter
@@ -30,11 +26,8 @@ import static jakarta.persistence.CascadeType.*;
 @Slf4j
 public class Customer implements UserDetails {
     @Id
-    @SequenceGenerator(name = "customer_id",
-            sequenceName = "customer_id",
-            allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-            generator = "customer_id")
+    @SequenceGenerator(name = "customer_id", sequenceName = "customer_id", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_id")
     private Long customer_id;
 
     @Column(name = "name", columnDefinition = "TEXT")
@@ -43,7 +36,7 @@ public class Customer implements UserDetails {
     @Column(name = "email", columnDefinition = "TEXT", nullable = false)
     private String email;
 
-    @Column(name = "password", columnDefinition = "TEXT", nullable = false, length = 8)
+    @Column(name = "password", columnDefinition = "TEXT", nullable = false)
     private String password;
 
     @Column(name = "phone_number", nullable = false)
@@ -55,26 +48,24 @@ public class Customer implements UserDetails {
     @Column(nullable = false)
     private Boolean isPhoneVerified;
 
+    @Column(nullable = false)
+    private Boolean isLogged;
 
-    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = {DETACH, REFRESH, PERSIST, MERGE})
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = {DETACH, REFRESH, PERSIST, MERGE})
     @JsonIgnore
     private List<Movie> movies = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "customers_roles",
             joinColumns = @JoinColumn(name = "customer_id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "role_id",
-                    foreignKey = @ForeignKey(name = "fk_customer_role_id")
-            ),
-            foreignKey = @ForeignKey(name = "fk_customers_role_customer_id")
+            inverseJoinColumns = @JoinColumn(name = "role_id"),
+            foreignKey = @ForeignKey(name = "fk_customer_role_id"),
+            inverseForeignKey = @ForeignKey(name = "fk_customers_role_customer_id")
     )
     @JsonBackReference
     private Set<Role> roles = new HashSet<>();
 
-    public Customer(Long customer_id, String name, String email,
-                    String password, Long phoneNumber, Boolean isEmailVerified,
-                    Boolean isPhoneVerified, List<Movie> movies, Set<Role> roles) {
+    public Customer(Long customer_id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isPhoneVerified, Boolean isLogged, List<Movie> movies, Set<Role> roles) {
         this.customer_id = customer_id;
         this.name = name;
         this.email = email;
@@ -82,22 +73,12 @@ public class Customer implements UserDetails {
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
         this.isPhoneVerified = isPhoneVerified;
+        this.isLogged = isLogged;
         this.movies = movies;
         this.roles = roles;
     }
 
-    public Customer(Long customer_id, String name, String email, String password, Long phoneNumber) {
-        this.customer_id = customer_id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-    }
-
-
-    public Customer(Long customer_id, String name, String email,
-                    String password, Long phoneNumber,
-                    Boolean isEmailVerified, Boolean isPhoneVerified) {
+    public Customer(Long customer_id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isPhoneVerified, Boolean isLogged) {
         this.customer_id = customer_id;
         this.name = name;
         this.email = email;
@@ -105,17 +86,17 @@ public class Customer implements UserDetails {
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
         this.isPhoneVerified = isPhoneVerified;
+        this.isLogged = isLogged;
     }
 
-    public Customer(String name, String email, String password,
-                    Long phoneNumber, Boolean isEmailVerified,
-                    Boolean isPhoneVerified) {
+    public Customer(String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isPhoneVerified, Boolean isLogged) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
         this.isPhoneVerified = isPhoneVerified;
+        this.isLogged = isLogged;
     }
 
     @Override
@@ -128,30 +109,38 @@ public class Customer implements UserDetails {
                 ", phoneNumber=" + phoneNumber +
                 ", isEmailVerified=" + isEmailVerified +
                 ", isPhoneVerified=" + isPhoneVerified +
+                ", isLoggedIn=" + isLogged +
                 ", movies=" + movies +
                 ", roles=" + roles +
                 '}';
     }
-
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return Objects.equals(customer_id, customer.customer_id) && Objects.equals(name, customer.name) && Objects.equals(email, customer.email) && Objects.equals(password, customer.password) && Objects.equals(phoneNumber, customer.phoneNumber) && Objects.equals(isEmailVerified, customer.isEmailVerified) && Objects.equals(isPhoneVerified, customer.isPhoneVerified) && Objects.equals(movies, customer.movies) && Objects.equals(roles, customer.roles);
+        return Objects.equals(customer_id, customer.customer_id) &&
+                Objects.equals(name, customer.name) &&
+                Objects.equals(email, customer.email) &&
+                Objects.equals(password, customer.password) &&
+                Objects.equals(phoneNumber, customer.phoneNumber) &&
+                Objects.equals(isEmailVerified, customer.isEmailVerified) &&
+                Objects.equals(isPhoneVerified, customer.isPhoneVerified) &&
+                Objects.equals(isLogged, customer.isLogged) &&
+                Objects.equals(movies, customer.movies) &&
+                Objects.equals(roles, customer.roles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(customer_id, name, email, password, phoneNumber, isEmailVerified, isPhoneVerified, movies, roles);
+        return Objects.hash(customer_id, name, email, password, phoneNumber, isEmailVerified, isPhoneVerified, isLogged, movies, roles);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        Set<Role> roles1 = this.roles;
-        for (Role role : roles1) {
+        for (Role role : roles) {
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
         return authorities;
@@ -183,7 +172,7 @@ public class Customer implements UserDetails {
     }
 
     public void addMovie(Movie movie) {
-        if (!movies.contains(movie) && movie != null) {
+        if (movie != null && !movies.contains(movie)) {
             movies.add(movie);
             movie.setCustomer(this);
         }
@@ -206,19 +195,22 @@ public class Customer implements UserDetails {
             if (movies.contains(movie)) {
                 iterator.remove();
                 movie.setCustomer(null);
-                log.info("Removed movie with ID {} from customer with I-D {}", movie.getMovie_id(), this.getCustomer_id());
+                log.info("Removed movie with ID {} from customer with ID {}", movie.getMovie_id(), this.getCustomer_id());
             }
         }
     }
 
-
     public void addRole(Role role) {
-        this.roles.add(role);
-        role.getCustomers().add(this);
+        if (role != null && !roles.contains(role)) {
+            roles.add(role);
+            role.getCustomers().add(this);
+        }
     }
 
     public void removeRole(Role role) {
-        this.roles.remove(role);
-        role.getCustomers().remove(this);
+        if (role != null && roles.contains(role)) {
+            roles.remove(role);
+            role.getCustomers().remove(this);
+        }
     }
 }

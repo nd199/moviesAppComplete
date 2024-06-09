@@ -44,10 +44,10 @@ public class MovieTicketBookingApplication {
         String customerEmail = customerName.toLowerCase().replace(" ", "") + "@codeNaren.com";
         String password = encoder.encode(FAKER.internet().password(8, 12));
         Long phoneNumber = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
+        Boolean isLoggedIn = FAKER.options().option(true, false);
 
-        Customer customer = new Customer(customerEmail, customerName, password, phoneNumber, false, false);
+        Customer customer = new Customer(customerEmail, customerName, password, phoneNumber, false, false, isLoggedIn);
         customerRepository.save(customer);
-
         log.info("Created new customer: {}", customer);
     }
 

@@ -86,4 +86,9 @@ public class CustomerDaoImpl implements CustomerDao {
     public Optional<Customer> getCustomerByPhoneNumber(Long phoneNumber) {
         return customerRepository.getCustomerByPhoneNumber(phoneNumber);
     }
+
+    @Override
+    public List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn) {
+        return customerRepository.getCustomersByIsLogged(isLoggedIn);
+    }
 }

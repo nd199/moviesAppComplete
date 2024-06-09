@@ -1,7 +1,7 @@
 package com.naren.movieticketbookingapplication.Entity;
+
 import com.naren.movieticketbookingapplication.AbstractTestContainers;
 import com.naren.movieticketbookingapplication.Dao.CustomerDaoImpl;
-import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Repo.CustomerRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,9 +39,9 @@ class CustomerTest extends AbstractTestContainers {
 
         underTest = new CustomerDaoImpl(customerRepository);
 
-         customer = new Customer(1L, FAKER.name().name(),
+        customer = new Customer(1L, FAKER.name().name(),
                 FAKER.internet().emailAddress(), FAKER.internet().password(),
-                Long.valueOf(FAKER.phoneNumber().subscriberNumber(9)), false, false);
+                Long.valueOf(FAKER.phoneNumber().subscriberNumber(9)), false,false, false);
     }
 
     @AfterEach

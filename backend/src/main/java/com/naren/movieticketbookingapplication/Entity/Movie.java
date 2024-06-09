@@ -1,7 +1,7 @@
 package com.naren.movieticketbookingapplication.Entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +15,7 @@ import java.util.Objects;
 })
 @Setter
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 public class Movie {
 
@@ -35,7 +36,7 @@ public class Movie {
     @Column(name = "rating", nullable = false)
     private Double rating;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000) // Example length
     private String description;
 
     @Column(nullable = false)
@@ -53,11 +54,9 @@ public class Movie {
     @Column(nullable = false)
     private String genre;
 
-
     @ManyToOne
     @JoinColumn(name = "customer_id",
             foreignKey = @ForeignKey(name = "fk_customer_movie_id"))
-    @JsonBackReference
     private Customer customer;
 
     public Movie(Long movie_id, String name, Double cost, Double rating,

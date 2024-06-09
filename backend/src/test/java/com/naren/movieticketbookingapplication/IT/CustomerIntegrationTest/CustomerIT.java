@@ -56,11 +56,11 @@ public class CustomerIT {
         boolean isEmailVerified = false;
         boolean isPhoneVerified = false;
 
-        registration = new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified);
+        registration = new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
 
         String adminName = "IM ADMIN" + FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".1123131213") + "@codeNaren.com";
-        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, isEmailVerified, isPhoneVerified);
+        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
     }
 
     private void createRoleIfNotExists() {
@@ -155,8 +155,8 @@ public class CustomerIT {
         boolean isEmailVerified = false;
         boolean isPhoneVerified = false;
 
-        CustomerRegistration customer1 = new CustomerRegistration(customerName1, email1, password, phone1, isEmailVerified, isPhoneVerified);
-        CustomerRegistration customer2 = new CustomerRegistration(customerName2, email2, password, phone2, isEmailVerified, isPhoneVerified);
+        CustomerRegistration customer1 = new CustomerRegistration(customerName1, email1, password, phone1, isEmailVerified, isPhoneVerified, false);
+        CustomerRegistration customer2 = new CustomerRegistration(customerName2, email2, password, phone2, isEmailVerified, isPhoneVerified, false);
 
         registerCustomerAndGetToken(customer2);
         String adminToken = registerAdminAndGetToken(customer1);
@@ -211,8 +211,8 @@ public class CustomerIT {
         boolean isEmailVerified = false;
         boolean isPhoneVerified = false;
 
-        CustomerRegistration adminReg = new CustomerRegistration(adminName, adminEmail, password, adminPhone, isEmailVerified, isPhoneVerified);
-        CustomerRegistration customerReg = new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified);
+        CustomerRegistration adminReg = new CustomerRegistration(adminName, adminEmail, password, adminPhone, isEmailVerified, isPhoneVerified, false);
+        CustomerRegistration customerReg = new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
 
         // Register admin and customer
         String adminToken = registerAdminAndGetToken(adminReg);
@@ -241,7 +241,10 @@ public class CustomerIT {
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
                 customerReg.name() + " Updated",
                 customerReg.email(),
-                customerReg.phoneNumber()
+                customerReg.phoneNumber(),
+                customerReg.isEmailVerified(),
+                customerReg.isPhoneVerified(),
+                customerReg.isLogged()
         );
 
         // Update customer
@@ -268,7 +271,7 @@ public class CustomerIT {
 
         // Create the expected customer DTO
         CustomerDTO expectedCustomerDTO = new CustomerDTO(customerId, updateRequest.name(), updateRequest.email(),
-                List.of("ROLE_USER"), updateRequest.phoneNumber(), updateRequest.email(), List.of());
+                List.of("ROLE_USER"), updateRequest.phoneNumber(), updateRequest.email(), List.of(), false, false, false);
 
         // Verify the updated customer matches the expected customer
         assertThat(updatedCustomerDTO).isEqualTo(expectedCustomerDTO);
@@ -285,7 +288,7 @@ public class CustomerIT {
         boolean isPhoneVerified = false;
 
         CustomerRegistration adminRegistration = new CustomerRegistration(adminName,
-                adminEmail, password, adminPhone, isEmailVerified, isPhoneVerified);
+                adminEmail, password, adminPhone, isEmailVerified, isPhoneVerified, false);
 
         String adminToken = registerAdminAndGetToken(adminRegistration);
 

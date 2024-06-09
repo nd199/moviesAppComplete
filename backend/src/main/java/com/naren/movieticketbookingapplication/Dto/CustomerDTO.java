@@ -10,6 +10,9 @@ public record CustomerDTO(
         String email,
         List<String> roles,
         Long phoneNumber,
-        String userName,
-        List<Movie> movies) {
+        String username,
+        List<Movie> movies,
+        Boolean isEmailVerified,
+        Boolean isPhoneVerified,
+        Boolean isLogged) {
 }
