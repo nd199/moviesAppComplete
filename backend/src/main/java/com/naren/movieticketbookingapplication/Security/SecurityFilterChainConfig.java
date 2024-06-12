@@ -37,16 +37,18 @@ public class SecurityFilterChainConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers("api/nwtChk").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/customers", "api/v1/admins").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/movies", "api/v1/movies/{id}",
                                 "api/v1/customers/{isLoggedIn}").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "api/v1/customers/add-movie/{customerId}/{movieId}", "api/v1/customers/{id}").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "api/v1/customers/add-movie/{customerId}/{movieId}",
+                                "api/v1/customers/{id}", "api/v1/customers/reset-pass/{id}").permitAll()
 
                         // Admin-only endpoints
                         .requestMatchers(HttpMethod.POST, "/api/v1/roles", "/api/v1/movies").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/roles").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/customers").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/customers/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/customers/{id}", "api/v1/customers/email/{email}",
+                                "api/v1/customers/phone/{phoneNumber}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/roles/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/movies/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/movies/{id}").hasRole("ADMIN")

@@ -13,6 +13,9 @@ import com.naren.movieticketbookingapplication.Exception.ResourceAlreadyExists;
 import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
+import com.naren.movieticketbookingapplication.Utils.EmailService;
+import com.naren.movieticketbookingapplication.Utils.OtpService;
+import com.naren.movieticketbookingapplication.Utils.SmSService;
 import com.naren.movieticketbookingapplication.jwt.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,12 +52,15 @@ class CustomerServiceImplTest {
     @Mock
     private MovieDao movieDao;
     private CustomerServiceImpl underTest;
+    private EmailService emailService;
+    private SmSService smSService;
+    private OtpService otpService;
 
     @BeforeEach
     void setUp() {
         underTest = new CustomerServiceImpl(
                 customerDao, passwordEncoder, customerDTOMapper, roleService,
-                movieDao, jwtUtil);
+                movieDao, jwtUtil, otpService);
 
     }
 

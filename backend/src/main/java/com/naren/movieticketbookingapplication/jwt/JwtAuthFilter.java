@@ -35,7 +35,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        log.info("Starting JWT_FILTER on " + request);
+        log.info("Starting JWT_FILTER on {}", request);
 
         final String authHeader = request.getHeader("Authorization");
 
