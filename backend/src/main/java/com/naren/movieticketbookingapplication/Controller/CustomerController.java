@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -53,12 +54,6 @@ public class CustomerController {
         return response;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<Customer> login(@RequestBody UserLogin userLogin, HttpServletRequest request) {
-        Customer response = customerService.loginUser(userLogin, request);
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping("/customers/{id}")
     public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable("id") Long customerId) {
         log.info("Fetching customer by ID: {}", customerId);
@@ -66,6 +61,23 @@ public class CustomerController {
         log.info("Customer found: {}", customerDTO);
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
+
+    @GetMapping("/customers/email/{email}")
+    public ResponseEntity<CustomerDTO> getCustomerByEmail(@PathVariable("email") String email) {
+        log.info("Fetching customer by email: {}", email);
+        CustomerDTO customerDTO = customerService.getCustomerByEmail(email);
+        log.info("Customer found : {}", customerDTO);
+        return new ResponseEntity<>(customerDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/customers/phone/{phoneNumber}")
+    public ResponseEntity<CustomerDTO> getCustomerByPhoneNumber(@PathVariable("phoneNumber") String phoneNumber) {
+        log.info("Fetching customer by phoneNumber: {}", phoneNumber);
+        CustomerDTO customerDTO = customerService.getCustomerByPhoneNumber(Long.parseLong(phoneNumber.substring(1)));
+        log.info("Customer  found :  {} ", customerDTO);
+        return new ResponseEntity<>(customerDTO, HttpStatus.OK);
+    }
+
 
     @GetMapping("/customers")
     public ResponseEntity<List<CustomerDTO>> customerList() {
@@ -80,7 +92,7 @@ public class CustomerController {
                                                    @PathVariable("id") Long customerId) {
         log.info("Updating customer with ID: {}", customerId);
         customerService.updateCustomer(customer, customerId);
-        log.info("Customer updated successfully.");
+        log.info("Customer updated successfully with ID: {}", customerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -88,7 +100,7 @@ public class CustomerController {
     public void deleteCustomer(@PathVariable("id") Long customerId) {
         log.info("Deleting customer with ID: {}", customerId);
         customerService.deleteCustomer(customerId);
-        log.info("Customer deleted successfully.");
+        log.info("Customer deleted successfully with ID: {}", customerId);
     }
 
     @PutMapping("/customers/add-movie/{customerId}/{movieId}")
@@ -105,7 +117,6 @@ public class CustomerController {
         log.info("Movie with ID {} removed from customer with ID: {}", movieId, customerId);
     }
 
-
     @DeleteMapping("/customers/{customerId}/remove-all-movies")
     public void removeAllMovies(@PathVariable Long customerId) {
         log.info("Removing all movies from customer with ID: {}", customerId);
@@ -115,17 +126,32 @@ public class CustomerController {
 
     @GetMapping("/roles")
     public ResponseEntity<List<Role>> getRoles() {
-        return ResponseEntity.ok(customerService.getRoles());
+        log.info("Fetching all roles");
+        List<Role> roles = customerService.getRoles();
+        log.info("Fetched {} roles", roles.size());
+        return ResponseEntity.ok(roles);
     }
 
     @DeleteMapping("/roles/{id}")
     public void deleteRole(@PathVariable("id") Long id) {
+        log.info("Deleting role with ID: {}", id);
         customerService.removeRole(id);
+        log.info("Role deleted successfully with ID: {}", id);
     }
 
-
     @GetMapping("/customers/{isLoggedIn}")
-    public void loggedInCustomers(@PathVariable boolean isLoggedIn) {
-        customerService.getCustomersByIsLoggedIn(isLoggedIn);
+    public List<Customer> loggedInCustomers(@PathVariable boolean isLoggedIn) {
+        log.info("Fetching customers with loggedIn status: {}", isLoggedIn);
+        List<Customer> customers = customerService.getCustomersByIsLoggedIn(isLoggedIn);
+        log.info("Fetched {} customers with loggedIn status: {}", customers.size(), isLoggedIn);
+        return customers;
+    }
+
+    @PutMapping("/customers/reset-pass/{id}")
+    public void resetPassword(@PathVariable Long id,
+                              @RequestBody Map<String, String> payload) {
+        log.info("Resetting password for customer ID: {}", id);
+        customerService.updatePassword(id, payload.get("resetPassword"), payload.get("typeOfVerification"), payload.get("enteredOtp"));
+        log.info("Password reset successfully for customer ID: {}", id);
     }
 }

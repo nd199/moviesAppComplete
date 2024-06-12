@@ -7,13 +7,11 @@ import com.naren.movieticketbookingapplication.Dto.CustomerDTOMapper;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Movie;
 import com.naren.movieticketbookingapplication.Entity.Role;
-import com.naren.movieticketbookingapplication.Exception.PasswordInvalidException;
-import com.naren.movieticketbookingapplication.Exception.RequestValidationException;
-import com.naren.movieticketbookingapplication.Exception.ResourceAlreadyExists;
-import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
+import com.naren.movieticketbookingapplication.Exception.*;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
 import com.naren.movieticketbookingapplication.Record.UserLogin;
+import com.naren.movieticketbookingapplication.Utils.OtpService;
 import com.naren.movieticketbookingapplication.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -41,131 +39,170 @@ public class CustomerServiceImpl implements CustomerService {
     private final RoleService roleService;
     private final MovieDao movieDao;
     private final JwtUtil jwtUtil;
+    private final OtpService otpService;
 
-    public CustomerServiceImpl(CustomerDao customerDao, PasswordEncoder passwordEncoder, CustomerDTOMapper customerDTOMapper, RoleService roleService, MovieDao movieDao, JwtUtil jwtUtil) {
+    public CustomerServiceImpl(CustomerDao customerDao, PasswordEncoder passwordEncoder, CustomerDTOMapper customerDTOMapper, RoleService roleService, MovieDao movieDao, JwtUtil jwtUtil, OtpService otpService) {
         this.customerDao = customerDao;
         this.passwordEncoder = passwordEncoder;
         this.customerDTOMapper = customerDTOMapper;
         this.roleService = roleService;
         this.movieDao = movieDao;
         this.jwtUtil = jwtUtil;
+        this.otpService = otpService;
     }
 
     @Override
     public void addRole(Role role) {
-        if (role == null)
+        if (role == null) {
+            log.error("Role cannot be null");
             throw new ResourceNotFoundException("Role cannot be null");
-        if (roleService.existsByName(role))
+        }
+        if (roleService.existsByName(role)) {
+            log.error("Role already exists: {}", role.getName());
             throw new ResourceAlreadyExists("Role already exists");
+        }
         roleService.saveRole(role);
+        log.info("Role added successfully: {}", role.getName());
     }
 
     @Override
     public List<Role> getRoles() {
+        log.info("Fetching all roles");
         return roleService.getAllRoles();
     }
 
     @Override
     public Role getRoleById(Long id) {
+        log.info("Fetching role by ID: {}", id);
         return roleService.findRoleById(id);
     }
 
     @Override
     public void removeRole(Long id) {
+        log.info("Removing role with ID: {}", id);
         Role role = getRoleById(id);
-        if (role == null)
-            throw new ResourceNotFoundException("Role cannot be null");
+        if (role == null) {
+            log.error("Role not found with ID: {}", id);
+            throw new ResourceNotFoundException("Role not found");
+        }
         roleService.deleteRole(id);
+        log.info("Role removed successfully with ID: {}", id);
     }
+//
+//    @Override
+//    public Customer loginUser(UserLogin userLogin, HttpServletRequest request) {
+//        log.info("Login attempt for user: {}", userLogin);
+//
+//        Optional<Customer> customer = Optional.empty();
+//        if (userLogin == null) {
+//            log.error("User login details cannot be null");
+//            throw new IllegalArgumentException("User cannot be null");
+//        }
+//        if (userLogin.email() == null) {
+//            customer = customerDao.getCustomerByPhoneNumber(userLogin.phoneNumber());
+//        } else if (userLogin.phoneNumber() == null) {
+//            customer = customerDao.getCustomerByUsername(userLogin.email());
+//        }
+//
+//        if (customer.isEmpty()) {
+//            log.error("User not found with email/phone: {}/{}", userLogin.email(), userLogin.phoneNumber());
+//            throw new ResourceNotFoundException("User not found");
+//        }
+//
+//        String authHeader = request.getHeader("Authorization");
+//        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+//            String token = authHeader.substring(7);
+//            if (jwtUtil.isTokenValid(token, jwtUtil.getSubject(token))) {
+//                log.info("Token validated for user: {}", userLogin.email());
+//                return customer.get();
+//            }
+//        }
+//
+//        log.error("Invalid login attempt for user: {}", userLogin.email());
+//        throw new IllegalArgumentException("Invalid login credentials");
+//    }
 
     @Override
-    public Customer loginUser(UserLogin userLogin, HttpServletRequest request) {
-        Optional<Customer> customer = Optional.empty();
+    public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration, Set<String> roleNames) {
+        log.info("Registering new user: {}", customerRegistration);
 
-        if (userLogin == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        }
-        if (userLogin.email() == null) {
-            customer = customerDao.getCustomerByPhoneNumber(userLogin.phoneNumber());
-        } else if (userLogin.phoneNumber() == null) {
-            customer = customerDao.getCustomerByUsername(userLogin.email());
-        }
+        try {
+            Customer registeredCustomer = registerCustomer(customerRegistration);
+            Set<Role> roles = new HashSet<>();
 
-        String AuthHeader = request.getHeader("Authorization");
-
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration,
-                                          Set<String> roleNames) {
-
-        Customer registeredCustomer = registerCustomer(customerRegistration);
-
-        Set<Role> roles = new HashSet<>();
-
-        for (String roleName : roleNames) {
-            Role role = roleService.findRoleByName(roleName);
-            if (role == null) {
-                return ResponseEntity.badRequest().body("Role " + roleName + " not found");
+            for (String roleName : roleNames) {
+                Role role = roleService.findRoleByName(roleName);
+                if (role == null) {
+                    log.error("Role not found: {}", roleName);
+                    return ResponseEntity.badRequest().body("Role " + roleName + " not found");
+                }
+                roles.add(role);
             }
-            roles.add(role);
+
+            roles.forEach(registeredCustomer::addRole);
+            registeredCustomer.setIsLogged(true);
+            customerDao.addCustomer(registeredCustomer);
+
+            String token = jwtUtil.issueToken(registeredCustomer.getUsername(), roles);
+
+            log.info("User registered successfully: {}", customerRegistration.email());
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .header(HttpHeaders.AUTHORIZATION, token)
+                    .body("Customer registered successfully!");
+        } catch (InvalidRegistration e) {
+            log.error("Registration failed: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        roles.forEach(registeredCustomer::addRole);
-
-        registeredCustomer.setIsLogged(true);
-
-        customerDao.addCustomer(registeredCustomer);
-
-        String token = jwtUtil.issueToken(registeredCustomer.getUsername(), roles);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .header(HttpHeaders.AUTHORIZATION, token)
-                .body("Customer registered successfully!");
     }
-
 
     private Customer registerCustomer(CustomerRegistration customerRegistration) {
+        log.info("Validating and registering customer: {}", customerRegistration.email());
 
-        boolean isValidPassword = validatePassword(customerRegistration.password(),
-                customerRegistration.name(),
-                customerRegistration.email(),
-                customerRegistration.phoneNumber());
+        boolean isValidPassword = validatePassword(customerRegistration.password(), customerRegistration.name(), customerRegistration.email(), customerRegistration.phoneNumber());
         if (!isValidPassword) {
+            log.error("Invalid password for user: {}", customerRegistration.email());
             throw new PasswordInvalidException("Invalid password");
         }
         if (customerDao.existsByEmail(customerRegistration.email())) {
+            log.error("Email already taken: {}", customerRegistration.email());
             throw new ResourceAlreadyExists("Email already taken");
         }
         if (customerDao.existsByPhoneNumber(customerRegistration.phoneNumber())) {
+            log.error("Phone number already taken: {}", customerRegistration.phoneNumber());
             throw new ResourceAlreadyExists("Phone number already taken");
         }
-        return new Customer(customerRegistration.name(), customerRegistration.email(),
+        return new Customer(customerRegistration.name(),
+                customerRegistration.email().toLowerCase(),
                 passwordEncoder.encode(customerRegistration.password()),
-                customerRegistration.phoneNumber(), false, false, false);
+                customerRegistration.phoneNumber(),
+                false, false, false);
     }
 
     private boolean validatePassword(String password, String name, String email, Long phoneNumber) {
         if (password == null || password.length() < REQ_PASSWORD_LENGTH) {
             log.error("Password must be at least {} characters long", REQ_PASSWORD_LENGTH);
-            return false;
+            throw new PasswordInvalidException("Password must be at least %s characters long".formatted(REQ_PASSWORD_LENGTH));
         }
         return !containsPersonalInfo(password, name, email, phoneNumber);
     }
 
     private boolean containsPersonalInfo(String password, String name, String email, Long phoneNumber) {
-        return password.contains(name) || password.contains(email) || password.contains(String.valueOf(phoneNumber));
-    }
 
+        if (password.contains(name) || password.contains(email) || password.contains(String.valueOf(phoneNumber))) {
+            throw new PasswordInvalidException("Password must not contain personal info [Name,Email,Phone] ");
+        }
+        return false;
+    }
 
     @Override
     public CustomerDTO getCustomerById(Long customerId) {
         log.info("Fetching customer by ID: {}", customerId);
-
         return customerDao.getCustomer(customerId)
                 .map(customerDTOMapper)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found with ID : {}", customerId);
+                    return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
+                });
     }
 
     @Override
@@ -173,7 +210,10 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Updating customer with ID: {}", id);
 
         Customer customer = customerDao.getCustomer(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + id + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found with ID  : {}", id);
+                    return new ResourceNotFoundException("Customer with ID " + id + " not found");
+                });
 
         boolean changes = false;
 
@@ -183,7 +223,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
         if (request.email() != null && !request.email().equals(customer.getEmail())) {
             if (customerDao.existsByEmail(request.email())) {
-                log.error("Email {} already exists", request.email());
+                log.error("Email already exists: {}", request.email());
                 throw new ResourceAlreadyExists("Email already taken");
             }
             customer.setEmail(request.email());
@@ -200,7 +240,6 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         customerDao.updateCustomer(customer);
-
         log.info("Customer updated successfully: {}", customer);
     }
 
@@ -220,7 +259,10 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Deleting customer with ID: {}", customerId);
 
         Customer customer = customerDao.getCustomer(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found with ID: {}", customerId);
+                    return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
+                });
 
         if (!customer.getMovies().isEmpty()) {
             removeAllMovies(customerId);
@@ -234,13 +276,20 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Adding movie with ID {} to customer with ID {}", movieId, customerId);
 
         Customer customer = customerDao.getCustomer(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found with  ID : {}  ", customerId);
+                    return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
+                });
         Movie movie = movieDao.getMovieById(movieId)
-                .orElseThrow(() -> new ResourceNotFoundException("Movie with ID " + movieId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Movie not found with  ID: {}", movieId);
+                    return new ResourceNotFoundException("Movie with ID " + movieId + " not found");
+                });
 
         if (customer.getMovies().contains(movie)) {
+            log.error("Customer {} already subscribed to movie {}", customerId, movieId);
             throw new ResourceAlreadyExists(
-                    "Customer %s already subscribed to %s movie".formatted(customer, movie));
+                    "Customer " + customerId + " already subscribed to movie " + movieId);
         }
         customer.addMovie(movie);
         customerDao.updateCustomer(customer);
@@ -253,13 +302,20 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Removing movie with ID {} from customer with ID {}", movieId, customerId);
 
         Customer customer = customerDao.getCustomer(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found with ID: {}", customerId);
+                    return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
+                });
         Movie movie = movieDao.getMovieById(movieId)
-                .orElseThrow(() -> new ResourceNotFoundException("Movie with ID " + movieId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Movie not found with ID: {}", movieId);
+                    return new ResourceNotFoundException("Movie with ID " + movieId + " not found");
+                });
 
         if (!customer.getMovies().contains(movie)) {
+            log.error("Customer {} not subscribed to movie {}", customerId, movieId);
             throw new ResourceNotFoundException(
-                    "Customer %s not subscribed to %s movie".formatted(customer, movie));
+                    "Customer " + customerId + " not subscribed to movie " + movieId);
         }
         customer.removeMovie(movie);
         customerDao.updateCustomer(customer);
@@ -268,10 +324,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void removeAllMovies(Long customerId) {
+        log.info("Removing all movies from customer with ID: {}", customerId);
 
-        log.info("Fetching customer with ID {}", customerId);
         Customer customer = customerDao.getCustomer(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found with ID: {}", customerId);
+                    return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
+                });
 
         List<Movie> movies = customer.getMovies();
 
@@ -281,7 +340,7 @@ public class CustomerServiceImpl implements CustomerService {
                     "Customer " + customerId + " not subscribed to any movie");
         }
 
-        log.info("Removing all movies from customer with ID {}", customerId);
+        log.info("Removing all movies from customer: {}", customer.getName());
         customer.removeMovies(movies);
         customerDao.updateCustomer(customer);
         log.info("Movies removed from customer successfully: Customer={}", customer.getName());
@@ -289,12 +348,63 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn) {
-        log.info("Fetching customer That are logged in");
+        log.info("Fetching customers that are logged in");
         List<Customer> customers = customerDao.getCustomersByIsLoggedIn(isLoggedIn);
         if (customers.isEmpty()) {
+            log.warn("No customers logged in");
             throw new ResourceNotFoundException(
-                    "No Customer logged In Application");
+                    "No customers logged in");
         }
         return customers;
+    }
+
+    @Override
+    public void updatePassword(Long customerID, String newPassword, String verificationType, String enteredOtp) {
+        log.info("Updating password for customer with ID: {}", customerID);
+
+        Customer customer = customerDao.getCustomer(customerID).orElseThrow(
+                () -> {
+                    log.error("Customer not found with ID: {}", customerID);
+                    return new ResourceNotFoundException("No Customer Found with id : " + customerID);
+                }
+        );
+
+        if ("mobile".equalsIgnoreCase(verificationType)) {
+            otpService.generateAndSendOtp(customerID, String.valueOf(customer.getPhoneNumber()), "mobile");
+        } else if ("mail".equalsIgnoreCase(verificationType)) {
+            otpService.generateAndSendOtp(customerID, String.valueOf(customer.getEmail()), "mail");
+        } else {
+            log.error("Invalid verification type: {}", verificationType);
+            throw new IllegalArgumentException("Invalid verification type");
+        }
+
+        boolean isValidPassword = validatePassword(newPassword, customer.getName(), customer.getEmail(), customer.getPhoneNumber());
+
+        if (!isValidPassword) {
+            log.error("Invalid password: {}", newPassword);
+            throw new PasswordInvalidException("Invalid password");
+        }
+
+        customer.setPassword(passwordEncoder.encode(newPassword));
+        customerDao.updateCustomer(customer);
+
+        log.info("Password updated successfully for customer with ID: {}", customerID);
+        ResponseEntity.ok("Password reset successfully");
+    }
+
+    @Override
+    public CustomerDTO getCustomerByEmail(String email) {
+        return customerDao.getCustomerByUsername(email).map((customerDTOMapper))
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Could not find customer by email " + email)
+                );
+    }
+
+    @Override
+    public CustomerDTO getCustomerByPhoneNumber(Long phoneNumber) {
+        return customerDao.getCustomerByPhoneNumber(phoneNumber)
+                .map(customerDTOMapper).orElseThrow(
+                        () -> new ResourceNotFoundException("Could not find customer by phone number " + phoneNumber)
+                );
     }
 }

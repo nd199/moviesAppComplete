@@ -37,9 +37,13 @@ public interface CustomerService {
 
     void removeRole(Long id);
 
-    Customer loginUser(UserLogin userLogin, HttpServletRequest request);
-
     void removeAllMovies(Long customerId);
 
     List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn);
+
+    void updatePassword(Long customerID, String newPassword, String verificationType, String enteredOtp);
+
+    CustomerDTO getCustomerByEmail(String email);
+
+    CustomerDTO getCustomerByPhoneNumber(Long phoneNumber);
 }

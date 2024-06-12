@@ -13,6 +13,16 @@ services:
     networks:
       - db
     restart: unless-stopped
+
+  redis:
+    container_name: redis-mv
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - db
+    restart: unless-stopped
+
 networks:
   db:
     driver: bridge
