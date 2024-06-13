@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/auth/")
+@RequestMapping("/auth")
 @Slf4j
 public class AuthController {
 

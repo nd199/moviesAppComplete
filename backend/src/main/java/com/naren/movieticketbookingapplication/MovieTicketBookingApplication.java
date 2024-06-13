@@ -49,7 +49,7 @@ public class MovieTicketBookingApplication {
         Long phoneNumber = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
         Boolean isLoggedIn = FAKER.options().option(true, false);
 
-        Customer customer = new Customer(customerEmail, customerName, password, phoneNumber, false, false, isLoggedIn);
+        Customer customer = new Customer(customerName, customerEmail, password, phoneNumber, false, false, isLoggedIn);
         customerRepository.save(customer);
         log.info("Created new customer: {}", customer);
     }

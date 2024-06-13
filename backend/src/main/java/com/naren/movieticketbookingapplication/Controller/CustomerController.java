@@ -5,9 +5,7 @@ import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
-import com.naren.movieticketbookingapplication.Record.UserLogin;
 import com.naren.movieticketbookingapplication.Service.CustomerService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,16 +60,17 @@ public class CustomerController {
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/customers/email/{email}")
-    public ResponseEntity<CustomerDTO> getCustomerByEmail(@PathVariable("email") String email) {
+    @GetMapping("/customers/email")
+    public ResponseEntity<CustomerDTO> getCustomerByEmail(@RequestBody String email) {
         log.info("Fetching customer by email: {}", email);
         CustomerDTO customerDTO = customerService.getCustomerByEmail(email);
         log.info("Customer found : {}", customerDTO);
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/customers/phone/{phoneNumber}")
-    public ResponseEntity<CustomerDTO> getCustomerByPhoneNumber(@PathVariable("phoneNumber") String phoneNumber) {
+
+    @GetMapping("/customers/phone")
+    public ResponseEntity<CustomerDTO> getCustomerByPhoneNumber(@RequestBody String phoneNumber) {
         log.info("Fetching customer by phoneNumber: {}", phoneNumber);
         CustomerDTO customerDTO = customerService.getCustomerByPhoneNumber(Long.parseLong(phoneNumber.substring(1)));
         log.info("Customer  found :  {} ", customerDTO);
@@ -151,7 +150,10 @@ public class CustomerController {
     public void resetPassword(@PathVariable Long id,
                               @RequestBody Map<String, String> payload) {
         log.info("Resetting password for customer ID: {}", id);
-        customerService.updatePassword(id, payload.get("resetPassword"), payload.get("typeOfVerification"), payload.get("enteredOtp"));
+        customerService.updatePassword(id, payload.get("resetPassword"),
+                payload.get("typeOfVerification"),
+                payload.get("enteredOtp")
+        );
         log.info("Password reset successfully for customer ID: {}", id);
     }
 }
