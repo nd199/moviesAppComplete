@@ -4,10 +4,14 @@ import {
   fetchUserByEmail,
   fetchUserByPhoneNumber,
   register,
+  verifyEmail,
+  verifyPhone,
 } from "../redux/ApiCalls";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import PasswordStrengthBar from "react-password-strength-bar";
+import { resetErrorMessage } from "../redux/userSlice";
+import { Send } from "@mui/icons-material";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -16,10 +20,26 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [matchText, setMatchText] = useState("");
+  const [verify, setShowVerify] = useState(false);
+  const [emVerify, setEmShowVerify] = useState(false);
+  const [mailOtp, setMailOTP] = useState("");
+  // const { isFetching, successMessage, errorMessage } = useSelector(
+  //   (state) => state.verifyEmail
+  // );
+
+  const [phoneOtp, setPhoneOTP] = useState("");
+  const [EmailOtp, setShowEmailOtp] = useState(false);
+  const [PhoneOtp, setShowPhoneOtp] = useState(false);
   const dispatch = useDispatch();
   const nav = useNavigate();
 
   const lError = useSelector((state) => state.user.errorMessage?.message);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetErrorMessage());
+    };
+  }, [dispatch]);
 
   const handleConfirmPasswordChange = (e) => {
     const confirmPasswordValue = e.target.value;
@@ -32,6 +52,28 @@ const Register = () => {
       setMatchText("Passwords Do Not Match");
     } else {
       setMatchText("Passwords Match");
+    }
+  };
+
+  const handleEmailVerify = async () => {
+    try {
+      setEmShowVerify(false);
+      setShowEmailOtp(true);
+      const res = await verifyEmail(email, dispatch);
+      console.log(res);
+    } catch (error) {
+      console.error("Error verifying email:", error);
+    }
+  };
+
+  const handlePhoneVerify = async () => {
+    try {
+      setShowVerify(false);
+      setShowPhoneOtp(true);
+      const res = await verifyPhone(phoneNumber, dispatch);
+      console.log(res);
+    } catch (error) {
+      console.error("Error verifying phone number:", error);
     }
   };
 
@@ -64,6 +106,7 @@ const Register = () => {
           className="reg-form"
         >
           <div className="inputs">
+            <label>NAME :</label>
             <input
               type="text"
               placeholder="John-Cena"
@@ -71,19 +114,55 @@ const Register = () => {
               onChange={(e) => setName(e.target.value)}
               required
             />
-            <label>NAME :</label>
           </div>
           <div className="inputs">
+            <label>EMAIL :</label>
+            {(emVerify && (
+              <button
+                type="button"
+                onClick={handleEmailVerify}
+                className="verify-button"
+              >
+                Verify Email
+              </button>
+            )) ||
+              (EmailOtp && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    backgroundColor: "white",
+                    width: "120px",
+                    padding: "0 5px",
+                  }}
+                >
+                  <input
+                    type="text"
+                    placeholder="OTP"
+                    value={mailOtp}
+                    style={{ width: "40%" }}
+                    onChange={(e) => setMailOTP(e.target.value)}
+                  />
+                  <Send
+                    style={{ color: "blue !important", cursor: "pointer" }}
+                  />
+                </div>
+              ))}
             <input
               type="email"
               placeholder="Cena@gmail.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value.toLocaleLowerCase())}
+              onChange={(e) => {
+                setEmail(e.target.value.toLocaleLowerCase());
+                setEmShowVerify(true);
+              }}
               required
             />
-            <label>EMAIL :</label>
           </div>
           <div className="inputs">
+            <label className="lblPassword" htmlFor={"password"}>
+              PASSWORD :
+            </label>
             <div className="passInput">
               <input
                 style={{ marginBottom: "2px" }}
@@ -101,9 +180,9 @@ const Register = () => {
                 />
               )}
             </div>
-            <label htmlFor={"password"}>PASSWORD :</label>
           </div>
           <div className="inputs">
+            <label className="lblPassword">CONFIRM PASSWORD :</label>
             <div style={{ flex: "1" }}>
               <input
                 type="password"
@@ -111,6 +190,7 @@ const Register = () => {
                 value={confirmPassword}
                 onChange={handleConfirmPasswordChange}
                 required
+                className="passInput"
               />
               {confirmPassword && (
                 <p
@@ -126,17 +206,36 @@ const Register = () => {
                 </p>
               )}
             </div>
-            <label>CONFIRM PASSWORD :</label>
           </div>
           <div className="inputs">
+            <label>PHONE NUMBER :</label>
+            {(verify && (
+              <button
+                type="button"
+                onClick={handlePhoneVerify}
+                className="verify-button"
+              >
+                Verify Phone
+              </button>
+            )) ||
+              (PhoneOtp && (
+                <input
+                  type="text"
+                  placeholder="Enter OTP"
+                  value={phoneOtp}
+                  onChange={(e) => setPhoneOTP(e.target.value)}
+                />
+              ))}
             <input
               type="text"
               placeholder="Phone Number"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              onChange={(e) => {
+                setPhoneNumber(e.target.value);
+                setShowVerify(true);
+              }}
               required
             />
-            <label>PHONE NUMBER :</label>
           </div>
           {lError && <div className="error">{lError}</div>}
           <button className="btn" type="submit">
@@ -144,7 +243,9 @@ const Register = () => {
           </button>
         </form>
         <Link to={"/"}>
-          <p>Have an account? Login here</p>
+          <p>
+            Have an account? Login <span style={{ color: "green" }}>here</span>
+          </p>
         </Link>
       </div>
     </div>

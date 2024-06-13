@@ -1,64 +1,139 @@
 .loginAdmin {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("../../public/images/REGBack.jpg") no-repeat center center;
+  background-size: cover;
+}
+
+.login-logo {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px 40px;
+  font-size: 40px;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  box-shadow: 0px 6px 7px 0px rgba(0, 0, 0, 0.65);
+  -webkit-box-shadow: 0px 5px 7px 0px rgba(0, 0, 0, 0.65);
+  -moz-box-shadow: 0px 5px 7px 0px rgba(0, 0, 0, 0.65);
 }
 
 .loginCard {
-    width: 580px;
-    height: 580px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 30px;
-    box-shadow: 2px 4px 58px 4px rgba(222, 137, 37, 0.29);
-    -webkit-box-shadow: 2px 4px 58px 4px rgba(222, 137, 37, 0.29);
-    -moz-box-shadow: 2px 4px 58px 4px rgba(222, 137, 37, 0.29);
+  width: 580px;
+  padding: 40px;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  box-shadow: 2px 4px 58px 4px rgba(222, 137, 37, 0.29);
+  -webkit-box-shadow: 2px 4px 58px 4px rgba(222, 137, 37, 0.29);
+  -moz-box-shadow: 2px 4px 58px 4px rgba(222, 137, 37, 0.29);
+  border-radius: 15px;
 }
 
-.loginCard label {
-    font-size: 20px;
-    font-weight: 550;
+.loginCard h1 {
+  font-size: 32px;
+  color: rgba(219, 68, 17, 0.8);
+}
+
+.loginCard h4 {
+  font-size: 18px;
+  color: #666;
+}
+
+.lg_inputs {
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  margin-bottom: 20px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lg_inputs > input {
+  border: none;
+  border-bottom: 2px solid #ddd;
+  height: 30px;
+  font-size: 18px;
+  margin-left: 30px;
+  outline: none;
+  padding: 5px;
+  transition: border-color 0.3s;
+}
+
+.lg_inputs > input:focus {
+  border-bottom-color: #aaf46d;
+}
+
+.lg_inputs > label {
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  color: #f2eeee;
+  margin-left: 20px;
+  text-align: left;
+}
+
+.passInput {
+  position: relative;
+  width: 100%;
+}
+
+.passInput .PasswordStrengthBar {
+  position: absolute;
+  bottom: -10px;
+  width: 100%;
 }
 
 .error {
-    color: red;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.inputs {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-}
-
-.loginCard .inputs > input {
-    border: none;
-    border-bottom: 2px solid;
-    height: 30px;
-    font-size: 24px;
-    outline: none;
+  color: red;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .btn {
-    width: 180px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #aaf46d;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    color: #fff;
+  width: 180px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #6cdb11;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #fff;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .btn:hover {
-    color: black;
+  background-color: #88d856;
+  color: black;
+}
+
+.loginCard p {
+  font-size: 17px;
+  color: #999;
+}
+
+.loginCard p span {
+  color: #aaf46d;
+  cursor: pointer;
+}
+
+.loginCard p span:hover {
+  text-decoration: underline;
 }

@@ -6,37 +6,39 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 @Service
 public class EmailService {
 
     private final JavaMailSender javaMailSender;
+    private final SpringTemplateEngine templateEngine;
 
     @Value("${spring.mail.username}")
-    private String userName;
+    private String username;
 
-
-    public EmailService(JavaMailSender javaMailSender) {
+    public EmailService(JavaMailSender javaMailSender, SpringTemplateEngine templateEngine) {
         this.javaMailSender = javaMailSender;
+        this.templateEngine = templateEngine;
     }
 
     public void sendOTPEmail(String toEmail, String otp) {
-        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
-            MimeMessageHelper helper = new MimeMessageHelper(message, true); // true indicates multipart message
-            helper.setFrom(userName);
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(username);
             helper.setTo(toEmail);
             helper.setSubject("Your OTP");
-            helper.setText("Your OTP is: " + otp);
-            String htmlContent = "<div style=\"padding: 20px; background-color: #f5f5f5;\">"
-                    + "<p style=\"font-size: 18px;\">Hi,</p>"
-                    + "<p style=\"font-size: 18px;\">Thanks for your password reset request. Please confirm it's you by entering the OTP below on our app:</p>"
-                    + "<div style=\"background-color: #8a2be2; padding: 10px; text-align: center; margin-top: 20px;\">"
-                    + "<p style=\"font-size: 24px; color: #ffffff;\">Your OTP: " + otp + "</p>"
-                    + "<button style=\"background-color: #8a2be2; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;\">Copy OTP</button>"
-                    + "</div></div>";
-            helper.setText(htmlContent, true);
-            javaMailSender.send(message);
+
+            // Create HTML content using Thymeleaf
+            Context context = new Context();
+            context.setVariable("otp", otp);
+            String htmlContent = templateEngine.process("otp-email", context);
+
+            helper.setText(htmlContent, true); // true indicates HTML content
+
+            javaMailSender.send(mimeMessage);
             System.out.println("Email sent successfully to: " + toEmail);
         } catch (MessagingException e) {
             System.err.println("Error sending email to: " + toEmail + ". Error: " + e.getMessage());

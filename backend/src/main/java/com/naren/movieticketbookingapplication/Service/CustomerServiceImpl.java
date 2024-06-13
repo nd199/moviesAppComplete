@@ -10,10 +10,8 @@ import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Exception.*;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
-import com.naren.movieticketbookingapplication.Record.UserLogin;
 import com.naren.movieticketbookingapplication.Utils.OtpService;
 import com.naren.movieticketbookingapplication.jwt.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -364,7 +361,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         Customer customer = customerDao.getCustomer(customerID).orElseThrow(
                 () -> {
-                    log.error("Customer not found with ID: {}", customerID);
+                    log.error("Customer not found with  ID: {}", customerID);
                     return new ResourceNotFoundException("No Customer Found with id : " + customerID);
                 }
         );
@@ -407,4 +404,10 @@ public class CustomerServiceImpl implements CustomerService {
                         () -> new ResourceNotFoundException("Could not find customer by phone number " + phoneNumber)
                 );
     }
+
+    @Override
+    public void generateAndSendMailOtp(String email) {
+        otpService.generateAndSendMailOtp(email);
+    }
+
 }

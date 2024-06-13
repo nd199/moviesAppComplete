@@ -23,6 +23,41 @@ public class OtpService {
     private EmailService emailService;
 
 
+    //Register Verification
+    public void generateAndSendMailOtp(String email) {
+        String otp = generateOtp();
+
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+
+        String key = generateKey(email);
+
+        valueOperations.set(key, otp, OTP_EXPIRE_INTERVAL, TimeUnit.MINUTES);
+
+        emailService.sendOTPEmail(email, otp);
+    }
+
+    public void generateAndSendPhoneOtp(String phoneNumber) {
+        String otp = generateOtp();
+
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+
+        String key = generateKey(phoneNumber);
+
+        valueOperations.set(key, otp, OTP_EXPIRE_INTERVAL, TimeUnit.MINUTES);
+
+        smSService.sendOtpRequest(phoneNumber, otp);
+    }
+
+    private String generateKey(Long number) {
+        return "One Time Password : " + number.toString();
+    }
+
+    private String generateKey(String email) {
+        return "One Time Password : " + email;
+    }
+
+
+    //Forgot Password
     public void generateAndSendOtp(Long customerId, String sentType, String verificationType) {
         String otp = generateOtp();
 
@@ -46,7 +81,14 @@ public class OtpService {
         assert storedOtp != null;
         return storedOtp.equals(enteredOtp);
     }
-
+    public boolean validateOtp(String customerEmail, String enteredOtp) {
+        ValueOperations<String, String> ops = redisTemplate.opsForValue();
+        String key = generateKey(customerEmail);
+        String storedOtp = ops.get(key);
+        if (enteredOtp == null) return false;
+        assert storedOtp != null;
+        return storedOtp.equals(enteredOtp);
+    }
 
     private String generateKey(Long customerId, String type) {
         return "One Time Password : " + customerId + ":" + type;

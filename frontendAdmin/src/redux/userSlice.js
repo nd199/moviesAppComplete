@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { verifyEmail } from "./ApiCalls";
 
 const userSlice = createSlice({
   name: "user",
@@ -7,6 +8,7 @@ const userSlice = createSlice({
     users: [],
     isFetching: false,
     error: false,
+    successMessage: null,
     errorMessage: null,
   },
   reducers: {
@@ -129,6 +131,39 @@ const userSlice = createSlice({
       state.isFetching = false;
       state.error = action.payload;
     },
+    verifyEmailStart: (state) => {
+      state.isFetching = true;
+      state.successMessage = null;
+      state.errorMessage = null;
+    },
+    verifyEmailSuccess: (state, action) => {
+      state.isFetching = false;
+      state.successMessage = action.payload;
+      state.errorMessage = null;
+    },
+    verifyEmailFailure: (state, action) => {
+      state.isFetching = false;
+      state.successMessage = null;
+      state.errorMessage = action.payload;
+    },
+    verifyPhoneStart: (state) => {
+      state.isFetching = true;
+      state.successMessage = null;
+      state.errorMessage = null;
+    },
+    verifyPhoneSuccess: (state, action) => {
+      state.isFetching = false;
+      state.successMessage = action.payload;
+      state.errorMessage = null;
+    },
+    verifyPhoneFailure: (state, action) => {
+      state.isFetching = false;
+      state.successMessage = null;
+      state.errorMessage = action.payload;
+    },
+    resetErrorMessage: (state) => {
+      state.errorMessage = null;
+    },
   },
 });
 
@@ -157,6 +192,13 @@ export const {
   forgotPasswordStart,
   forgotPasswordSuccess,
   forgotPasswordFailure,
+  verifyEmailStart,
+  verifyEmailSuccess,
+  verifyEmailFailure,
+  verifyPhoneStart,
+  verifyPhoneSuccess,
+  verifyPhoneFailure,
+  resetErrorMessage,
 } = userSlice.actions;
 
 export default userSlice.reducer;

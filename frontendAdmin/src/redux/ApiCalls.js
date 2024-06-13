@@ -1,5 +1,5 @@
 import axios from "axios";
-import { publicRequest, userRequest } from "../AxiosMethods";
+import { authRequest, publicRequest, userRequest } from "../AxiosMethods";
 import {
   addProductsFailure,
   addProductsStart,
@@ -39,12 +39,18 @@ import {
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,
+  verifyEmailStart,
+  verifyEmailSuccess,
+  verifyEmailFailure,
+  verifyPhoneStart,
+  verifyPhoneSuccess,
+  verifyPhoneFailure,
 } from "./userSlice";
 
 export const register = async (dispatch, adminInfo) => {
   dispatch(registerStart());
   try {
-    const res = await publicRequest.post("/admins", adminInfo);
+    const res = await authRequest.post("/admins", adminInfo);
     dispatch(registerSuccess(res.data));
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -56,6 +62,7 @@ export const register = async (dispatch, adminInfo) => {
     }
   }
 };
+
 
 export const forgotPassword = async (dispatch, data) => {
   dispatch(forgotPasswordStart());
@@ -79,7 +86,7 @@ export const forgotPassword = async (dispatch, data) => {
 export const login = async (dispatch, userInfo) => {
   dispatch(loginStart());
   try {
-    const res = await publicRequest.post("auth/login", userInfo);
+    const res = await authRequest.post("/login", userInfo);
     dispatch(loginSuccess(res.data));
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -204,7 +211,7 @@ export const fetchUsers = async (dispatch) => {
 export const fetchUserByEmail = async (email, dispatch) => {
   dispatch(fetchUserByEmailStart());
   try {
-    const res = await userRequest().get(`/customers/email/${email}`);
+    const res = await userRequest().get(`/customers/email`, email);
     dispatch(fetchUserByEmailSuccess(res.data));
     return res.data;
   } catch (error) {
@@ -220,7 +227,7 @@ export const fetchUserByEmail = async (email, dispatch) => {
 export const fetchUserByPhoneNumber = async (phoneNumber, dispatch) => {
   dispatch(fetchUserByPhoneNumberStart());
   try {
-    const res = await userRequest().get(`/customers/phone/${phoneNumber}`);
+    const res = await userRequest().get(`/customers/phone`, phoneNumber);
     dispatch(fetchUserByPhoneNumberSuccess(res.data));
     return res.data;
   } catch (error) {
@@ -232,3 +239,36 @@ export const fetchUserByPhoneNumber = async (phoneNumber, dispatch) => {
     return null;
   }
 };
+
+
+export const verifyEmail = async (otp, dispatch) =>{
+  dispatch(verifyEmailStart());
+  try{
+    const res = await publicRequest.post("/customer/verify/email", otp);
+    dispatch(verifyEmailSuccess(res.data.message));
+    return res.data;
+  }catch(error){
+    if (axios.isAxiosError(error) && error.response) {
+      dispatch(verifyEmailFailure(error.response.data.message));
+    } else {
+      dispatch(verifyEmailFailure("An unexpected error occurred"));
+    }
+    return null;
+  }
+}
+
+export const verifyPhone = async (otp, dispatch) =>{
+  dispatch(verifyPhoneStart());
+  try{
+    const res = await publicRequest.post("/customer/verify/phone", otp);
+    dispatch(verifyPhoneSuccess(res.data.message));
+    return res.data;
+  }catch(error){
+    if (axios.isAxiosError(error) && error.response) {
+      dispatch(verifyPhoneFailure(error.response.data.message));
+    } else {
+      dispatch(verifyPhoneFailure("An unexpected error occurred"));
+    }
+    return null;
+  }
+}
