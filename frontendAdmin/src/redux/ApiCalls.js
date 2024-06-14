@@ -45,6 +45,9 @@ import {
   verifyPhoneStart,
   verifyPhoneSuccess,
   verifyPhoneFailure,
+  validateOtpStart,
+  validateOtpSuccess,
+  validateOtpFailure,
 } from "./userSlice";
 
 export const register = async (dispatch, adminInfo) => {
@@ -241,10 +244,10 @@ export const fetchUserByPhoneNumber = async (phoneNumber, dispatch) => {
 };
 
 
-export const verifyEmail = async (otp, dispatch) =>{
+export const verifyEmail = async (dispatch, email) =>{
   dispatch(verifyEmailStart());
   try{
-    const res = await publicRequest.post("/customer/verify/email", otp);
+    const res = await publicRequest.post("/verify/email", email);
     dispatch(verifyEmailSuccess(res.data.message));
     return res.data;
   }catch(error){
@@ -257,10 +260,27 @@ export const verifyEmail = async (otp, dispatch) =>{
   }
 }
 
+export const validateOtp = async(dispatch, validateInfo) => {
+  dispatch(validateOtpStart());
+  try{
+    const res = await publicRequest.post("/validate/Otp", validateInfo);
+    dispatch(validateOtpSuccess(res.data.message));
+    return res.data;
+  }catch(error){
+    if (axios.isAxiosError(error) && error.response) {
+      dispatch(validateOtpFailure(error.response.data.message));
+    } else {
+      dispatch(validateOtpFailure("An unexpected error occurred"));
+    }
+    return null;
+  }
+}
+
+
 export const verifyPhone = async (otp, dispatch) =>{
   dispatch(verifyPhoneStart());
   try{
-    const res = await publicRequest.post("/customer/verify/phone", otp);
+    const res = await publicRequest.post("/verify/phone", otp);
     dispatch(verifyPhoneSuccess(res.data.message));
     return res.data;
   }catch(error){

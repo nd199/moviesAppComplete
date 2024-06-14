@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { verifyEmail } from "./ApiCalls";
 
 const userSlice = createSlice({
   name: "user",
@@ -161,6 +160,21 @@ const userSlice = createSlice({
       state.successMessage = null;
       state.errorMessage = action.payload;
     },
+    validateOtpStart: (state) => {
+      state.isFetching = true;
+      state.successMessage = null;
+      state.errorMessage = null;
+    },
+    validateOtpSuccess: (state, action) => {
+      state.isFetching = false;
+      state.successMessage = action.payload;
+      state.errorMessage = null;
+    },
+    validateOtpFailure: (state, action) => {
+      state.isFetching = false;
+      state.successMessage = null;
+      state.errorMessage = action.payload;
+    },
     resetErrorMessage: (state) => {
       state.errorMessage = null;
     },
@@ -198,6 +212,9 @@ export const {
   verifyPhoneStart,
   verifyPhoneSuccess,
   verifyPhoneFailure,
+  validateOtpStart,
+  validateOtpSuccess,
+  validateOtpFailure,
   resetErrorMessage,
 } = userSlice.actions;
 

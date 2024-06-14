@@ -5,6 +5,7 @@ import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
+import com.naren.movieticketbookingapplication.Record.EmailVerificationRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -45,5 +46,5 @@ public interface CustomerService {
 
     CustomerDTO getCustomerByPhoneNumber(Long phoneNumber);
 
-    void generateAndSendMailOtp(String email);
+    void generateAndSendMailOtp(EmailVerificationRequest email);
 }

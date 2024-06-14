@@ -1,9 +1,9 @@
 package com.naren.movieticketbookingapplication.Controller;
 
+import com.naren.movieticketbookingapplication.Record.EmailVerificationRequest;
 import com.naren.movieticketbookingapplication.Record.VerifyOtpRequest;
 import com.naren.movieticketbookingapplication.Service.CustomerService;
 import com.naren.movieticketbookingapplication.Utils.OtpService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,19 +24,18 @@ public class RegVerifyController {
     }
 
     @PostMapping("/verify/email")
-    public ResponseEntity<String> sendEmailToCustomer(@RequestBody String email) {
-        System.out.println("****************************************" + email + "********************************");
-        customerService.generateAndSendMailOtp(email);
-        return ResponseEntity.ok("OTP sent to email: " + email);
+    public ResponseEntity<String> sendEmailToCustomer(@RequestBody EmailVerificationRequest emailVerificationRequest) {
+        customerService.generateAndSendMailOtp(emailVerificationRequest);
+        return ResponseEntity.ok("OTP sent to email: " + emailVerificationRequest.email());
     }
 
-    @PostMapping("/validate/otp")
+    @PostMapping("/validate/Otp")
     public ResponseEntity<String> verifyEmailOtp(@RequestBody VerifyOtpRequest request) {
-        String email = request.email();
+        String email = request.customerEmail();
         String enteredOtp = request.enteredOTP();
 
         boolean isOtpValid = otpService.validateOtp(email, enteredOtp);
-        
+
         if (isOtpValid) {
             return ResponseEntity.ok("OTP verified successfully");
         } else {

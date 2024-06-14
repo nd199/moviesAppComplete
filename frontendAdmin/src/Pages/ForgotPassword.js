@@ -116,7 +116,7 @@ const ForgotPassword = () => {
                 required
               />
             </div>
-            <button type="submit">Submit</button>
+            <button className="fp-btn" type="submit">Submit</button>
           </form>
         </div>
       </div>

@@ -77,16 +77,15 @@ public class OtpService {
         ValueOperations<String, String> ops = redisTemplate.opsForValue();
         String key = generateKey(customerID, verificationType);
         String storedOtp = ops.get(key);
-        if (enteredOtp == null) return false;
-        assert storedOtp != null;
+        if (enteredOtp == null || storedOtp == null) return false;
         return storedOtp.equals(enteredOtp);
     }
+
     public boolean validateOtp(String customerEmail, String enteredOtp) {
         ValueOperations<String, String> ops = redisTemplate.opsForValue();
         String key = generateKey(customerEmail);
         String storedOtp = ops.get(key);
-        if (enteredOtp == null) return false;
-        assert storedOtp != null;
+        if (enteredOtp == null || storedOtp == null) return false;
         return storedOtp.equals(enteredOtp);
     }
 
