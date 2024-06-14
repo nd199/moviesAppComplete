@@ -31,17 +31,17 @@ public class EmailService {
             helper.setTo(toEmail);
             helper.setSubject("Your OTP");
 
-            // Create HTML content using Thymeleaf
             Context context = new Context();
             context.setVariable("otp", otp);
             String htmlContent = templateEngine.process("otp-email", context);
 
-            helper.setText(htmlContent, true); // true indicates HTML content
-
+            helper.setText(htmlContent, true);
             javaMailSender.send(mimeMessage);
             System.out.println("Email sent successfully to: " + toEmail);
         } catch (MessagingException e) {
             System.err.println("Error sending email to: " + toEmail + ". Error: " + e.getMessage());
         }
     }
+
 }
+

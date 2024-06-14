@@ -10,6 +10,7 @@ import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Exception.*;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
+import com.naren.movieticketbookingapplication.Record.EmailVerificationRequest;
 import com.naren.movieticketbookingapplication.Utils.OtpService;
 import com.naren.movieticketbookingapplication.jwt.JwtUtil;
 import jakarta.transaction.Transactional;
@@ -406,8 +407,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void generateAndSendMailOtp(String email) {
-        otpService.generateAndSendMailOtp(email);
+    public void generateAndSendMailOtp(EmailVerificationRequest emailVerificationRequest) {
+        otpService.generateAndSendMailOtp(emailVerificationRequest.email());
     }
 
 }

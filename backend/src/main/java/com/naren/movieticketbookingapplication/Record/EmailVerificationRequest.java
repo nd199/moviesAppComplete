@@ -1,4 +1,4 @@
 package com.naren.movieticketbookingapplication.Record;
 
-public record EmailVerificationRequest(String email, String otp) {
+public record EmailVerificationRequest(String email) {
 }
