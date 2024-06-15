@@ -1,5 +1,6 @@
 package com.naren.movieticketbookingapplication.Service;
 
+import com.naren.movieticketbookingapplication.Controller.RegVerifyController;
 import com.naren.movieticketbookingapplication.Dao.CustomerDao;
 import com.naren.movieticketbookingapplication.Dao.MovieDao;
 import com.naren.movieticketbookingapplication.Dto.CustomerDTO;
@@ -86,6 +87,7 @@ public class CustomerServiceImpl implements CustomerService {
         roleService.deleteRole(id);
         log.info("Role removed successfully with ID: {}", id);
     }
+
 //
 //    @Override
 //    public Customer loginUser(UserLogin userLogin, HttpServletRequest request) {
@@ -138,6 +140,7 @@ public class CustomerServiceImpl implements CustomerService {
             }
 
             roles.forEach(registeredCustomer::addRole);
+            registeredCustomer.setIsEmailVerified(true);
             registeredCustomer.setIsLogged(true);
             customerDao.addCustomer(registeredCustomer);
 
@@ -258,7 +261,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         Customer customer = customerDao.getCustomer(customerId)
                 .orElseThrow(() -> {
-                    log.error("Customer not found with ID: {}", customerId);
+                    log.error("Customer not found with  ID  :  {}", customerId);
                     return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
                 });
 

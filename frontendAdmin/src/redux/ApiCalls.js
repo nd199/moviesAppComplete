@@ -42,9 +42,6 @@ import {
   verifyEmailStart,
   verifyEmailSuccess,
   verifyEmailFailure,
-  verifyPhoneStart,
-  verifyPhoneSuccess,
-  verifyPhoneFailure,
   validateOtpStart,
   validateOtpSuccess,
   validateOtpFailure,
@@ -252,7 +249,8 @@ export const verifyEmail = async (dispatch, email) =>{
     return res.data;
   }catch(error){
     if (axios.isAxiosError(error) && error.response) {
-      dispatch(verifyEmailFailure(error.response.data.message));
+      dispatch(verifyEmailFailure(error.response));
+      throw error;
     } else {
       dispatch(verifyEmailFailure("An unexpected error occurred"));
     }
@@ -264,30 +262,14 @@ export const validateOtp = async(dispatch, validateInfo) => {
   dispatch(validateOtpStart());
   try{
     const res = await publicRequest.post("/validate/Otp", validateInfo);
-    dispatch(validateOtpSuccess(res.data.message));
+    dispatch(validateOtpSuccess(res.data));
     return res.data;
   }catch(error){
     if (axios.isAxiosError(error) && error.response) {
-      dispatch(validateOtpFailure(error.response.data.message));
+      dispatch(validateOtpFailure(error.response.data));
+      throw error;
     } else {
       dispatch(validateOtpFailure("An unexpected error occurred"));
-    }
-    return null;
-  }
-}
-
-
-export const verifyPhone = async (otp, dispatch) =>{
-  dispatch(verifyPhoneStart());
-  try{
-    const res = await publicRequest.post("/verify/phone", otp);
-    dispatch(verifyPhoneSuccess(res.data.message));
-    return res.data;
-  }catch(error){
-    if (axios.isAxiosError(error) && error.response) {
-      dispatch(verifyPhoneFailure(error.response.data.message));
-    } else {
-      dispatch(verifyPhoneFailure("An unexpected error occurred"));
     }
     return null;
   }

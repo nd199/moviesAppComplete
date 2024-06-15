@@ -17,6 +17,7 @@ public class RegVerifyController {
 
     private final CustomerService customerService;
     private final OtpService otpService;
+    public static boolean getOtpResult = false;
 
     public RegVerifyController(CustomerService customerService, OtpService otpService) {
         this.customerService = customerService;
@@ -29,18 +30,22 @@ public class RegVerifyController {
         return ResponseEntity.ok("OTP sent to email: " + emailVerificationRequest.email());
     }
 
+
     @PostMapping("/validate/Otp")
     public ResponseEntity<String> verifyEmailOtp(@RequestBody VerifyOtpRequest request) {
         String email = request.customerEmail();
         String enteredOtp = request.enteredOTP();
-
         boolean isOtpValid = otpService.validateOtp(email, enteredOtp);
-
+        getOtpResult = isOtpValid;
         if (isOtpValid) {
             return ResponseEntity.ok("OTP verified successfully");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid OTP or OTP expired");
+                    .body("Invalid OTP");
         }
+    }
+
+    public boolean getOtpVerificationResult() {
+        return getOtpResult;
     }
 }
