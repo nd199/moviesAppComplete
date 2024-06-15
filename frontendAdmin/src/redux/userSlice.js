@@ -145,21 +145,6 @@ const userSlice = createSlice({
       state.successMessage = null;
       state.errorMessage = action.payload;
     },
-    verifyPhoneStart: (state) => {
-      state.isFetching = true;
-      state.successMessage = null;
-      state.errorMessage = null;
-    },
-    verifyPhoneSuccess: (state, action) => {
-      state.isFetching = false;
-      state.successMessage = action.payload;
-      state.errorMessage = null;
-    },
-    verifyPhoneFailure: (state, action) => {
-      state.isFetching = false;
-      state.successMessage = null;
-      state.errorMessage = action.payload;
-    },
     validateOtpStart: (state) => {
       state.isFetching = true;
       state.successMessage = null;
@@ -173,6 +158,7 @@ const userSlice = createSlice({
     validateOtpFailure: (state, action) => {
       state.isFetching = false;
       state.successMessage = null;
+      state.error = true;
       state.errorMessage = action.payload;
     },
     resetErrorMessage: (state) => {
@@ -209,9 +195,6 @@ export const {
   verifyEmailStart,
   verifyEmailSuccess,
   verifyEmailFailure,
-  verifyPhoneStart,
-  verifyPhoneSuccess,
-  verifyPhoneFailure,
   validateOtpStart,
   validateOtpSuccess,
   validateOtpFailure,

@@ -11,21 +11,16 @@ const UserList = () => {
     const users = useSelector((state) => state.user.users);
 
     useEffect(() => {
-        // Fetch users when component mounts
         fetchUsers(dispatch);
     }, [dispatch]);
 
     const fetchUserList = () => {
-        // Refetch user list after deletion
         fetchUsers(dispatch);
     };
 
     const deleteUserHandler = async (id) => {
         try {
-            // Delete the user
             await deleteUser(id, dispatch);
-
-            // Refetch user list after successful deletion
             fetchUserList();
         } catch (err) {
             console.log(err);

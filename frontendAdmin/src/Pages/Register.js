@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "./Register.css";
-import {
-  register,
-  validateOtp,
-  verifyEmail,
-  verifyPhone,
-} from "../redux/ApiCalls";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import PasswordStrengthBar from "react-password-strength-bar";
 import { resetErrorMessage } from "../redux/userSlice";
-import { Send } from "@mui/icons-material";
-import CrossMark from "../animations/CrossMark.json";
-import TickMark from "../animations/TickMark.json";
+import EmailReg from "../components/EmailReg";
+import { register } from "../redux/ApiCalls";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -21,17 +14,10 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [matchText, setMatchText] = useState("");
-  const [verify, setShowVerify] = useState(false);
-  const [emVerify, setEmShowVerify] = useState(false);
-  const [mailOtp, setMailOTP] = useState("");
-  const [phoneOtp, setPhoneOTP] = useState("");
-  const [EmailOtp, setShowEmailOtp] = useState(false);
-  const [PhoneOtp, setShowPhoneOtp] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
-  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false); 
   const dispatch = useDispatch();
   const nav = useNavigate();
-
   const lError = useSelector((state) => state.user.errorMessage?.message);
 
   useEffect(() => {
@@ -50,11 +36,6 @@ const Register = () => {
     return () => clearInterval(timer);
   }, [otpTimer]);
 
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const handleConfirmPasswordChange = (e) => {
     const confirmPasswordValue = e.target.value;
     setConfirmPassword(confirmPasswordValue);
@@ -65,47 +46,17 @@ const Register = () => {
     }
   };
 
-  const handleEmailVerify = async () => {
-    setIsSendingEmail(true);
-    try {
-      setEmShowVerify(false);
-      setShowEmailOtp(true);
-      await verifyEmail(dispatch, { email });
-      setOtpTimer(60);
-    } catch (error) {
-      console.error("Error verifying email:", error);
-    } finally {
-      setIsSendingEmail(false);
-    }
+  const handleEmailChange = (emailValue) => {
+    setEmail(emailValue);
   };
 
-  const otpValidationHandler = async () => {
-    if (otpTimer <= 0) {
-      console.log("OTP has expired");
-      return;
-    }
-    try {
-      const validateInfo = { customerEmail: email, enteredOTP: mailOtp };
-      await validateOtp(dispatch, validateInfo);
-      console.log(email, mailOtp);
-    } catch (error) {
-      setShowEmailOtp(false);
-      console.error("Error validating email:", error);
-    }
-  };
-
-  const handlePhoneVerify = async () => {
-    try {
-      setShowVerify(false);
-      setShowPhoneOtp(true);
-      await verifyPhone(phoneNumber, dispatch);
-    } catch (error) {
-      console.error("Error verifying phone number:", error);
-    }
+  const handleEmailVerified = (status) => {
+    setIsEmailVerified(status);
   };
 
   const registerHandler = async (e) => {
     e.preventDefault();
+
     if (password === confirmPassword) {
       try {
         await register(dispatch, { name, email, password, phoneNumber });
@@ -116,24 +67,6 @@ const Register = () => {
     } else {
       setMatchText("Passwords Do Not Match");
     }
-  };
-
-  const TickMarkOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: TickMark,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-
-  const CrossMarkOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: CrossMark,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
   };
 
   return (
@@ -157,62 +90,18 @@ const Register = () => {
                 required
               />
             </div>
+            <EmailReg onEmailUpdate={handleEmailChange} onEmailVerified={handleEmailVerified}/>
             <div className="inputs">
-              <label>EMAIL :</label>
+              <label>PHONE NUMBER :</label>
               <input
-                type="email"
-                placeholder="Cena@gmail.com"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value.toLocaleLowerCase());
-                  setEmShowVerify(true);
-                }}
+                type="tel"
+                inputMode="tel"
+                placeholder="(+91) (123 - 456 - 789)"
+                pattern="[+][0-9]{1,4}[0-9]{7,12}"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
-              {emVerify ? (
-                <button
-                  type="button"
-                  onClick={handleEmailVerify}
-                  className="verify-button"
-                  disabled={!isValidEmail(email)}
-                  style={{
-                    cursor: !isValidEmail(email) ? "not-allowed" : "pointer",
-                  }}
-                  title={
-                    !isValidEmail(email)
-                      ? "Please enter a valid email"
-                      : "Click to verify your email"
-                  }
-                >
-                  Verify Email
-                </button>
-              ) : EmailOtp ? (
-                <div className="otp-container">
-                  <input
-                    type="text"
-                    placeholder="OTP"
-                    value={mailOtp}
-                    onChange={(e) => setMailOTP(e.target.value)}
-                  />
-                  <div>
-                    {isSendingEmail ? (
-                      <p>Sending Mail...</p>
-                    ) : (
-                      <div className="otp-Actions">
-                        <Send
-                          className="send-icon"
-                          onClick={otpValidationHandler}
-                        />
-                        <span>
-                          {" "}
-                          OTP Expires in{" "}
-                          <span className="timer">{otpTimer}</span> seconds
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : null}
             </div>
             <div className="inputs">
               <label className="lblPassword" htmlFor={"password"}>
@@ -237,14 +126,13 @@ const Register = () => {
             </div>
             <div className="inputs">
               <label className="lblPassword">CONFIRM PASSWORD :</label>
-              <div>
+              <div className="passInput">
                 <input
                   type="password"
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChange={handleConfirmPasswordChange}
                   required
-                  className="passInput"
                 />
                 {confirmPassword && (
                   <p
@@ -259,37 +147,14 @@ const Register = () => {
                 )}
               </div>
             </div>
-            <div className="inputs">
-              <label>PHONE NUMBER :</label>
-              {verify ? (
-                <button
-                  type="button"
-                  onClick={handlePhoneVerify}
-                  className="verify-button"
-                >
-                  Verify Phone
-                </button>
-              ) : PhoneOtp ? (
-                <input
-                  type="text"
-                  placeholder="Enter OTP"
-                  value={phoneOtp}
-                  onChange={(e) => setPhoneOTP(e.target.value)}
-                />
-              ) : null}
-              <input
-                type="text"
-                placeholder="Phone Number"
-                value={phoneNumber}
-                onChange={(e) => {
-                  setPhoneNumber(e.target.value);
-                  setShowVerify(true);
-                }}
-                required
-              />
-            </div>
             {lError && <div className="error">{lError}</div>}
-            <button className="RegisterButton" type="submit">
+            <p style={{color:"white"}}>{!isEmailVerified ? "Verify Your Email To continue" : ""}</p>
+            <button
+              className="RegisterButton"
+              type="submit"
+              disabled={!isEmailVerified}
+              style={{ cursor: !isEmailVerified ? "not-allowed" : "pointer" }}
+            >
               R E G I S T E R
             </button>
             <div className="reg-form-links">

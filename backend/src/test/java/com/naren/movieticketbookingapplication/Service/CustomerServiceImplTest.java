@@ -1,5 +1,6 @@
 package com.naren.movieticketbookingapplication.Service;
 
+import com.naren.movieticketbookingapplication.Controller.RegVerifyController;
 import com.naren.movieticketbookingapplication.Dao.CustomerDao;
 import com.naren.movieticketbookingapplication.Dao.MovieDao;
 import com.naren.movieticketbookingapplication.Dto.CustomerDTO;
@@ -15,7 +16,6 @@ import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
 import com.naren.movieticketbookingapplication.Utils.EmailService;
 import com.naren.movieticketbookingapplication.Utils.OtpService;
-import com.naren.movieticketbookingapplication.Utils.SmSService;
 import com.naren.movieticketbookingapplication.jwt.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,10 +51,14 @@ class CustomerServiceImplTest {
     private JwtUtil jwtUtil;
     @Mock
     private MovieDao movieDao;
+
     private CustomerServiceImpl underTest;
+
     private EmailService emailService;
-    private SmSService smSService;
+
     private OtpService otpService;
+
+    private RegVerifyController controller;
 
     @BeforeEach
     void setUp() {

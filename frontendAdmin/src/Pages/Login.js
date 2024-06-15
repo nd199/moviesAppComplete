@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/ApiCalls";
 import "./Login.css";
 import { Link, useNavigate } from "react-router-dom";
-import PasswordStrengthBar from "react-password-strength-bar";
 import { resetErrorMessage } from "../redux/userSlice";
 
 const Login = () => {
@@ -12,16 +11,14 @@ const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const dispatch = useDispatch();
   const nav = useNavigate();
-  
-  let lError = useSelector((state) => state.user.errorMessage?.message);
 
+  let lError = useSelector((state) => state.user.errorMessage?.message);
 
   useEffect(() => {
     return () => {
       dispatch(resetErrorMessage());
     };
   }, [dispatch]);
-
 
   const loginHandler = async (e) => {
     e.preventDefault();
@@ -37,16 +34,15 @@ const Login = () => {
   };
 
   return (
-    <div className="loginAdmin">
-      <div className="login-logo">CN.io</div>
+    <div className="login_Admin">
       <div className="loginCard">
-        <h1>Welcome Admin</h1>
-        <h4>Please Login below</h4>
-        <form
-          onSubmit={loginHandler}
-          className="reg-form"
-        >
-          <div className="lg_inputs">
+        <div className="login-title">
+          <h1>Welcome Admin</h1>
+          <h4>Please Login below</h4>
+        </div>
+        <form onSubmit={loginHandler} className="login-form">
+          <div className="login-inputs">
+            <label>EMAIL :</label>
             <input
               type="email"
               placeholder="Cena@gmail.com"
@@ -54,20 +50,19 @@ const Login = () => {
               onChange={(e) => setUsername(e.target.value.toLowerCase())}
               required
             />
-            <label>EMAIL :</label>
           </div>
-          <div className="lg_inputs">
-              <input
-                style={{ marginBottom: "2px" }}
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+          <div className="login-inputs">
             <label>PASSWORD :</label>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
-          <div className="lg_inputs">
+          <div className="login-inputs">
+            <label>PHONE NUMBER :</label>
             <input
               type="text"
               placeholder="Phone Number"
@@ -75,25 +70,26 @@ const Login = () => {
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
             />
-            <label>PHONE NUMBER :</label>
           </div>
           {lError && <div className="error">{lError}</div>}
-          <button className="btn" type="submit">
+          <button className="login-button" type="submit">
             L O G I N
           </button>
         </form>
-        <p>
-          New to CN.IO? Register{" "}
-          <Link to="/registerAdmin">
-            <span>here</span>
-          </Link>
-        </p>
-        <p>
-          Forgot Password? Click{" "}
-          <Link to="/forgotPassword">
-            <span>here</span>
-          </Link>
-        </p>
+        <div className="login-form-links">
+          <p>
+            New to CN.IO? <br /> Register{" "}
+            <Link to="/registerAdmin">
+              <span className="login-register-link">here</span>
+            </Link>
+          </p>
+          <p>
+            Forgot Password? Click{" "}
+            <Link to="/forgotPassword">
+              <span className="login-forgot-link">here</span>
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

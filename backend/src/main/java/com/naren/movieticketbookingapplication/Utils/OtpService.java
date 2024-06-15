@@ -13,14 +13,15 @@ public class OtpService {
 
     private static final long OTP_EXPIRE_INTERVAL = 5;
 
-    @Autowired
-    private StringRedisTemplate redisTemplate;
 
-    @Autowired
-    private SmSService smSService;
+    private final StringRedisTemplate redisTemplate;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
+
+    public OtpService(StringRedisTemplate redisTemplate, EmailService emailService) {
+        this.redisTemplate = redisTemplate;
+        this.emailService = emailService;
+    }
 
 
     //Register Verification
@@ -36,17 +37,6 @@ public class OtpService {
         emailService.sendOTPEmail(email, otp);
     }
 
-    public void generateAndSendPhoneOtp(String phoneNumber) {
-        String otp = generateOtp();
-
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-
-        String key = generateKey(phoneNumber);
-
-        valueOperations.set(key, otp, OTP_EXPIRE_INTERVAL, TimeUnit.MINUTES);
-
-        smSService.sendOtpRequest(phoneNumber, otp);
-    }
 
     private String generateKey(Long number) {
         return "One Time Password : " + number.toString();
@@ -60,17 +50,12 @@ public class OtpService {
     //Forgot Password
     public void generateAndSendOtp(Long customerId, String sentType, String verificationType) {
         String otp = generateOtp();
-
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         String key = generateKey(customerId, verificationType);
 
         valueOperations.set(key, otp, OTP_EXPIRE_INTERVAL, TimeUnit.MINUTES);
 
-        if ("mobile".equalsIgnoreCase(verificationType)) {
-            smSService.sendOtpRequest(sentType, otp);
-        } else if ("mail".equalsIgnoreCase(verificationType)) {
-            emailService.sendOTPEmail(sentType, otp);
-        }
+        emailService.sendOTPEmail(sentType, otp);
     }
 
     public boolean validateOtp(Long customerID, String verificationType, String enteredOtp) {
