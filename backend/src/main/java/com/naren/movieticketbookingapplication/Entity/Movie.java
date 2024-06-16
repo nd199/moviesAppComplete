@@ -1,11 +1,15 @@
 package com.naren.movieticketbookingapplication.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -13,9 +17,9 @@ import java.util.Objects;
         @UniqueConstraint(name = "movie_name_unique",
                 columnNames = "name")
 })
-@Setter
 @Getter
-@AllArgsConstructor
+@Setter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 public class Movie {
 
@@ -57,22 +61,16 @@ public class Movie {
     @ManyToOne
     @JoinColumn(name = "customer_id",
             foreignKey = @ForeignKey(name = "fk_customer_movie_id"))
+    @JsonBackReference
     private Customer customer;
 
-    public Movie(Long movie_id, String name, Double cost, Double rating,
-                 String description, String poster, String ageRating,
-                 Integer year, String runtime, String genre) {
-        this.movie_id = movie_id;
-        this.name = name;
-        this.cost = cost;
-        this.rating = rating;
-        this.description = description;
-        this.poster = poster;
-        this.ageRating = ageRating;
-        this.year = year;
-        this.runtime = runtime;
-        this.genre = genre;
-    }
+    @Column(nullable = false, updatable = false)
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     public Movie(String name, Double cost, Double rating, String description,
                  String poster, String ageRating,
@@ -88,11 +86,21 @@ public class Movie {
         this.genre = genre;
     }
 
-    public Movie(String name, Double cost, Double rating) {
+    public Movie(Long movie_id, String name, Double cost, Double rating,
+                 String description, String poster, String ageRating, Integer year,
+                 String runtime, String genre) {
+        this.movie_id = movie_id;
         this.name = name;
         this.cost = cost;
         this.rating = rating;
+        this.description = description;
+        this.poster = poster;
+        this.ageRating = ageRating;
+        this.year = year;
+        this.runtime = runtime;
+        this.genre = genre;
     }
+
 
     @Override
     public String toString() {

@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class RegVerifyController {
 
+    public static boolean getOtpResult = false;
     private final CustomerService customerService;
     private final OtpService otpService;
-    public static boolean getOtpResult = false;
 
     public RegVerifyController(CustomerService customerService, OtpService otpService) {
         this.customerService = customerService;

@@ -5,7 +5,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -15,6 +19,7 @@ import java.util.Objects;
 })
 @Setter
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 public class Show {
 
@@ -59,6 +64,14 @@ public class Show {
     @JsonBackReference
     private Customer customer;
 
+    @Column(nullable = false, updatable = false)
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
     public Show(String name, Double cost, Double rating, String description,
                 String poster, String ageRating,
                 Integer year, String runtime, String genre) {
@@ -73,9 +86,8 @@ public class Show {
         this.genre = genre;
     }
 
-    public Show(Long show_id, String name, Double cost, Double rating,
-                String description, String poster, String ageRating,
-                Integer year, String runtime, String genre) {
+    public Show(Long show_id, String name, Double cost, Double rating, String description,
+                String poster, String ageRating, Integer year, String runtime, String genre) {
         this.show_id = show_id;
         this.name = name;
         this.cost = cost;
@@ -86,12 +98,6 @@ public class Show {
         this.year = year;
         this.runtime = runtime;
         this.genre = genre;
-    }
-
-    public Show(String name, Double cost, Double rating) {
-        this.name = name;
-        this.cost = cost;
-        this.rating = rating;
     }
 
     @Override

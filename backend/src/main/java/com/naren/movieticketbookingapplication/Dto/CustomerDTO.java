@@ -2,6 +2,7 @@ package com.naren.movieticketbookingapplication.Dto;
 
 import com.naren.movieticketbookingapplication.Entity.Movie;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record CustomerDTO(
@@ -14,5 +15,8 @@ public record CustomerDTO(
         List<Movie> movies,
         Boolean isEmailVerified,
         Boolean isPhoneVerified,
-        Boolean isLogged) {
+        Boolean isLogged,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {
 }
