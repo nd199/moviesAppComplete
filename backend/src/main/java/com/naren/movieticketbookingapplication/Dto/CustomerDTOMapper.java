@@ -27,7 +27,9 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                 customer.getMovies(),
                 customer.getIsEmailVerified(),
                 customer.getIsPhoneVerified(),
-                customer.getIsLogged()
+                customer.getIsLogged(),
+                customer.getCreatedAt(),
+                customer.getUpdatedAt()
         );
 
         log.debug("Mapped Customer to CustomerDTO: {}", customerDTO);

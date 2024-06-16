@@ -7,10 +7,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static jakarta.persistence.CascadeType.*;
@@ -22,6 +26,7 @@ import static jakarta.persistence.CascadeType.*;
 })
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 @Slf4j
 public class Customer implements UserDetails {
@@ -64,6 +69,14 @@ public class Customer implements UserDetails {
     )
     @JsonBackReference
     private Set<Role> roles = new HashSet<>();
+
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public Customer(Long customer_id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isPhoneVerified, Boolean isLogged, List<Movie> movies, Set<Role> roles) {
         this.customer_id = customer_id;
@@ -112,6 +125,8 @@ public class Customer implements UserDetails {
                 ", isLoggedIn=" + isLogged +
                 ", movies=" + movies +
                 ", roles=" + roles +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 
@@ -129,12 +144,14 @@ public class Customer implements UserDetails {
                 Objects.equals(isPhoneVerified, customer.isPhoneVerified) &&
                 Objects.equals(isLogged, customer.isLogged) &&
                 Objects.equals(movies, customer.movies) &&
-                Objects.equals(roles, customer.roles);
+                Objects.equals(roles, customer.roles) &&
+                Objects.equals(createdAt, customer.createdAt) &&
+                Objects.equals(updatedAt, customer.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(customer_id, name, email, password, phoneNumber, isEmailVerified, isPhoneVerified, isLogged, movies, roles);
+        return Objects.hash(customer_id, name, email, password, phoneNumber, isEmailVerified, isPhoneVerified, isLogged, movies, roles, createdAt, updatedAt);
     }
 
     @Override
@@ -195,7 +212,7 @@ public class Customer implements UserDetails {
             if (movies.contains(movie)) {
                 iterator.remove();
                 movie.setCustomer(null);
-                log.info("Removed movie with ID {} from customer with ID {}", movie.getMovie_id(), this.getCustomer_id());
+                log.info("Removed movie with ID {} from customer_with ID {}", movie.getMovie_id(), this.getCustomer_id());
             }
         }
     }
@@ -207,10 +224,5 @@ public class Customer implements UserDetails {
         }
     }
 
-    public void removeRole(Role role) {
-        if (role != null && roles.contains(role)) {
-            roles.remove(role);
-            role.getCustomers().remove(this);
-        }
-    }
+
 }

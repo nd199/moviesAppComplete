@@ -1,6 +1,5 @@
 package com.naren.movieticketbookingapplication.Service;
 
-import com.naren.movieticketbookingapplication.Controller.RegVerifyController;
 import com.naren.movieticketbookingapplication.Dao.CustomerDao;
 import com.naren.movieticketbookingapplication.Dao.MovieDao;
 import com.naren.movieticketbookingapplication.Dto.CustomerDTO;

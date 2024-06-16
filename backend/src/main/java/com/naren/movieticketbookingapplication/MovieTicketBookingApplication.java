@@ -14,12 +14,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Random;
 
 @Slf4j
 @SpringBootApplication
+@EnableJpaAuditing
 public class MovieTicketBookingApplication {
 
     private static final Random RANDOM = new Random();
@@ -55,7 +57,7 @@ public class MovieTicketBookingApplication {
     }
 
     private void createRandomMovie(MovieRepository movieRepository) {
-        String movieName = FAKER.book().title();
+        String movieName = FAKER.book().title() + Math.random();
         double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
         double cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
         String description = FAKER.lorem().sentence();

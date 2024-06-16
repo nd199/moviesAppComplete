@@ -278,13 +278,18 @@ public class CustomerIT {
                 .returnResult()
                 .getResponseBody();
 
+        // Assert that updatedAt field is set and is not null
+        assertThat(updatedCustomerDTO).isNotNull();
+        assertThat(updatedCustomerDTO.updatedAt()).isNotNull();
+
         // Create the expected customer DTO
         CustomerDTO expectedCustomerDTO = new CustomerDTO(customerId, updateRequest.name(),
                 updateRequest.email(),
                 List.of("ROLE_USER"), updateRequest.phoneNumber(), updateRequest.email(),
-                List.of(), true, false, true);
+                List.of(), true, false, true,
+                updatedCustomerDTO.createdAt(), updatedCustomerDTO.updatedAt());
 
-        // Verify the updated customer matches the expected customer
+        // Assert other fields
         assertThat(updatedCustomerDTO).isEqualTo(expectedCustomerDTO);
     }
 
