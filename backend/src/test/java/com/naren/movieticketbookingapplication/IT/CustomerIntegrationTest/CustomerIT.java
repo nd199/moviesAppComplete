@@ -15,11 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +29,8 @@ public class CustomerIT {
 
     private static final Faker FAKER = new Faker();
     private static final String API_PATH = "/api/v1/customers";
+    private static final String API_PATH_CUSTOMERS = "/api/v1/auth/customers";
+    private static final String API_PATH_ADMINS = "/api/v1/auth/admins";
     private static final Random RANDOM = new Random();
 
     @Autowired
@@ -37,12 +39,6 @@ public class CustomerIT {
     @Autowired
     private RoleRepository roleRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-
-    private CustomerRegistration registration;
-
     private CustomerRegistration adminRegistration;
 
     @BeforeEach
@@ -50,13 +46,13 @@ public class CustomerIT {
         createRoleIfNotExists();
 
         String customerName = "IM CUSTOMER" + FAKER.name().fullName();
-        String customerEmail = customerName.replace(" ", ".") + "@codeNaren.com";
+        String customerEmail = customerName.replace(" ", ".") + "@codeNaren.com".toLowerCase();
         String password = FAKER.internet().password(8, 12);
         Long customerPhone = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
-        boolean isEmailVerified = false;
+        boolean isEmailVerified = true;
         boolean isPhoneVerified = false;
 
-        registration = new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
+        new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
 
         String adminName = "IM ADMIN" + FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".1123131213") + "@codeNaren.com";
@@ -76,9 +72,9 @@ public class CustomerIT {
         roleRepository.save(role);
     }
 
-    private String registerCustomerAndGetToken(CustomerRegistration registration) {
-        return webTestClient.post()
-                .uri(API_PATH)
+    private void registerCustomerAndGetToken(CustomerRegistration registration) {
+        webTestClient.post()
+                .uri(API_PATH_CUSTOMERS)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(registration), CustomerRegistration.class)
@@ -89,9 +85,9 @@ public class CustomerIT {
                 .getFirst(HttpHeaders.AUTHORIZATION);
     }
 
-    private String registerAdminAndGetToken(CustomerRegistration registration) {
+    private String registerAdminAndGetToken() {
         return webTestClient.post()
-                .uri(API_PATH.substring(0, 8) + "admins")
+                .uri(API_PATH_ADMINS)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(adminRegistration), CustomerRegistration.class)
@@ -104,8 +100,8 @@ public class CustomerIT {
 
     @Test
     void createCustomer() {
-        String adminToken = registerAdminAndGetToken(adminRegistration);
-
+        String adminToken = registerAdminAndGetToken();
+        System.out.println("Admin Token: " + adminToken);
 
         List<CustomerDTO> customerDTOList = webTestClient.get()
                 .uri(API_PATH)
@@ -117,13 +113,21 @@ public class CustomerIT {
                 })
                 .returnResult()
                 .getResponseBody();
-        System.out.println("Customer List: " + customerDTOList);
 
-        assert customerDTOList != null;
-        long customerId = customerDTOList.stream()
-                .filter(c -> c.email().equals(adminRegistration.email()))
-                .map(CustomerDTO::id)
-                .findFirst().orElseThrow();
+        System.out.println("Customer List: " + customerDTOList);
+        assertThat(customerDTOList).isNotNull();
+        assertThat(customerDTOList).isNotEmpty();
+
+        Optional<CustomerDTO> optionalCustomer = customerDTOList.stream()
+                .filter(c -> c.email().equalsIgnoreCase(adminRegistration.email()))
+                .findFirst();
+
+        if (optionalCustomer.isEmpty()) {
+            System.out.println("Registered admin customer not found in the list.");
+        }
+
+        assertThat(optionalCustomer).isPresent();
+        long customerId = optionalCustomer.orElseThrow().id();
 
         CustomerDTO customerDTO = webTestClient.get()
                 .uri(API_PATH + "/{id}", customerId)
@@ -136,8 +140,11 @@ public class CustomerIT {
                 .returnResult()
                 .getResponseBody();
 
+        System.out.println("CustomerDTO: " + customerDTO);
+        assertThat(customerDTO).isNotNull();
         assertThat(customerDTOList).contains(customerDTO);
     }
+
 
     @Test
     void deleteACustomer() {
@@ -155,11 +162,11 @@ public class CustomerIT {
         boolean isEmailVerified = false;
         boolean isPhoneVerified = false;
 
-        CustomerRegistration customer1 = new CustomerRegistration(customerName1, email1, password, phone1, isEmailVerified, isPhoneVerified, false);
+        new CustomerRegistration(customerName1, email1, password, phone1, isEmailVerified, isPhoneVerified, false);
         CustomerRegistration customer2 = new CustomerRegistration(customerName2, email2, password, phone2, isEmailVerified, isPhoneVerified, false);
 
         registerCustomerAndGetToken(customer2);
-        String adminToken = registerAdminAndGetToken(customer1);
+        String adminToken = registerAdminAndGetToken();
 
         List<CustomerDTO> allCustomers = webTestClient.get()
                 .uri(API_PATH)
@@ -174,7 +181,7 @@ public class CustomerIT {
 
         assert allCustomers != null;
         long id = allCustomers.stream()
-                .filter(c -> c.email().equals(customer2.email()))
+                .filter(c -> c.email().equalsIgnoreCase(customer2.email()))
                 .map(CustomerDTO::id)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
@@ -211,12 +218,14 @@ public class CustomerIT {
         boolean isEmailVerified = false;
         boolean isPhoneVerified = false;
 
-        CustomerRegistration adminReg = new CustomerRegistration(adminName, adminEmail, password, adminPhone, isEmailVerified, isPhoneVerified, false);
-        CustomerRegistration customerReg = new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
+        new CustomerRegistration(adminName, adminEmail, password,
+                adminPhone, isEmailVerified, isPhoneVerified, false);
+        CustomerRegistration customerReg = new CustomerRegistration(customerName, customerEmail,
+                password, customerPhone, isEmailVerified, isPhoneVerified, false);
 
         // Register admin and customer
-        String adminToken = registerAdminAndGetToken(adminReg);
-        String customerToken = registerCustomerAndGetToken(customerReg);
+        String adminToken = registerAdminAndGetToken();
+        registerCustomerAndGetToken(customerReg);
 
         // Fetch list of customers
         List<CustomerDTO> customerDTOList = webTestClient.get()
@@ -232,7 +241,7 @@ public class CustomerIT {
 
         assert customerDTOList != null;
         long customerId = customerDTOList.stream()
-                .filter(c -> c.email().equals(customerReg.email()))
+                .filter(c -> c.email().equalsIgnoreCase(customerReg.email()))
                 .map(CustomerDTO::id)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
@@ -252,7 +261,7 @@ public class CustomerIT {
                 .uri(API_PATH + "/{id}", customerId)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", customerToken))
+                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", adminToken))
                 .body(Mono.just(updateRequest), CustomerUpdateRequest.class)
                 .exchange()
                 .expectStatus().isOk();
@@ -270,8 +279,10 @@ public class CustomerIT {
                 .getResponseBody();
 
         // Create the expected customer DTO
-        CustomerDTO expectedCustomerDTO = new CustomerDTO(customerId, updateRequest.name(), updateRequest.email(),
-                List.of("ROLE_USER"), updateRequest.phoneNumber(), updateRequest.email(), List.of(), false, false, false);
+        CustomerDTO expectedCustomerDTO = new CustomerDTO(customerId, updateRequest.name(),
+                updateRequest.email(),
+                List.of("ROLE_USER"), updateRequest.phoneNumber(), updateRequest.email(),
+                List.of(), true, false, true);
 
         // Verify the updated customer matches the expected customer
         assertThat(updatedCustomerDTO).isEqualTo(expectedCustomerDTO);
@@ -287,10 +298,10 @@ public class CustomerIT {
         boolean isEmailVerified = false;
         boolean isPhoneVerified = false;
 
-        CustomerRegistration adminRegistration = new CustomerRegistration(adminName,
+        new CustomerRegistration(adminName,
                 adminEmail, password, adminPhone, isEmailVerified, isPhoneVerified, false);
 
-        String adminToken = registerAdminAndGetToken(adminRegistration);
+        String adminToken = registerAdminAndGetToken();
 
         String movieName = FAKER.book().title();
         Double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;

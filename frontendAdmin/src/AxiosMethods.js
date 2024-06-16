@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const Base_url = "http://localhost:8080/api/v1";
-const BaseAuthUrl = "http://localhost:8080/auth";
+const BaseAuthUrl = "http://localhost:8080/api/v1/auth";
 
 export const publicRequest = axios.create({
   baseURL: Base_url,

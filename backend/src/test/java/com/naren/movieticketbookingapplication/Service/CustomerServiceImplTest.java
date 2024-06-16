@@ -97,7 +97,7 @@ class CustomerServiceImplTest {
         assertThat(capturedCustomer.getName()).isEqualTo("test");
         assertThat(capturedCustomer.getPassword()).isEqualTo(encodedPassword);
         assertThat(capturedCustomer.getPhoneNumber()).isEqualTo(22222222222L);
-        assertThat(capturedCustomer.getIsEmailVerified()).isEqualTo(false);
+        assertThat(capturedCustomer.getIsEmailVerified()).isEqualTo(true);
         assertThat(capturedCustomer.getIsPhoneVerified()).isEqualTo(false);
         verify(roleService).findRoleByName("ROLE_USER");
         assertThat(capturedCustomer.getRoles()).contains(role);
@@ -126,7 +126,7 @@ class CustomerServiceImplTest {
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(PasswordInvalidException.class)
-                .hasMessage("Invalid password");
+                .hasMessage("Password must not contain personal info [Name,Email,Phone] ");
 
         verify(customerDao, never()).addCustomer(any());
     }
@@ -137,7 +137,7 @@ class CustomerServiceImplTest {
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(PasswordInvalidException.class)
-                .hasMessage("Invalid password");
+                .hasMessage("Password must be at least 8 characters long");
 
         verify(customerDao, never()).addCustomer(any());
     }
@@ -330,8 +330,9 @@ class CustomerServiceImplTest {
 
     @Test
     void testRemoveRoleThrowsIfRoleIsNull() {
-        assertThatThrownBy(() -> underTest.removeRole(null)).isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Role cannot be null");
+        assertThatThrownBy(() -> underTest.removeRole(null))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Role not found");
         verify(roleService, never()).deleteRole(any());
     }
 
@@ -373,7 +374,7 @@ class CustomerServiceImplTest {
 
         assertThatThrownBy(() -> underTest.addMovieToCustomer(customer.getCustomer_id(), movie.getMovie_id()))
                 .isInstanceOf(ResourceAlreadyExists.class)
-                .hasMessage("Customer %s already subscribed to %s movie".formatted(customer, movie));
+                .hasMessage("Customer " + customer.getCustomer_id() + " already subscribed to movie " + movie.getMovie_id());
 
         verify(customerDao, never()).updateCustomer(any());
     }

@@ -73,7 +73,7 @@ const Login = () => {
           </div>
           {lError && <div className="error">{lError}</div>}
           <button className="login-button" type="submit">
-            L O G I N
+            <Link to="/" style={{color: "white"}}>L O G I N</Link>
           </button>
         </form>
         <div className="login-form-links">

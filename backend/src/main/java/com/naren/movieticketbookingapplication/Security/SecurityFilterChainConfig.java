@@ -31,28 +31,72 @@ public class SecurityFilterChainConfig {
     }
 
     @Bean
-    public SecurityFilterChain customSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain customSecurityFilterChain(HttpSecurity http) throws Exception {
         log.info("Configuring custom Security Filter Chain...");
-        httpSecurity.csrf(AbstractHttpConfigurer::disable)
+        http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
-                        .requestMatchers("api/nwtChk").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/*").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/movies", "api/v1/movies/{id}",
-                                "api/v1/customers/{isLoggedIn}").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "api/v1/customers/add-movie/{customerId}/{movieId}",
-                                "api/v1/customers/{id}", "api/v1/customers/reset-pass/{id}").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/verify/email", "api/v1/validate/Otp").permitAll()
+                        .requestMatchers("/api/v1/verify/email", "/api/v1/validate/Otp")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/customers", "/api/v1/auth/admins",
+                                "/api/v1/auth/login")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/customers", "/api/v1/customers/byEmail",
+                                "/api/v1/customers/byPhone", "/api/v1/customers/loggedIn/{isLoggedIn}")
+                        .permitAll()
 
                         // Admin-only endpoints
-                        .requestMatchers(HttpMethod.POST, "/api/v1/roles", "/api/v1/movies").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/roles").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/customers").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/customers/{id}", "api/v1/customers/email/{email}",
-                                "api/v1/customers/phone/{phoneNumber}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/roles/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/movies/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/movies/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/customers/roles")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/customers/{id}", "/api/v1/customers/byEmail",
+                                "/api/v1/customers/byPhone", "/api/v1/customers", "/api/v1/roles")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/{id}", "/api/v1/roles/{id}")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/customers/add-movie/{customerId}/{movieId}",
+                                "/api/v1/customers/{id}", "/api/v1/customers/reset-pass/{id}")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/remove-movie/{customerId}/{movieId}",
+                                "/api/v1/customers/{customerId}/remove-all-movies")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/roles")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/roles/{id}")
+                        .hasRole("ADMIN")
+
+                        // MovieController endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/v1/movies")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/movies/{id}", "/api/v1/movies")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/movies/{id}")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/movies/{id}")
+                        .hasRole("ADMIN")
+
+                        // ShowController endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/v1/shows")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/shows/{id}", "/api/v1/shows")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/shows/{id}")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/shows/{id}")
+                        .hasRole("ADMIN")
+
+                        // AuthController endpoints
+                        .requestMatchers(HttpMethod.POST, "/auth/customers")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/admins")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login")
+                        .permitAll()
+
+                        // RegVerifyController endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/v1/verify/email")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/validate/Otp")
+                        .permitAll()
 
                         .anyRequest().authenticated())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -60,7 +104,7 @@ public class SecurityFilterChainConfig {
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(authenticationEntryPoint));
         log.info("Custom Security Filter Chain configured successfully.");
-        return httpSecurity.build();
+        return http.build();
     }
 
 }

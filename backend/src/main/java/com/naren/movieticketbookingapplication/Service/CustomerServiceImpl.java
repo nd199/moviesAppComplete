@@ -88,39 +88,6 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Role removed successfully with ID: {}", id);
     }
 
-//
-//    @Override
-//    public Customer loginUser(UserLogin userLogin, HttpServletRequest request) {
-//        log.info("Login attempt for user: {}", userLogin);
-//
-//        Optional<Customer> customer = Optional.empty();
-//        if (userLogin == null) {
-//            log.error("User login details cannot be null");
-//            throw new IllegalArgumentException("User cannot be null");
-//        }
-//        if (userLogin.email() == null) {
-//            customer = customerDao.getCustomerByPhoneNumber(userLogin.phoneNumber());
-//        } else if (userLogin.phoneNumber() == null) {
-//            customer = customerDao.getCustomerByUsername(userLogin.email());
-//        }
-//
-//        if (customer.isEmpty()) {
-//            log.error("User not found with email/phone: {}/{}", userLogin.email(), userLogin.phoneNumber());
-//            throw new ResourceNotFoundException("User not found");
-//        }
-//
-//        String authHeader = request.getHeader("Authorization");
-//        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-//            String token = authHeader.substring(7);
-//            if (jwtUtil.isTokenValid(token, jwtUtil.getSubject(token))) {
-//                log.info("Token validated for user: {}", userLogin.email());
-//                return customer.get();
-//            }
-//        }
-//
-//        log.error("Invalid login attempt for user: {}", userLogin.email());
-//        throw new IllegalArgumentException("Invalid login credentials");
-//    }
 
     @Override
     public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration, Set<String> roleNames) {
@@ -304,7 +271,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         Customer customer = customerDao.getCustomer(customerId)
                 .orElseThrow(() -> {
-                    log.error("Customer not found with ID: {}", customerId);
+                    log.error("Customer not found with ID:  {}", customerId);
                     return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
                 });
         Movie movie = movieDao.getMovieById(movieId)
