@@ -45,7 +45,4 @@ public class RegVerifyController {
         }
     }
 
-    public boolean getOtpVerificationResult() {
-        return getOtpResult;
-    }
 }

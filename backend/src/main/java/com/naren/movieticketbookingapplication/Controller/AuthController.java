@@ -1,6 +1,5 @@
 package com.naren.movieticketbookingapplication.Controller;
 
-
 import com.naren.movieticketbookingapplication.Auth.AuthRequest;
 import com.naren.movieticketbookingapplication.Auth.AuthResponse;
 import com.naren.movieticketbookingapplication.Auth.AuthService;
@@ -17,12 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 @Slf4j
 public class AuthController {
 
     private final AuthService authService;
-
     private final CustomerService customerService;
 
     public AuthController(AuthService authService, CustomerService customerService) {
@@ -53,5 +51,4 @@ public class AuthController {
                 .header(HttpHeaders.AUTHORIZATION)
                 .body(authResponse);
     }
-
 }

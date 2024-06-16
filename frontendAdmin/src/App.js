@@ -21,29 +21,34 @@ import ForgotPassword from "./Pages/ForgotPassword";
 
 function AppContent() {
   const user = useSelector((state) => state.user);
-  const isLoggedIn = user?.currentUser?.isLoggedIn || false;
+  const isLoggedIn = user?.currentUser?.customerDTO?.isLogged || false;
+  console.log(isLoggedIn);
 
   return (
-    <div className="container">
-      <Routes>-
-        <Route
-          path="/"
-          element={isLoggedIn ? <Navigate to="/Home" /> : <Login />}
-        />
-        <Route path="/registerAdmin" element={<Register />} />
-        <Route
-          path="/Home"
-          element={isLoggedIn ? <Home /> : <Navigate to="/" />}
-        />
-        <Route path="/users" element={<UserList />} />
-        <Route path="/user/:userId" element={<UserInfoAndEdit />} />
-        <Route path="/newUser" element={<NewUser />} />
-        <Route path="/products" element={<ProductList />} />
-        <Route path="/product/:productId" element={<ProductInfoAndEdit />} />
-        <Route path="/newProduct" element={<NewProduct />} />
-        <Route path="/forgotPassword" element={<ForgotPassword />} />
-      </Routes>
-    </div>
+    <>
+      {isLoggedIn && <Navbar />}
+      <div className="container">
+        <SideNav />
+        <Routes>
+          <Route path="/registerAdmin" element={<Register />} />
+          <Route
+            path="/"
+            element={isLoggedIn ? <Navigate to="/Home" /> : <Login />}
+          />
+          <Route
+            path="/Home"
+            element={isLoggedIn ? <Home /> : <Navigate to="/" />}
+          />
+          <Route path="/users" element={<UserList />} />
+          <Route path="/user/:userId" element={<UserInfoAndEdit />} />
+          <Route path="/newUser" element={<NewUser />} />
+          <Route path="/products" element={<ProductList />} />
+          <Route path="/product/:productId" element={<ProductInfoAndEdit />} />
+          <Route path="/newProduct" element={<NewProduct />} />
+          <Route path="/forgotPassword" element={<ForgotPassword />} />
+        </Routes>
+      </div>
+    </>
   );
 }
 
@@ -53,8 +58,6 @@ function App() {
 
   return (
     <Router>
-      {isLoggedIn && <Navbar />}
-      {isLoggedIn && <SideNav />}
       <AppContent />
     </Router>
   );

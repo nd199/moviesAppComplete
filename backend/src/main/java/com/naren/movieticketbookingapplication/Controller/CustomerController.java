@@ -60,23 +60,21 @@ public class CustomerController {
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/customers/email")
-    public ResponseEntity<CustomerDTO> getCustomerByEmail(@RequestBody String email) {
+    @GetMapping("/customers/byEmail")
+    public ResponseEntity<CustomerDTO> getCustomerByEmail(@RequestParam String email) {
         log.info("Fetching customer by email: {}", email);
         CustomerDTO customerDTO = customerService.getCustomerByEmail(email);
+        log.info("Customer _found:{}", customerDTO);
+        return new ResponseEntity<>(customerDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/customers/byPhone")
+    public ResponseEntity<CustomerDTO> getCustomerByPhoneNumber(@RequestParam String phoneNumber) {
+        log.info("Fetching customer by phoneNumber: {}", phoneNumber);
+        CustomerDTO customerDTO = customerService.getCustomerByPhoneNumber(Long.parseLong(phoneNumber.substring(1)));
         log.info("Customer found : {}", customerDTO);
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
-
-
-    @GetMapping("/customers/phone")
-    public ResponseEntity<CustomerDTO> getCustomerByPhoneNumber(@RequestBody String phoneNumber) {
-        log.info("Fetching customer by phoneNumber: {}", phoneNumber);
-        CustomerDTO customerDTO = customerService.getCustomerByPhoneNumber(Long.parseLong(phoneNumber.substring(1)));
-        log.info("Customer  found :  {} ", customerDTO);
-        return new ResponseEntity<>(customerDTO, HttpStatus.OK);
-    }
-
 
     @GetMapping("/customers")
     public ResponseEntity<List<CustomerDTO>> customerList() {
@@ -138,7 +136,7 @@ public class CustomerController {
         log.info("Role deleted successfully with ID: {}", id);
     }
 
-    @GetMapping("/customers/{isLoggedIn}")
+    @GetMapping("/customers/loggedIn/{isLoggedIn}")
     public List<Customer> loggedInCustomers(@PathVariable boolean isLoggedIn) {
         log.info("Fetching customers with loggedIn status: {}", isLoggedIn);
         List<Customer> customers = customerService.getCustomersByIsLoggedIn(isLoggedIn);

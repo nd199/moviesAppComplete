@@ -41,8 +41,6 @@ public class MovieIT {
 
     private MovieRegistration registration;
 
-    private CustomerRegistration customerRegistration;
-
     private CustomerRegistration adminRegistration;
 
     @BeforeEach
@@ -56,7 +54,7 @@ public class MovieIT {
         boolean isEmailVerified = false;
         boolean isPhoneVerified = false;
 
-        customerRegistration = new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
+        new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
 
         String adminName = "IM ADMIN " + FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".1123131213") + "@codeNaren.com";
@@ -69,7 +67,7 @@ public class MovieIT {
         String poster = FAKER.internet().url();
         String ageRating = "PG-13";
         Integer year = RANDOM.nextInt(1950, 2023);
-        String runtime = RANDOM.nextInt(90, 180) + " mins";
+        String runtime = RANDOM.nextInt(90, 180) + " minutes";
         String genre = "Action";
 
         registration = new MovieRegistration(movieName, cost, rating, description, poster, ageRating, year, runtime, genre);
@@ -88,22 +86,9 @@ public class MovieIT {
         roleRepository.save(role);
     }
 
-    private String registerCustomerAndGetToken(CustomerRegistration registration) {
-        return Objects.requireNonNull(webTestClient.post()
-                .uri("/api/v1/customers")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(registration), CustomerRegistration.class)
-                .exchange()
-                .expectStatus().isCreated()
-                .returnResult(Void.class)
-                .getResponseHeaders()
-                .getFirst(HttpHeaders.AUTHORIZATION));
-    }
-
     private String registerAdminAndGetToken(CustomerRegistration registration) {
         return Objects.requireNonNull(webTestClient.post()
-                .uri("/api/v1/admins")
+                .uri("/api/v1/auth/admins")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(registration), CustomerRegistration.class)
