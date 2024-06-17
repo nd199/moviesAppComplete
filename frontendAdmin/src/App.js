@@ -53,9 +53,6 @@ function AppContent() {
 }
 
 function App() {
-  const user = useSelector((state) => state.user);
-  const isLoggedIn = user?.currentUser?.isLoggedIn || false;
-
   return (
     <Router>
       <AppContent />

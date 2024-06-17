@@ -24,6 +24,7 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(dispatch, { username, password });
+      nav('/');
     } catch (err) {
       console.error(
         "Login error: ",
@@ -40,7 +41,7 @@ const Login = () => {
           <h1>Welcome Admin</h1>
           <h4>Please Login below</h4>
         </div>
-        <form onSubmit={loginHandler} className="login-form">
+        <form method="post" onSubmit={loginHandler} className="login-form">
           <div className="login-inputs">
             <label>EMAIL :</label>
             <input
@@ -73,7 +74,7 @@ const Login = () => {
           </div>
           {lError && <div className="error">{lError}</div>}
           <button className="login-button" type="submit">
-            <Link to="/" style={{color: "white"}}>L O G I N</Link>
+            L O G I N
           </button>
         </form>
         <div className="login-form-links">

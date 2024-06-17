@@ -350,7 +350,7 @@ class CustomerServiceImplTest {
         when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
         when(movieDao.getMovieById(1L)).thenReturn(Optional.of(movie));
 
-        underTest.addMovieToCustomer(customer.getCustomer_id(), movie.getMovie_id());
+        underTest.addMovieToCustomer(customer.getId(), movie.getMovie_id());
 
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
 
@@ -372,9 +372,9 @@ class CustomerServiceImplTest {
 
         customer.setMovies(List.of(movie));
 
-        assertThatThrownBy(() -> underTest.addMovieToCustomer(customer.getCustomer_id(), movie.getMovie_id()))
+        assertThatThrownBy(() -> underTest.addMovieToCustomer(customer.getId(), movie.getMovie_id()))
                 .isInstanceOf(ResourceAlreadyExists.class)
-                .hasMessage("Customer " + customer.getCustomer_id() + " already subscribed to movie " + movie.getMovie_id());
+                .hasMessage("Customer " + customer.getId() + " already subscribed to movie " + movie.getMovie_id());
 
         verify(customerDao, never()).updateCustomer(any());
     }

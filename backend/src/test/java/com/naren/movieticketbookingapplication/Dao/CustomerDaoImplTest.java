@@ -51,9 +51,9 @@ class CustomerDaoImplTest extends AbstractTestContainers {
     @Test
     void getCustomer() {
 
-        underTest.getCustomer(customer.getCustomer_id());
+        underTest.getCustomer(customer.getId());
 
-        verify(customerRepository).findById(customer.getCustomer_id());
+        verify(customerRepository).findById(customer.getId());
     }
 
     @Test

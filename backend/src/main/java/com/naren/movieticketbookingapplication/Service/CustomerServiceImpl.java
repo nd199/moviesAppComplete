@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -115,7 +116,7 @@ public class CustomerServiceImpl implements CustomerService {
             log.info("User registered successfully: {}", customerRegistration.email());
             return ResponseEntity.status(HttpStatus.CREATED)
                     .header(HttpHeaders.AUTHORIZATION, token)
-                    .body("Customer registered successfully!");
+                    .body("Customer Registered Successfully");
         } catch (InvalidRegistration e) {
             log.error("Registration failed: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -380,4 +381,11 @@ public class CustomerServiceImpl implements CustomerService {
         otpService.generateAndSendMailOtp(emailVerificationRequest.email());
     }
 
+    @Override
+    public List<CustomerDTO> getLatestCustomerList(){
+        return getAllCustomers()
+                .stream().sorted(Comparator.comparing(CustomerDTO::updatedAt).reversed())
+                .limit(10)
+                .toList();
+    }
 }

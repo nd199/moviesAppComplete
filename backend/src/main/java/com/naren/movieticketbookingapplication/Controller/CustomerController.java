@@ -3,7 +3,6 @@ package com.naren.movieticketbookingapplication.Controller;
 import com.naren.movieticketbookingapplication.Dto.CustomerDTO;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
-import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
 import com.naren.movieticketbookingapplication.Service.CustomerService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -36,21 +34,6 @@ public class CustomerController {
                 .body("Role added successfully");
     }
 
-    @PostMapping("/customers")
-    public ResponseEntity<?> addCustomer(@RequestBody CustomerRegistration customerRegistration) {
-        log.info("Received request to add customer: {}", customerRegistration);
-        ResponseEntity<?> response = customerService.registerUser(customerRegistration, Set.of("ROLE_USER"));
-        log.info("Customer registration response: {}", response);
-        return response;
-    }
-
-    @PostMapping("/admins")
-    public ResponseEntity<?> addAdmin(@RequestBody CustomerRegistration customerRegistration) {
-        log.info("Received request to add admin: {}", customerRegistration);
-        ResponseEntity<?> response = customerService.registerUser(customerRegistration, Set.of("ROLE_ADMIN"));
-        log.info("Admin registration response: {}", response);
-        return response;
-    }
 
     @GetMapping("/customers/{id}")
     public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable("id") Long customerId) {
@@ -77,9 +60,15 @@ public class CustomerController {
     }
 
     @GetMapping("/customers")
-    public ResponseEntity<List<CustomerDTO>> customerList() {
+    public ResponseEntity<List<CustomerDTO>> customerList(@RequestParam(name = "new", required = false)
+                                                          Boolean isNew) {
         log.info("Fetching list of customers...");
-        List<CustomerDTO> customers = customerService.getAllCustomers();
+        List<CustomerDTO> customers;
+        if (Boolean.TRUE.equals(isNew)) {
+            customers = customerService.getLatestCustomerList();
+        } else {
+            customers = customerService.getAllCustomers();
+        }
         log.info("Fetched {} customers.", customers.size());
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }

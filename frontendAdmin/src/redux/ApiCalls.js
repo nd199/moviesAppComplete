@@ -63,7 +63,6 @@ export const register = async (dispatch, adminInfo) => {
   }
 };
 
-
 export const forgotPassword = async (dispatch, data) => {
   dispatch(forgotPasswordStart());
   try {
@@ -88,6 +87,15 @@ export const login = async (dispatch, userInfo) => {
   try {
     const res = await authRequest.post("/login", userInfo);
     dispatch(loginSuccess(res.data));
+    localStorage.setItem(
+      "persist:root",
+      JSON.stringify({
+        user: JSON.stringify({
+          currentUser: res.data,
+        }),
+      })
+    );
+    return res.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(loginFailure(error.response.data));
@@ -197,7 +205,8 @@ export const deleteUser = async (id, dispatch) => {
 export const fetchUsers = async (dispatch) => {
   dispatch(fetchUsersStart());
   try {
-    const res = await userRequest().get("/users");
+    const res = await userRequest().get("/customers");
+    console.log(res);
     dispatch(fetchUsersSuccess(res.data));
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -240,14 +249,13 @@ export const fetchUserByPhoneNumber = async (phoneNumber, dispatch) => {
   }
 };
 
-
-export const verifyEmail = async (dispatch, email) =>{
+export const verifyEmail = async (dispatch, email) => {
   dispatch(verifyEmailStart());
-  try{
+  try {
     const res = await publicRequest.post("/verify/email", email);
     dispatch(verifyEmailSuccess(res.data.message));
     return res.data;
-  }catch(error){
+  } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(verifyEmailFailure(error.response));
       throw error;
@@ -256,15 +264,15 @@ export const verifyEmail = async (dispatch, email) =>{
     }
     return null;
   }
-}
+};
 
-export const validateOtp = async(dispatch, validateInfo) => {
+export const validateOtp = async (dispatch, validateInfo) => {
   dispatch(validateOtpStart());
-  try{
+  try {
     const res = await publicRequest.post("/validate/Otp", validateInfo);
     dispatch(validateOtpSuccess(res.data));
     return res.data;
-  }catch(error){
+  } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(validateOtpFailure(error.response.data));
       throw error;
@@ -273,4 +281,4 @@ export const validateOtp = async(dispatch, validateInfo) => {
     }
     return null;
   }
-}
+};

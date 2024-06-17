@@ -41,7 +41,7 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/customers", "/api/v1/auth/admins",
                                 "/api/v1/auth/login")
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/customers", "/api/v1/customers/byEmail",
+                        .requestMatchers(HttpMethod.GET, "/api/v1/customers/byEmail",
                                 "/api/v1/customers/byPhone", "/api/v1/customers/loggedIn/{isLoggedIn}")
                         .permitAll()
 

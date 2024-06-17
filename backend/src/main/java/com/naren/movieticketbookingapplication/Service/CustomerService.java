@@ -47,4 +47,6 @@ public interface CustomerService {
     CustomerDTO getCustomerByPhoneNumber(Long phoneNumber);
 
     void generateAndSendMailOtp(EmailVerificationRequest email);
+
+    List<CustomerDTO> getLatestCustomerList();
 }

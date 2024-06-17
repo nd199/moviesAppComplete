@@ -17,7 +17,7 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
         log.debug("Mapping Customer to CustomerDTO: {}", customer);
 
         CustomerDTO customerDTO = new CustomerDTO(
-                customer.getCustomer_id(),
+                customer.getId(),
                 customer.getName(),
                 customer.getEmail(),
                 customer.getAuthorities()
