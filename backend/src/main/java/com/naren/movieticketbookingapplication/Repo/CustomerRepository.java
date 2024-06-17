@@ -18,7 +18,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     List<Customer> getCustomersByIsLogged(Boolean isLoggedIn);
 
-
 }
 
 

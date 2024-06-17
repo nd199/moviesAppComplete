@@ -33,7 +33,7 @@ public class Customer implements UserDetails {
     @Id
     @SequenceGenerator(name = "customer_id", sequenceName = "customer_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_id")
-    private Long customer_id;
+    private Long id;
 
     @Column(name = "name", columnDefinition = "TEXT")
     private String name;
@@ -78,8 +78,8 @@ public class Customer implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Customer(Long customer_id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isPhoneVerified, Boolean isLogged, List<Movie> movies, Set<Role> roles) {
-        this.customer_id = customer_id;
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isPhoneVerified, Boolean isLogged, List<Movie> movies, Set<Role> roles) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
@@ -91,8 +91,8 @@ public class Customer implements UserDetails {
         this.roles = roles;
     }
 
-    public Customer(Long customer_id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isPhoneVerified, Boolean isLogged) {
-        this.customer_id = customer_id;
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isPhoneVerified, Boolean isLogged) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
@@ -115,7 +115,7 @@ public class Customer implements UserDetails {
     @Override
     public String toString() {
         return "Customer{" +
-                "customer_id=" + customer_id +
+                "customer_id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
@@ -135,7 +135,7 @@ public class Customer implements UserDetails {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return Objects.equals(customer_id, customer.customer_id) &&
+        return Objects.equals(id, customer.id) &&
                 Objects.equals(name, customer.name) &&
                 Objects.equals(email, customer.email) &&
                 Objects.equals(password, customer.password) &&
@@ -151,7 +151,7 @@ public class Customer implements UserDetails {
 
     @Override
     public int hashCode() {
-        return Objects.hash(customer_id, name, email, password, phoneNumber, isEmailVerified, isPhoneVerified, isLogged, movies, roles, createdAt, updatedAt);
+        return Objects.hash(id, name, email, password, phoneNumber, isEmailVerified, isPhoneVerified, isLogged, movies, roles, createdAt, updatedAt);
     }
 
     @Override
@@ -199,7 +199,7 @@ public class Customer implements UserDetails {
         if (movie != null && movies.contains(movie)) {
             movies.remove(movie);
             movie.setCustomer(null);
-            log.info("Removed movie with ID {} from customer with ID {}", movie.getMovie_id(), this.getCustomer_id());
+            log.info("Removed movie with ID {} from customer with ID {}", movie.getMovie_id(), this.getId());
         } else {
             log.warn("Attempted to remove a movie that is not associated with the customer or movie is null");
         }
@@ -212,7 +212,7 @@ public class Customer implements UserDetails {
             if (movies.contains(movie)) {
                 iterator.remove();
                 movie.setCustomer(null);
-                log.info("Removed movie with ID {} from customer_with ID {}", movie.getMovie_id(), this.getCustomer_id());
+                log.info("Removed movie with ID {} from customer_with ID {}", movie.getMovie_id(), this.getId());
             }
         }
     }

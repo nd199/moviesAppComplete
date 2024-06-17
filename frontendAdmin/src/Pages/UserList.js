@@ -9,9 +9,11 @@ import {deleteUser, fetchUsers} from "../redux/ApiCalls";
 const UserList = () => {
     const dispatch = useDispatch();
     const users = useSelector((state) => state.user.users);
+    console.log(users);
 
     useEffect(() => {
-        fetchUsers(dispatch);
+        const res = fetchUsers(dispatch);
+        console.log(res);
     }, [dispatch]);
 
     const fetchUserList = () => {
@@ -28,9 +30,9 @@ const UserList = () => {
     };
 
     const columns = [
-        {field: "_id", headerName: "ID", width: 220},
+        {field: "id", headerName: "ID", width: 220},
         {
-            field: "userName",
+            field: "username",
             headerName: "User",
             width: 200,
             renderCell: (params) => {
@@ -43,19 +45,19 @@ const UserList = () => {
         },
         {field: "email", headerName: "Email", width: 200},
         {
-            field: "online",
+            field: "isLogged",
             headerName: "Online Status",
             width: 200,
             renderCell: (params) => {
                 return (
                     <div
                         style={{
-                            color: params.row.online ? "green" : "red",
+                            color: params.row.isLogged ? "green" : "red",
                             display: "flex",
                             justifyContent: "center",
                         }}
                     >
-                        {params.row.online ? "Online" : "Not Online"}
+                        {params.row.isLogged ? "Online" : "Not Online"}
                     </div>
                 );
             },
@@ -67,12 +69,12 @@ const UserList = () => {
             renderCell: (params) => {
                 return (
                     <div className="ulActions">
-                        <Link to={"/User/" + params.row._id}>
+                        <Link to={"/User/" + params.row.id}>
                             <EditOutlined className="ulEdit"/>
                         </Link>
                         <DeleteOutlineOutlined
                             className="ulDelete"
-                            onClick={() => deleteUserHandler(params.row._id)}
+                            onClick={() => deleteUserHandler(params.row.id)}
                         />
                     </div>
                 );
@@ -86,7 +88,7 @@ const UserList = () => {
                 rows={users}
                 disableRowSelectionOnClick
                 columns={columns}
-                getRowId={(row) => row._id}
+                getRowId={(row) => row.id}
                 pageSize={5}
                 checkboxSelection
                 headerClassName="header-class"
