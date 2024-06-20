@@ -5,8 +5,7 @@ public record CustomerUpdateRequest(
         String email,
         Long phoneNumber,
         Boolean isEmailVerified,
-        Boolean isPhoneVerified,
-
+        String address,
         Boolean isLogged) {
 }
 

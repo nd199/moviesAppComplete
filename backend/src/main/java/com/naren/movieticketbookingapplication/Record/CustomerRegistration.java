@@ -7,7 +7,7 @@ public record CustomerRegistration(
         String password,
         Long phoneNumber,
         boolean isEmailVerified,
-        boolean isPhoneVerified,
+        String address,
         boolean isLogged) {
 }
 

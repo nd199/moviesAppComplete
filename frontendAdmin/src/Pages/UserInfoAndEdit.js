@@ -1,126 +1,190 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./UserInfoAndEdit.css";
 import {
-    CalendarTodayOutlined,
-    LocationOnOutlined,
-    MailOutlined,
-    Person2Outlined,
-    PhoneAndroidOutlined,
-    PublishOutlined,
+  CalendarTodayOutlined,
+  LocationOnOutlined,
+  MailOutlined,
+  Person2Outlined,
+  PhoneAndroidOutlined,
+  PublishOutlined,
 } from "@mui/icons-material";
-import {Link} from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUsers, updateUser } from "../redux/ApiCalls";
+import { format } from "date-fns";
 
 const UserInfoAndEdit = () => {
-    return (
-        <div className="uEdit">
-            <div className="uTitleContainer">
-                <h1 className="uTitle">Edit User</h1>
-                <Link to={"/NewUser"}>
-                    <button className="userAdd">Create</button>
-                </Link>
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const userId = Number(location.pathname.split("/")[2]);
+  const user = useSelector((state) =>
+    state.user?.users?.find((user) => user.id === userId)
+  );
+
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
+  const [imageUrl, setImageUrl] = useState(user.imageUrl);
+  const [address, setAddress] = useState(user.address);
+  const [createdAt, setFormatted] = useState(user.createdAt);
+
+  const userUpdateHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await updateUser(dispatch, user.id, {
+        name,
+        email,
+        phoneNumber,
+        address,
+      });
+      fetchUsers(dispatch);
+      setName("");
+      setEmail("");
+      setPhoneNumber("");
+      setAddress("");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setImageUrl(reader.result);
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
+
+  return (
+    <div className="uEdit">
+      <div className="uTitleContainer">
+        <h1 className="uTitle">Edit User</h1>
+        <Link to={"/NewUser"}>
+          <button className="userAdd">Create</button>
+        </Link>
+      </div>
+      <div className="uContainer">
+        <div className="uInfo">
+          <div className="uInfoContainer">
+            <img
+              src={imageUrl || "https://example.com/default-image.jpg"}
+              alt=""
+              className="userInfoImg"
+            />
+            <div className="uInfoText">
+              <h3 className="uInfoName">{name || user.name}</h3>
             </div>
-            <div className="uContainer">
-                <div className="uInfo">
-                    <div className="uInfoContainer">
-                        <img
-                            src="https://imgs.search.brave.com/WZirnZKPnJp5y-WxleFntqVsyNaurlBGbRfxIDuvPSI/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTA1/NTY1ODYzNC9waG90/by9iZWF1dGlmdWwt/d29tYW4td2Vhcmlu/Zy1zd2VhdGVyLmpw/Zz9zPTYxMng2MTIm/dz0wJms9MjAmYz1M/UVRrMFN3a0o3SWgt/M19Vb3pnU3pEU0JN/cTM3YUMxOXU4QnlT/ZTduYUs4PQ"
-                            alt=""
-                            className="userInfoImg"
-                        />
-                        <div className="uInfoText">
-                            <h3 className="uInfoName">Becky Rose</h3>
-                            <span className="uInfoTitle">Software Engineer</span>
-                        </div>
-                        <div className="uInformation">
-                            <span className="userInfoTitle">Account Details</span>
-                            <div className="uInfoMore">
-                                <Person2Outlined/>
-                                <span className="userShowInfo">b_Rose277</span>
-                            </div>
-                            <div className="uInfoMore">
-                                <CalendarTodayOutlined/>
-                                <span className="userShowInfo">25.06.1999</span>
-                            </div>
-                            <span className="userInfoTitle">Contact Details</span>
-                            <div className="uInfoMore">
-                                <PhoneAndroidOutlined/>
-                                <span className="userShowInfo">+123 2324 2232</span>
-                            </div>
-                            <div className="uInfoMore">
-                                <MailOutlined/>
-                                <span className="userShowInfo">beckyRose@gmail.com</span>
-                            </div>
-                            <div className="uInfoMore">
-                                <LocationOnOutlined/>
-                                <span className="userShowInfo">LV, USA</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="uUpdate">
-                    <div className="userUpdateTitle">Edit</div>
-                    <form className="userUpdateForm">
-                        <div className="uUpLeft">
-                            <div className="uUpLeftItem">
-                                <label>Username</label>
-                                <input
-                                    type="text"
-                                    placeholder="b_Rose277"
-                                    className="userUpInput"
-                                />
-                            </div>
-                            <div className="uUpLeftItem">
-                                <label>Full Name</label>
-                                <input
-                                    type="text"
-                                    placeholder="Becky Rose"
-                                    className="userUpInput"
-                                />
-                            </div>
-                            <div className="uUpLeftItem">
-                                <label>Email</label>
-                                <input
-                                    type="text"
-                                    placeholder="beckyRose@gmail.com"
-                                    className="userUpInput"
-                                />
-                            </div>
-                            <div className="uUpLeftItem">
-                                <label>Phone</label>
-                                <input
-                                    type="text"
-                                    placeholder="+123 2324 2232"
-                                    className="userUpInput"
-                                />
-                            </div>
-                            <div className="uUpLeftItem">
-                                <label>Address</label>
-                                <input
-                                    type="text"
-                                    placeholder="LV, USA"
-                                    className="userUpInput"
-                                />
-                            </div>
-                        </div>
-                        <div className="uUpRight">
-                            <div className="uUpRightUpload">
-                                <img
-                                    src="https://imgs.search.brave.com/WZirnZKPnJp5y-WxleFntqVsyNaurlBGbRfxIDuvPSI/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTA1/NTY1ODYzNC9waG90/by9iZWF1dGlmdWwt/d29tYW4td2Vhcmlu/Zy1zd2VhdGVyLmpw/Zz9zPTYxMng2MTIm/dz0wJms9MjAmYz1M/UVRrMFN3a0o3SWgt/M19Vb3pnU3pEU0JN/cTM3YUMxOXU4QnlT/ZTduYUs4PQ"
-                                    alt=""
-                                    className="userUpdateImg"
-                                />
-                                <label htmlFor="file">
-                                    <PublishOutlined className="uUpdateIcon"/>
-                                </label>
-                                <input type="file" id="file" style={{display: "none"}}/>
-                            </div>
-                            <button className="userUpdateButton">Update</button>
-                        </div>
-                    </form>
-                </div>
+            <div className="uInformation">
+              <span className="userInfoTitle">Account Details</span>
+              <div className="uInfoMore">
+                <Person2Outlined />
+                <span className="userShowInfo">{email || user.email}</span>
+              </div>
+              <div className="uInfoMore">
+                <CalendarTodayOutlined />
+                <span className="userShowInfo" style={{ display: "none" }}>
+                  {createdAt}
+                </span>
+                {format(new Date(createdAt), "MMMM dd, yyyy HH:mm")}
+              </div>
+              <span className="userInfoTitle">Contact Details</span>
+              <div className="uInfoMore">
+                <PhoneAndroidOutlined />
+                <span className="userShowInfo">
+                  {phoneNumber || user.phoneNumber}
+                </span>
+              </div>
+              <div className="uInfoMore">
+                <MailOutlined />
+                <span className="userShowInfo">{email || user.email}</span>
+              </div>
+              <div className="uInfoMore">
+                <LocationOnOutlined />
+                <span className="userShowInfo">{address || user.address}</span>
+              </div>
             </div>
+          </div>
         </div>
-    );
+        <div className="uUpdate">
+          <div className="userUpdateTitle">Edit</div>
+          <form className="userUpdateForm" onSubmit={userUpdateHandler}>
+            <div className="uUpLeft">
+              <div className="uUpLeftItem">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  className="userUpInput"
+                  name="name"
+                  placeholder={user.name}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="uUpLeftItem">
+                <label>Email</label>
+                <input
+                  type="text"
+                  className="userUpInput"
+                  name="email"
+                  placeholder={user.email}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="uUpLeftItem">
+                <label>Phone</label>
+                <input
+                  type="text"
+                  className="userUpInput"
+                  name="phoneNumber"
+                  placeholder={user.phoneNumber}
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+              </div>
+              <div className="uUpLeftItem">
+                <label>Address</label>
+                <input
+                  type="text"
+                  className="userUpInput"
+                  name="address"
+                  placeholder={user.address}
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="uUpRight">
+              <div className="uUpRightUpload">
+                <img
+                  src={imageUrl || "https://example.com/default-image.jpg"}
+                  alt=""
+                  className="userUpdateImg"
+                />
+                <label htmlFor="file">
+                  <PublishOutlined className="uUpdateIcon" />
+                </label>
+                <input
+                  type="file"
+                  id="file"
+                  style={{ display: "none" }}
+                  onChange={handleImageUpload}
+                />
+              </div>
+              <button className="userUpdateButton" type="submit">
+                Update
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default UserInfoAndEdit;

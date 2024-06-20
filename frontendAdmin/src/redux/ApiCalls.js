@@ -55,6 +55,7 @@ export const register = async (dispatch, adminInfo) => {
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(registerFailure(error.response.data));
+      console.log(error.response);
       throw error;
     } else {
       dispatch(registerFailure({ error: "an unexpected error occurred" }));
@@ -112,7 +113,12 @@ export const fetchProducts = async (dispatch) => {
   dispatch(fetchProductsStart());
   try {
     const res = await publicRequest.get("/products");
-    dispatch(fetchProductsSuccess(res.data));
+    const products = [...res.data.movies, ...res.data.shows];
+    const productsWithId = products.map((product, index) => ({
+      ...product,
+      id: index + 1,
+    }));
+    dispatch(fetchProductsSuccess(productsWithId));
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(fetchProductsFailure(error.response.data));
@@ -140,11 +146,11 @@ export const deleteProduct = async (id, dispatch) => {
 };
 
 // Update Product
-export const updateProduct = async (id, product, dispatch) => {
+export const updateProduct = async (dispatch, id, type, product) => {
   dispatch(updateProductsStart());
   try {
-    const res = await userRequest().put(`/products/${id}`, product);
-    dispatch(updateProductsSuccess({ id, product: res.data }));
+    const res = await userRequest().put(`/products/${id}/${type}`, product);
+    dispatch(updateProductsSuccess({ id, type, product: res.data }));
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(updateProductsFailure(error.response.data));
@@ -172,11 +178,12 @@ export const addProduct = async (product, dispatch) => {
 };
 
 // Update User
-export const updateUser = async (id, user, dispatch) => {
+export const updateUser = async (dispatch, id, customer) => {
   dispatch(updateUserStart());
   try {
-    const res = await userRequest().put(`/users/${id}`, user);
+    const res = await userRequest().put(`/customers/${id}`, customer);
     dispatch(updateUserSuccess({ id, user: res.data }));
+    return res.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(updateUserFailure(error.response.data));
@@ -190,7 +197,7 @@ export const updateUser = async (id, user, dispatch) => {
 export const deleteUser = async (id, dispatch) => {
   dispatch(deleteUserStart());
   try {
-    await userRequest().delete(`/users/${id}`);
+    await userRequest().delete(`/customers/${id}`);
     dispatch(deleteUserSuccess(id));
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -206,7 +213,6 @@ export const fetchUsers = async (dispatch) => {
   dispatch(fetchUsersStart());
   try {
     const res = await userRequest().get("/customers");
-    console.log(res);
     dispatch(fetchUsersSuccess(res.data));
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

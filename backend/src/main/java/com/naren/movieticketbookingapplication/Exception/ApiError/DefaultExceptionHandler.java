@@ -1,6 +1,7 @@
 package com.naren.movieticketbookingapplication.Exception.ApiError;
 
 import com.naren.movieticketbookingapplication.Exception.IncorrectPasswordException;
+import com.naren.movieticketbookingapplication.Exception.ResourceAlreadyExists;
 import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import com.naren.movieticketbookingapplication.Exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,18 +20,17 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 public class DefaultExceptionHandler {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException e,
-                                                                    HttpServletRequest request) {
-        log.info("Handling ResourceNotFoundException: {}", e.getMessage());
 
-        ApiError apiError = new ApiError(
+    @ExceptionHandler(ResourceAlreadyExists.class)
+    public ResponseEntity<ApiError> handleResourceAlreadyExists(HttpServletRequest request,
+                                                                ResourceAlreadyExists e) {
+        ApiError error = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
-                NOT_FOUND.value(),
+                CONFLICT.value(),
                 LocalDateTime.now()
         );
-        return new ResponseEntity<>(apiError, NOT_FOUND);
+        return new ResponseEntity<>(error, CONFLICT);
     }
 
     @ExceptionHandler(InsufficientAuthenticationException.class)
@@ -54,13 +54,14 @@ public class DefaultExceptionHandler {
 
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
-                "Invalid username or password",
+                "Profile Not Found / Invalid username or password",
                 UNAUTHORIZED.value(),
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(apiError, UNAUTHORIZED);
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> handleUserNotFoundException(UserNotFoundException e,
                                                                 HttpServletRequest request) {
         log.warn("Handling UserNotFoundException: {}", e.getMessage());

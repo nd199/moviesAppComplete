@@ -23,11 +23,11 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                 customer.getAuthorities()
                         .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()),
                 customer.getPhoneNumber(),
-                customer.getUsername(),
                 customer.getMovies(),
                 customer.getIsEmailVerified(),
-                customer.getIsPhoneVerified(),
+                customer.getAddress(),
                 customer.getIsLogged(),
+                customer.getImageUrl(),
                 customer.getCreatedAt(),
                 customer.getUpdatedAt()
         );

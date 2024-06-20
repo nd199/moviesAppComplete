@@ -47,11 +47,14 @@ public class Customer implements UserDetails {
     @Column(name = "phone_number", nullable = false)
     private Long phoneNumber;
 
+    @Column(name = "image_url")
+    private String ImageUrl;
+
     @Column(nullable = false)
     private Boolean isEmailVerified;
 
     @Column(nullable = false)
-    private Boolean isPhoneVerified;
+    private String address;
 
     @Column(nullable = false)
     private Boolean isLogged;
@@ -78,37 +81,37 @@ public class Customer implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isPhoneVerified, Boolean isLogged, List<Movie> movies, Set<Role> roles) {
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, String address, Boolean isLogged, List<Movie> movies, Set<Role> roles) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
-        this.isPhoneVerified = isPhoneVerified;
+        this.address = address;
         this.isLogged = isLogged;
         this.movies = movies;
         this.roles = roles;
     }
 
-    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isPhoneVerified, Boolean isLogged) {
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, String address) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
-        this.isPhoneVerified = isPhoneVerified;
+        this.address = address;
         this.isLogged = isLogged;
     }
 
-    public Customer(String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isPhoneVerified, Boolean isLogged) {
+    public Customer(String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, String address) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
-        this.isPhoneVerified = isPhoneVerified;
+        this.address = address;
         this.isLogged = isLogged;
     }
 
@@ -121,7 +124,7 @@ public class Customer implements UserDetails {
                 ", password='" + password + '\'' +
                 ", phoneNumber=" + phoneNumber +
                 ", isEmailVerified=" + isEmailVerified +
-                ", isPhoneVerified=" + isPhoneVerified +
+                ", address=" + address +
                 ", isLoggedIn=" + isLogged +
                 ", movies=" + movies +
                 ", roles=" + roles +
@@ -141,7 +144,7 @@ public class Customer implements UserDetails {
                 Objects.equals(password, customer.password) &&
                 Objects.equals(phoneNumber, customer.phoneNumber) &&
                 Objects.equals(isEmailVerified, customer.isEmailVerified) &&
-                Objects.equals(isPhoneVerified, customer.isPhoneVerified) &&
+                Objects.equals(address, customer.address) &&
                 Objects.equals(isLogged, customer.isLogged) &&
                 Objects.equals(movies, customer.movies) &&
                 Objects.equals(roles, customer.roles) &&
@@ -151,7 +154,7 @@ public class Customer implements UserDetails {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, email, password, phoneNumber, isEmailVerified, isPhoneVerified, isLogged, movies, roles, createdAt, updatedAt);
+        return Objects.hash(id, name, email, password, phoneNumber, isEmailVerified, address, isLogged, movies, roles, createdAt, updatedAt);
     }
 
     @Override

@@ -47,8 +47,8 @@ public class ShowServiceImpl implements ShowService {
                 registration.ageRating(),
                 registration.year(),
                 registration.runtime(),
-                registration.genre()
-        );
+                registration.genre(),
+                "shows");
     }
 
     @Override
@@ -84,7 +84,7 @@ public class ShowServiceImpl implements ShowService {
     }
 
     @Override
-    public void updateShow(ShowUpdation update, Long showId) {
+    public Show updateShow(ShowUpdation update, Long showId) {
         log.info("Updating show with ID: {}", showId);
         Show show = showDao.getShowById(showId)
                 .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
@@ -133,6 +133,8 @@ public class ShowServiceImpl implements ShowService {
         }
         showDao.updateShow(show);
         log.info("Show updated successfully: {}", show);
+
+        return show;
     }
 
     @Override

@@ -19,6 +19,7 @@ const Register = () => {
   const dispatch = useDispatch();
   const nav = useNavigate();
   const lError = useSelector((state) => state.user.errorMessage?.message);
+  console.log(lError);
 
   useEffect(() => {
     return () => {

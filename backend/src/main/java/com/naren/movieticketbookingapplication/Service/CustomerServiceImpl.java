@@ -4,6 +4,7 @@ import com.naren.movieticketbookingapplication.Dao.CustomerDao;
 import com.naren.movieticketbookingapplication.Dao.MovieDao;
 import com.naren.movieticketbookingapplication.Dto.CustomerDTO;
 import com.naren.movieticketbookingapplication.Dto.CustomerDTOMapper;
+import com.naren.movieticketbookingapplication.Dto.CustomerStatsDTO;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Movie;
 import com.naren.movieticketbookingapplication.Entity.Role;
@@ -21,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -116,7 +116,7 @@ public class CustomerServiceImpl implements CustomerService {
             log.info("User registered successfully: {}", customerRegistration.email());
             return ResponseEntity.status(HttpStatus.CREATED)
                     .header(HttpHeaders.AUTHORIZATION, token)
-                    .body("Customer Registered Successfully");
+                    .body("Customer registered successfully!");
         } catch (InvalidRegistration e) {
             log.error("Registration failed: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -143,7 +143,7 @@ public class CustomerServiceImpl implements CustomerService {
                 customerRegistration.email().toLowerCase(),
                 passwordEncoder.encode(customerRegistration.password()),
                 customerRegistration.phoneNumber(),
-                false, false, false);
+                false, false, "Chennai, India");
     }
 
     private boolean validatePassword(String password, String name, String email, Long phoneNumber) {
@@ -174,7 +174,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void updateCustomer(CustomerUpdateRequest request, Long id) {
+    public CustomerDTO updateCustomer(CustomerUpdateRequest request, Long id) {
         log.info("Updating customer with ID: {}", id);
 
         Customer customer = customerDao.getCustomer(id)
@@ -184,6 +184,7 @@ public class CustomerServiceImpl implements CustomerService {
                 });
 
         boolean changes = false;
+        System.out.println(request);
 
         if (request.name() != null && !request.name().equals(customer.getName())) {
             customer.setName(request.name());
@@ -209,6 +210,8 @@ public class CustomerServiceImpl implements CustomerService {
 
         customerDao.updateCustomer(customer);
         log.info("Customer updated successfully: {}", customer);
+
+        return customerDTOMapper.apply(customer);
     }
 
     @Override
@@ -271,7 +274,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         Customer customer = customerDao.getCustomer(customerId)
                 .orElseThrow(() -> {
-                    log.error("Customer not found with ID:  {}", customerId);
+                    log.error("Customer not  found with ID:  {}", customerId);
                     return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
                 });
         Movie movie = movieDao.getMovieById(movieId)
@@ -382,10 +385,18 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerDTO> getLatestCustomerList(){
-        return getAllCustomers()
-                .stream().sorted(Comparator.comparing(CustomerDTO::updatedAt).reversed())
-                .limit(10)
+    public List<CustomerDTO> getLatestCustomerList() {
+        return customerDao.getTop5Customers()
+                .stream().map(customerDTOMapper)
+                .toList();
+    }
+
+    @Override
+    public List<CustomerStatsDTO> getCustomerStats() {
+        return customerDao.getCustomerStats()
+                .stream()
+                .map(result -> new CustomerStatsDTO(((Number) result[0]).intValue(),
+                        ((Number) result[1]).longValue()))
                 .toList();
     }
 }

@@ -26,7 +26,6 @@ const FeaturesInfo = () => {
         getIncome();
     }, []);
 
-    console.log(incomeStats);
 
     return (
         <div className="feature-info">

@@ -58,6 +58,9 @@ public class Movie {
     @Column(nullable = false)
     private String genre;
 
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'movies'")
+    private String type;
+
     @ManyToOne
     @JoinColumn(name = "customer_id",
             foreignKey = @ForeignKey(name = "fk_customer_movie_id"))
@@ -74,7 +77,7 @@ public class Movie {
 
     public Movie(String name, Double cost, Double rating, String description,
                  String poster, String ageRating,
-                 Integer year, String runtime, String genre) {
+                 Integer year, String runtime, String genre, String type) {
         this.name = name;
         this.cost = cost;
         this.rating = rating;
@@ -84,11 +87,12 @@ public class Movie {
         this.year = year;
         this.runtime = runtime;
         this.genre = genre;
+        this.type = type;
     }
 
     public Movie(Long movie_id, String name, Double cost, Double rating,
                  String description, String poster, String ageRating, Integer year,
-                 String runtime, String genre) {
+                 String runtime, String genre, String type) {
         this.movie_id = movie_id;
         this.name = name;
         this.cost = cost;
@@ -99,6 +103,7 @@ public class Movie {
         this.year = year;
         this.runtime = runtime;
         this.genre = genre;
+        this.type = type;
     }
 
 
@@ -115,7 +120,10 @@ public class Movie {
                 ", year=" + year +
                 ", runtime='" + runtime + '\'' +
                 ", genre='" + genre + '\'' +
+                ", type='" + type + '\'' +
                 ", customer=" + customer +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 
@@ -124,11 +132,11 @@ public class Movie {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Movie movie = (Movie) o;
-        return Objects.equals(movie_id, movie.movie_id) && Objects.equals(name, movie.name) && Objects.equals(cost, movie.cost) && Objects.equals(rating, movie.rating) && Objects.equals(description, movie.description) && Objects.equals(poster, movie.poster) && Objects.equals(ageRating, movie.ageRating) && Objects.equals(year, movie.year) && Objects.equals(runtime, movie.runtime) && Objects.equals(genre, movie.genre) && Objects.equals(customer, movie.customer);
+        return Objects.equals(movie_id, movie.movie_id) && Objects.equals(name, movie.name) && Objects.equals(cost, movie.cost) && Objects.equals(rating, movie.rating) && Objects.equals(description, movie.description) && Objects.equals(poster, movie.poster) && Objects.equals(ageRating, movie.ageRating) && Objects.equals(year, movie.year) && Objects.equals(runtime, movie.runtime) && Objects.equals(genre, movie.genre) && Objects.equals(type, movie.type) && Objects.equals(customer, movie.customer) && Objects.equals(createdAt, movie.createdAt) && Objects.equals(updatedAt, movie.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(movie_id, name, cost, rating, description, poster, ageRating, year, runtime, genre, customer);
+        return Objects.hash(movie_id, name, cost, rating, description, poster, ageRating, year, runtime, genre, type, customer, createdAt, updatedAt);
     }
 }

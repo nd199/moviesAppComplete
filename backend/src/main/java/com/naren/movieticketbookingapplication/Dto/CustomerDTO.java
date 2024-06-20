@@ -11,11 +11,11 @@ public record CustomerDTO(
         String email,
         List<String> roles,
         Long phoneNumber,
-        String username,
         List<Movie> movies,
         Boolean isEmailVerified,
-        Boolean isPhoneVerified,
+        String address,
         Boolean isLogged,
+        String imageUrl,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {

@@ -5,14 +5,17 @@ import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LogoutIcon from "@mui/icons-material/Logout";
 import {useNavigate} from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
     const navigate = useNavigate();
+    const currentUser = useSelector(state => state.user?.currentUser?.customerDTO?.isLogged);
 
-    const handleLocStorage = () => {
+    const handleLogOutActions = () => {
         localStorage.removeItem("persist:root");
         navigate("/");
         window.location.reload();
+
     };
 
     return (
@@ -27,7 +30,7 @@ const Navbar = () => {
                             style={{fontSize: "26px", color: "white"}}
                             titleAccess="Logout"
                         />
-                        <span className="notification logout" onClick={handleLocStorage}>
+                        <span className="notification logout" onClick={handleLogOutActions}>
               Logout
             </span>
                     </div>

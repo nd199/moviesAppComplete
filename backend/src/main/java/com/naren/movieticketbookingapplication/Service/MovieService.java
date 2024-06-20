@@ -17,7 +17,7 @@ public interface MovieService {
 
     List<Movie> getMovieList();
 
-    void updateMovie(MovieUpdation update, Long movieId);
+    Movie updateMovie(MovieUpdation update, Long movieId);
 
     List<Movie> getMoviesByYear(Integer year);
 

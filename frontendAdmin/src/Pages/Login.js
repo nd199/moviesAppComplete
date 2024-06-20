@@ -24,7 +24,7 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(dispatch, { username, password });
-      nav('/');
+      nav('/Home');
     } catch (err) {
       console.error(
         "Login error: ",

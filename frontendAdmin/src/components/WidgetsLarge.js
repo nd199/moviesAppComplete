@@ -12,33 +12,33 @@ const WidgetsLarge = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const orderData = await userRequest().get("/orders");
-                const userWithOrder = await Promise.all(
-                    orderData.data.orders.map(async (order) => {
-                        try {
-                            const user = await userRequest().get(`/users/${order.userId}`);
-                            return {...order, user: user.data};
-                        } catch (error) {
-                            if (error.response && error.response.status === 404) {
-                                return order;
-                            } else {
-                                throw error;
-                            }
-                        }
-                    })
-                );
-                setOrders(userWithOrder);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchOrders();
-    }, []);
+    // useEffect(() => {
+    //     const fetchOrders = async () => {
+    //         try {
+    //             const orderData = await userRequest().get("/orders");
+    //             const userWithOrder = await Promise.all(
+    //                 orderData.data.orders.map(async (order) => {
+    //                     try {
+    //                         const user = await userRequest().get(`/users/${order.userId}`);
+    //                         return {...order, user: user.data};
+    //                     } catch (error) {
+    //                         if (error.response && error.response.status === 404) {
+    //                             return order;
+    //                         } else {
+    //                             throw error;
+    //                         }
+    //                     }
+    //                 })
+    //             );
+    //             setOrders(userWithOrder);
+    //         } catch (err) {
+    //             setError(err);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+    //     fetchOrders();
+    // }, []);
 
     if (loading) {
         return <div className="widgetLarge">Loading...</div>;

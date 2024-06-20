@@ -108,6 +108,12 @@
     margin-bottom: 5px;
     font-size: 18px;
     font-weight: 400;
+    color: darkorange;
+}
+
+.uUpLeftItem > input{
+    font-weight: 200;
+    font-size: 12px;
 }
 
 .userUpInput {
@@ -139,6 +145,7 @@
 
 .uUpdateIcon {
     cursor: pointer;
+    color: black !important;
 }
 
 .userUpdateButton {
