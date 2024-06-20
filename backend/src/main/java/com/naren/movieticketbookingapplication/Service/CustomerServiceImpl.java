@@ -184,7 +184,6 @@ public class CustomerServiceImpl implements CustomerService {
                 });
 
         boolean changes = false;
-        System.out.println(request);
 
         if (request.name() != null && !request.name().equals(customer.getName())) {
             customer.setName(request.name());
@@ -200,6 +199,10 @@ public class CustomerServiceImpl implements CustomerService {
         }
         if (request.phoneNumber() != null && !request.phoneNumber().equals(customer.getPhoneNumber())) {
             customer.setPhoneNumber(request.phoneNumber());
+            changes = true;
+        }
+        if (request.address() != null && !request.address().equals(customer.getAddress())) {
+            customer.setAddress(request.address());
             changes = true;
         }
 

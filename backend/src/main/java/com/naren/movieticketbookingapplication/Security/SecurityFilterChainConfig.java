@@ -64,7 +64,7 @@ public class SecurityFilterChainConfig {
                         .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/roles")
                         .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/roles/{id}")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/roles/{id}", "/api/v1/products/{id}/{type}")
                         .hasRole("ADMIN")
 
                         // MovieController endpoints

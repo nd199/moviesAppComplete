@@ -129,10 +129,10 @@ export const fetchProducts = async (dispatch) => {
 };
 
 // Delete Product
-export const deleteProduct = async (id, dispatch) => {
+export const deleteProduct = async (id, type, dispatch) => {
   dispatch(deleteProductsStart());
   try {
-    await userRequest().delete(`/products/${id}`);
+    await userRequest().delete(`/products/${id}/${type}`);
     dispatch(deleteProductsSuccess(id));
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

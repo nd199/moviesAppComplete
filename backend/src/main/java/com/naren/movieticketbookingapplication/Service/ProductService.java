@@ -27,8 +27,6 @@ public class ProductService {
     public ResponseEntity<?> updateProduct(@RequestBody ProductUpdateRequest productUpdateRequest,
                                            @PathVariable("id") Long id,
                                            @PathVariable("type") String type) {
-
-
         try {
             if ("movies".equals(type)) {
                 MovieUpdation movieUpdation = new MovieUpdation(
@@ -66,6 +64,19 @@ public class ProductService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error updating product: " + e.getMessage());
+        }
+    }
+
+    public void deleteProduct(Long id, String type) {
+
+        try {
+            if (type.equals("movies")) {
+                movieService.removeMovie(id);
+            } else if (type.equals("shows")) {
+                showService.removeShow(id);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 }
