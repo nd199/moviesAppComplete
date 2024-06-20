@@ -4,7 +4,7 @@ public record ProductUpdateRequest(
         String name,
         Double cost,
         Double rating,
-        Integer productId,
+        Integer entityId,
         String description,
         String poster,
         String ageRating,

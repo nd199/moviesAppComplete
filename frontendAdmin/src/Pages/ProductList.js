@@ -5,12 +5,11 @@ import { DeleteOutlineOutlined, EditOutlined } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteProduct, fetchProducts } from "../redux/ApiCalls";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 
 const ProductList = () => {
   const dispatch = useDispatch();
   const items = useSelector((state) => state.product.products);
-  console.log(items);
 
   useEffect(() => {
     fetchProducts(dispatch);
@@ -21,8 +20,18 @@ const ProductList = () => {
   };
 
   const deleteProductHandler = async (id) => {
+    const productToBeDeleted = items?.find(
+      (product) => Number(product.id) === id
+    );
+    const productType = productToBeDeleted.type;
+    let entityId;
+    if (productType === "movies") {
+      entityId = productToBeDeleted?.movie_id;
+    } else if (productType === "shows") {
+      entityId = productToBeDeleted?.show_id;
+    }
     try {
-      await deleteProduct(id, dispatch);
+      await deleteProduct(entityId, productType, dispatch);
       fetchProductList();
     } catch (err) {
       console.error("Error deleting product:", err);

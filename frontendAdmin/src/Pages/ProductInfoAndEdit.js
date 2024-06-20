@@ -22,19 +22,29 @@ const ProductInfoAndEdit = () => {
   const [imageUrl, setImageUrl] = useState(product?.poster);
   const [file, setFile] = useState(null);
 
+  let entityId = null;
+
+  if(product?.type === "movies"){
+    entityId = product?.movie_id
+  }else if(product?.type === "shows"){
+    entityId = product?.show_id;
+  }
+
   const productUpdateHandler = async (e) => {
     e.preventDefault();
     const updatedProduct = {
       name,
       cost,
       description,
-      productsId,
+      entityId,
       genre,
+      entityId,
       runtime,
       poster: imageUrl,
     };
+
     try {
-      await updateProduct(dispatch, productsId, product.type, updatedProduct);
+      await updateProduct(dispatch, entityId, product.type, updatedProduct);
       fetchProducts(dispatch);
       setCost("");
       setDescription("");

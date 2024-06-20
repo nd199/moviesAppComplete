@@ -177,4 +177,9 @@ public class CustomerController {
 
         return productService.updateProduct(productUpdateRequest, id, type);
     }
+
+    @DeleteMapping("/products/{id}/{type}")
+    public void DeleteProductHandler(@PathVariable("id") Long id, @PathVariable("type") String type) {
+        productService.deleteProduct(id, type);
+    }
 }
