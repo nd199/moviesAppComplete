@@ -31,7 +31,6 @@ const ForgotPassword = () => {
         typeOfVerification,
         enteredOtp,
       });
-      console.log(res.data);
     } catch (error) {
       console.error(error);
     }

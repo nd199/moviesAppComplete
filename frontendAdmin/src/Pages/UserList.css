@@ -60,3 +60,9 @@
 .ulDelete:hover {
     font-size: 35px !important;
 }
+
+
+.ulUser{
+    display: flex;
+    align-items: center;
+}

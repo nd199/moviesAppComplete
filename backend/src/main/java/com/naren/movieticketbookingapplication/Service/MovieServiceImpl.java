@@ -47,8 +47,8 @@ public class MovieServiceImpl implements MovieService {
                 registration.ageRating(),
                 registration.year(),
                 registration.runtime(),
-                registration.genre()
-        );
+                registration.genre(),
+                "movies");
     }
 
     @Override
@@ -84,7 +84,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public void updateMovie(MovieUpdation update, Long movieId) {
+    public Movie updateMovie(MovieUpdation update, Long movieId) {
         log.info("Updating movie with ID: {}", movieId);
         Movie movie = movieDao.getMovieById(movieId)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie not found"));
@@ -133,6 +133,7 @@ public class MovieServiceImpl implements MovieService {
         }
         movieDao.updateMovie(movie);
         log.info("Movie updated successfully: {}", movie);
+        return movie;
     }
 
     @Override

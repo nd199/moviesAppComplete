@@ -22,7 +22,6 @@ import ForgotPassword from "./Pages/ForgotPassword";
 function AppContent() {
   const user = useSelector((state) => state.user);
   const isLoggedIn = user?.currentUser?.customerDTO?.isLogged || false;
-  console.log(isLoggedIn);
 
   return (
     <>

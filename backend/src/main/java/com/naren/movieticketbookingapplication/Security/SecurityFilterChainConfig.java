@@ -23,6 +23,7 @@ public class SecurityFilterChainConfig {
     private final JwtAuthFilter authFilter;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
+
     public SecurityFilterChainConfig(AuthenticationProvider authenticationProvider, JwtAuthFilter authFilter,
                                      AuthenticationEntryPoint authenticationEntryPoint) {
         this.authenticationProvider = authenticationProvider;
@@ -42,7 +43,8 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/auth/login")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/customers/byEmail",
-                                "/api/v1/customers/byPhone", "/api/v1/customers/loggedIn/{isLoggedIn}")
+                                "/api/v1/customers/byPhone", "/api/v1/customers/loggedIn/{isLoggedIn}",
+                                "api/v1/customers/stats", "api/v1/products")
                         .permitAll()
 
                         // Admin-only endpoints
@@ -54,7 +56,8 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/{id}", "/api/v1/roles/{id}")
                         .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/customers/add-movie/{customerId}/{movieId}",
-                                "/api/v1/customers/{id}", "/api/v1/customers/reset-pass/{id}")
+                                "/api/v1/customers/{id}", "/api/v1/customers/reset-pass/{id}",
+                                "/api/v1/customers/products/{id}/{type}")
                         .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/remove-movie/{customerId}/{movieId}",
                                 "/api/v1/customers/{customerId}/remove-all-movies")

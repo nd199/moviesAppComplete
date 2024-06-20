@@ -1,10 +1,18 @@
 package com.naren.movieticketbookingapplication.Controller;
 
 import com.naren.movieticketbookingapplication.Dto.CustomerDTO;
+import com.naren.movieticketbookingapplication.Dto.CustomerStatsDTO;
+import com.naren.movieticketbookingapplication.Dto.ProductDTO;
 import com.naren.movieticketbookingapplication.Entity.Customer;
+import com.naren.movieticketbookingapplication.Entity.Movie;
 import com.naren.movieticketbookingapplication.Entity.Role;
+import com.naren.movieticketbookingapplication.Entity.Show;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
+import com.naren.movieticketbookingapplication.Record.ProductUpdateRequest;
 import com.naren.movieticketbookingapplication.Service.CustomerService;
+import com.naren.movieticketbookingapplication.Service.MovieService;
+import com.naren.movieticketbookingapplication.Service.ProductService;
+import com.naren.movieticketbookingapplication.Service.ShowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +27,15 @@ import java.util.Map;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final MovieService movieService;
+    private final ShowService showService;
+    private final ProductService productService;
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, MovieService movieService, ShowService showService, ProductService productService) {
         this.customerService = customerService;
+        this.movieService = movieService;
+        this.showService = showService;
+        this.productService = productService;
     }
 
     @PostMapping("/roles")
@@ -29,9 +43,7 @@ public class CustomerController {
         log.info("Received request to add role: {}", role);
         customerService.addRole(role);
         log.info("Role added successfully: {}", role);
-        return ResponseEntity
-                .ok()
-                .body("Role added successfully");
+        return ResponseEntity.ok().body("Role added successfully");
     }
 
 
@@ -60,8 +72,7 @@ public class CustomerController {
     }
 
     @GetMapping("/customers")
-    public ResponseEntity<List<CustomerDTO>> customerList(@RequestParam(name = "new", required = false)
-                                                          Boolean isNew) {
+    public ResponseEntity<List<CustomerDTO>> customerList(@RequestParam(name = "new", required = false) Boolean isNew) {
         log.info("Fetching list of customers...");
         List<CustomerDTO> customers;
         if (Boolean.TRUE.equals(isNew)) {
@@ -74,12 +85,12 @@ public class CustomerController {
     }
 
     @PutMapping("/customers/{id}")
-    public ResponseEntity<Customer> updateCustomer(@RequestBody CustomerUpdateRequest customer,
-                                                   @PathVariable("id") Long customerId) {
+    public ResponseEntity<CustomerDTO> updateCustomer(@RequestBody CustomerUpdateRequest customer,
+                                                      @PathVariable("id") Long customerId) {
         log.info("Updating customer with ID: {}", customerId);
-        customerService.updateCustomer(customer, customerId);
+        CustomerDTO updatedCustomer = customerService.updateCustomer(customer, customerId);
         log.info("Customer updated successfully with ID: {}", customerId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
     }
 
     @DeleteMapping("/customers/{id}")
@@ -134,13 +145,36 @@ public class CustomerController {
     }
 
     @PutMapping("/customers/reset-pass/{id}")
-    public void resetPassword(@PathVariable Long id,
-                              @RequestBody Map<String, String> payload) {
+    public void resetPassword(@PathVariable Long id, @RequestBody Map<String, String> payload) {
         log.info("Resetting password for customer ID: {}", id);
-        customerService.updatePassword(id, payload.get("resetPassword"),
-                payload.get("typeOfVerification"),
-                payload.get("enteredOtp")
-        );
+        customerService.updatePassword(id, payload.get("resetPassword"), payload.get("typeOfVerification"), payload.get("enteredOtp"));
         log.info("Password reset successfully for customer ID: {}", id);
+    }
+
+    @GetMapping("/customers/stats")
+    public ResponseEntity<List<CustomerStatsDTO>> getCustomerStats() {
+        try {
+            List<CustomerStatsDTO> customerStats = customerService.getCustomerStats();
+            return ResponseEntity.ok(customerStats);
+        } catch (Exception e) {
+            System.out.println("Error getting customer stats" + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/products")
+    public ResponseEntity<ProductDTO> getProducts() {
+        List<Movie> movies = movieService.getMovieList();
+        List<Show> shows = showService.getShowList();
+        ProductDTO productDTO = new ProductDTO(movies, shows);
+        return ResponseEntity.ok(productDTO);
+    }
+
+    @PutMapping("/products/{id}/{type}")
+    public ResponseEntity<?> updateProduct(@RequestBody ProductUpdateRequest productUpdateRequest,
+                                           @PathVariable("id") Long id,
+                                           @PathVariable("type") String type) {
+
+        return productService.updateProduct(productUpdateRequest, id, type);
     }
 }

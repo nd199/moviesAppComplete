@@ -50,13 +50,13 @@ public class CustomerIT {
         String password = FAKER.internet().password(8, 12);
         Long customerPhone = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
         boolean isEmailVerified = true;
-        boolean isPhoneVerified = false;
+        String address = "Chennai, India";
 
-        new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
+        new CustomerRegistration(customerName, customerEmail, password, customerPhone, isEmailVerified, address, false);
 
         String adminName = "IM ADMIN" + FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".1123131213") + "@codeNaren.com";
-        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
+        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, isEmailVerified, address, false);
     }
 
     private void createRoleIfNotExists() {
@@ -160,10 +160,10 @@ public class CustomerIT {
 
         String password = faker.internet().password(8, 12);
         boolean isEmailVerified = false;
-        boolean isPhoneVerified = false;
+        String address = "Chennai, India";
 
-        new CustomerRegistration(customerName1, email1, password, phone1, isEmailVerified, isPhoneVerified, false);
-        CustomerRegistration customer2 = new CustomerRegistration(customerName2, email2, password, phone2, isEmailVerified, isPhoneVerified, false);
+        new CustomerRegistration(customerName1, email1, password, phone1, isEmailVerified, address, false);
+        CustomerRegistration customer2 = new CustomerRegistration(customerName2, email2, password, phone2, isEmailVerified, address, false);
 
         registerCustomerAndGetToken(customer2);
         String adminToken = registerAdminAndGetToken();
@@ -216,12 +216,12 @@ public class CustomerIT {
         Long customerPhone = Long.valueOf(faker.phoneNumber().subscriberNumber(9));
 
         boolean isEmailVerified = false;
-        boolean isPhoneVerified = false;
+        String address = "Chennai, India";
 
         new CustomerRegistration(adminName, adminEmail, password,
-                adminPhone, isEmailVerified, isPhoneVerified, false);
+                adminPhone, isEmailVerified, address, false);
         CustomerRegistration customerReg = new CustomerRegistration(customerName, customerEmail,
-                password, customerPhone, isEmailVerified, isPhoneVerified, false);
+                password, customerPhone, isEmailVerified, address, false);
 
         // Register admin and customer
         String adminToken = registerAdminAndGetToken();
@@ -252,7 +252,7 @@ public class CustomerIT {
                 customerReg.email(),
                 customerReg.phoneNumber(),
                 customerReg.isEmailVerified(),
-                customerReg.isPhoneVerified(),
+                customerReg.address(),
                 customerReg.isLogged()
         );
 
@@ -285,8 +285,9 @@ public class CustomerIT {
         // Create the expected customer DTO
         CustomerDTO expectedCustomerDTO = new CustomerDTO(customerId, updateRequest.name(),
                 updateRequest.email(),
-                List.of("ROLE_USER"), updateRequest.phoneNumber(), updateRequest.email(),
-                List.of(), true, false, true,
+                List.of("ROLE_USER"), updateRequest.phoneNumber(),
+                List.of(), true, "Chennai, India", true,
+                null,
                 updatedCustomerDTO.createdAt(), updatedCustomerDTO.updatedAt());
 
         // Assert other fields
@@ -301,10 +302,10 @@ public class CustomerIT {
         Long adminPhone = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
         String password = FAKER.internet().password(8, 12);
         boolean isEmailVerified = false;
-        boolean isPhoneVerified = false;
+        String address = "Chennai, India";
 
         new CustomerRegistration(adminName,
-                adminEmail, password, adminPhone, isEmailVerified, isPhoneVerified, false);
+                adminEmail, password, adminPhone, isEmailVerified, address, false);
 
         String adminToken = registerAdminAndGetToken();
 

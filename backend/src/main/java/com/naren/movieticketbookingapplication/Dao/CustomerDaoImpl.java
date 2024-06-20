@@ -77,9 +77,7 @@ public class CustomerDaoImpl implements CustomerDao {
     @Override
     public Optional<Customer> getCustomerByUsername(String email) {
         log.info("Fetching customer by username (email): {}", email);
-        Optional<Customer> customer = customerRepository.findCustomerByEmail(email);
-        log.info("Customer fetched by username '{}': {}", email, customer.orElse(null));
-        return customer;
+        return customerRepository.findCustomerByEmail(email);
     }
 
     @Override
@@ -90,5 +88,15 @@ public class CustomerDaoImpl implements CustomerDao {
     @Override
     public List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn) {
         return customerRepository.getCustomersByIsLogged(isLoggedIn);
+    }
+
+    @Override
+    public List<Customer> getTop5Customers() {
+        return customerRepository.getCustomersByTop5();
+    }
+
+    @Override
+    public List<Object[]> getCustomerStats() {
+        return customerRepository.getCustomerCountByEachMonthInYear();
     }
 }

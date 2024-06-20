@@ -25,6 +25,10 @@ public interface CustomerDao {
     Optional<Customer> getCustomerByPhoneNumber(Long phoneNumber);
 
     List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn);
+
+    List<Customer> getTop5Customers();
+
+    List<Object[]> getCustomerStats();
 }
 
 

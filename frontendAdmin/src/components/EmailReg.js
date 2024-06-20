@@ -88,7 +88,6 @@ const EmailReg = ({ onEmailUpdate, onEmailVerified }) => {
       setIsVerifyingOtp(true);
       const validateInfo = { customerEmail: email, enteredOTP: mailOtp };
       const res = await validateOtp(dispatch, validateInfo);
-      console.log(res);
       setOtpMessage(res);
       setShowEmailOtp(false);
       setShowSuccessErrorMessage("");
@@ -98,7 +97,6 @@ const EmailReg = ({ onEmailUpdate, onEmailVerified }) => {
       }
     } catch (error) {
       setShowEmailOtp(false);
-      console.log(error.response?.data);
       setOtpMessage(error?.response?.data);
       setShowSuccessErrorMessage(
         error?.response?.data + " Please enter you email again to re-verify"

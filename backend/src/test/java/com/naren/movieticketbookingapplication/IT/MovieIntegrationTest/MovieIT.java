@@ -53,14 +53,14 @@ public class MovieIT {
         String password = FAKER.internet().password(8, 12);
         Long customerPhone = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
         boolean isEmailVerified = false;
-        boolean isPhoneVerified = false;
+        String address = "Chennai, India";
 
         new CustomerRegistration(customerName, customerEmail,
-                password, customerPhone, isEmailVerified, isPhoneVerified, false);
+                password, customerPhone, isEmailVerified, address, false);
 
         String adminName = "IM ADMIN " + FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".1123131213") + "@codeNaren.com";
-        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, isEmailVerified, isPhoneVerified, false);
+        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, isEmailVerified, address, false);
 
         String movieName = FAKER.book().title() + Math.random();
         Double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
@@ -259,7 +259,7 @@ public class MovieIT {
                 .getResponseBody();
 
         assertThat(updatedMovie).usingRecursiveComparison()
-                .ignoringFields("movie_id", "createdAt", "updatedAt", "customer")
+                .ignoringFields("movie_id", "createdAt", "updatedAt", "customer", "type", "ImageUrl")
                 .isEqualTo(movieUpdation);
 
         assert updatedMovie != null;

@@ -50,8 +50,7 @@ public class MovieTicketBookingApplication {
         String password = encoder.encode(FAKER.internet().password(8, 12));
         Long phoneNumber = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
         Boolean isLoggedIn = FAKER.options().option(true, false);
-
-        Customer customer = new Customer(customerName, customerEmail, password, phoneNumber, false, false, isLoggedIn);
+        Customer customer = new Customer(customerName, customerEmail, password, phoneNumber, false, isLoggedIn, "Chennai, India");
         customerRepository.save(customer);
         log.info("Created new customer: {}", customer);
     }
@@ -66,9 +65,9 @@ public class MovieTicketBookingApplication {
         int year = RANDOM.nextInt(1980, 2023);
         String runtime = RANDOM.nextInt(80, 180) + " mins";
         String genre = FAKER.book().genre();
-        int Random = RANDOM.nextInt();
+        int Random = RANDOM.nextInt(1000);
 
-        Movie movie = new Movie(movieName + Random, cost, rating, description, poster, ageRating, year, runtime, genre);
+        Movie movie = new Movie(movieName + "-" + Random, cost, rating, description, poster, ageRating, year, runtime, genre, "movies");
         movieRepository.save(movie);
 
         log.info("Created new movie: {}", movie);
@@ -84,9 +83,9 @@ public class MovieTicketBookingApplication {
         int year = RANDOM.nextInt(1980, 2023);
         String runtime = RANDOM.nextInt(20, 60) + " mins";
         String genre = FAKER.book().genre();
-        int Random = RANDOM.nextInt();
+        int Random = RANDOM.nextInt(1000);
 
-        Show show = new Show(showName + Random, cost, rating, description, poster, ageRating, year, runtime, genre);
+        Show show = new Show(showName + "-" + Random, cost, rating, description, poster, ageRating, year, runtime, genre, "shows");
         showRepository.save(show);
         log.info("Created new show: {}", show);
     }

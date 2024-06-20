@@ -31,8 +31,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
 
         underTest.save(movie);
 
@@ -52,8 +52,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
 
         underTest.save(movie);
 
@@ -71,8 +71,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
 
         underTest.save(movie);
 
@@ -90,8 +90,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
 
         underTest.save(movie);
 
@@ -112,8 +112,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
 
         underTest.save(movie);
 
@@ -131,8 +131,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
 
         Movie movie1 = new Movie(
                 "harryPotter2",
@@ -143,8 +143,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
         Movie movie2 = new Movie(
                 "harryPotter3",
                 233D,
@@ -154,8 +154,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
 
 
         underTest.save(movie);
@@ -177,8 +177,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
 
         Movie movie1 = new Movie(
                 "harryPotter2",
@@ -189,8 +189,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
         Movie movie2 = new Movie(
                 "harryPotter3",
                 233D,
@@ -200,8 +200,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
 
 
         underTest.save(movie);
@@ -223,8 +223,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
 
         Movie movie1 = new Movie(
                 "harryPotter2",
@@ -235,8 +235,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
         Movie movie2 = new Movie(
                 "harryPotter3",
                 233D,
@@ -246,8 +246,8 @@ class MovieRepositoryTest {
                 "PG-13",
                 2022,
                 "120 mins",
-                "Fantasy"
-        );
+                "Fantasy",
+                "movies");
 
         underTest.save(movie);
         underTest.save(movie1);

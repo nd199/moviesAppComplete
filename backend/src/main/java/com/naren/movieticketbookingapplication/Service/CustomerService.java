@@ -1,6 +1,7 @@
 package com.naren.movieticketbookingapplication.Service;
 
 import com.naren.movieticketbookingapplication.Dto.CustomerDTO;
+import com.naren.movieticketbookingapplication.Dto.CustomerStatsDTO;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
@@ -16,7 +17,7 @@ public interface CustomerService {
 
     CustomerDTO getCustomerById(Long customerId);
 
-    void updateCustomer(CustomerUpdateRequest customer, Long customerId);
+    CustomerDTO updateCustomer(CustomerUpdateRequest customer, Long customerId);
 
     List<CustomerDTO> getAllCustomers();
 
@@ -49,4 +50,6 @@ public interface CustomerService {
     void generateAndSendMailOtp(EmailVerificationRequest email);
 
     List<CustomerDTO> getLatestCustomerList();
+
+    List<CustomerStatsDTO> getCustomerStats();
 }
