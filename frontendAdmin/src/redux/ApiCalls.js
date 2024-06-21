@@ -112,7 +112,7 @@ export const login = async (dispatch, userInfo) => {
 export const fetchProducts = async (dispatch) => {
   dispatch(fetchProductsStart());
   try {
-    const res = await publicRequest.get("/products");
+    const res = await userRequest().get("/products/AllProducts");
     const products = [...res.data.movies, ...res.data.shows];
     const productsWithId = products.map((product, index) => ({
       ...product,
@@ -175,6 +175,7 @@ export const addProduct = async (product, dispatch) => {
       dispatch(addProductsFailure({ error: "An unexpected error occurred" }));
     }
   }
+  fetchProducts();
 };
 
 // Update User

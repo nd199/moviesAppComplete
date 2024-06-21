@@ -2,15 +2,10 @@ package com.naren.movieticketbookingapplication.Service;
 
 import com.naren.movieticketbookingapplication.Entity.Movie;
 import com.naren.movieticketbookingapplication.Entity.Show;
-import com.naren.movieticketbookingapplication.Record.MovieUpdation;
-import com.naren.movieticketbookingapplication.Record.ProductUpdateRequest;
-import com.naren.movieticketbookingapplication.Record.ShowUpdation;
+import com.naren.movieticketbookingapplication.Record.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class ProductService {
@@ -23,10 +18,9 @@ public class ProductService {
         this.showService = showService;
     }
 
-    @PutMapping("/products/{id}/{type}")
-    public ResponseEntity<?> updateProduct(@RequestBody ProductUpdateRequest productUpdateRequest,
-                                           @PathVariable("id") Long id,
-                                           @PathVariable("type") String type) {
+    public ResponseEntity<?> updateProduct(ProductUpdateRequest productUpdateRequest,
+                                           Long id,
+                                           String type) {
         try {
             if ("movies".equals(type)) {
                 MovieUpdation movieUpdation = new MovieUpdation(
@@ -68,7 +62,6 @@ public class ProductService {
     }
 
     public void deleteProduct(Long id, String type) {
-
         try {
             if (type.equals("movies")) {
                 movieService.removeMovie(id);
@@ -77,6 +70,46 @@ public class ProductService {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public ResponseEntity<?> addProduct(ProductCreateRequest productCreateRequest) {
+
+        try {
+            if (productCreateRequest.type().equals("movies")) {
+                MovieRegistration movieRegistration
+                        = new MovieRegistration(
+                        productCreateRequest.name(),
+                        productCreateRequest.cost(),
+                        productCreateRequest.rating(),
+                        productCreateRequest.description(),
+                        productCreateRequest.poster(),
+                        productCreateRequest.ageRating(),
+                        productCreateRequest.year(),
+                        productCreateRequest.runtime(),
+                        productCreateRequest.genre()
+                );
+                movieService.addMovie(movieRegistration);
+                return new ResponseEntity<>(movieRegistration, HttpStatus.CREATED);
+            } else if (productCreateRequest.type().equals("shows")) {
+                ShowRegistration showRegistration = new ShowRegistration(
+                        productCreateRequest.name(),
+                        productCreateRequest.cost(),
+                        productCreateRequest.rating(),
+                        productCreateRequest.description(),
+                        productCreateRequest.poster(),
+                        productCreateRequest.ageRating(),
+                        productCreateRequest.year(),
+                        productCreateRequest.runtime(),
+                        productCreateRequest.genre()
+                );
+                showService.addShow(showRegistration);
+                return new ResponseEntity<>(showRegistration, HttpStatus.CREATED);
+            } else {
+                return ResponseEntity.badRequest().body("Unsupported type: " + productCreateRequest.type());
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>("Could Not Add a Product", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
