@@ -44,14 +44,15 @@ public class SecurityFilterChainConfig {
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/customers/byEmail",
                                 "/api/v1/customers/byPhone", "/api/v1/customers/loggedIn/{isLoggedIn}",
-                                "api/v1/customers/stats", "api/v1/products")
+                                "api/v1/customers/stats")
                         .permitAll()
 
                         // Admin-only endpoints
                         .requestMatchers(HttpMethod.POST, "/api/v1/customers/roles")
                         .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/customers/{id}", "/api/v1/customers/byEmail",
-                                "/api/v1/customers/byPhone", "/api/v1/customers", "/api/v1/roles")
+                                "/api/v1/customers/byPhone", "/api/v1/customers",
+                                "/api/v1/products/AllProducts", "/api/v1/roles")
                         .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/{id}", "/api/v1/roles/{id}")
                         .hasRole("ADMIN")

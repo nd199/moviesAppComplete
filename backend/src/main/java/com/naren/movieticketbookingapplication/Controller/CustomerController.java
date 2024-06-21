@@ -8,6 +8,7 @@ import com.naren.movieticketbookingapplication.Entity.Movie;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Entity.Show;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
+import com.naren.movieticketbookingapplication.Record.ProductCreateRequest;
 import com.naren.movieticketbookingapplication.Record.ProductUpdateRequest;
 import com.naren.movieticketbookingapplication.Service.CustomerService;
 import com.naren.movieticketbookingapplication.Service.MovieService;
@@ -162,13 +163,19 @@ public class CustomerController {
         }
     }
 
-    @GetMapping("/products")
+    @GetMapping("/products/AllProducts")
     public ResponseEntity<ProductDTO> getProducts() {
         List<Movie> movies = movieService.getMovieList();
         List<Show> shows = showService.getShowList();
         ProductDTO productDTO = new ProductDTO(movies, shows);
         return ResponseEntity.ok(productDTO);
     }
+
+    @PostMapping("/products")
+    public ResponseEntity<?> addProduct(@RequestBody ProductCreateRequest productCreateRequest) {
+        return productService.addProduct(productCreateRequest);
+    }
+
 
     @PutMapping("/products/{id}/{type}")
     public ResponseEntity<?> updateProduct(@RequestBody ProductUpdateRequest productUpdateRequest,
