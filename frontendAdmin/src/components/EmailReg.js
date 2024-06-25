@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Lottie from "react-lottie";
 import { validateOtp, verifyEmail } from "../redux/ApiCalls";
 import "./EmailReg.css";
@@ -17,7 +17,7 @@ const EmailReg = ({ onEmailUpdate, onEmailVerified }) => {
   const [otpTimer, setOtpTimer] = useState();
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
-  const [placeholder, setPlaceHolder] = useState("Cena@gmail.com")
+  const [placeholder, setPlaceHolder] = useState("Cena@gmail.com");
   const [showSuccessErrorMessage, setShowSuccessErrorMessage] = useState(false);
   const [isEmailDisabled, setIsEmailDisabled] = useState(false);
 
@@ -74,7 +74,9 @@ const EmailReg = ({ onEmailUpdate, onEmailVerified }) => {
 
   const otpValidationHandler = async () => {
     if (otpTimer <= 0 && mailOtp.length !== 0) {
-      setShowSuccessErrorMessage("Otp has expired Please re enter your email to try again");
+      setShowSuccessErrorMessage(
+        "Otp has expired Please re enter your email to try again"
+      );
       setEmShowVerify(true);
       setShowEmailOtp(false);
       setOtpMessage("");
@@ -148,7 +150,7 @@ const EmailReg = ({ onEmailUpdate, onEmailVerified }) => {
             }}
             required
             disabled={isEmailDisabled}
-            style={{cursor: !isEmailDisabled ? "pointer" : "not-allowed"}}
+            style={{ cursor: !isEmailDisabled ? "pointer" : "not-allowed" }}
           />
           {otpMessage === "OTP verified successfully" ? (
             <Lottie

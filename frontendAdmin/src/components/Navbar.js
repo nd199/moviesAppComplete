@@ -5,7 +5,7 @@ import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LogoutIcon from "@mui/icons-material/Logout";
 import {useNavigate} from "react-router-dom";
-import { useSelector } from "react-redux";
+import {useSelector} from "react-redux";
 
 const Navbar = () => {
     const navigate = useNavigate();

@@ -203,7 +203,7 @@ class MovieServiceImplTest {
                 new MovieUpdation("Hello", 100.0, 4.5, "New Description", "New Poster",
                         "New Age Rating", 2000, "New Runtime", "New Genre"), movieId))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Movie not found");
+                .hasMessage("Movie with ID '%s' not found".formatted(movieId));
 
         verify(movieDao, never()).updateMovie(any());
     }
@@ -242,7 +242,7 @@ class MovieServiceImplTest {
 
         assertThatThrownBy(() -> underTest.updateMovie(updation, id))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Movie not found");
+                .hasMessageContaining("Movie with ID '%s' not found".formatted(id));
 
         verify(movieDao, never()).updateMovie(any());
     }

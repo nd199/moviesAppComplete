@@ -29,7 +29,10 @@ function AppContent() {
       <div className="container">
         <SideNav />
         <Routes>
-          <Route path="/registerAdmin" element={<Register />} />
+          <Route
+            path="/registerAdmin"
+            element={isLoggedIn ? <Navigate to="/Home" /> : <Register />}
+          />
           <Route
             path="/"
             element={isLoggedIn ? <Navigate to="/Home" /> : <Login />}
