@@ -2,8 +2,12 @@ import React, { useEffect, useState } from "react";
 import "./WidgetsSmall.css";
 import { VisibilityOutlined } from "@mui/icons-material";
 import { userRequest } from "../AxiosMethods";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const WidgetsSmall = () => {
+  const usersState = useSelector((state) => state.user.users);
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -56,7 +60,9 @@ const WidgetsSmall = () => {
                 </div>
                 <button className="wsButton">
                   <VisibilityOutlined className="ws-icon" />
-                  Display
+                  <Link to={"/User/" + user.id} style={{ color: "violet" }}>
+                    Display
+                  </Link>
                 </button>
               </li>
             ))

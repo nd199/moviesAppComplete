@@ -1,102 +1,99 @@
 
-
-
-
 .otp-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .otp-container input {
-  width: 90px;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  font-size: 20px;
-  transition: border-color 0.3s;
+    width: 90px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 20px;
+    transition: border-color 0.3s;
 }
 
 .otp-container input:focus {
-  border-color: 1px solid white;
-  outline: none;
+    border-color: 1px solid white;
+    outline: none;
 }
 
 .otp-container .send-icon {
-  color: var(--secondary-color);
-  cursor: pointer;
-  font-size: 24px;
-  transition: color 0.3s, transform 0.3s;
+    color: var(--secondary-color);
+    cursor: pointer;
+    font-size: 24px;
+    transition: color 0.3s, transform 0.3s;
 }
 
 .otp-container .send-icon:hover {
-  color: var(--secondary-color);
-  transform: scale(1.1);
+    color: var(--secondary-color);
+    transform: scale(1.1);
 }
 
 .otp-container p {
-  color: #fff;
-  font-size: 20px;
-  font-weight: 600;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
 }
 
 .otp-container span {
-  font-size: 13px;
-  color: #fff;
+    font-size: 13px;
+    color: #fff;
 }
 
 .otp-Actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 10px;
 }
 
 .timer {
-  background-color: white;
-  padding: 2px;
-  font-size: 18px !important;
-  color: var(--secondary-color) !important;
+    background-color: white;
+    padding: 2px;
+    font-size: 18px !important;
+    color: var(--secondary-color) !important;
 }
 
 .reg-form-links a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-  margin-bottom: -75px;
-  font-size: 20px;
-  padding: 0;
-  color: #fff !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: -75px;
+    font-size: 20px;
+    padding: 0;
+    color: #fff !important;
 }
 
 .reg-login-link {
-  color: green;
+    color: green;
 }
 
 .envVerify-message {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10px;
-  border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.2);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .envVerify-message input {
-  background-color: transparent;
-  width: 90%;
-  border: none;
-  outline: none;
+    background-color: transparent;
+    width: 90%;
+    border: none;
+    outline: none;
 }
 
 .envVerify-message input:focus {
-  border: none;
-  outline: none;
+    border: none;
+    outline: none;
 }
 
 .envVerify-message:active {
-  border: 2px solid white;
+    border: 2px solid white;
 }

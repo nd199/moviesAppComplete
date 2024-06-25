@@ -1,6 +1,5 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import "./WidgetsLarge.css";
-import {userRequest} from "../AxiosMethods";
 import {format} from "timeago.js";
 
 const WidgetsLarge = () => {

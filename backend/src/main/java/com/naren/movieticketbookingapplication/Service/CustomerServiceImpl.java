@@ -109,6 +109,7 @@ public class CustomerServiceImpl implements CustomerService {
             roles.forEach(registeredCustomer::addRole);
             registeredCustomer.setIsEmailVerified(true);
             registeredCustomer.setIsLogged(true);
+            registeredCustomer.setImageUrl(customerRegistration.imageUrl());
             customerDao.addCustomer(registeredCustomer);
 
             String token = jwtUtil.issueToken(registeredCustomer.getUsername(), roles);
@@ -116,7 +117,7 @@ public class CustomerServiceImpl implements CustomerService {
             log.info("User registered successfully: {}", customerRegistration.email());
             return ResponseEntity.status(HttpStatus.CREATED)
                     .header(HttpHeaders.AUTHORIZATION, token)
-                    .body("Customer registered successfully!");
+                    .body(customerDTOMapper.apply(registeredCustomer));
         } catch (InvalidRegistration e) {
             log.error("Registration failed: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -203,6 +204,11 @@ public class CustomerServiceImpl implements CustomerService {
         }
         if (request.address() != null && !request.address().equals(customer.getAddress())) {
             customer.setAddress(request.address());
+            changes = true;
+        }
+
+        if (request.imageUrl() != null && !request.imageUrl().equals(customer.getImageUrl())) {
+            customer.setImageUrl(request.imageUrl());
             changes = true;
         }
 

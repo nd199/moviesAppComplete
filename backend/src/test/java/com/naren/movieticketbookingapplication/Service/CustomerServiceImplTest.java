@@ -72,7 +72,7 @@ class CustomerServiceImplTest {
         String password = "password";
         String encodedPassword = passwordEncoder.encode(password);
         CustomerRegistration registration = new CustomerRegistration("test",
-                email, password, 22222222222L, false, "Chennai, India", false);
+                email, password, 22222222222L, "", false, "Chennai, India", false);
 
         when(customerDao.existsByEmail(email)).thenReturn(false);
         when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
@@ -83,7 +83,6 @@ class CustomerServiceImplTest {
         ResponseEntity<?> response = underTest.registerUser(registration, Set.of("ROLE_USER"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(response.getBody()).isEqualTo("Customer registered successfully!");
 
         underTest.registerUser(registration, Set.of(String.valueOf(role)));
 
@@ -99,12 +98,13 @@ class CustomerServiceImplTest {
         assertThat(capturedCustomer.getAddress()).isEqualTo("Chennai, India");
         verify(roleService).findRoleByName("ROLE_USER");
         assertThat(capturedCustomer.getRoles()).contains(role);
+        assertThat(response.getBody()).isEqualTo(customerDTOMapper.apply(capturedCustomer));
     }
 
     @Test
     void registerUser_InvalidRoleName_ReturnsBadRequest() {
 
-        CustomerRegistration registration = new CustomerRegistration("John Doe", "johndoe@example.com", "password", 1234567890L, false, "Chennai, India", false);
+        CustomerRegistration registration = new CustomerRegistration("John Doe", "johndoe@example.com", "password", 1234567890L, "", false, "Chennai, India", false);
         Set<String> roleNames = new HashSet<>();
         roleNames.add("INVALID_ROLE");
 
@@ -120,7 +120,7 @@ class CustomerServiceImplTest {
 
     @Test
     void registerCustomerPersonalInfoInPasswordThrowsException() {
-        CustomerRegistration registration = new CustomerRegistration("testName", "testEmail", "testName123", 1234567890L, false, "Chennai, India", false);
+        CustomerRegistration registration = new CustomerRegistration("testName", "testEmail", "testName123", 1234567890L, "", false, "Chennai, India", false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(PasswordInvalidException.class)
@@ -131,7 +131,7 @@ class CustomerServiceImplTest {
 
     @Test
     void registerCustomerInvalidPasswordLengthThrowsException() {
-        CustomerRegistration registration = new CustomerRegistration("testName", "test@example.com", "pass", 20220292232L, false, "Chennai, India", false);
+        CustomerRegistration registration = new CustomerRegistration("testName", "test@example.com", "pass", 20220292232L, "", false, "Chennai, India", false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(PasswordInvalidException.class)
@@ -145,7 +145,7 @@ class CustomerServiceImplTest {
         String email = "test@example.com";
         when(customerDao.existsByEmail(email)).thenReturn(true);
 
-        CustomerRegistration registration = new CustomerRegistration("testName", email, "testpassword", 20220292232L, false, "Chennai, India", false);
+        CustomerRegistration registration = new CustomerRegistration("testName", email, "testpassword", 20220292232L, "", false, "Chennai, India", false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(ResourceAlreadyExists.class)
@@ -159,7 +159,7 @@ class CustomerServiceImplTest {
 
         CustomerRegistration registration =
                 new CustomerRegistration("testName", "test@example.com",
-                        "testPassword", 1234567890L, false, "Chennai, India", false);
+                        "testPassword", 1234567890L, "", false, "Chennai, India", false);
         when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(true);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
@@ -200,7 +200,7 @@ class CustomerServiceImplTest {
     void updateCustomerSuccessful() {
         long customerId = 1;
         Customer customer = new Customer(customerId, "testName", "test@example.com", "oldPassword", 20220292232L, false, false, "Chennai, India");
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L, false, "Chennai, India", false);
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L, "", false, "Chennai, India", false);
 
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
         when(customerDao.existsByEmail(updateRequest.email())).thenReturn(false);
@@ -219,7 +219,7 @@ class CustomerServiceImplTest {
     @Test
     void updateCustomerNonExistingCustomerIdThrowsException() {
         long nonExistingCustomerId = 100;
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L, false, "Chennai, India", false);
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L, "", false, "Chennai, India", false);
 
         when(customerDao.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
 
@@ -240,7 +240,7 @@ class CustomerServiceImplTest {
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
         when(customerDao.existsByEmail("new@example.com")).thenReturn(true);
 
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", "new@example.com", 1234567890L, false, "Chennai, India", false);
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", "new@example.com", 1234567890L, "", false, "Chennai, India", false);
 
         assertThatThrownBy(() -> underTest.updateCustomer(updateRequest, customerId))
                 .isInstanceOf(ResourceAlreadyExists.class)
@@ -253,11 +253,13 @@ class CustomerServiceImplTest {
     void updateCustomerNoChangesFoundThrowsRequestValidationException() {
         long customerId = 1;
         String existingEmail = "existing@example.com";
-        Customer existingCustomer = new Customer(customerId, "John Doe", existingEmail, "password", 1234567890L, false, false, "Chennai, India");
+        Customer existingCustomer = new Customer(customerId, "John Doe", existingEmail, "password", 1234567890L,
+                "", false, "Chennai, India", false);
 
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
 
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", existingEmail, 1234567890L, false, "Chennai, India", false);
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", existingEmail, 1234567890L, "",
+                false, "Chennai, India", false);
 
         assertThatThrownBy(() -> underTest.updateCustomer(updateRequest, customerId))
                 .isInstanceOf(RequestValidationException.class)
