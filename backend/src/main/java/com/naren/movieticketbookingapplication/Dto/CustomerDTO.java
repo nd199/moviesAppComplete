@@ -15,6 +15,7 @@ public record CustomerDTO(
         Boolean isEmailVerified,
         String address,
         Boolean isLogged,
+        Boolean isRegistered,
         String imageUrl,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

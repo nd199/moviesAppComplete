@@ -6,6 +6,6 @@ public record CustomerUpdateRequest(
         Long phoneNumber,
         String imageUrl, Boolean isEmailVerified,
         String address,
-        Boolean isLogged) {
+        Boolean isLogged, Boolean isRegistered) {
 }
 

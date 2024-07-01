@@ -8,6 +8,6 @@ public record CustomerRegistration(
         Long phoneNumber,
         String imageUrl, boolean isEmailVerified,
         String address,
-        boolean isLogged) {
+        boolean isLogged, boolean isRegistered) {
 }
 

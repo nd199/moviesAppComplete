@@ -8,18 +8,24 @@ import VideoFullScreen from "./Pages/VideoFullScreen";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import RegistrationForm from "./Pages/RegistrationForm";
 import { useSelector } from "react-redux";
+import LoginForm from "./Pages/LoginForm";
 
 function AppWithNavigation() {
   const user = useSelector((state) => state.user);
-  const isLoggedIn = user?.currentUser?.isLogged || false;
-  
+  const isRegistered = user?.currentUser?.isRegistered || false;
+  const isLoggedIn = user?.currentUser?.customerDTO?.isLogged || false;
+
   return (
     <Router>
       <div className="App">
         <Routes>
           <Route
             path="/"
-            element={isLoggedIn ? <Home /> : <RegistrationForm />}
+            element={isRegistered ? <Home /> : <RegistrationForm />}
+          />
+          <Route
+            path="/Login"
+            element={isLoggedIn ? <Home /> : <LoginForm />}
           />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/movies" element={<Movies />} />

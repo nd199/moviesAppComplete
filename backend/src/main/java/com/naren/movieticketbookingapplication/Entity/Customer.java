@@ -61,6 +61,9 @@ public class Customer implements UserDetails {
     @Column(nullable = false)
     private Boolean isLogged;
 
+    @Column(nullable = false)
+    private Boolean isRegistered;
+
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = {DETACH, REFRESH, PERSIST, MERGE})
     @JsonIgnore
     private List<Movie> movies = new ArrayList<>();
@@ -83,7 +86,7 @@ public class Customer implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, String address, Boolean isLogged, List<Movie> movies, Set<Role> roles) {
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, List<Movie> movies, Set<Role> roles) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -92,11 +95,12 @@ public class Customer implements UserDetails {
         this.isEmailVerified = isEmailVerified;
         this.address = address;
         this.isLogged = isLogged;
+        this.isRegistered = isRegistered;
         this.movies = movies;
         this.roles = roles;
     }
 
-    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, String address) {
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -105,9 +109,10 @@ public class Customer implements UserDetails {
         this.isEmailVerified = isEmailVerified;
         this.address = address;
         this.isLogged = isLogged;
+        this.isRegistered = isRegistered;
     }
 
-    public Customer(Long id, String name, String email, String password, Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged) {
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -117,9 +122,11 @@ public class Customer implements UserDetails {
         this.isEmailVerified = isEmailVerified;
         this.address = address;
         this.isLogged = isLogged;
+        this.isRegistered = isRegistered;
+
     }
 
-    public Customer(String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, String address) {
+    public Customer(String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -127,10 +134,11 @@ public class Customer implements UserDetails {
         this.isEmailVerified = isEmailVerified;
         this.address = address;
         this.isLogged = isLogged;
+        this.isRegistered = isRegistered;
     }
 
     public Customer(String name, String email, String password,
-                    Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged) {
+                    Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -139,6 +147,7 @@ public class Customer implements UserDetails {
         this.isEmailVerified = isEmailVerified;
         this.address = address;
         this.isLogged = isLogged;
+        this.isRegistered = isRegistered;
     }
 
     @Override
@@ -153,6 +162,7 @@ public class Customer implements UserDetails {
                 ", isEmailVerified=" + isEmailVerified +
                 ", address='" + address + '\'' +
                 ", isLogged=" + isLogged +
+                ", isRegistered=" + isRegistered +
                 ", movies=" + movies +
                 ", roles=" + roles +
                 ", createdAt=" + createdAt +
@@ -165,12 +175,12 @@ public class Customer implements UserDetails {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return Objects.equals(id, customer.id) && Objects.equals(name, customer.name) && Objects.equals(email, customer.email) && Objects.equals(password, customer.password) && Objects.equals(phoneNumber, customer.phoneNumber) && Objects.equals(imageUrl, customer.imageUrl) && Objects.equals(isEmailVerified, customer.isEmailVerified) && Objects.equals(address, customer.address) && Objects.equals(isLogged, customer.isLogged) && Objects.equals(movies, customer.movies) && Objects.equals(roles, customer.roles) && Objects.equals(createdAt, customer.createdAt) && Objects.equals(updatedAt, customer.updatedAt);
+        return Objects.equals(id, customer.id) && Objects.equals(name, customer.name) && Objects.equals(email, customer.email) && Objects.equals(password, customer.password) && Objects.equals(phoneNumber, customer.phoneNumber) && Objects.equals(imageUrl, customer.imageUrl) && Objects.equals(isEmailVerified, customer.isEmailVerified) && Objects.equals(address, customer.address) && Objects.equals(isLogged, customer.isLogged) && Objects.equals(isRegistered, customer.isRegistered) && Objects.equals(movies, customer.movies) && Objects.equals(roles, customer.roles) && Objects.equals(createdAt, customer.createdAt) && Objects.equals(updatedAt, customer.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, email, password, phoneNumber, imageUrl, isEmailVerified, address, isLogged, movies, roles, createdAt, updatedAt);
+        return Objects.hash(id, name, email, password, phoneNumber, imageUrl, isEmailVerified, address, isLogged, isRegistered, movies, roles, createdAt, updatedAt);
     }
 
     @Override

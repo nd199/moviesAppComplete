@@ -1,0 +1,99 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("../../public/images/loginUserBg.jpg") no-repeat center;
+  background-size: cover;
+}
+
+.login-card {
+  background: rgba(
+    0,
+    0,
+    0,
+    0.75
+  );
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: center;
+  color: white;
+}
+
+.login-card h1 {
+  margin-bottom: 20px;
+  color: white;
+  font-size: 24px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputs {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.inputs label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #b3b3b3;
+}
+
+.inputs input {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  background: #333;
+  color: white;
+}
+
+.inputs input::placeholder {
+  color: #b3b3b3;
+}
+
+.error {
+  color: #e87c03;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.login-button {
+  padding: 10px;
+  border: none;
+  background-color: #e50914;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.login-button:hover {
+  background-color: #f6121d;
+}
+
+.login-links {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #b3b3b3;
+}
+
+.login-links a {
+  color: #e50914;
+  text-decoration: none;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
+}
+
+.login-register-link {
+  font-weight: bold;
+}
