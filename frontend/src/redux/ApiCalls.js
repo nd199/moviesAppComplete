@@ -47,11 +47,22 @@ import {
   verifyEmailSuccess,
 } from "./userSlice";
 
-export const register = async (dispatch, customerInfo, DownloadUrl) => {
+export const register = async (dispatch, customerInfo) => {
   dispatch(registerStart());
   try {
-    const res = await authRequest.post("/customers", customerInfo, DownloadUrl);
-    dispatch(registerSuccess(res.data));
+    const res = await authRequest.post("/customers", customerInfo);
+    const { data: customerDTO, headers } = res;
+    dispatch(registerSuccess(customerDTO));
+    if (registerSuccess) {
+      localStorage.setItem(
+        "persist:root",
+        JSON.stringify({
+          user: JSON.stringify({
+            currentUser: customerDTO,
+          }),
+        })
+      );
+    }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(registerFailure(error.response.data));
@@ -87,16 +98,16 @@ export const login = async (dispatch, userInfo) => {
   dispatch(loginStart());
   try {
     const res = await authRequest.post("/login", userInfo);
-    dispatch(loginSuccess(res.data));
+    const { data: customerDTO, headers } = res;
+    dispatch(loginSuccess(customerDTO)); 
     localStorage.setItem(
       "persist:root",
       JSON.stringify({
         user: JSON.stringify({
-          currentUser: res.data,
+          currentUser: customerDTO,
         }),
       })
     );
-    return res.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(loginFailure(error.response.data));

@@ -116,7 +116,7 @@ const Register = () => {
             imageUrl: downloadURL,
           };
           await register(dispatch, userData);
-          nav("/");
+          window.location.reload();
         } catch (error) {
           console.error("Error getting download URL: ", error);
           setError("Registration failed. Please try again.");
@@ -274,7 +274,7 @@ const Register = () => {
               R E G I S T E R
             </button>
             <div className="reg-form-links">
-              <Link to={"/"}>
+              <Link to={"/Login"}>
                 <p>
                   Have an account? Login{" "}
                   <span className="reg-login-link">here</span>

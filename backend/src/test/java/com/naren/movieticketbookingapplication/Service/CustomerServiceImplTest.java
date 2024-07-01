@@ -72,7 +72,7 @@ class CustomerServiceImplTest {
         String password = "password";
         String encodedPassword = passwordEncoder.encode(password);
         CustomerRegistration registration = new CustomerRegistration("test",
-                email, password, 22222222222L, "", false, "Chennai, India", false);
+                email, password, 22222222222L, "", false, "Chennai, India", false, false);
 
         when(customerDao.existsByEmail(email)).thenReturn(false);
         when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
@@ -104,7 +104,7 @@ class CustomerServiceImplTest {
     @Test
     void registerUser_InvalidRoleName_ReturnsBadRequest() {
 
-        CustomerRegistration registration = new CustomerRegistration("John Doe", "johndoe@example.com", "password", 1234567890L, "", false, "Chennai, India", false);
+        CustomerRegistration registration = new CustomerRegistration("John Doe", "johndoe@example.com", "password", 1234567890L, "", false, "Chennai, India", false, false);
         Set<String> roleNames = new HashSet<>();
         roleNames.add("INVALID_ROLE");
 
@@ -120,7 +120,7 @@ class CustomerServiceImplTest {
 
     @Test
     void registerCustomerPersonalInfoInPasswordThrowsException() {
-        CustomerRegistration registration = new CustomerRegistration("testName", "testEmail", "testName123", 1234567890L, "", false, "Chennai, India", false);
+        CustomerRegistration registration = new CustomerRegistration("testName", "testEmail", "testName123", 1234567890L, "", false, "Chennai, India", false, false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(PasswordInvalidException.class)
@@ -131,7 +131,7 @@ class CustomerServiceImplTest {
 
     @Test
     void registerCustomerInvalidPasswordLengthThrowsException() {
-        CustomerRegistration registration = new CustomerRegistration("testName", "test@example.com", "pass", 20220292232L, "", false, "Chennai, India", false);
+        CustomerRegistration registration = new CustomerRegistration("testName", "test@example.com", "pass", 20220292232L, "", false, "Chennai, India", false, false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(PasswordInvalidException.class)
@@ -145,7 +145,7 @@ class CustomerServiceImplTest {
         String email = "test@example.com";
         when(customerDao.existsByEmail(email)).thenReturn(true);
 
-        CustomerRegistration registration = new CustomerRegistration("testName", email, "testpassword", 20220292232L, "", false, "Chennai, India", false);
+        CustomerRegistration registration = new CustomerRegistration("testName", email, "testpassword", 20220292232L, "", false, "Chennai, India", false, false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(ResourceAlreadyExists.class)
@@ -159,7 +159,7 @@ class CustomerServiceImplTest {
 
         CustomerRegistration registration =
                 new CustomerRegistration("testName", "test@example.com",
-                        "testPassword", 1234567890L, "", false, "Chennai, India", false);
+                        "testPassword", 1234567890L, "", false, "Chennai, India", false, false);
         when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(true);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
@@ -173,7 +173,7 @@ class CustomerServiceImplTest {
     void getCustomerByIdReturnsCustomerDTO() {
         long customerId = 1;
         Customer customer = new Customer(customerId, "Alex", "alex@example.com",
-                "password", 1234567890L, false, false, "Chennai, India");
+                "password", 1234567890L, false,false, false, "Chennai, India");
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
 
         CustomerDTO result = underTest.getCustomerById(customerId);
@@ -199,8 +199,8 @@ class CustomerServiceImplTest {
     @Test
     void updateCustomerSuccessful() {
         long customerId = 1;
-        Customer customer = new Customer(customerId, "testName", "test@example.com", "oldPassword", 20220292232L, false, false, "Chennai, India");
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L, "", false, "Chennai, India", false);
+        Customer customer = new Customer(customerId, "testName", "test@example.com", "oldPassword", 20220292232L, false, false,false, "Chennai, India");
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L, "", false, "Chennai, India", false, false);
 
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
         when(customerDao.existsByEmail(updateRequest.email())).thenReturn(false);
@@ -219,7 +219,7 @@ class CustomerServiceImplTest {
     @Test
     void updateCustomerNonExistingCustomerIdThrowsException() {
         long nonExistingCustomerId = 100;
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L, "", false, "Chennai, India", false);
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L, "", false, "Chennai, India", false, false);
 
         when(customerDao.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
 
@@ -235,12 +235,12 @@ class CustomerServiceImplTest {
     void updateCustomerEmailAlreadyExistsThrowsResourceAlreadyExists() {
         long customerId = 1;
         String existingEmail = "existing@example.com";
-        Customer existingCustomer = new Customer(customerId, "John Doe", existingEmail, "password", 1234567890L, false, false, "Chennai, India");
+        Customer existingCustomer = new Customer(customerId, "John Doe", existingEmail, "password", 1234567890L, false, false, false, "Chennai, India");
 
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
         when(customerDao.existsByEmail("new@example.com")).thenReturn(true);
 
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", "new@example.com", 1234567890L, "", false, "Chennai, India", false);
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", "new@example.com", 1234567890L, "", false, "Chennai, India", false, false);
 
         assertThatThrownBy(() -> underTest.updateCustomer(updateRequest, customerId))
                 .isInstanceOf(ResourceAlreadyExists.class)
@@ -254,12 +254,12 @@ class CustomerServiceImplTest {
         long customerId = 1;
         String existingEmail = "existing@example.com";
         Customer existingCustomer = new Customer(customerId, "John Doe", existingEmail, "password", 1234567890L,
-                "", false, "Chennai, India", false);
+                "", false, "Chennai, India", false, false);
 
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
 
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", existingEmail, 1234567890L, "",
-                false, "Chennai, India", false);
+                false, "Chennai, India", false, false);
 
         assertThatThrownBy(() -> underTest.updateCustomer(updateRequest, customerId))
                 .isInstanceOf(RequestValidationException.class)
@@ -272,7 +272,7 @@ class CustomerServiceImplTest {
     @Test
     void deleteCustomerSuccessfullyDeletesCustomer() {
         long customerId = 1;
-        Customer customer = new Customer(customerId, "testName", "test@example.com", "password", 20220292232L, false, false, "Chennai, India");
+        Customer customer = new Customer(customerId, "testName", "test@example.com", "password", 20220292232L, false, false, false, "Chennai, India");
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
 
         underTest.deleteCustomer(customerId);
@@ -344,7 +344,7 @@ class CustomerServiceImplTest {
 
     @Test
     void addMovieToCustomer() {
-        Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L, false, false, "Chennai, India");
+        Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L, false, false, false, "Chennai, India");
         Movie movie = new Movie(1L, "testName", 230.00, 9.00, "none", "none", "none", 2000, "none", "none", "movies");
 
         when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
@@ -364,7 +364,7 @@ class CustomerServiceImplTest {
 
     @Test
     void addMovieToCustomerThrowsIfMovieExists() {
-        Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L, false, false, "Chennai, India");
+        Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L, false, false, false, "Chennai, India");
         Movie movie = new Movie(1L, "testName", 230.00, 9.00, "none", "none", "none", 2000, "none", "none", "movies");
 
         when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
@@ -381,7 +381,7 @@ class CustomerServiceImplTest {
 
     @Test
     void removeMovieFromCustomerRemovesMovieFromCustomer() {
-        Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L, false, false, "Chennai, India");
+        Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L, false, false, false, "Chennai, India");
         Movie movie = new Movie(1L, "testMovie", 230.00, 9.00, "none", "none", "none", 2000, "none", "none", "movies");
 
         when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
@@ -403,7 +403,7 @@ class CustomerServiceImplTest {
 
     @Test
     void removeMovieFromCustomerThrowsResourceNotFoundExceptionNotFound() {
-        Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L, false, false, "Chennai, India");
+        Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L, false, false,false, "Chennai, India");
         Movie movie = new Movie(1L, "testMovie", 230.00, 9.00, "none", "none", "none", 2000, "none", "none", "movies");
 
         when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));

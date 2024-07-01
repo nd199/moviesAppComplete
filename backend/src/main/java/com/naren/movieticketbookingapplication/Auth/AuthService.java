@@ -34,6 +34,7 @@ public class AuthService {
         Customer principal;
         try {
             principal = (Customer) authentication.getPrincipal();
+            principal.setIsLogged(true);
         } catch (UserNotFoundException e) {
             throw new UserNotFoundException("Profile Not Found, " +
                     "If you are new here consider registering first, else contact us");

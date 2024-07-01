@@ -108,16 +108,17 @@ public class CustomerServiceImpl implements CustomerService {
 
             roles.forEach(registeredCustomer::addRole);
             registeredCustomer.setIsEmailVerified(true);
-            registeredCustomer.setIsLogged(true);
+            registeredCustomer.setIsRegistered(true);
             registeredCustomer.setImageUrl(customerRegistration.imageUrl());
             customerDao.addCustomer(registeredCustomer);
 
             String token = jwtUtil.issueToken(registeredCustomer.getUsername(), roles);
+            CustomerDTO customerDTO = customerDTOMapper.apply(registeredCustomer);
 
             log.info("User registered successfully: {}", customerRegistration.email());
             return ResponseEntity.status(HttpStatus.CREATED)
                     .header(HttpHeaders.AUTHORIZATION, token)
-                    .body(customerDTOMapper.apply(registeredCustomer));
+                    .body(customerDTO);
         } catch (InvalidRegistration e) {
             log.error("Registration failed: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -144,7 +145,7 @@ public class CustomerServiceImpl implements CustomerService {
                 customerRegistration.email().toLowerCase(),
                 passwordEncoder.encode(customerRegistration.password()),
                 customerRegistration.phoneNumber(),
-                false, false, "Chennai, India");
+                false, false, false, "Chennai, India");
     }
 
     private boolean validatePassword(String password, String name, String email, Long phoneNumber) {

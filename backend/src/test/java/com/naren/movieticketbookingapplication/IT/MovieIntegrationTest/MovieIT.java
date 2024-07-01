@@ -55,11 +55,11 @@ public class MovieIT {
         String address = "Chennai, India";
 
         new CustomerRegistration(customerName, customerEmail,
-                password, customerPhone, "", isEmailVerified, address, false);
+                password, customerPhone, "", isEmailVerified, address, false, false);
 
         String adminName = "IM ADMIN " + FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".1123131213") + "@codeNaren.com";
-        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, "", isEmailVerified, address, false);
+        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, "", isEmailVerified, address, false, false);
 
         String movieName = FAKER.book().title() + Math.random();
         Double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
