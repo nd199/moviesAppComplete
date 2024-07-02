@@ -11,7 +11,7 @@ const NavBar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const nav = useNavigate();
-  const user = useSelector(state => state.user);
+  const user = useSelector((state) => state.user);
   let dropdownTimeout;
 
   window.onscroll = () => {
@@ -85,7 +85,12 @@ const NavBar = () => {
               <img
                 src={user?.currentUser?.imageUrl || "images/naren.png"}
                 alt=""
-                style={{ width: "35px", height: "35px", borderRadius: "10px" }}
+                style={{
+                  width: "35px",
+                  height: "35px",
+                  borderRadius: "10px",
+                  objectFit: "cover",
+                }}
               />
               <ArrowDropDown className="dropdown" onClick={toggleDropdown} />
             </div>

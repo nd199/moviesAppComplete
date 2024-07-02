@@ -55,7 +55,7 @@ public class Movie {
     @Column(nullable = false)
     private String runtime;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String genre;
 
     @Column(nullable = false, columnDefinition = "varchar(255) default 'movies'")
