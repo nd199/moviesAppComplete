@@ -60,8 +60,10 @@ public class MovieIT {
         String adminName = "IM ADMIN " + FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".1123131213") + "@codeNaren.com";
         adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, "", isEmailVerified, address, false, false);
+        Random random = new Random();
+        var randomNumber = random.nextInt(100);
 
-        String movieName = FAKER.book().title() + Math.random();
+        String movieName = FAKER.book().title() + randomNumber;
         Double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
         Double cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
         String description = FAKER.lorem().paragraph();

@@ -62,16 +62,17 @@ public class MovieTicketBookingApplication {
         String movieName = FAKER.book().title() + Math.random();
         var rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
         var cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
-        String description = FAKER.lorem().sentence();
+        String description = FAKER.lorem().sentence(40);
         String poster = FAKER.internet().url();
         String ageRating = FAKER.options().option("G", "PG", "PG-13", "R", "NC-17");
         int year = RANDOM.nextInt(1980, 2023);
         String runtime = RANDOM.nextInt(80, 180) + " mins";
-        String genre = FAKER.book().genre();
-        int Random = RANDOM.nextInt(1000);
+        String genre1 = FAKER.book().genre();
+        String genre2 = FAKER.book().genre();
+        int Random = RANDOM.nextInt(100);
 
         Movie movie = new Movie(movieName + "-" + Random, cost, rating,
-                description, poster, ageRating, year, runtime, genre, "movies");
+                description, poster, ageRating, year, runtime, genre1 + "," + genre2, "movies");
         movieRepository.save(movie);
 
         log.info("Created new movie: {}", movie);
@@ -81,16 +82,17 @@ public class MovieTicketBookingApplication {
         String showName = FAKER.book().title();
         double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
         double cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
-        String description = FAKER.lorem().sentence();
+        String description = FAKER.lorem().sentence(40);
         String poster = FAKER.internet().url();
         String ageRating = FAKER.options().option("G", "PG", "PG-13", "R", "NC-17");
         int year = RANDOM.nextInt(1980, 2023);
         String runtime = RANDOM.nextInt(20, 60) + " mins";
-        String genre = FAKER.book().genre();
-        int Random = RANDOM.nextInt(1000);
+        String genre1 = FAKER.book().genre();
+        String genre2 = FAKER.book().genre();
+        int Random = RANDOM.nextInt(100);
 
         Show show = new Show(showName + "-" + Random, cost, rating, description, poster,
-                ageRating, year, runtime, genre, "shows");
+                ageRating, year, runtime, genre1 + "," + genre2, "shows");
         showRepository.save(show);
         log.info("Created new show: {}", show);
     }

@@ -1,32 +1,20 @@
 import axios from "axios";
 import { authRequest, publicRequest, userRequest } from "../AxiosMethods";
 import {
-  addProductsFailure,
-  addProductsStart,
-  addProductsSuccess,
-  deleteProductsFailure,
-  deleteProductsStart,
-  deleteProductsSuccess,
-  fetchProductsFailure,
-  fetchProductsStart,
-  fetchProductsSuccess,
-  updateProductsFailure,
-  updateProductsStart,
-  updateProductsSuccess,
+  fetchMoviesStart,
+  fetchMoviesSuccess,
+  fetchMoviesFailure,
+  fetchShowsStart,
+  fetchShowsSuccess,
+  fetchShowsFailure,
 } from "./ProductsRedux";
 import {
-  deleteUserFailure,
-  deleteUserStart,
-  deleteUserSuccess,
   fetchUserByEmailFailure,
   fetchUserByEmailStart,
   fetchUserByEmailSuccess,
   fetchUserByPhoneNumberFailure,
   fetchUserByPhoneNumberStart,
   fetchUserByPhoneNumberSuccess,
-  fetchUsersFailure,
-  fetchUsersStart,
-  fetchUsersSuccess,
   forgotPasswordFailure,
   forgotPasswordStart,
   forgotPasswordSuccess,
@@ -36,9 +24,6 @@ import {
   registerFailure,
   registerStart,
   registerSuccess,
-  updateUserFailure,
-  updateUserStart,
-  updateUserSuccess,
   validateOtpFailure,
   validateOtpStart,
   validateOtpSuccess,
@@ -99,7 +84,7 @@ export const login = async (dispatch, userInfo) => {
   try {
     const res = await authRequest.post("/login", userInfo);
     const { data: customerDTO, headers } = res;
-    dispatch(loginSuccess(customerDTO)); 
+    dispatch(loginSuccess(customerDTO));
     localStorage.setItem(
       "persist:root",
       JSON.stringify({
@@ -120,117 +105,33 @@ export const login = async (dispatch, userInfo) => {
 };
 
 // Fetch Products
-export const fetchProducts = async (dispatch) => {
-  dispatch(fetchProductsStart());
+export const fetchMovies = async (dispatch) => {
+  dispatch(fetchMoviesStart());
   try {
-    const res = await userRequest().get("/products/AllProducts");
-    const products = [...res.data.movies, ...res.data.shows];
-    const productsWithId = products.map((product, index) => ({
-      ...product,
-      id: index + 1,
-    }));
-    dispatch(fetchProductsSuccess(productsWithId));
+    const res = await publicRequest.get("/movies");
+    dispatch(fetchMoviesSuccess(res.data));
+    console.log(res.data);
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      dispatch(fetchProductsFailure(error.response.data));
+      dispatch(fetchMoviesFailure(error.response.data));
     } else {
-      dispatch(fetchProductsFailure({ error: "An unexpected error occurred" }));
+      dispatch(fetchMoviesFailure({ error: "An unexpected error occurred" }));
     }
   }
 };
 
-// Delete Product
-export const deleteProduct = async (id, type, dispatch) => {
-  dispatch(deleteProductsStart());
+// Fetch Shows
+export const fetchShows = async (dispatch) => {
+  dispatch(fetchShowsStart());
   try {
-    await userRequest().delete(`/products/${id}/${type}`);
-    dispatch(deleteProductsSuccess(id));
+    const res = await publicRequest.get("/shows");
+    dispatch(fetchShowsSuccess(res.data));
+    console.log(res.data);
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      dispatch(deleteProductsFailure(error.response.data));
+      dispatch(fetchShowsFailure(error.response.data));
     } else {
-      dispatch(
-        deleteProductsFailure({ error: "An unexpected error occurred" })
-      );
-    }
-  }
-};
-
-// Update Product
-export const updateProduct = async (dispatch, id, type, product) => {
-  dispatch(updateProductsStart());
-  try {
-    const res = await userRequest().put(`/products/${id}/${type}`, product);
-    dispatch(updateProductsSuccess({ id, type, product: res.data }));
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      dispatch(updateProductsFailure(error.response.data));
-    } else {
-      dispatch(
-        updateProductsFailure({ error: "An unexpected error occurred" })
-      );
-    }
-  }
-};
-
-// Add Product
-export const addProduct = async (product, dispatch) => {
-  dispatch(addProductsStart());
-  try {
-    const res = await userRequest().post("/products", product);
-    dispatch(addProductsSuccess(res.data));
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      dispatch(addProductsFailure(error.response.data));
-    } else {
-      dispatch(addProductsFailure({ error: "An unexpected error occurred" }));
-    }
-  }
-  fetchProducts();
-};
-
-// Update User
-export const updateUser = async (dispatch, id, customer) => {
-  dispatch(updateUserStart());
-  try {
-    const res = await userRequest().put(`/customers/${id}`, customer);
-    dispatch(updateUserSuccess({ id, user: res.data }));
-    return res.data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      dispatch(updateUserFailure(error.response.data));
-    } else {
-      dispatch(updateUserFailure({ error: "An unexpected error occurred" }));
-    }
-  }
-};
-
-// Delete User
-export const deleteUser = async (id, dispatch) => {
-  dispatch(deleteUserStart());
-  try {
-    await userRequest().delete(`/customers/${id}`);
-    dispatch(deleteUserSuccess(id));
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      dispatch(deleteUserFailure(error.response.data));
-    } else {
-      dispatch(deleteUserFailure({ error: "An unexpected error occurred" }));
-    }
-  }
-};
-
-// Fetch Users
-export const fetchUsers = async (dispatch) => {
-  dispatch(fetchUsersStart());
-  try {
-    const res = await userRequest().get("/customers");
-    dispatch(fetchUsersSuccess(res.data));
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      dispatch(fetchUsersFailure(error.response.data));
-    } else {
-      dispatch(fetchUsersFailure({ error: "An unexpected error occurred" }));
+      dispatch(fetchShowsFailure({ error: "An unexpected error occurred" }));
     }
   }
 };
