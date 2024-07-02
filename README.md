@@ -93,19 +93,20 @@ MoviesApp is an example of an Internet Streaming service Platform (OTT applicati
 
 ## API Endpoints
 ### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Log in a user
+- `POST /api/v1/auth/register` - Register a new user
+- `POST /api/v1/auth/login` - Log in a user
 
 ### Movies
-- `GET /api/movies` - Get a list of all movies
-- `POST /api/movies` - Add a new movie (admin only)
-- `PUT /api/movies/{id}` - Update a movie (admin only)
-- `DELETE /api/movies/{id}` - Delete a movie (admin only)
+- `GET /api/v1/movies` - Get a list of all movies
+- `POST /api/v1/movies` - Add a new movie (admin only)
+- `PUT /api/v1/movies/{id}` - Update a movie (admin only)
+- `DELETE /api/v1/movies/{id}` - Delete a movie (admin only)
 
 ### Bookings
-- `GET /api/bookings` - Get a list of all bookings (admin only)
-- `POST /api/bookings` - Create a new booking
-- `DELETE /api/bookings/{id}` - Cancel a booking
+- `GET /api/v1/users` - Get a list of all bookings (admin only)
+- `GET /api/v1/products` - Create a new booking
+- `POST /api/v1/products` - Adding a new Product (Movie or Show)
+- `DELETE /api/v1/bookings/{id}` - Delete a Product (Movie or Show)
 
 ## Contributing
 Contributions are welcome! Please follow these steps:
