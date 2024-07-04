@@ -12,7 +12,7 @@ const Login = () => {
     const dispatch = useDispatch();
     const nav = useNavigate();
 
-    let lError = useSelector((state) => state.user.errorMessage?.message);
+    let lError = useSelector((state) => state?.user?.errorMessage?.message);
 
     useEffect(() => {
         return () => {
@@ -24,7 +24,7 @@ const Login = () => {
         e.preventDefault();
         try {
             await login(dispatch, {username, password});
-            nav('/Home');
+            nav('/');
         } catch (err) {
             console.error(
                 "Login error: ",
