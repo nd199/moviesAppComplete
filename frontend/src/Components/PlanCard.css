@@ -1,0 +1,73 @@
+.pl-card {
+    border: 1px solid #ccc;
+    padding: 30px;
+    height: 400px;
+    max-width: 600px;
+    width: 100%;
+    margin-bottom: 20px;
+    background: transparent;
+    color: aliceblue;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    border-bottom-left-radius: 230px;
+    border-bottom-right-radius: 230px;
+}
+
+.pl-card:hover {
+    transform: scale(1.05);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.25) -20%, transparent) transparent;;
+}
+
+.pl-card h2 {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.pl-card p {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 1.0rem;
+}
+
+.pl-card .details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pl-card .price {
+    display: flex;
+    align-items: center;
+    font-size: 1.9rem;
+    font-weight: bold;
+}
+
+.pl-card button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pl-card button:hover {
+    background-color: #0056b3;
+}
+
+.planActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.selected{
+    background-color: red;
+}
