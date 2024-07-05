@@ -10,12 +10,13 @@ import RegistrationForm from "./Pages/RegistrationForm";
 import {useSelector} from "react-redux";
 import LoginForm from "./Pages/LoginForm";
 import Subscription from "./Pages/Subscription";
+import EmailReg from "./Components/EmailReg";
 
 function AppWithNavigation() {
     const user = useSelector((state) => state.user);
     const currentUser = user?.currentUser;
     const isRegistered = currentUser?.isRegistered || false;
-    const isLoggedIn = currentUser?.customerDTO?.isLogged || false;
+    const isLoggedIn = currentUser?.isLogged || false;
 
     return (
         <Router>
@@ -33,6 +34,7 @@ function AppWithNavigation() {
                     <Route path="/movies" element={<Movies/>}/>
                     <Route path="/shows" element={<Shows/>}/>
                     <Route path="/vfs" element={<VideoFullScreen/>}/>
+                    <Route path="/email-verification" element={<EmailReg/>}/>
                     <Route path="/subscribe" element={<Subscription/>}/>
                 </Routes>
             </div>

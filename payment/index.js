@@ -3,7 +3,6 @@ const app = express();
 const port = process.env.PORT || 3008;
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const path = require('path');
 const morgan = require('morgan');
 
 dotenv.config();
@@ -18,10 +17,16 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
 });
 
 
-
 app.get('/', (req, res) => {
     res.send("Hello Naren");
 })
+
+
+app.post("/login", (req, res) => {
+    res.send("Hello Naren");
+
+})
+
 
 app.listen(port, () => {
     console.log("app listening on port " + 'http://localhost:' + port);

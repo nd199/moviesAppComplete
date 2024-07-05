@@ -3,10 +3,10 @@
     height: 100vh;
     display: flex;
     align-items: center;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("../../public/images/stars.jpg") fixed no-repeat;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../../public/images/stars.jpg") fixed no-repeat;
     background-size: cover;
     justify-content: center;
+    transition: 2s all ease-in-out;
 }
 
 .subscribe-form {
@@ -31,8 +31,13 @@
     align-items: center;
     justify-content: space-between;
     gap: 50px;
+    transition: all 0.5s ease-in-out;
 }
 
+.sub-body.selected {
+    justify-content: center;
+    transition: 2s all ease-in-out;
+}
 
 .subscribePlan {
     width: 10rem;
@@ -57,4 +62,9 @@
     text-decoration: none;
     font-weight: bold;
     border-radius: 10px;
+}
+
+.subscribePlan:disabled {
+    background-color: grey;
+    cursor: not-allowed;
 }
