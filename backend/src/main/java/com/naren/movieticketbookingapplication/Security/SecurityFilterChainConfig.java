@@ -40,7 +40,7 @@ public class SecurityFilterChainConfig {
                         .requestMatchers("/api/v1/verify/email", "/api/v1/validate/Otp")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/customers", "/api/v1/auth/admins",
-                                "/api/v1/auth/login")
+                                "/api/v1/auth/login", "/api/v1/auth/loginAdmin")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/customers/byEmail",
                                 "/api/v1/customers/byPhone", "/api/v1/customers/loggedIn/{isLoggedIn}",

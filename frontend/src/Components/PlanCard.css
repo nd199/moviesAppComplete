@@ -15,11 +15,12 @@
     gap: 20px;
     border-bottom-left-radius: 230px;
     border-bottom-right-radius: 230px;
+    transition: all 0.5s ease-in-out;
 }
 
 .pl-card:hover {
     transform: scale(1.05);
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.25) -20%, transparent) transparent;;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.25) -20%, transparent) transparent;
 }
 
 .pl-card h2 {
@@ -53,6 +54,7 @@
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
+    margin-top: 30px;
     transition: background-color 0.3s ease;
 }
 
@@ -66,8 +68,4 @@
     align-items: center;
     flex-direction: column;
     gap: 20px;
-}
-
-.selected{
-    background-color: red;
 }
