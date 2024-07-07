@@ -12,7 +12,7 @@ const PaymentSchema
     paymentMethod: {type: String, enum: ['CURRENCY', 'CARD'], required: true},
     timestamp: {type: Date, default: Date.now},
     status: {type: String, enum: ['PENDING', 'FAILED', 'COMPLETED'], required: true},
-    expiry: {type: Date, default: },
+    expiry: {type: Date},
     movieId: {type: Number, required: true},
     transactionId: {type: String, ref: 'Transaction', required: true},
 }, {timestamps: true});

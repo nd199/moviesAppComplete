@@ -1,8 +1,6 @@
 import {combineReducers, configureStore} from "@reduxjs/toolkit";
 
-import userReducer from "./userSlice";
-import productReducer from "./ProductsRedux";
-import paymentReducer from "./PaymentRedux";
+import getPaymentReducer from "./PaymentRedux";
 import {FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE,} from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
@@ -11,7 +9,7 @@ const persistConfig = {
     version: 1,
     storage,
 };
-const root = combineReducers({user: userReducer, product: productReducer, payment: paymentReducer});
+const root = combineReducers({payment: getPaymentReducer});
 
 const persistedReducer = persistReducer(persistConfig, root);
 
