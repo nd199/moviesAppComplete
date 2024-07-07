@@ -1,32 +1,62 @@
-import React, {useState, useEffect} from 'react';
-import {useLocation} from "react-router-dom";
-import EmailReg from '../Components/EmailReg';
+import React, {useEffect, useState, useCallback} from "react";
+import {useNavigate} from "react-router-dom";
+import EmailReg from "../Components/EmailReg";
+import "./EmailVerification.css";
+import {useDispatch, useSelector} from "react-redux";
+import {pushToPaymentModule} from "../redux/ApiCalls";
 
 const EmailVerification = () => {
-    const location = useLocation();
-    const [email, setEmail] = useState('');
+    const selectedPlan = useSelector(state => state?.payment.paymentPlan);
+    const [email, setEmail] = useState("");
     const [isVerified, setIsVerified] = useState(false);
+    const [isVerifiedError, setIsVerifiedError] = useState("");
+    const dispatch = useDispatch();
+    const currentUser = useSelector(state => state?.user?.currentUser);
 
-    const handleEmailUpdate = (email) => {
+    const handleEmailUpdate = useCallback((email) => {
         setEmail(email);
-    };
+    }, []);
 
-    const handleEmailVerified = (verified) => {
+    const handleEmailVerified = useCallback((verified) => {
         setIsVerified(verified);
-    };
+    }, []);
+
+    const handleEmailError = useCallback((error) => {
+        setIsVerifiedError(error);
+    }, []);
+
+    useEffect(() => {
+        if (isVerified && selectedPlan) {
+            pushToPaymentModule(dispatch, {currentUser, selectedPlan});
+        }
+    }, [isVerified, selectedPlan, currentUser, dispatch]);
 
     return (
-        <div>
+        <div className="email-verification-page">
             <h2>Email Verification</h2>
-            <form>
-                <EmailReg onEmailUpdate={handleEmailUpdate} onEmailVerified={handleEmailVerified}/>
-                {isVerified && (
-                    <div>
-                        <p>Email has been verified!</p>
-                        <p>Selected Plan: {selectedPlan?.name}</p>
-                    </div>
-                )}
-            </form>
+            <div className="email-verify-box">
+                <EmailReg
+                    onEmailUpdate={handleEmailUpdate}
+                    onEmailVerified={handleEmailVerified}
+                    onEmailError={handleEmailError}
+                />
+            </div>
+            {isVerifiedError && <p className="error-message">{isVerifiedError}</p>}
+            {isVerified && selectedPlan && (
+                <div style={{
+                    marginTop: "30px",
+                    color: "lightGreen",
+                    fontSize: "20px",
+                    padding: "10px",
+                    border: "2px solid white",
+                    textAlign: "center",
+                    borderRadius: "10px",
+                    boxShadow: "2px 4px 18px lightGreen"
+                }}>
+                    <p>Email has been verified!</p>
+                    <p>Selected Plan: {selectedPlan.name}</p>
+                </div>
+            )}
         </div>
     );
 };

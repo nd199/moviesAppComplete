@@ -8,7 +8,7 @@ import { Send } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { resetErrorMessage } from "../redux/userSlice";
 
-const EmailReg = ({ onEmailUpdate, onEmailVerified }) => {
+const EmailReg = ({ onEmailUpdate, onEmailVerified, onEmailError }) => {
   const [email, setEmail] = useState("");
   const [emVerify, setEmShowVerify] = useState(false);
   const [mailOtp, setMailOTP] = useState("");
@@ -22,7 +22,8 @@ const EmailReg = ({ onEmailUpdate, onEmailVerified }) => {
   const [isEmailDisabled, setIsEmailDisabled] = useState(false);
 
   const dispatch = useDispatch();
-  const lError = useSelector((state) => state.user.errorMessage?.message);
+  let lError = useSelector((state) => state?.user.errorMessage?.message);
+  const currUserEmail = useSelector((state) => state?.user?.currentUser?.email);
 
   useEffect(() => {
     return () => {
@@ -112,6 +113,7 @@ const EmailReg = ({ onEmailUpdate, onEmailVerified }) => {
       setIsVerifyingOtp(false);
     }
   };
+
   const TickMarkOptions = {
     loop: true,
     autoplay: true,
@@ -140,11 +142,21 @@ const EmailReg = ({ onEmailUpdate, onEmailVerified }) => {
             placeholder={placeholder}
             value={email}
             onChange={(e) => {
-              setEmail(e.target.value.toLocaleLowerCase());
-              {
-                email.length > 1
-                  ? setEmShowVerify(true)
-                  : setEmShowVerify(false);
+              const inputEmail = e.target.value.toLowerCase();
+              setEmail(inputEmail);
+              if (inputEmail.length > 1 && inputEmail !== currUserEmail) {
+                onEmailError(
+                  "Your email is incorrect, check and provide correct Email to proceed with verification"
+                );
+              } else if (
+                inputEmail.length > 1 &&
+                inputEmail === currUserEmail
+              ) {
+                setEmShowVerify(true);
+                onEmailError("");
+              } else {
+                setEmShowVerify(false);
+                onEmailError("");
               }
               setOtpMessage("");
             }}
@@ -209,7 +221,7 @@ const EmailReg = ({ onEmailUpdate, onEmailVerified }) => {
                             : "pointer",
                         }}
                         title={
-                          !isValidEmail(mailOtp)
+                          !isValidOtp(mailOtp)
                             ? "Please enter a valid OTP"
                             : "Click to verify your OTP"
                         }
@@ -217,10 +229,7 @@ const EmailReg = ({ onEmailUpdate, onEmailVerified }) => {
                         <Send className="send-icon" />
                       </button>
                       <span>
-                        {" "}
-                        OTP Expires in <span className="timer">
-                          {otpTimer}
-                        </span>{" "}
+                        OTP Expires in <span className="timer">{otpTimer}</span>{" "}
                         seconds
                       </span>
                     </div>

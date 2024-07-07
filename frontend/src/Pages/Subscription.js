@@ -4,18 +4,30 @@ import './Subscription.css';
 import NavBar from '../Components/NavBar';
 import Footer from '../Components/Footer';
 import {useNavigate} from "react-router-dom";
+import {useDispatch} from "react-redux";
+import {setPaymentPlan} from '../redux/PaymentRedux';
 
 const Subscription = () => {
     const [selectedPlan, setSelectedPlan] = useState(null);
     const nav = useNavigate();
+    const dispatch = useDispatch();
 
     const handlePlanSelect = (planId) => {
         const selected = plans.find(plan => plan.id === planId);
         setSelectedPlan(selected);
+        console.log("Plan selected:", selected); // Add this line to verify
     };
 
     const handlePlanDeselect = () => {
         setSelectedPlan(null);
+    };
+
+    const handleSubscribe = () => {
+        if (selectedPlan) {
+            dispatch(setPaymentPlan(selectedPlan));
+            console.log("Dispatched setPaymentPlan:", selectedPlan); // Add this line to verify
+            nav("/email-verification");
+        }
     };
 
     const plans = [
@@ -58,7 +70,7 @@ const Subscription = () => {
                     </div>
                     <button
                         className="subscribePlan"
-                        onClick={() => selectedPlan && nav("/email-verification", {state: {selectedPlan}})}
+                        onClick={handleSubscribe}
                         disabled={!selectedPlan}
                     >
                         Subscribe
@@ -68,6 +80,6 @@ const Subscription = () => {
             <Footer/>
         </>
     );
-}
+};
 
 export default Subscription;
