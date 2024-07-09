@@ -1,5 +1,5 @@
 import axios from "axios";
-import {authRequest, publicRequest, userRequest} from "../AxiosMethods";
+import {authRequest, publicRequest} from "../AxiosMethods";
 import {
     fetchMoviesStart,
     fetchMoviesSuccess,
@@ -9,9 +9,6 @@ import {
     fetchShowsFailure,
 } from "./ProductsRedux";
 import {
-    fetchUserByEmailFailure,
-    fetchUserByEmailStart,
-    fetchUserByEmailSuccess,
     forgotPasswordFailure,
     forgotPasswordStart,
     forgotPasswordSuccess,
@@ -139,21 +136,6 @@ export const fetchShows = async (dispatch) => {
     }
 };
 
-export const fetchUserByEmail = async (email, dispatch) => {
-    dispatch(fetchUserByEmailStart());
-    try {
-        const res = await userRequest().get(`/customers/email`, email);
-        dispatch(fetchUserByEmailSuccess(res.data));
-        return res.data;
-    } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-            dispatch(fetchUserByEmailFailure(error.response.data.message));
-        } else {
-            dispatch(fetchUserByEmailFailure("An unexpected error occurred"));
-        }
-        return null;
-    }
-};
 
 export const verifyEmail = async (dispatch, email) => {
     dispatch(verifyEmailStart());
@@ -192,17 +174,13 @@ export const validateOtp = async (dispatch, validateInfo) => {
 export const pushToPaymentModule = async (dispatch, userPaymentInfo) => {
     dispatch(pushToPaymentStart());
     try {
-        console.log('Sending payment info:', userPaymentInfo); // Log the payload
-        const res = await axios.post('http://localhost:3008/payment', userPaymentInfo);
-        console.log('Response from server:', res.data); // Log the response
+        const res = await axios.post('http://localhost:3008/api/auth/payment', userPaymentInfo);
         dispatch(pushToPaymentSuccess(res.data));
     } catch (paymentError) {
-        console.error('Error during payment:', paymentError); // Log the full error
+        console.error('Error during payment:', paymentError);
         if (axios.isAxiosError(paymentError) && paymentError.response) {
-            console.error('Server response error:', paymentError.response.data); // Log the response data if available
             dispatch(pushToPaymentFailure(paymentError.response.data));
         } else {
-            console.error('Unexpected error:', paymentError.message); // Log the error message
             dispatch(pushToPaymentFailure("An unexpected error occurred"));
         }
     }
