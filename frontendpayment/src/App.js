@@ -7,7 +7,7 @@ function AppCheckout() {
         <div className="AppCheckout">
             <Router>
                 <Routes>
-                    <Route path="/" element={<PaymentCheckout/>}/>
+                    <Route path="/:userId" element={<PaymentCheckout/>}/>
                 </Routes>
             </Router>
         </div>

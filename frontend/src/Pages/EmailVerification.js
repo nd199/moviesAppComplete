@@ -1,5 +1,4 @@
 import React, {useEffect, useState, useCallback} from "react";
-import {useNavigate} from "react-router-dom";
 import EmailReg from "../Components/EmailReg";
 import "./EmailVerification.css";
 import {useDispatch, useSelector} from "react-redux";
@@ -28,6 +27,7 @@ const EmailVerification = () => {
     useEffect(() => {
         if (isVerified && selectedPlan) {
             pushToPaymentModule(dispatch, {currentUser, selectedPlan});
+            window.location.href = `http://localhost:5001/${currentUser.id}`;
         }
     }, [isVerified, selectedPlan, currentUser, dispatch]);
 
