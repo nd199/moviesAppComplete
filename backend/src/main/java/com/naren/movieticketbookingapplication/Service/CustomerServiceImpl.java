@@ -4,18 +4,16 @@ import com.naren.movieticketbookingapplication.Dao.CustomerDao;
 import com.naren.movieticketbookingapplication.Dao.MovieDao;
 import com.naren.movieticketbookingapplication.Dto.CustomerDTO;
 import com.naren.movieticketbookingapplication.Dto.CustomerDTOMapper;
+import com.naren.movieticketbookingapplication.Dto.CustomerStatsDTO;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Movie;
 import com.naren.movieticketbookingapplication.Entity.Role;
-import com.naren.movieticketbookingapplication.Exception.PasswordInvalidException;
-import com.naren.movieticketbookingapplication.Exception.RequestValidationException;
-import com.naren.movieticketbookingapplication.Exception.ResourceAlreadyExists;
-import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
+import com.naren.movieticketbookingapplication.Exception.*;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
-import com.naren.movieticketbookingapplication.Record.UserLogin;
+import com.naren.movieticketbookingapplication.Record.EmailVerificationRequest;
+import com.naren.movieticketbookingapplication.Utils.OtpService;
 import com.naren.movieticketbookingapplication.jwt.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Set;
 
 @Slf4j
@@ -41,137 +39,152 @@ public class CustomerServiceImpl implements CustomerService {
     private final RoleService roleService;
     private final MovieDao movieDao;
     private final JwtUtil jwtUtil;
+    private final OtpService otpService;
 
-    public CustomerServiceImpl(CustomerDao customerDao, PasswordEncoder passwordEncoder, CustomerDTOMapper customerDTOMapper, RoleService roleService, MovieDao movieDao, JwtUtil jwtUtil) {
+    public CustomerServiceImpl(CustomerDao customerDao, PasswordEncoder passwordEncoder, CustomerDTOMapper customerDTOMapper, RoleService roleService, MovieDao movieDao, JwtUtil jwtUtil, OtpService otpService) {
         this.customerDao = customerDao;
         this.passwordEncoder = passwordEncoder;
         this.customerDTOMapper = customerDTOMapper;
         this.roleService = roleService;
         this.movieDao = movieDao;
         this.jwtUtil = jwtUtil;
+        this.otpService = otpService;
     }
 
     @Override
     public void addRole(Role role) {
-        if (role == null)
+        if (role == null) {
+            log.error("Role cannot be null");
             throw new ResourceNotFoundException("Role cannot be null");
-        if (roleService.existsByName(role))
+        }
+        if (roleService.existsByName(role)) {
+            log.error("Role already exists: {}", role.getName());
             throw new ResourceAlreadyExists("Role already exists");
+        }
         roleService.saveRole(role);
+        log.info("Role added successfully: {}", role.getName());
     }
 
     @Override
     public List<Role> getRoles() {
+        log.info("Fetching all roles");
         return roleService.getAllRoles();
     }
 
     @Override
     public Role getRoleById(Long id) {
+        log.info("Fetching role by ID: {}", id);
         return roleService.findRoleById(id);
     }
 
     @Override
     public void removeRole(Long id) {
+        log.info("Removing role with ID: {}", id);
         Role role = getRoleById(id);
-        if (role == null)
-            throw new ResourceNotFoundException("Role cannot be null");
+        if (role == null) {
+            log.error("Role not found with ID: {}", id);
+            throw new ResourceNotFoundException("Role not found");
+        }
         roleService.deleteRole(id);
+        log.info("Role removed successfully with ID: {}", id);
     }
 
-    @Override
-    public Customer loginUser(UserLogin userLogin, HttpServletRequest request) {
-        Optional<Customer> customer = Optional.empty();
-
-        if (userLogin == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        }
-        if (userLogin.email() == null) {
-            customer = customerDao.getCustomerByPhoneNumber(userLogin.phoneNumber());
-        } else if (userLogin.phoneNumber() == null) {
-            customer = customerDao.getCustomerByUsername(userLogin.email());
-        }
-
-        String AuthHeader = request.getHeader("Authorization");
-
-        return null;
-    }
 
     @Override
-    public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration,
-                                          Set<String> roleNames) {
+    public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration, Set<String> roleNames) {
+        log.info("Registering new user: {}", customerRegistration);
 
-        Customer registeredCustomer = registerCustomer(customerRegistration);
+        try {
+            Customer registeredCustomer = registerCustomer(customerRegistration);
+            Set<Role> roles = new HashSet<>();
 
-        Set<Role> roles = new HashSet<>();
-
-        for (String roleName : roleNames) {
-            Role role = roleService.findRoleByName(roleName);
-            if (role == null) {
-                return ResponseEntity.badRequest().body("Role " + roleName + " not found");
+            for (String roleName : roleNames) {
+                Role role = roleService.findRoleByName(roleName);
+                if (role == null) {
+                    log.error("Role not found: {}", roleName);
+                    return ResponseEntity.badRequest().body("Role " + roleName + " not found");
+                }
+                roles.add(role);
             }
-            roles.add(role);
+
+            roles.forEach(registeredCustomer::addRole);
+            registeredCustomer.setIsEmailVerified(true);
+            registeredCustomer.setIsRegistered(true);
+            registeredCustomer.setImageUrl(customerRegistration.imageUrl());
+            customerDao.addCustomer(registeredCustomer);
+
+            String token = jwtUtil.issueToken(registeredCustomer.getUsername(), roles);
+            CustomerDTO customerDTO = customerDTOMapper.apply(registeredCustomer);
+
+            log.info("User registered successfully: {}", customerRegistration.email());
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .header(HttpHeaders.AUTHORIZATION, token)
+                    .body(customerDTO);
+        } catch (InvalidRegistration e) {
+            log.error("Registration failed: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        roles.forEach(registeredCustomer::addRole);
-
-        customerDao.addCustomer(registeredCustomer);
-
-        String token = jwtUtil.issueToken(registeredCustomer.getUsername(), roles);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .header(HttpHeaders.AUTHORIZATION, token)
-                .body("Customer registered successfully!");
     }
-
 
     private Customer registerCustomer(CustomerRegistration customerRegistration) {
+        log.info("Validating and registering customer: {}", customerRegistration.email());
 
-        boolean isValidPassword = validatePassword(customerRegistration.password(),
-                customerRegistration.name(),
-                customerRegistration.email(),
-                customerRegistration.phoneNumber());
+        boolean isValidPassword = validatePassword(customerRegistration.password(), customerRegistration.name(), customerRegistration.email(), customerRegistration.phoneNumber());
         if (!isValidPassword) {
+            log.error("Invalid password for user: {}", customerRegistration.email());
             throw new PasswordInvalidException("Invalid password");
         }
         if (customerDao.existsByEmail(customerRegistration.email())) {
+            log.error("Email already taken: {}", customerRegistration.email());
             throw new ResourceAlreadyExists("Email already taken");
         }
         if (customerDao.existsByPhoneNumber(customerRegistration.phoneNumber())) {
+            log.error("Phone number already taken: {}", customerRegistration.phoneNumber());
             throw new ResourceAlreadyExists("Phone number already taken");
         }
-        return new Customer(customerRegistration.name(), customerRegistration.email(),
+        return new Customer(customerRegistration.name(),
+                customerRegistration.email().toLowerCase(),
                 passwordEncoder.encode(customerRegistration.password()),
-                customerRegistration.phoneNumber(), false, false);
+                customerRegistration.phoneNumber(),
+                false, false, false, "Chennai, India");
     }
 
     private boolean validatePassword(String password, String name, String email, Long phoneNumber) {
         if (password == null || password.length() < REQ_PASSWORD_LENGTH) {
             log.error("Password must be at least {} characters long", REQ_PASSWORD_LENGTH);
-            return false;
+            throw new PasswordInvalidException("Password must be at least %s characters long".formatted(REQ_PASSWORD_LENGTH));
         }
         return !containsPersonalInfo(password, name, email, phoneNumber);
     }
 
     private boolean containsPersonalInfo(String password, String name, String email, Long phoneNumber) {
-        return password.contains(name) || password.contains(email) || password.contains(String.valueOf(phoneNumber));
-    }
 
+        if (password.contains(name) || password.contains(email) || password.contains(String.valueOf(phoneNumber))) {
+            throw new PasswordInvalidException("Password must not contain personal info [Name,Email,Phone] ");
+        }
+        return false;
+    }
 
     @Override
     public CustomerDTO getCustomerById(Long customerId) {
         log.info("Fetching customer by ID: {}", customerId);
-
         return customerDao.getCustomer(customerId)
                 .map(customerDTOMapper)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found with ID : {}", customerId);
+                    return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
+                });
     }
 
     @Override
-    public void updateCustomer(CustomerUpdateRequest request, Long id) {
+    public CustomerDTO updateCustomer(CustomerUpdateRequest request, Long id) {
         log.info("Updating customer with ID: {}", id);
 
         Customer customer = customerDao.getCustomer(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + id + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found with ID  : {}", id);
+                    return new ResourceNotFoundException("Customer with ID " + id + " not found");
+                });
 
         boolean changes = false;
 
@@ -181,7 +194,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
         if (request.email() != null && !request.email().equals(customer.getEmail())) {
             if (customerDao.existsByEmail(request.email())) {
-                log.error("Email {} already exists", request.email());
+                log.error("Email already exists: {}", request.email());
                 throw new ResourceAlreadyExists("Email already taken");
             }
             customer.setEmail(request.email());
@@ -191,6 +204,15 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setPhoneNumber(request.phoneNumber());
             changes = true;
         }
+        if (request.address() != null && !request.address().equals(customer.getAddress())) {
+            customer.setAddress(request.address());
+            changes = true;
+        }
+
+        if (request.imageUrl() != null && !request.imageUrl().equals(customer.getImageUrl())) {
+            customer.setImageUrl(request.imageUrl());
+            changes = true;
+        }
 
         if (!changes) {
             log.warn("No data changes found for customer with ID: {}", id);
@@ -198,8 +220,28 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         customerDao.updateCustomer(customer);
-
         log.info("Customer updated successfully: {}", customer);
+
+        return customerDTOMapper.apply(customer);
+    }
+
+    @Override
+    public void updatePassword(String email, String newPassword) {
+        Customer customer = customerDao.getCustomerByUsername(email)
+                .orElseThrow(() -> {
+                    log.error("Customer not found with email  : {}", email);
+                    return new ResourceNotFoundException("Customer with email "
+                            + email + " not found");
+                });
+        if (newPassword != null && Objects.equals(customer.getPassword(), newPassword)) {
+            throw new PasswordInvalidException("Do not enter password you might already used");
+        }
+        var passwordIsValid = validatePassword(newPassword, customer.getName(), customer.getEmail(), customer.getPhoneNumber());
+        if (!passwordIsValid) {
+            throw new PasswordInvalidException("Invalid password");
+        }
+        customer.setPassword(passwordEncoder.encode(newPassword));
+        customerDao.updateCustomer(customer);
     }
 
     @Override
@@ -218,7 +260,10 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Deleting customer with ID: {}", customerId);
 
         Customer customer = customerDao.getCustomer(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found with  ID  :  {}", customerId);
+                    return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
+                });
 
         if (!customer.getMovies().isEmpty()) {
             removeAllMovies(customerId);
@@ -232,13 +277,20 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Adding movie with ID {} to customer with ID {}", movieId, customerId);
 
         Customer customer = customerDao.getCustomer(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found with  ID : {}  ", customerId);
+                    return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
+                });
         Movie movie = movieDao.getMovieById(movieId)
-                .orElseThrow(() -> new ResourceNotFoundException("Movie with ID " + movieId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Movie not found with  ID: {}", movieId);
+                    return new ResourceNotFoundException("Movie with ID " + movieId + " not found");
+                });
 
         if (customer.getMovies().contains(movie)) {
+            log.error("Customer {} already subscribed to movie {}", customerId, movieId);
             throw new ResourceAlreadyExists(
-                    "Customer %s already subscribed to %s movie".formatted(customer, movie));
+                    "Customer " + customerId + " already subscribed to movie " + movieId);
         }
         customer.addMovie(movie);
         customerDao.updateCustomer(customer);
@@ -251,13 +303,20 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Removing movie with ID {} from customer with ID {}", movieId, customerId);
 
         Customer customer = customerDao.getCustomer(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not  found with ID:  {}", customerId);
+                    return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
+                });
         Movie movie = movieDao.getMovieById(movieId)
-                .orElseThrow(() -> new ResourceNotFoundException("Movie with ID " + movieId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Movie not found with ID: {}", movieId);
+                    return new ResourceNotFoundException("Movie with ID " + movieId + " not found");
+                });
 
         if (!customer.getMovies().contains(movie)) {
+            log.error("Customer {} not subscribed to movie {}", customerId, movieId);
             throw new ResourceNotFoundException(
-                    "Customer %s not subscribed to %s movie".formatted(customer, movie));
+                    "Customer " + customerId + " not subscribed to movie " + movieId);
         }
         customer.removeMovie(movie);
         customerDao.updateCustomer(customer);
@@ -266,10 +325,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void removeAllMovies(Long customerId) {
+        log.info("Removing all movies from customer with ID: {}", customerId);
 
-        log.info("Fetching customer with ID {}", customerId);
         Customer customer = customerDao.getCustomer(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + customerId + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found with ID: {}", customerId);
+                    return new ResourceNotFoundException("Customer with ID " + customerId + " not found");
+                });
 
         List<Movie> movies = customer.getMovies();
 
@@ -279,9 +341,58 @@ public class CustomerServiceImpl implements CustomerService {
                     "Customer " + customerId + " not subscribed to any movie");
         }
 
-        log.info("Removing all movies from customer with ID {}", customerId);
+        log.info("Removing all movies from customer: {}", customer.getName());
         customer.removeMovies(movies);
         customerDao.updateCustomer(customer);
         log.info("Movies removed from customer successfully: Customer={}", customer.getName());
+    }
+
+    @Override
+    public List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn) {
+        log.info("Fetching customers that are logged in");
+        List<Customer> customers = customerDao.getCustomersByIsLoggedIn(isLoggedIn);
+        if (customers.isEmpty()) {
+            log.warn("No customers logged in");
+            throw new ResourceNotFoundException(
+                    "No customers logged in");
+        }
+        return customers;
+    }
+
+    @Override
+    public CustomerDTO getCustomerByEmail(String email) {
+        return customerDao.getCustomerByUsername(email).map((customerDTOMapper))
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Could not find customer by email " + email)
+                );
+    }
+
+    @Override
+    public CustomerDTO getCustomerByPhoneNumber(Long phoneNumber) {
+        return customerDao.getCustomerByPhoneNumber(phoneNumber)
+                .map(customerDTOMapper).orElseThrow(
+                        () -> new ResourceNotFoundException("Could not find customer by phone number " + phoneNumber)
+                );
+    }
+
+    @Override
+    public void generateAndSendMailOtp(EmailVerificationRequest emailVerificationRequest) {
+        otpService.generateAndSendMailOtp(emailVerificationRequest.email());
+    }
+
+    @Override
+    public List<CustomerDTO> getLatestCustomerList() {
+        return customerDao.getTop5Customers()
+                .stream().map(customerDTOMapper)
+                .toList();
+    }
+
+    @Override
+    public List<CustomerStatsDTO> getCustomerStats() {
+        return customerDao.getCustomerStats()
+                .stream()
+                .map(result -> new CustomerStatsDTO(((Number) result[0]).intValue(),
+                        ((Number) result[1]).longValue()))
+                .toList();
     }
 }

@@ -1,0 +1,105 @@
+.newProduct {
+    flex: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.productCreate {
+    margin: 10px;
+    padding: 30px;
+    box-shadow: 2px 4px 58px 4px rgba(222, 137, 37, 0.29);
+    -webkit-box-shadow: 2px 4px 58px 4px rgba(222, 137, 37, 0.29);
+    -moz-box-shadow: 2px 4px 58px 4px rgba(222, 137, 37, 0.29);
+    color: #fff;
+}
+
+.linearProgressBar {
+    width: 50%;
+    height: 5px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: all 2s ease-in-out;
+}
+
+.linearProgressBar .MuiLinearProgress-bar {
+    background-color: #007bff;
+}
+
+.linearProgressBar .MuiLinearProgress-bar2Buffer {
+    background-color: #ccc;
+}
+
+.pTitle {
+    text-align: center;
+    font-weight: 600;
+    font-size: 30px;
+}
+
+.pForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pItem {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+.pItem:first-of-type {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.pItem > label {
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.pItem > input {
+    border: none;
+    height: 40px;
+
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 19px;
+}
+
+.pItem > select {
+    height: 40px;
+    width: 40%;
+    text-align: center;
+    font-size: 20px;
+}
+
+.pButton {
+    width: 150px;
+    height: 40px;
+    font-size: 20px;
+    border: none;
+    background-color: salmon;
+    color: white;
+    padding: 5px 5px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 30px;
+}
+
+.pButton[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Enabled button */
+.pButton:not([disabled]) {
+    background-color: #45a049;
+}

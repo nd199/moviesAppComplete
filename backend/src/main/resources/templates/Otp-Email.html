@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Your OTP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header {
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .logo {
+            max-width: 150px;
+        }
+
+        .otp {
+            background-color: #8a2be2;
+            color: #ffffff;
+            padding: 15px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            border-radius: 4px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eeeeee;
+            font-size: 12px;
+            color: #888888;
+        }
+
+        .social-icons img {
+            width: 32px;
+            height: 32px;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <img alt="CN.io" class="logo" src="cid:logoImage"/>
+    </div>
+    <p style="font-size: 18px;">Hi,</p>
+    <p style="font-size: 18px;">
+        Thanks for Registering With us. Please confirm it's you by entering the OTP below on our
+        app:</p>
+    <div class="otp" id="otp">[[${otp}]]</div>
+    <div class="footer">
+        <p>Follow us on:</p>
+        <div class="social-icons">
+            <a href="https://www.facebook.com/yourpage"><img
+                    alt="Facebook"
+                    src="https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/facebook-app-symbol.png?alt=media&token=ce57327a-40df-4671-a21f-fb767a5fc2ee"></a>
+            <a href="https://www.twitter.com/yourpage"><img
+                    alt="Twitter"
+                    src="https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/twitter.png?alt=media&token=7bc557e8-77fb-4b0c-bf1d-1efdba078ec7"></a>
+            <a href="https://www.instagram.com/yourpage"><img
+                    alt="Instagram"
+                    src="https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/instagram.png?alt=media&token=352da9d0-0ed4-4d03-9228-6b765eb16b13"></a>
+        </div>
+        <p>© 2024 CN.io. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>

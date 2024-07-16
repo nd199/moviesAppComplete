@@ -47,8 +47,8 @@ public class MovieServiceImpl implements MovieService {
                 registration.ageRating(),
                 registration.year(),
                 registration.runtime(),
-                registration.genre()
-        );
+                registration.genre(),
+                "movies");
     }
 
     @Override
@@ -65,6 +65,14 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
+    public List<Movie> getMovieList() {
+        log.info("Fetching list of movies");
+        List<Movie> movies = movieDao.getMovieList();
+        log.info("Retrieved {} movies", movies.size());
+        return movies;
+    }
+
+    @Override
     public Movie getMovieById(Long id) {
         log.info("Fetching movie by ID: {}", id);
         return movieDao.getMovieById(id)
@@ -76,56 +84,47 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public List<Movie> getMovieList() {
-        log.info("Fetching list of movies");
-        List<Movie> movies = movieDao.getMovieList();
-        log.info("Retrieved {} movies", movies.size());
-        return movies;
-    }
-
-    @Override
-    public void updateMovie(MovieUpdation update, Long movieId) {
+    public Movie updateMovie(MovieUpdation update, Long movieId) {
         log.info("Updating movie with ID: {}", movieId);
-        Movie movie = movieDao.getMovieById(movieId)
-                .orElseThrow(() -> new ResourceNotFoundException("Movie not found"));
+        Movie movie = getMovieById(movieId);
 
         boolean changes = false;
 
         if (update.name() != null && !update.name().equals(movie.getName())) {
-            changes = true;
             movie.setName(update.name());
+            changes = true;
         }
         if (update.cost() != null && !update.cost().equals(movie.getCost())) {
-            changes = true;
             movie.setCost(update.cost());
+            changes = true;
         }
         if (update.rating() != null && !update.rating().equals(movie.getRating())) {
-            changes = true;
             movie.setRating(update.rating());
+            changes = true;
         }
         if (update.description() != null && !update.description().equals(movie.getDescription())) {
-            changes = true;
             movie.setDescription(update.description());
+            changes = true;
         }
         if (update.poster() != null && !update.poster().equals(movie.getPoster())) {
-            changes = true;
             movie.setPoster(update.poster());
+            changes = true;
         }
         if (update.ageRating() != null && !update.ageRating().equals(movie.getAgeRating())) {
-            changes = true;
             movie.setAgeRating(update.ageRating());
+            changes = true;
         }
         if (update.year() != null && !update.year().equals(movie.getYear())) {
-            changes = true;
             movie.setYear(update.year());
+            changes = true;
         }
         if (update.runtime() != null && !update.runtime().equals(movie.getRuntime())) {
-            changes = true;
             movie.setRuntime(update.runtime());
+            changes = true;
         }
         if (update.genre() != null && !update.genre().equals(movie.getGenre())) {
-            changes = true;
             movie.setGenre(update.genre());
+            changes = true;
         }
 
         if (!changes) {
@@ -133,6 +132,7 @@ public class MovieServiceImpl implements MovieService {
         }
         movieDao.updateMovie(movie);
         log.info("Movie updated successfully: {}", movie);
+        return movie;
     }
 
     @Override

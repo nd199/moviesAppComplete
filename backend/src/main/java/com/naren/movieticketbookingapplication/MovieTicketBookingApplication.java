@@ -14,12 +14,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Random;
 
 @Slf4j
 @SpringBootApplication
+@EnableJpaAuditing
 public class MovieTicketBookingApplication {
 
     private static final Random RANDOM = new Random();
@@ -32,7 +34,8 @@ public class MovieTicketBookingApplication {
     @Bean
     public CommandLineRunner commandLineRunner(CustomerRepository customerRepository,
                                                MovieRepository movieRepository, PasswordEncoder encoder,
-                                               RoleRepository roleRepository, ShowRepository showRepository) {
+                                               RoleRepository roleRepository,
+                                               ShowRepository showRepository) {
         return args -> {
             createRandomCustomer(customerRepository, encoder);
             createRandomMovie(movieRepository);
@@ -46,25 +49,30 @@ public class MovieTicketBookingApplication {
         String customerEmail = customerName.toLowerCase().replace(" ", "") + "@codeNaren.com";
         String password = encoder.encode(FAKER.internet().password(8, 12));
         Long phoneNumber = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
+        String imageUrl = FAKER.internet().image(200, 200, false, "");
+        Boolean isLoggedIn = FAKER.options().option(true, false);
+        Customer customer = new Customer(customerName, customerEmail, password,
+                phoneNumber, imageUrl, false, "Chennai, India", isLoggedIn, false);
 
-        Customer customer = new Customer(customerEmail, customerName, password, phoneNumber, false, false);
         customerRepository.save(customer);
-
         log.info("Created new customer: {}", customer);
     }
 
     private void createRandomMovie(MovieRepository movieRepository) {
-        String movieName = FAKER.book().title();
-        double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
-        double cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
-        String description = FAKER.lorem().sentence();
+        String movieName = FAKER.book().title() + Math.random();
+        var rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
+        var cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
+        String description = FAKER.lorem().sentence(40);
         String poster = FAKER.internet().url();
         String ageRating = FAKER.options().option("G", "PG", "PG-13", "R", "NC-17");
         int year = RANDOM.nextInt(1980, 2023);
         String runtime = RANDOM.nextInt(80, 180) + " mins";
-        String genre = FAKER.book().genre();
+        String genre1 = FAKER.book().genre();
+        String genre2 = FAKER.book().genre();
+        int Random = RANDOM.nextInt(100);
 
-        Movie movie = new Movie(movieName, cost, rating, description, poster, ageRating, year, runtime, genre);
+        Movie movie = new Movie(movieName + "-" + Random, cost, rating,
+                description, poster, ageRating, year, runtime, genre1 + "," + genre2, "movies");
         movieRepository.save(movie);
 
         log.info("Created new movie: {}", movie);
@@ -74,14 +82,17 @@ public class MovieTicketBookingApplication {
         String showName = FAKER.book().title();
         double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
         double cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
-        String description = FAKER.lorem().sentence();
+        String description = FAKER.lorem().sentence(40);
         String poster = FAKER.internet().url();
         String ageRating = FAKER.options().option("G", "PG", "PG-13", "R", "NC-17");
         int year = RANDOM.nextInt(1980, 2023);
         String runtime = RANDOM.nextInt(20, 60) + " mins";
-        String genre = FAKER.book().genre();
+        String genre1 = FAKER.book().genre();
+        String genre2 = FAKER.book().genre();
+        int Random = RANDOM.nextInt(100);
 
-        Show show = new Show(showName, cost, rating, description, poster, ageRating, year, runtime, genre);
+        Show show = new Show(showName + "-" + Random, cost, rating, description, poster,
+                ageRating, year, runtime, genre1 + "," + genre2, "shows");
         showRepository.save(show);
         log.info("Created new show: {}", show);
     }

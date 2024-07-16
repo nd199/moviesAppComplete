@@ -6,6 +6,7 @@
 
 # Ignore Node.js dependencies
 frontend/node_modules/
+payment/node_modules/
 
 # Ignore IDE specific files
 .idea/

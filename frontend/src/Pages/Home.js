@@ -9,10 +9,9 @@ const Home = () => {
     return (
         <div className="home">
             <NavBar/>
-            <Featured type={"series"}/>
-            <List/>
-            <List/>
-            <List/>
+            <Featured/>
+            <List title={"Movies"}/>
+            <List title={"Shows"}/>
             <Footer/>
         </div>
     );

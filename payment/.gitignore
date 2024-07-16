@@ -1,0 +1,18 @@
+<<<<<<< HEAD
+.DS_Store
+=======
+# Ignore Mac system files
+.DS_Store
+
+# Ignore Node.js dependencies
+payment/node_modules/
+
+# Ignore IDE specific files
+.idea/
+
+# Ignore build artifacts
+frontend/build/
+backend/target/
+backend/movieticketbookingapplication.iml
+
+>>>>>>> 4ee0c34 (backend and frontend ready just merging mut be done)

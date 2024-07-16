@@ -89,7 +89,7 @@ class MovieServiceImplTest {
         long id = 1;
         Movie movie = new Movie(id, "testName", 300.22, 5.00,
                 "A great movie", "http://poster.url", "PG-13",
-                2022, "120 mins", "Action");
+                2022, "120 mins", "Action", "movies");
 
         when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
 
@@ -116,7 +116,7 @@ class MovieServiceImplTest {
         long id = 1;
         Movie movie = new Movie(id, "testName", 300.22, 5.00,
                 "A great movie", "http://poster.url", "PG-13",
-                2022, "120 mins", "Action");
+                2022, "120 mins", "Action", "movies");
 
         when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
 
@@ -149,7 +149,7 @@ class MovieServiceImplTest {
 
         Movie movie = new Movie(id, "testName22", 200.0, 2.0,
                 "A movie", "http://poster.url", "PG", 2000,
-                "100 mins", "Comedy");
+                "100 mins", "Comedy", "movies");
 
         when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
 
@@ -203,7 +203,7 @@ class MovieServiceImplTest {
                 new MovieUpdation("Hello", 100.0, 4.5, "New Description", "New Poster",
                         "New Age Rating", 2000, "New Runtime", "New Genre"), movieId))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Movie not found");
+                .hasMessage("Movie with ID '%s' not found".formatted(movieId));
 
         verify(movieDao, never()).updateMovie(any());
     }
@@ -215,7 +215,7 @@ class MovieServiceImplTest {
 
         Movie movie = new Movie(id, "testName", 200.0, 2.0,
                 "A movie", "http://poster.url", "PG", 2000,
-                "100 mins", "Comedy");
+                "100 mins", "Comedy", "movies");
 
         when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
 
@@ -242,7 +242,7 @@ class MovieServiceImplTest {
 
         assertThatThrownBy(() -> underTest.updateMovie(updation, id))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Movie not found");
+                .hasMessageContaining("Movie with ID '%s' not found".formatted(id));
 
         verify(movieDao, never()).updateMovie(any());
     }
@@ -251,8 +251,8 @@ class MovieServiceImplTest {
     void testGetMoviesByYear() {
         int year = 2021;
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
-                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieDao.getMoviesByYear(year)).thenReturn(expectedMovies);
@@ -267,8 +267,8 @@ class MovieServiceImplTest {
     void testGetMoviesByAgeRating() {
         String ageRating = "PG-13";
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
-                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieDao.getMoviesByAgeRating(ageRating)).thenReturn(expectedMovies);
@@ -283,8 +283,8 @@ class MovieServiceImplTest {
     void testFindByRatingGreaterThanEqual() {
         double rating = 4.5;
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
-                new Movie("Movie2", 10.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 10.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieDao.findByRatingGreaterThanEqual(rating)).thenReturn(expectedMovies);
@@ -299,8 +299,8 @@ class MovieServiceImplTest {
     void testFindByRatingLessThanEqual() {
         double rating = 4.5;
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.2, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
-                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+                new Movie("Movie1", 10.0, 4.2, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieDao.findByRatingLessThanEqual(rating)).thenReturn(expectedMovies);
@@ -316,8 +316,8 @@ class MovieServiceImplTest {
         double minCost = 5.0;
         double maxCost = 15.0;
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieDao.findByCostBetween(minCost, maxCost)).thenReturn(expectedMovies);
@@ -331,8 +331,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByNameAsc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieDao.findAllByOrderByNameAsc()).thenReturn(expectedMovies);
@@ -346,8 +346,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByNameDesc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama"),
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action")
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
         when(movieDao.findAllByOrderByNameDesc()).thenReturn(expectedMovies);
@@ -361,8 +361,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByCostAsc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieDao.findAllByOrderByCostAsc()).thenReturn(expectedMovies);
@@ -376,8 +376,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByCostDesc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama"),
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action")
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
         when(movieDao.findAllByOrderByCostDesc()).thenReturn(expectedMovies);
@@ -391,8 +391,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByRatingAsc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieDao.findAllByOrderByRatingAsc()).thenReturn(expectedMovies);
@@ -406,8 +406,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByRatingDesc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama"),
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action")
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
         when(movieDao.findAllByOrderByRatingDesc()).thenReturn(expectedMovies);
@@ -421,8 +421,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByYearAsc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieDao.findAllByOrderByYearAsc()).thenReturn(expectedMovies);
@@ -436,8 +436,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByYearDesc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama"),
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action")
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
         when(movieDao.findAllByOrderByYearDesc()).thenReturn(expectedMovies);
@@ -451,8 +451,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByGenreAsc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama")
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieDao.findAllByOrderByGenreAsc()).thenReturn(expectedMovies);
@@ -466,8 +466,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByGenreDesc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama"),
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action")
+                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
+                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
         when(movieDao.findAllByOrderByGenreDesc()).thenReturn(expectedMovies);

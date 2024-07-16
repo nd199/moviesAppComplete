@@ -8,6 +8,7 @@ import CallOutlinedIcon from "@mui/icons-material/CallOutlined";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import MailOutlineOutlinedIcon from "@mui/icons-material/MailOutlineOutlined";
 import {HandshakeOutlined} from "@mui/icons-material";
+import {Link} from "react-router-dom";
 
 const Footer = () => {
     return (
@@ -54,8 +55,31 @@ const Footer = () => {
                 <div className="footer__container__center">
                     <div className="footer__container__center__title">Quick Links</div>
                     <div className="footer__container__center__links">
-                        <div className="footer__container__center__links__link">Home</div>
-                        <div className="footer__container__center__links__link">About</div>
+                        <div className="footer__container__center__links__link">
+                            <Link to={"/"}>
+                                <span>Home</span>
+                            </Link>
+                        </div>
+                        <div className="footer__container__center__links__link">
+                            <Link to={"/About"}>
+                                <span>About Us</span>
+                            </Link>
+                        </div>
+                        <div className="footer__container__center__links__link">
+                            <Link to={"/Movies"}>
+                                <span>Movies</span>
+                            </Link>
+                        </div>
+                        <div className="footer__container__center__links__link">
+                            <Link to={"/Shows"}>
+                                <span>Shows</span>
+                            </Link>
+                        </div>
+                        <div className="footer__container__center__links__link">
+                            <Link to={"/"}>
+                                <span>My WishList</span>
+                            </Link>
+                        </div>
                         <div className="footer__container__center__links__link">
                             Privacy Policy
                         </div>

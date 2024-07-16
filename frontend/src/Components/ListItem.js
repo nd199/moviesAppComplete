@@ -3,12 +3,28 @@ import "./ListItem.css";
 import {Add, PlayArrow, ThumbDownOutlined, ThumbUpAltOutlined, VolumeOff, VolumeUp,} from "@mui/icons-material";
 import {Link} from "react-router-dom";
 
-const ListItem = () => {
+const ListItem = ({
+                      name,
+                      desc,
+                      year,
+                      img,
+                      ageRating,
+                      cost,
+                      rating,
+                      runtime,
+                      genre,
+                  }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isMuted, setIsMuted] = useState(true);
 
     const toggleAudio = () => {
         setIsMuted(!isMuted);
+    };
+
+    const formatRuntime = (minutes) => {
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return `${hours}h ${mins}m`;
     };
 
     return (
@@ -48,7 +64,7 @@ const ListItem = () => {
                             <div className="hovered-info">
                                 <div className="hovered-info-top">
                                     <div className="hovered-li-title">
-                                        <h3>Avatar</h3>
+                                        <h5>{name}</h5>
                                     </div>
                                     <div className="hovered-li-actions">
                                         <Link to="/vfs" className="hovered-li-action">
@@ -67,15 +83,7 @@ const ListItem = () => {
                                 </div>
                                 <div className="hovered-li-desc-container">
                                     <div className="hovered-li-description">
-                                        <p>
-                                            Avatar is a 2009 American epic science fiction film
-                                            directed, written, produced, and co-edited by James
-                                            Cameron, and starring Sam Worthington and Zoe Saldana. Set
-                                            in 2154, the plot follows Jake Sully, a paraplegic war
-                                            veteran who replaces his deceased twin brother to
-                                            participate in a mission to secure unObtanium, a mineral
-                                            that gives unlimited sustainable energy.
-                                        </p>
+                                        <p>{desc}</p>
                                     </div>
                                 </div>
                             </div>
@@ -84,28 +92,24 @@ const ListItem = () => {
                                 <div className="li-description">
                                     <div className="li-desc-top">
                                         <div className="li-title">
-                                            <h3>Avatar</h3>
+                                            <h6>{name}</h6>
                                             <div className="age-rating">
-                                                <p>U/A 13+</p>
+                                                <p>{ageRating}</p>
                                             </div>
                                         </div>
                                         <div className="li-details">
-                                            <p>2009</p>
-                                            <p>2h 42m</p>
-                                            <p>IMDB: 8.0⭐️/10</p>
+                                            <p>{year}</p>
+                                            <p>{formatRuntime(runtime?.substring(0, 3))}</p>
+                                            <p>IMDB: {rating}⭐️/10</p>
                                         </div>
                                     </div>
                                     <div className="li-desc-bottom">
-                                        <p>
-                                            Avatar is a 2009 American epic science fiction film
-                                            directed, written, produced, and co-edited by James
-                                            Cameron.
-                                        </p>
+                                        <p>{desc}</p>
                                     </div>
                                     <div className="li-genre">
-                                        <p>Action</p>
-                                        <p>Adventure</p>
-                                        <p>Sci-Fi</p>
+                                        {genre?.split(",").map((genre) => (
+                                            <p key={genre}>{genre}</p>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
