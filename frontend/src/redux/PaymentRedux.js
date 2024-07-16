@@ -3,7 +3,7 @@ import {createSlice} from "@reduxjs/toolkit";
 export const PaymentRedux = createSlice({
     name: "payment",
     initialState: {
-        paymentPlan: null,
+        paymentPlan: {},
         isFetching: false,
         error: null,
         errorMessage: null,

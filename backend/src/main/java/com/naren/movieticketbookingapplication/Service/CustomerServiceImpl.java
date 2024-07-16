@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Slf4j
@@ -225,6 +226,25 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public void updatePassword(String email, String newPassword) {
+        Customer customer = customerDao.getCustomerByUsername(email)
+                .orElseThrow(() -> {
+                    log.error("Customer not found with email  : {}", email);
+                    return new ResourceNotFoundException("Customer with email "
+                            + email + " not found");
+                });
+        if (newPassword != null && Objects.equals(customer.getPassword(), newPassword)) {
+            throw new PasswordInvalidException("Do not enter password you might already used");
+        }
+        var passwordIsValid = validatePassword(newPassword, customer.getName(), customer.getEmail(), customer.getPhoneNumber());
+        if (!passwordIsValid) {
+            throw new PasswordInvalidException("Invalid password");
+        }
+        customer.setPassword(passwordEncoder.encode(newPassword));
+        customerDao.updateCustomer(customer);
+    }
+
+    @Override
     public List<CustomerDTO> getAllCustomers() {
         log.info("Fetching all customers");
         List<CustomerDTO> customers = customerDao.getCustomerList()
@@ -337,40 +357,6 @@ public class CustomerServiceImpl implements CustomerService {
                     "No customers logged in");
         }
         return customers;
-    }
-
-    @Override
-    public void updatePassword(Long customerID, String newPassword, String verificationType, String enteredOtp) {
-        log.info("Updating password for customer with ID: {}", customerID);
-
-        Customer customer = customerDao.getCustomer(customerID).orElseThrow(
-                () -> {
-                    log.error("Customer not found with  ID: {}", customerID);
-                    return new ResourceNotFoundException("No Customer Found with id : " + customerID);
-                }
-        );
-
-        if ("mobile".equalsIgnoreCase(verificationType)) {
-            otpService.generateAndSendOtp(customerID, String.valueOf(customer.getPhoneNumber()), "mobile");
-        } else if ("mail".equalsIgnoreCase(verificationType)) {
-            otpService.generateAndSendOtp(customerID, String.valueOf(customer.getEmail()), "mail");
-        } else {
-            log.error("Invalid verification type: {}", verificationType);
-            throw new IllegalArgumentException("Invalid verification type");
-        }
-
-        boolean isValidPassword = validatePassword(newPassword, customer.getName(), customer.getEmail(), customer.getPhoneNumber());
-
-        if (!isValidPassword) {
-            log.error("Invalid password: {}", newPassword);
-            throw new PasswordInvalidException("Invalid password");
-        }
-
-        customer.setPassword(passwordEncoder.encode(newPassword));
-        customerDao.updateCustomer(customer);
-
-        log.info("Password updated successfully for customer with ID: {}", customerID);
-        ResponseEntity.ok("Password reset successfully");
     }
 
     @Override

@@ -173,7 +173,7 @@ class CustomerServiceImplTest {
     void getCustomerByIdReturnsCustomerDTO() {
         long customerId = 1;
         Customer customer = new Customer(customerId, "Alex", "alex@example.com",
-                "password", 1234567890L, false,false, false, "Chennai, India");
+                "password", 1234567890L, false, false, false, "Chennai, India");
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
 
         CustomerDTO result = underTest.getCustomerById(customerId);
@@ -199,7 +199,7 @@ class CustomerServiceImplTest {
     @Test
     void updateCustomerSuccessful() {
         long customerId = 1;
-        Customer customer = new Customer(customerId, "testName", "test@example.com", "oldPassword", 20220292232L, false, false,false, "Chennai, India");
+        Customer customer = new Customer(customerId, "testName", "test@example.com", "oldPassword", 20220292232L, false, false, false, "Chennai, India");
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", 9999999999L, "", false, "Chennai, India", false, false);
 
         when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
@@ -403,7 +403,7 @@ class CustomerServiceImplTest {
 
     @Test
     void removeMovieFromCustomerThrowsResourceNotFoundExceptionNotFound() {
-        Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L, false, false,false, "Chennai, India");
+        Customer customer = new Customer(1L, "testName", "test@example.com", "password", 20220292232L, false, false, false, "Chennai, India");
         Movie movie = new Movie(1L, "testMovie", 230.00, 9.00, "none", "none", "none", 2000, "none", "none", "movies");
 
         when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));

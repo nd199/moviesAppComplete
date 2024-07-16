@@ -37,10 +37,6 @@ public class OtpService {
     }
 
 
-    private String generateKey(Long number) {
-        return "One Time Password : " + number.toString();
-    }
-
     private String generateKey(String email) {
         return "One Time Password : " + email;
     }

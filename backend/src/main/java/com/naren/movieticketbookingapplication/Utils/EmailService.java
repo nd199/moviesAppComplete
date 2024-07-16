@@ -43,5 +43,24 @@ public class EmailService {
         }
     }
 
+    public void sendPasswordResetMail(String toMail, String token) {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(username);
+            helper.setTo(toMail);
+            helper.setSubject("Password Reset Request");
+
+            Context context = new Context();
+            context.setVariable("resetLink", "http://localhost:3000/forgotPassword?token=" + token);
+            String htmlContent = templateEngine.process("password-reset-mail", context);
+
+            helper.setText(htmlContent, true);
+            javaMailSender.send(mimeMessage);
+            System.out.println("Password reset email sent successfully to: " + toMail);
+        } catch (MessagingException e) {
+            System.err.println("Error sending password reset email to: " + toMail + ". Error: " + e.getMessage());
+        }
+    }
 }
 

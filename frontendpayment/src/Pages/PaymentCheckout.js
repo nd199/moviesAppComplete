@@ -1,22 +1,27 @@
 import './PaymentCheckout.css';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {getPaymentDetails} from '../Network/ApiCalls';
-import {useParams} from 'react-router-dom';
+import {getPaymentDetails, saveFinalPayment} from '../Network/ApiCalls';
+import {useNavigate, useParams} from 'react-router-dom';
+
+const {v4: uuid} = require('uuid');
 
 const PaymentCheckout = () => {
-    const userAndPaymentData = useSelector(state => state?.payment?.userInfoAndSelectedPlan);
+    const userAndPaymentData = useSelector((state) => state?.payment?.userInfoAndSelectedPlan);
     const userDetails = userAndPaymentData?.data;
-    const selectedPlan = userAndPaymentData?.data.selectedPlan;
+    const selectedPlan = userAndPaymentData?.data?.selectedPlan?.selectedPlan;
+    const allPlans = userAndPaymentData?.data?.selectedPlan?.allPlans;
     const dispatch = useDispatch();
     const {userId} = useParams();
+    const UUID = uuid();
+    const nav = useNavigate();
 
-    const [name, setName] = useState(userDetails.name);
-    const [address, setAddress] = useState(userDetails.address);
-    const [phoneNumber, setPhoneNumber] = useState(userDetails.phoneNumber);
-    const [planName, setPlanName] = useState(selectedPlan.name);
-    const [planDescription, setPlanDescription] = useState(selectedPlan.description);
-    const [planPrice, setPlanPrice] = useState(selectedPlan.price);
+    const [name, setName] = useState(userDetails?.name);
+    const [address, setAddress] = useState(userDetails?.address);
+    const [phoneNumber, setPhoneNumber] = useState(userDetails?.phoneNumber);
+    const [planName, setPlanName] = useState(selectedPlan?.name);
+    const [planDescription, setPlanDescription] = useState(selectedPlan?.description);
+    const [planPrice, setPlanPrice] = useState(selectedPlan?.price);
 
     const [paymentDetails, setPaymentDetails] = useState({
         cardNumber: '',
@@ -53,22 +58,46 @@ const PaymentCheckout = () => {
     };
 
     const handlePaymentCheckout = () => {
-        // TODO: Implement your payment checkout logic here
-        // This could involve sending data to a payment gateway or processing the payment
-        console.log('Processing payment with details:', {...userDetails, ...paymentDetails});
+
+        const transactionId = UUID;
+
+        const finalUser = {
+            ...userDetails,
+            name,
+            address,
+            phoneNumber,
+        };
+
+        const finalPlan = {
+            ...selectedPlan,
+            name: planName,
+            description: planDescription,
+            price: planPrice,
+        };
+
+        const {paymentMethod} = paymentDetails;
+
+
+        try {
+            saveFinalPayment(dispatch, {finalUser, finalPlan, paymentMethod, transactionId});
+            if (saveFinalPayment) {
+                nav("/success");
+            }
+        } catch (error) {
+            console.error('Error during payment:', error);
+        }
     };
 
     const formatCardNumber = (cardNumber) => {
-        // Format card number to display with dashes (e.g., 0000-0000-0000-0000)
         const formattedCardNumber = cardNumber.replace(/\D/g, '').replace(/(.{4})/g, '$1-');
-        return formattedCardNumber.substring(0, 19); // Limit to 19 characters
+        return formattedCardNumber.substring(0, 19);
     };
 
     const formatExpiry = (expiry) => {
-        // Format expiry date to MM/YY format
         const formattedExpiry = expiry.replace(/\D/g, '').replace(/(\d{2})(\d{0,4})/, '$1/$2');
-        return formattedExpiry.substring(0, 5); // Limit to MM/YY format
+        return formattedExpiry.substring(0, 5);
     };
+
 
     return (
         <div className="paymentPage-container">
@@ -82,47 +111,31 @@ const PaymentCheckout = () => {
                         <div className="paymentPage-left-top">
                             <div className="paymentPage-left-heading">
                                 <h2>Your Details</h2>
-                                <img src={userDetails.imageUrl} alt="yourProfile.jpg"
+                                <img src={userDetails?.imageUrl} alt="yourProfile.jpg"
                                      className="paymentPage-profile-img"/>
                             </div>
-                            <p style={{margin: "10px auto", color: "white", fontWeight: 300, textAlign: "right"}}>Check
-                                your details. You can edit them except your email.</p>
+                            <p style={{margin: '10px auto', color: 'white', fontWeight: 300, textAlign: 'right'}}>
+                                Check your details. You can edit them except your email and plan.
+                            </p>
                             <div className="paymentPage-left-content">
                                 <div className="paymentPage-input">
                                     <label>Your Name</label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={name}
-                                        onChange={handleUserDetailsChange}
-                                    />
+                                    <input type="text" name="name" value={name} onChange={handleUserDetailsChange}/>
                                 </div>
                                 <div className="paymentPage-input">
                                     <label>Your Email</label>
-                                    <input
-                                        type="email"
-                                        value={userDetails.email}
-                                        style={{cursor: "not-allowed"}}
-                                        disabled
-                                    />
+                                    <input type="email" value={userDetails?.email} style={{cursor: 'not-allowed'}}
+                                           disabled/>
                                 </div>
                                 <div className="paymentPage-input">
                                     <label>Your Billing Address</label>
-                                    <input
-                                        type="text"
-                                        name="address"
-                                        value={address}
-                                        onChange={handleUserDetailsChange}
-                                    />
+                                    <input type="text" name="address" value={address}
+                                           onChange={handleUserDetailsChange}/>
                                 </div>
                                 <div className="paymentPage-input">
                                     <label>Your Phone</label>
-                                    <input
-                                        type="text"
-                                        name="phoneNumber"
-                                        value={phoneNumber}
-                                        onChange={handleUserDetailsChange}
-                                    />
+                                    <input type="text" name="phoneNumber" value={phoneNumber}
+                                           onChange={handleUserDetailsChange}/>
                                 </div>
                             </div>
                         </div>
@@ -133,27 +146,18 @@ const PaymentCheckout = () => {
                             <div className="paymentPage-left-content">
                                 <div className="paymentPage-input">
                                     <label>Your Plan Name</label>
-                                    <input
-                                        type="text"
-                                        value={planName}
-                                        onChange={(e) => setPlanName(e.target.value)}
-                                    />
+                                    <input type="text" value={planName}
+                                           onChange={(e) => setPlanName(e.target?.value)} disabled/>
                                 </div>
                                 <div className="paymentPage-input">
                                     <label>Your Plan Description</label>
-                                    <input
-                                        type="text"
-                                        value={planDescription}
-                                        onChange={(e) => setPlanDescription(e.target.value)}
-                                    />
+                                    <input type="text" value={planDescription}
+                                           onChange={(e) => setPlanDescription(e.target?.value)} disabled/>
                                 </div>
                                 <div className="paymentPage-input">
                                     <label>Your Plan Price (In Rupees)</label>
-                                    <input
-                                        type="text"
-                                        value={planPrice}
-                                        onChange={(e) => setPlanPrice(e.target.value)}
-                                    />
+                                    <input type="text" value={planPrice}
+                                           onChange={(e) => setPlanPrice(e.target?.value)} disabled/>
                                 </div>
                             </div>
                         </div>
@@ -165,7 +169,7 @@ const PaymentCheckout = () => {
                             </div>
                             <div className="paymentPage-right-content">
                                 <div className="cards">
-                                    <label>Accepted Cards</label>
+                                    <label>Accepted Transactions</label>
                                     <img src="https://i.ibb.co/Qfvn4z6/payment.png" alt=""
                                          className="paymentCardImage"/>
                                 </div>
@@ -234,14 +238,15 @@ const PaymentCheckout = () => {
                                 </div>
                             </div>
                         </div>
-                        <button className="paymentPage-checkout-btn" onClick={handlePaymentCheckout}>Proceed to
+                        <button className="paymentPage-checkout-btn" onClick={handlePaymentCheckout}>
                             Checkout
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-    );
+    )
+        ;
 };
 
 export default PaymentCheckout;

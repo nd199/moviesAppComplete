@@ -61,7 +61,7 @@ const EmailReg = ({onEmailUpdate, onEmailVerified}) => {
             setShowEmailOtp(true);
             const res = await verifyEmail(dispatch, {email});
             setOtpMessage(res);
-            setOtpTimer(20);
+            setOtpTimer(60);
         } catch (error) {
             console.error("Error verifying email:", error);
         } finally {

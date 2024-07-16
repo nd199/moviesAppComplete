@@ -1,142 +1,143 @@
 .footer {
-  width: 100%;
-  background-color: var(--main-color);
-  border: 1px solid #333;
-  border-left: none;
-  border-right: none;
-  color: var(--text-color);
-  padding: 25px 0;
+    width: 100%;
+    background-color: var(--main-color);
+    border: 1px solid #333;
+    border-left: none;
+    border-right: none;
+    color: var(--text-color);
+    padding: 25px 0;
 }
 
 .footer__container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 25px;
-  gap: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px;
+    gap: 20px;
 }
 
 .footer__container__left,
 .footer__container__center,
 .footer__container__right {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
 }
 
 .footer__container__left__logo > h1 {
-  font-size: 40px;
-  font-weight: 700;
+    font-size: 40px;
+    font-weight: 700;
 }
 
 .footer__container__left__desc {
-  margin: 10px 0;
-  padding: 10px;
-  width: 100%;
-  border: 1px solid #333;
-  border-radius: 5px;
-  font-size: 15px;
-  font-weight: 500;
-  text-align: center;
+    margin: 10px 0;
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #333;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
 }
 
 .social-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  align-items: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
 }
 
 .s-icon {
-  width: 50px;
-  height: 50px;
-  background-color: whitesmoke;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 50px;
+    height: 50px;
+    background-color: whitesmoke;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .wIcon {
-  font-size: 30px !important;
+    font-size: 30px !important;
 }
 
 .footer__container__center__title,
 .footer__container__right__title {
-  font-size: 25px;
-  font-weight: bold;
-  margin-bottom: 20px;
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
 .footer__container__center__links {
-  display: flex;
-  max-width: 500px;
-  padding: 20px;
-  flex-wrap: wrap;
+    display: flex;
+    max-width: 500px;
+    padding: 20px;
+    flex-wrap: wrap;
 }
 
 .footer__container__center__links__link {
-  width: 50%;
-  margin-bottom: 20px;
+    width: 50%;
+    margin-bottom: 20px;
 }
 
 .footer__container__center__links__link a {
-  color: white;
+    color: white;
 }
 
 .r-info {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
 }
 
 .r-info > div > h3 {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
 }
 
 .payment {
-  width: 100%;
-  max-width: 200px;
-  cursor: pointer;
+    width: 100%;
+    max-width: 200px;
+    cursor: pointer;
 }
-/* 
+
+/*
 /* Responsive Design */
 @media only screen and (min-width: 980px) {
-  .footer__container {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
+    .footer__container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
 
-  .footer__container__left,
-  .footer__container__center,
-  .footer__container__right {
-    flex: 1;
-    align-items: flex-start;
-  }
+    .footer__container__left,
+    .footer__container__center,
+    .footer__container__right {
+        flex: 1;
+        align-items: flex-start;
+    }
 
-  .footer__container__left__logo > h1 {
-    font-size: 60px;
-  }
+    .footer__container__left__logo > h1 {
+        font-size: 60px;
+    }
 
-  .footer__container__left__desc {
-    text-align: left;
-  }
+    .footer__container__left__desc {
+        text-align: left;
+    }
 
-  .r-info {
-    align-items: flex-start;
-  }
+    .r-info {
+        align-items: flex-start;
+    }
 
-  .r-info > div > h3 {
-    justify-content: flex-start;
-  }
+    .r-info > div > h3 {
+        justify-content: flex-start;
+    }
 }

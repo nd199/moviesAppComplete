@@ -1,22 +1,46 @@
 const mongoose = require('mongoose');
-const {Mongoose} = require("mongoose");
+const {Schema} = mongoose;
 
+const SelectedPlanSchema = new Schema({
+    id: {type: Number, required: true},
+    name: {type: String, required: true},
+    price: {type: Number, required: true},
+    interval: {type: String, required: true},
+    description: {type: String, required: true}
+}, {_id: false});
 
-const PaymentSchema
-    = new Mongoose.Schema({
-    userId: {type: Number, required: true},
-    subscriptionId: {type: Object, required: true},
-    paymentType: {type: String, enum: ['subscription', 'rental', 'purchase'], required: true},
-    amount: {type: Number, default: 0.00, required: true},
-    currency: {type: String, enum: ['INR', 'USD'], default: 0.00, required: true},
-    paymentMethod: {type: String, enum: ['CURRENCY', 'CARD'], required: true},
-    timestamp: {type: Date, default: Date.now},
-    status: {type: String, enum: ['PENDING', 'FAILED', 'COMPLETED'], required: true},
-    expiry: {type: Date},
-    movieId: {type: Number, required: true},
-    transactionId: {type: String, ref: 'Transaction', required: true},
+const FinalUserSchema = new Schema({
+    _id: {type: String, required: true},
+    id: {type: Number, required: true},
+    name: {type: String, required: true},
+    email: {type: String, required: true},
+    roles: {type: [String], required: true},
+    phoneNumber: {type: Number, required: true},
+    movies: {type: [String], default: []},
+    isEmailVerified: {type: Boolean, required: true},
+    address: {type: String, required: true},
+    isLogged: {type: Boolean, required: true},
+    isRegistered: {type: Boolean, required: true},
+    imageUrl: {type: String, required: true},
+    createdAt: {type: Date, required: true},
+    updatedAt: {type: Date, required: true}
+}, {_id: false});
+
+const FinalPlanSchema = new Schema({
+    id: {type: Number, required: true},
+    name: {type: String, required: true},
+    price: {type: Number, required: true},
+    interval: {type: String, required: true},
+    description: {type: String, required: true}
+}, {_id: false});
+
+const PaymentSchema = new Schema({
+    finalUser: {type: FinalUserSchema, required: true},
+    finalPlan: {type: FinalPlanSchema, required: true},
+    paymentMethod: {type: String, default: ''},
+    transactionId: {type: String, required: true}
 }, {timestamps: true});
 
-const Payment = mongoose.model('Payment', PaymentSchema);
+const PaymentGateway = mongoose.model('Payment', PaymentSchema);
 
-module.exports = Payment;
+module.exports = PaymentGateway;

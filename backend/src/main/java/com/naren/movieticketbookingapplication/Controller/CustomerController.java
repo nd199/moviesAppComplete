@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -145,13 +144,6 @@ public class CustomerController {
         return customers;
     }
 
-    @PutMapping("/customers/reset-pass/{id}")
-    public void resetPassword(@PathVariable Long id, @RequestBody Map<String, String> payload) {
-        log.info("Resetting password for customer ID: {}", id);
-        customerService.updatePassword(id, payload.get("resetPassword"), payload.get("typeOfVerification"), payload.get("enteredOtp"));
-        log.info("Password reset successfully for customer ID: {}", id);
-    }
-
     @GetMapping("/customers/stats")
     public ResponseEntity<List<CustomerStatsDTO>> getCustomerStats() {
         try {
@@ -188,5 +180,25 @@ public class CustomerController {
     @DeleteMapping("/products/{id}/{type}")
     public void DeleteProductHandler(@PathVariable("id") Long id, @PathVariable("type") String type) {
         productService.deleteProduct(id, type);
+    }
+
+    @PutMapping("/profile/{id}")
+    public ResponseEntity<CustomerDTO> updateProfile(@RequestBody CustomerUpdateRequest customerUpdateRequest,
+                                                     @PathVariable("id") Long id) {
+        CustomerDTO customerDTO = customerService.updateCustomer(customerUpdateRequest, id);
+        return new ResponseEntity<>(customerDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/customers/userRequest")
+    public ResponseEntity<List<CustomerDTO>> customers(@RequestParam(name = "new", required = false)
+                                                       Boolean isNew) {
+        List<CustomerDTO> customers;
+        if (Boolean.TRUE.equals(isNew)) {
+            customers = customerService.getLatestCustomerList();
+        } else {
+            customers = customerService.getAllCustomers();
+        }
+        log.info("Fetched {} customers .", customers.size());
+        return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 }

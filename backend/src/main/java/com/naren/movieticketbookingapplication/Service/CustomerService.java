@@ -19,6 +19,8 @@ public interface CustomerService {
 
     CustomerDTO updateCustomer(CustomerUpdateRequest customer, Long customerId);
 
+    void updatePassword(String email, String newPassword);
+
     List<CustomerDTO> getAllCustomers();
 
     void deleteCustomer(Long customerId);
@@ -40,8 +42,6 @@ public interface CustomerService {
     void removeAllMovies(Long customerId);
 
     List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn);
-
-    void updatePassword(Long customerID, String newPassword, String verificationType, String enteredOtp);
 
     CustomerDTO getCustomerByEmail(String email);
 
