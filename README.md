@@ -1,4 +1,4 @@
-# MoviesAppComplete
+# Movies OTT Application
 
 ### NOTE: The secrets provided in props and env files are just for testing purposes and serve as examples. The DB secrets are for local use and can be changed. For SMTP, the provided Username and password will not work, and emails will not be sent. Please provide your email and password of your Gmail app to experience a fully working app.
 
