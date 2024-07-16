@@ -1,29 +1,29 @@
-ALTER TABLE movie
-    ADD COLUMN description VARCHAR(255) NOT NULL DEFAULT 'None';
+alter table movie
+    add column description TEXT NOT NULL DEFAULT 'None';
 
-ALTER TABLE movie
-    ADD COLUMN poster VARCHAR(255) NOT NULL DEFAULT 'None';
+alter table movie
+    add column poster VARCHAR(255) NOT NULL DEFAULT 'None';
 
-ALTER TABLE movie
-    ADD COLUMN year INTEGER NOT NULL DEFAULT 2000;
+alter table movie
+    add column year INTEGER NOT NULL DEFAULT 2000;
 
-ALTER TABLE movie
-    ADD COLUMN runtime VARCHAR(255) NOT NULL DEFAULT 'None';
+alter table movie
+    add column runtime VARCHAR(255) NOT NULL DEFAULT 'None';
 
-ALTER TABLE movie
-    ADD COLUMN genre VARCHAR(255) NOT NULL DEFAULT 'None';
+alter table movie
+    add column genre TEXT NOT NULL DEFAULT 'None';
 
-ALTER TABLE show
-    ADD COLUMN description VARCHAR(255) NOT NULL DEFAULT 'None';
+alter table show
+    add column description TEXT NOT NULL DEFAULT 'None';
 
-ALTER TABLE show
-    ADD COLUMN poster VARCHAR(255) NOT NULL DEFAULT 'None';
+alter table show
+    add column poster TEXT NOT NULL DEFAULT 'None';
 
-ALTER TABLE show
-    ADD COLUMN year INTEGER NOT NULL DEFAULT 2000;
+alter table show
+    add column year INTEGER NOT NULL DEFAULT 2000;
 
-ALTER TABLE show
-    ADD COLUMN runtime VARCHAR(255) NOT NULL DEFAULT 'None';
+alter table show
+    add column runtime VARCHAR(255) NOT NULL DEFAULT 'None';
 
-ALTER TABLE show
-    ADD COLUMN genre VARCHAR(255) NOT NULL DEFAULT 'None';
+alter table show
+    add column genre TEXT NOT NULL DEFAULT 'None';

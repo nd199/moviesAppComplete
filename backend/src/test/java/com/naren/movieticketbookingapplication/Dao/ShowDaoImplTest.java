@@ -33,7 +33,7 @@ class ShowDaoImplTest {
         sh = new Show(1L,
                 "Harry Potter",
                 200D,
-                5D, "none", "none", "none", 2000, "none", "none");
+                5D, "none", "none", "none", 2000, "none", "none", "shows");
     }
 
     @AfterEach

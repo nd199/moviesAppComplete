@@ -1,41 +1,41 @@
 package com.naren.movieticketbookingapplication.Entity;
 
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static jakarta.persistence.CascadeType.*;
 
-
 @Entity
 @Table(name = "Customer", uniqueConstraints = {
-        @UniqueConstraint(name = "email_id_unique",
-                columnNames = "email"),
-        @UniqueConstraint(name = "phone_number_unique",
-                columnNames = "phone_number")
+        @UniqueConstraint(name = "email_id_unique", columnNames = "email"),
+        @UniqueConstraint(name = "phone_number_unique", columnNames = "phone_number")
 })
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 @Slf4j
+@AllArgsConstructor
 public class Customer implements UserDetails {
     @Id
-    @SequenceGenerator(name = "customer_id",
-            sequenceName = "customer_id",
-            allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-            generator = "customer_id")
-    private Long customer_id;
+    @SequenceGenerator(name = "customer_id", sequenceName = "customer_id", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_id")
+    private Long id;
 
     @Column(name = "name", columnDefinition = "TEXT")
     private String name;
@@ -43,115 +43,150 @@ public class Customer implements UserDetails {
     @Column(name = "email", columnDefinition = "TEXT", nullable = false)
     private String email;
 
-    @Column(name = "password", columnDefinition = "TEXT", nullable = false, length = 8)
+    @Column(name = "password", columnDefinition = "TEXT", nullable = false)
     private String password;
 
     @Column(name = "phone_number", nullable = false)
     private Long phoneNumber;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(nullable = false)
     private Boolean isEmailVerified;
 
     @Column(nullable = false)
-    private Boolean isPhoneVerified;
+    private String address;
 
+    @Column(nullable = false)
+    private Boolean isLogged;
 
-    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = {DETACH, REFRESH, PERSIST, MERGE})
+    @Column(nullable = false)
+    private Boolean isRegistered;
+
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = {DETACH, REFRESH, PERSIST, MERGE})
     @JsonIgnore
     private List<Movie> movies = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "customers_roles",
             joinColumns = @JoinColumn(name = "customer_id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "role_id",
-                    foreignKey = @ForeignKey(name = "fk_customer_role_id")
-            ),
-            foreignKey = @ForeignKey(name = "fk_customers_role_customer_id")
+            inverseJoinColumns = @JoinColumn(name = "role_id"),
+            foreignKey = @ForeignKey(name = "fk_customer_role_id"),
+            inverseForeignKey = @ForeignKey(name = "fk_customers_role_customer_id")
     )
     @JsonBackReference
     private Set<Role> roles = new HashSet<>();
 
-    public Customer(Long customer_id, String name, String email,
-                    String password, Long phoneNumber, Boolean isEmailVerified,
-                    Boolean isPhoneVerified, List<Movie> movies, Set<Role> roles) {
-        this.customer_id = customer_id;
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, List<Movie> movies, Set<Role> roles) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
-        this.isPhoneVerified = isPhoneVerified;
+        this.address = address;
+        this.isLogged = isLogged;
+        this.isRegistered = isRegistered;
         this.movies = movies;
         this.roles = roles;
     }
 
-    public Customer(Long customer_id, String name, String email, String password, Long phoneNumber) {
-        this.customer_id = customer_id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-    }
-
-
-    public Customer(Long customer_id, String name, String email,
-                    String password, Long phoneNumber,
-                    Boolean isEmailVerified, Boolean isPhoneVerified) {
-        this.customer_id = customer_id;
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
-        this.isPhoneVerified = isPhoneVerified;
+        this.address = address;
+        this.isLogged = isLogged;
+        this.isRegistered = isRegistered;
+    }
+
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.imageUrl = imageUrl;
+        this.isEmailVerified = isEmailVerified;
+        this.address = address;
+        this.isLogged = isLogged;
+        this.isRegistered = isRegistered;
+
+    }
+
+    public Customer(String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.isEmailVerified = isEmailVerified;
+        this.address = address;
+        this.isLogged = isLogged;
+        this.isRegistered = isRegistered;
     }
 
     public Customer(String name, String email, String password,
-                    Long phoneNumber, Boolean isEmailVerified,
-                    Boolean isPhoneVerified) {
+                    Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
+        this.imageUrl = imageUrl;
         this.isEmailVerified = isEmailVerified;
-        this.isPhoneVerified = isPhoneVerified;
+        this.address = address;
+        this.isLogged = isLogged;
+        this.isRegistered = isRegistered;
     }
 
     @Override
     public String toString() {
         return "Customer{" +
-                "customer_id=" + customer_id +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", phoneNumber=" + phoneNumber +
+                ", imageUrl='" + imageUrl + '\'' +
                 ", isEmailVerified=" + isEmailVerified +
-                ", isPhoneVerified=" + isPhoneVerified +
+                ", address='" + address + '\'' +
+                ", isLogged=" + isLogged +
+                ", isRegistered=" + isRegistered +
                 ", movies=" + movies +
                 ", roles=" + roles +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
-
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return Objects.equals(customer_id, customer.customer_id) && Objects.equals(name, customer.name) && Objects.equals(email, customer.email) && Objects.equals(password, customer.password) && Objects.equals(phoneNumber, customer.phoneNumber) && Objects.equals(isEmailVerified, customer.isEmailVerified) && Objects.equals(isPhoneVerified, customer.isPhoneVerified) && Objects.equals(movies, customer.movies) && Objects.equals(roles, customer.roles);
+        return Objects.equals(id, customer.id) && Objects.equals(name, customer.name) && Objects.equals(email, customer.email) && Objects.equals(password, customer.password) && Objects.equals(phoneNumber, customer.phoneNumber) && Objects.equals(imageUrl, customer.imageUrl) && Objects.equals(isEmailVerified, customer.isEmailVerified) && Objects.equals(address, customer.address) && Objects.equals(isLogged, customer.isLogged) && Objects.equals(isRegistered, customer.isRegistered) && Objects.equals(movies, customer.movies) && Objects.equals(roles, customer.roles) && Objects.equals(createdAt, customer.createdAt) && Objects.equals(updatedAt, customer.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(customer_id, name, email, password, phoneNumber, isEmailVerified, isPhoneVerified, movies, roles);
+        return Objects.hash(id, name, email, password, phoneNumber, imageUrl, isEmailVerified, address, isLogged, isRegistered, movies, roles, createdAt, updatedAt);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        Set<Role> roles1 = this.roles;
-        for (Role role : roles1) {
+        for (Role role : roles) {
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
         return authorities;
@@ -183,7 +218,7 @@ public class Customer implements UserDetails {
     }
 
     public void addMovie(Movie movie) {
-        if (!movies.contains(movie) && movie != null) {
+        if (movie != null && !movies.contains(movie)) {
             movies.add(movie);
             movie.setCustomer(this);
         }
@@ -193,7 +228,7 @@ public class Customer implements UserDetails {
         if (movie != null && movies.contains(movie)) {
             movies.remove(movie);
             movie.setCustomer(null);
-            log.info("Removed movie with ID {} from customer with ID {}", movie.getMovie_id(), this.getCustomer_id());
+            log.info("Removed movie with ID {} from customer with ID {}", movie.getMovie_id(), this.getId());
         } else {
             log.warn("Attempted to remove a movie that is not associated with the customer or movie is null");
         }
@@ -206,19 +241,17 @@ public class Customer implements UserDetails {
             if (movies.contains(movie)) {
                 iterator.remove();
                 movie.setCustomer(null);
-                log.info("Removed movie with ID {} from customer with I-D {}", movie.getMovie_id(), this.getCustomer_id());
+                log.info("Removed movie with ID {} from customer_with ID {}", movie.getMovie_id(), this.getId());
             }
         }
     }
 
-
     public void addRole(Role role) {
-        this.roles.add(role);
-        role.getCustomers().add(this);
+        if (role != null && !roles.contains(role)) {
+            roles.add(role);
+            role.getCustomers().add(this);
+        }
     }
 
-    public void removeRole(Role role) {
-        this.roles.remove(role);
-        role.getCustomers().remove(this);
-    }
+
 }

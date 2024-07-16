@@ -6,6 +6,8 @@ public record CustomerRegistration(
         String email,
         String password,
         Long phoneNumber,
-        boolean isEmailVerified,
-        boolean isPhoneVerified) {
+        String imageUrl, boolean isEmailVerified,
+        String address,
+        boolean isLogged, boolean isRegistered) {
 }
+

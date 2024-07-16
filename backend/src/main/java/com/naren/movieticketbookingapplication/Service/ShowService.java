@@ -16,7 +16,7 @@ public interface ShowService {
 
     List<Show> getShowList();
 
-    void updateShow(ShowUpdation update, Long showId);
+    Show updateShow(ShowUpdation update, Long showId);
 
     List<Show> getShowsByYear(Integer year);
 

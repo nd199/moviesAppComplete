@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {getDownloadURL, ref} from "firebase/storage";
 import {storage} from "../Firebase";
 
-const VideoComponent = ({className, filePath, isMuted}) => {
+const VideoComponent = ({className, filePath, isMuted, onLoadedData}) => {
     const [videoUrl, setVideoUrl] = useState("");
     const [error, setError] = useState(null);
 
@@ -36,6 +36,7 @@ const VideoComponent = ({className, filePath, isMuted}) => {
                 autoPlay
                 loop
                 muted={isMuted}
+                onLoadedData={onLoadedData}
             />
         </div>
     );

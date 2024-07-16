@@ -5,7 +5,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -13,8 +17,9 @@ import java.util.Objects;
         @UniqueConstraint(name = "movie_name_unique",
                 columnNames = "name")
 })
-@Setter
 @Getter
+@Setter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 public class Movie {
 
@@ -35,7 +40,7 @@ public class Movie {
     @Column(name = "rating", nullable = false)
     private Double rating;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000) // Example length
     private String description;
 
     @Column(nullable = false)
@@ -50,9 +55,11 @@ public class Movie {
     @Column(nullable = false)
     private String runtime;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String genre;
 
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'movies'")
+    private String type;
 
     @ManyToOne
     @JoinColumn(name = "customer_id",
@@ -60,9 +67,32 @@ public class Movie {
     @JsonBackReference
     private Customer customer;
 
+    @Column(nullable = false, updatable = false)
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
+    public Movie(String name, Double cost, Double rating, String description,
+                 String poster, String ageRating,
+                 Integer year, String runtime, String genre, String type) {
+        this.name = name;
+        this.cost = cost;
+        this.rating = rating;
+        this.description = description;
+        this.poster = poster;
+        this.ageRating = ageRating;
+        this.year = year;
+        this.runtime = runtime;
+        this.genre = genre;
+        this.type = type;
+    }
+
     public Movie(Long movie_id, String name, Double cost, Double rating,
-                 String description, String poster, String ageRating,
-                 Integer year, String runtime, String genre) {
+                 String description, String poster, String ageRating, Integer year,
+                 String runtime, String genre, String type) {
         this.movie_id = movie_id;
         this.name = name;
         this.cost = cost;
@@ -73,27 +103,9 @@ public class Movie {
         this.year = year;
         this.runtime = runtime;
         this.genre = genre;
+        this.type = type;
     }
 
-    public Movie(String name, Double cost, Double rating, String description,
-                 String poster, String ageRating,
-                 Integer year, String runtime, String genre) {
-        this.name = name;
-        this.cost = cost;
-        this.rating = rating;
-        this.description = description;
-        this.poster = poster;
-        this.ageRating = ageRating;
-        this.year = year;
-        this.runtime = runtime;
-        this.genre = genre;
-    }
-
-    public Movie(String name, Double cost, Double rating) {
-        this.name = name;
-        this.cost = cost;
-        this.rating = rating;
-    }
 
     @Override
     public String toString() {
@@ -108,7 +120,10 @@ public class Movie {
                 ", year=" + year +
                 ", runtime='" + runtime + '\'' +
                 ", genre='" + genre + '\'' +
+                ", type='" + type + '\'' +
                 ", customer=" + customer +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 
@@ -117,11 +132,11 @@ public class Movie {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Movie movie = (Movie) o;
-        return Objects.equals(movie_id, movie.movie_id) && Objects.equals(name, movie.name) && Objects.equals(cost, movie.cost) && Objects.equals(rating, movie.rating) && Objects.equals(description, movie.description) && Objects.equals(poster, movie.poster) && Objects.equals(ageRating, movie.ageRating) && Objects.equals(year, movie.year) && Objects.equals(runtime, movie.runtime) && Objects.equals(genre, movie.genre) && Objects.equals(customer, movie.customer);
+        return Objects.equals(movie_id, movie.movie_id) && Objects.equals(name, movie.name) && Objects.equals(cost, movie.cost) && Objects.equals(rating, movie.rating) && Objects.equals(description, movie.description) && Objects.equals(poster, movie.poster) && Objects.equals(ageRating, movie.ageRating) && Objects.equals(year, movie.year) && Objects.equals(runtime, movie.runtime) && Objects.equals(genre, movie.genre) && Objects.equals(type, movie.type) && Objects.equals(customer, movie.customer) && Objects.equals(createdAt, movie.createdAt) && Objects.equals(updatedAt, movie.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(movie_id, name, cost, rating, description, poster, ageRating, year, runtime, genre, customer);
+        return Objects.hash(movie_id, name, cost, rating, description, poster, ageRating, year, runtime, genre, type, customer, createdAt, updatedAt);
     }
 }

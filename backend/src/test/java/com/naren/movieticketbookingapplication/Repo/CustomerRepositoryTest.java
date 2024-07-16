@@ -27,7 +27,7 @@ class CustomerRepositoryTest extends AbstractTestContainers {
         var customerEmail = customerName + "@codeNaren.com";
         var password = FAKER.internet().password(8, 12);
         Long phoneNumber = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
-        customer = new Customer(customerEmail, customerName, password, phoneNumber, false, false);
+        customer = new Customer(customerEmail, customerName, password, phoneNumber, false, false, false, "Chennai, India");
     }
 
     @Test

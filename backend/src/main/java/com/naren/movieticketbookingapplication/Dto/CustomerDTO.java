@@ -2,6 +2,7 @@ package com.naren.movieticketbookingapplication.Dto;
 
 import com.naren.movieticketbookingapplication.Entity.Movie;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record CustomerDTO(
@@ -10,6 +11,13 @@ public record CustomerDTO(
         String email,
         List<String> roles,
         Long phoneNumber,
-        String userName,
-        List<Movie> movies) {
+        List<Movie> movies,
+        Boolean isEmailVerified,
+        String address,
+        Boolean isLogged,
+        Boolean isRegistered,
+        String imageUrl,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {
 }

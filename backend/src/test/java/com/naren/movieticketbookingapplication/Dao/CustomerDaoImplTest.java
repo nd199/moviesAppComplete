@@ -32,7 +32,7 @@ class CustomerDaoImplTest extends AbstractTestContainers {
 
         customer = new Customer(1L, FAKER.name().name(),
                 FAKER.internet().emailAddress(), FAKER.internet().password(),
-                Long.valueOf(FAKER.phoneNumber().subscriberNumber(9)), false, false);
+                Long.valueOf(FAKER.phoneNumber().subscriberNumber(9)), false, false, false, "Chennai, India");
     }
 
     @AfterEach
@@ -51,9 +51,9 @@ class CustomerDaoImplTest extends AbstractTestContainers {
     @Test
     void getCustomer() {
 
-        underTest.getCustomer(customer.getCustomer_id());
+        underTest.getCustomer(customer.getId());
 
-        verify(customerRepository).findById(customer.getCustomer_id());
+        verify(customerRepository).findById(customer.getId());
     }
 
     @Test

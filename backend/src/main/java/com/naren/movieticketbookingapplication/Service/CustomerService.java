@@ -1,12 +1,12 @@
 package com.naren.movieticketbookingapplication.Service;
 
 import com.naren.movieticketbookingapplication.Dto.CustomerDTO;
+import com.naren.movieticketbookingapplication.Dto.CustomerStatsDTO;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
-import com.naren.movieticketbookingapplication.Record.UserLogin;
-import jakarta.servlet.http.HttpServletRequest;
+import com.naren.movieticketbookingapplication.Record.EmailVerificationRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -17,7 +17,9 @@ public interface CustomerService {
 
     CustomerDTO getCustomerById(Long customerId);
 
-    void updateCustomer(CustomerUpdateRequest customer, Long customerId);
+    CustomerDTO updateCustomer(CustomerUpdateRequest customer, Long customerId);
+
+    void updatePassword(String email, String newPassword);
 
     List<CustomerDTO> getAllCustomers();
 
@@ -37,7 +39,17 @@ public interface CustomerService {
 
     void removeRole(Long id);
 
-    Customer loginUser(UserLogin userLogin, HttpServletRequest request);
-
     void removeAllMovies(Long customerId);
+
+    List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn);
+
+    CustomerDTO getCustomerByEmail(String email);
+
+    CustomerDTO getCustomerByPhoneNumber(Long phoneNumber);
+
+    void generateAndSendMailOtp(EmailVerificationRequest email);
+
+    List<CustomerDTO> getLatestCustomerList();
+
+    List<CustomerStatsDTO> getCustomerStats();
 }
