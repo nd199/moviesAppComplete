@@ -2,6 +2,16 @@
 
 ### NOTE: The secrets provided in props and env files are just for testing purposes and serve as examples. The DB secrets are for local use and can be changed. For SMTP, the provided Username and password will not work, and emails will not be sent. Please provide your email and password of your Gmail app to experience a fully working app.
 
+
+
+
+# App Screenshots
+![alt text](https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/Screenshot%202024-07-16%20at%206.51.51%E2%80%AFPM.png?alt=media&token=cdccc77e-cf9a-4bb3-97ea-10e6226ffce7)
+
+![alt text](https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/Screenshot%202024-07-16%20at%207.06.08%E2%80%AFPM.png?alt=media&token=84318f15-de05-40d3-a8f2-fbbb41ca13d4)
+
+![alt text](https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/Screenshot%202024-07-16%20at%207.00.05%E2%80%AFPM.png?alt=media&token=b5dd6a42-83cb-4acb-96af-b8bbe2fc152f)
+
 MoviesApp is an example of an Internet Streaming Service Platform (OTT application). The application features a user-friendly interface for both admins and users. It is built with a Java Spring backend and a React frontend. The application also utilizes a microservices architecture, with separate services for handling user/admin operations and payment processing, which communicate via APIs.
 
 ## Table of Contents
