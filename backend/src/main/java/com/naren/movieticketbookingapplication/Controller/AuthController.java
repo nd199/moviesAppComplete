@@ -59,4 +59,5 @@ public class AuthController {
                 .header(HttpHeaders.AUTHORIZATION)
                 .body(authResponse);
     }
+
 }

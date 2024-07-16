@@ -40,12 +40,16 @@ public class SecurityFilterChainConfig {
                         .requestMatchers("/api/v1/verify/email", "/api/v1/validate/Otp")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/customers", "/api/v1/auth/admins",
-                                "/api/v1/auth/login", "/api/v1/auth/loginAdmin")
+                                "/api/v1/auth/login", "/api/v1/auth/loginAdmin", "/api/password-reset/request",
+                                "/api/password-reset/reset")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/customers/byEmail",
                                 "/api/v1/customers/byPhone", "/api/v1/customers/loggedIn/{isLoggedIn}",
                                 "api/v1/customers/stats")
                         .permitAll()
+
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/profile/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/customers/userRequest").permitAll()
 
                         // Admin-only endpoints
                         .requestMatchers(HttpMethod.POST, "/api/v1/customers/roles")

@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
 const UserPlan = require("./models/UserPlanInfo");
+const PaymentGateway = require("./models/Payment")
 
 const app = express();
 const port = process.env.PORT || 3008;
@@ -19,17 +20,21 @@ app.post("/api/auth/payment", async (req, res) => {
 
     try {
         const existingUser = await UserPlan.findOne({email: currentUser.email});
-        const existingPlan =
-            existingUser && existingUser.selectedPlan.id === selectedPlan.id;
 
-        if (!existingPlan) {
-            const userPlan = new UserPlan({...currentUser, selectedPlan});
+        if (!existingUser) {
+            const userPlan = new UserPlan({
+                ...currentUser,
+                selectedPlan
+            });
+            console.log(userPlan);
             await userPlan.save();
             res.status(200).json({
                 message: "Payment Initiated",
                 data: {currentUser, selectedPlan},
             });
         } else {
+            existingUser.selectedPlan = selectedPlan;
+            await existingUser.save();
             res.status(200).json({
                 message: "User Already Subscribed to Selected Plan",
                 data: {currentUser, selectedPlan},
@@ -57,6 +62,18 @@ app.get("/paymentDetails", async (req, res) => {
     } catch (error) {
         console.error("Error saving user:", error);
         res.status(500).json({message: "Payment failed", error});
+    }
+});
+
+app.post('/submitPayment', async (req, res) => {
+    try {
+        const {finalPayment} = req.body;
+        const newPayment = new PaymentGateway(finalPayment);
+        await newPayment.save();
+        res.status(201).json(newPayment);
+    } catch (error) {
+        console.error('Error saving payment:', error);
+        res.status(500).json({error: 'Failed to save payment.'});
     }
 });
 

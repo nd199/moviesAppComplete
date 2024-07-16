@@ -1,6 +1,7 @@
 import './App.css';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import PaymentCheckout from './Pages/PaymentCheckout';
+import Success from "./Pages/Success";
 
 function AppCheckout() {
     return (
@@ -8,6 +9,7 @@ function AppCheckout() {
             <Router>
                 <Routes>
                     <Route path="/:userId" element={<PaymentCheckout/>}/>
+                    <Route path='/Success' element={<Success/>}/>
                 </Routes>
             </Router>
         </div>

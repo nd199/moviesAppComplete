@@ -15,19 +15,10 @@ const Subscription = () => {
     const handlePlanSelect = (planId) => {
         const selected = plans.find(plan => plan.id === planId);
         setSelectedPlan(selected);
-        console.log("Plan selected:", selected); // Add this line to verify
     };
 
     const handlePlanDeselect = () => {
         setSelectedPlan(null);
-    };
-
-    const handleSubscribe = () => {
-        if (selectedPlan) {
-            dispatch(setPaymentPlan(selectedPlan));
-            console.log("Dispatched setPaymentPlan:", selectedPlan); // Add this line to verify
-            nav("/email-verification");
-        }
     };
 
     const plans = [
@@ -41,6 +32,13 @@ const Subscription = () => {
         },
         {id: 3, name: 'Yearly Plan', price: 1200, interval: 'year', description: 'Save 20% with annual billing.'},
     ];
+
+    const handleSubscribe = () => {
+        if (selectedPlan) {
+            dispatch(setPaymentPlan({selectedPlan: selectedPlan, allPlans: plans}));
+            nav("/email-verification");
+        }
+    };
 
     return (
         <>

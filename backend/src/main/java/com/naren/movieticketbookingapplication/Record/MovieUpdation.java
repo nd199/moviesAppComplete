@@ -1,8 +1,6 @@
 package com.naren.movieticketbookingapplication.Record;
 
 
-import com.naren.movieticketbookingapplication.Entity.Customer;
-
 public record MovieUpdation(
         String name,
         Double cost,

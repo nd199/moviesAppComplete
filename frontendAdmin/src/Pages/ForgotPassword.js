@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import "./ForgotPassword.css";
 import PasswordStrengthBar from "react-password-strength-bar";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {forgotPassword} from "../redux/ApiCalls";
 
 const ForgotPassword = () => {
@@ -11,7 +11,6 @@ const ForgotPassword = () => {
     const [typeOfVerification, setTypeOfVerification] = useState("");
     const [enteredOtp, setEnteredOtp] = useState("");
     const dispatch = useDispatch();
-    const user = useSelector((state) => state.user);
 
     const handleConfirmPasswordChange = (e) => {
         const confirmPasswordValue = e.target.value;
@@ -31,25 +30,26 @@ const ForgotPassword = () => {
                 typeOfVerification,
                 enteredOtp,
             });
+            // Handle response if needed
         } catch (error) {
             console.error(error);
         }
     };
 
     return (
-        <div className="fPPage">
-            <div className="fpWrapperCard">
-                <div className="fpLft">
-                    <img src="/images/FP.gif" alt="FP.gif" className="fPGIf"/>
+        <div className="forgot-password-page">
+            <div className="forgot-password-wrapper">
+                <div className="forgot-password-left">
+                    <img src="/images/FP.gif" alt="Forgot Password" className="forgot-password-gif"/>
                 </div>
-                <div className="fpRht">
-                    <div className="fp-title">
-                        <h1>FORGOT PASSWORD</h1>
+                <div className="forgot-password-right">
+                    <div className="forgot-password-title">
+                        <h1>Forgot Password</h1>
                     </div>
-                    <form className="pc-form" onSubmit={handlePasswordChange}>
-                        <div className="inputs">
-                            <label>PASSWORD :</label>
-                            <div className="p-Input">
+                    <form className="password-change-form" onSubmit={handlePasswordChange}>
+                        <div className="form-input">
+                            <label>Password:</label>
+                            <div className="password-input">
                                 <input
                                     type="password"
                                     placeholder="Password"
@@ -66,9 +66,9 @@ const ForgotPassword = () => {
                                 )}
                             </div>
                         </div>
-                        <div className="inputs">
-                            <label>CONFIRM PASSWORD :</label>
-                            <div className="c-input">
+                        <div className="form-input">
+                            <label>Confirm Password:</label>
+                            <div className="confirm-password-input">
                                 <input
                                     type="password"
                                     placeholder="Confirm Password"
@@ -81,7 +81,7 @@ const ForgotPassword = () => {
                                         style={{
                                             fontSize: "15px",
                                             color:
-                                                password === confirmPassword ? "lightGreen" : "red",
+                                                password === confirmPassword ? "lightgreen" : "red",
                                             marginTop: "10px",
                                         }}
                                     >
@@ -90,8 +90,8 @@ const ForgotPassword = () => {
                                 )}
                             </div>
                         </div>
-                        <div className="inputs">
-                            <label>Verification Type</label>
+                        <div className="form-input">
+                            <label>Verification Type:</label>
                             <select
                                 name="verificationType"
                                 value={typeOfVerification}
@@ -105,8 +105,8 @@ const ForgotPassword = () => {
                                 <option value="Mobile">Mobile</option>
                             </select>
                         </div>
-                        <div className="inputs">
-                            <label>One Time Password :</label>
+                        <div className="form-input">
+                            <label>One Time Password:</label>
                             <input
                                 type="number"
                                 placeholder="One Time Password"
@@ -115,7 +115,9 @@ const ForgotPassword = () => {
                                 required
                             />
                         </div>
-                        <button className="fp-btn" type="submit">Submit</button>
+                        <button className="forgot-password-btn" type="submit">
+                            Submit
+                        </button>
                     </form>
                 </div>
             </div>

@@ -11,18 +11,18 @@ export const PaymentRedux = createSlice({
     },
 
     reducers: {
-        getPaymentStart: (state) => {
+        SavePaymentStart: (state) => {
             state.isFetching = true;
             state.error = false;
             state.errorMessage = "";
         },
-        getPaymentSuccess: (state, action) => {
+        SavePaymentSuccess: (state, action) => {
             state.paymentPlan = action.payload;
             state.isFetching = false;
             state.error = false;
             state.errorMessage = "";
         },
-        getPaymentFailure: (state, action) => {
+        SavePaymentFailure: (state, action) => {
             state.isFetching = false;
             state.error = true;
             state.errorMessage = action.payload;
@@ -47,9 +47,8 @@ export const PaymentRedux = createSlice({
 });
 
 export const {
-    getPaymentStart,
-    getPaymentSuccess,
-    getPaymentFailure,
+    SavePaymentStart, SavePaymentSuccess,
+    SavePaymentFailure,
     userInfoAndSelectedPlanStart,
     userInfoAndSelectedPlanSuccess,
     userInfoAndSelectedPlanFailure,

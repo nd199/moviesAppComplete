@@ -1,8 +1,8 @@
-import React, {useEffect, useState, useCallback} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import EmailReg from "../Components/EmailReg";
 import "./EmailVerification.css";
 import {useDispatch, useSelector} from "react-redux";
-import {pushToPaymentModule} from "../redux/ApiCalls";
+import {pushToPaymentModule} from "../Network/ApiCalls";
 
 const EmailVerification = () => {
     const selectedPlan = useSelector(state => state?.payment.paymentPlan);

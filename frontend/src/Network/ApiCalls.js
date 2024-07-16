@@ -1,14 +1,17 @@
 import axios from "axios";
-import {authRequest, publicRequest} from "../AxiosMethods";
+import {authRequest, passResetRequest, publicRequest} from "../AxiosMethods";
 import {
+    fetchMoviesFailure,
     fetchMoviesStart,
     fetchMoviesSuccess,
-    fetchMoviesFailure,
+    fetchShowsFailure,
     fetchShowsStart,
     fetchShowsSuccess,
-    fetchShowsFailure,
-} from "./ProductsRedux";
+} from "../redux/ProductsRedux";
 import {
+    fetchUsersFailure,
+    fetchUsersStart,
+    fetchUsersSuccess,
     forgotPasswordFailure,
     forgotPasswordStart,
     forgotPasswordSuccess,
@@ -18,19 +21,21 @@ import {
     registerFailure,
     registerStart,
     registerSuccess,
+    updatePassPushFailure,
+    updatePassPushStart,
+    updatePassPushSuccess,
+    updateUserFailure,
+    updateUserStart,
+    updateUserSuccess,
     validateOtpFailure,
     validateOtpStart,
     validateOtpSuccess,
     verifyEmailFailure,
     verifyEmailStart,
     verifyEmailSuccess,
-} from "./userSlice";
+} from "../redux/userSlice";
 
-import {
-    pushToPaymentStart,
-    pushToPaymentSuccess,
-    pushToPaymentFailure,
-} from "./PaymentRedux";
+import {pushToPaymentFailure, pushToPaymentStart, pushToPaymentSuccess,} from "../redux/PaymentRedux";
 
 export const register = async (dispatch, customerInfo) => {
     dispatch(registerStart());
@@ -60,10 +65,10 @@ export const register = async (dispatch, customerInfo) => {
     }
 };
 
-export const forgotPassword = async (dispatch, data) => {
+export const forgotPasswordRequest = async (dispatch, email) => {
     dispatch(forgotPasswordStart());
     try {
-        const res = await publicRequest.put("/customers/${customerId}", data);
+        const res = await passResetRequest.post("/request", {email});
         dispatch(forgotPasswordSuccess(res.data));
     } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
@@ -110,7 +115,6 @@ export const fetchMovies = async (dispatch) => {
     try {
         const res = await publicRequest.get("/movies");
         dispatch(fetchMoviesSuccess(res.data));
-        console.log(res.data);
     } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
             dispatch(fetchMoviesFailure(error.response.data));
@@ -126,7 +130,6 @@ export const fetchShows = async (dispatch) => {
     try {
         const res = await publicRequest.get("/shows");
         dispatch(fetchShowsSuccess(res.data));
-        console.log(res.data);
     } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
             dispatch(fetchShowsFailure(error.response.data));
@@ -135,7 +138,6 @@ export const fetchShows = async (dispatch) => {
         }
     }
 };
-
 
 export const verifyEmail = async (dispatch, email) => {
     dispatch(verifyEmailStart());
@@ -172,6 +174,7 @@ export const validateOtp = async (dispatch, validateInfo) => {
 };
 
 export const pushToPaymentModule = async (dispatch, userPaymentInfo) => {
+    console.log(userPaymentInfo);
     dispatch(pushToPaymentStart());
     try {
         const res = await axios.post('http://localhost:3008/api/auth/payment', userPaymentInfo);
@@ -185,3 +188,46 @@ export const pushToPaymentModule = async (dispatch, userPaymentInfo) => {
         }
     }
 };
+
+export const updateProfile = async (dispatch, userUpdateInfo, id) => {
+    dispatch(updateUserStart());
+    try {
+        const res = await publicRequest.put(`/profile/${id}`, userUpdateInfo);
+        dispatch(updateUserSuccess(res.data));
+    } catch (error) {
+        console.error('Error during update:', error);
+        if (axios.isAxiosError(error) && error.response) {
+            dispatch(updateUserFailure(error.response.data));
+        } else {
+            dispatch(updateUserFailure("An unexpected error occurred"));
+        }
+    }
+};
+
+export const fetchUsers = async (dispatch) => {
+    dispatch(fetchUsersStart());
+    try {
+        const res = await publicRequest.get("/customers/userRequest");
+        dispatch(fetchUsersSuccess(res.data));
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+            dispatch(fetchUsersFailure(error.response.data));
+        } else {
+            dispatch(fetchUsersFailure({error: "An unexpected error occurred"}));
+        }
+    }
+};
+
+export const updatePasswordAndPushToLoginPage = async (dispatch, data) => {
+    dispatch(updatePassPushStart());
+    try {
+        const res = await passResetRequest.post("/reset", data);
+        dispatch(updatePassPushSuccess(res.data));
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+            dispatch(updatePassPushFailure(error.response.data));
+        } else {
+            dispatch(updatePassPushFailure({error: "An unexpected error occurred"}));
+        }
+    }
+}

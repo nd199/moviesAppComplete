@@ -11,6 +11,8 @@ import {useSelector} from "react-redux";
 import LoginForm from "./Pages/LoginForm";
 import Subscription from "./Pages/Subscription";
 import EmailVerification from "./Pages/EmailVerification";
+import Profile from "./Pages/Profile";
+import ForgotPassword from "./Pages/ForgotPassword";
 
 function AppWithNavigation() {
     const user = useSelector((state) => state?.user);
@@ -36,6 +38,8 @@ function AppWithNavigation() {
                     <Route path="/vfs" element={<VideoFullScreen/>}/>
                     <Route path="/email-verification" element={<EmailVerification/>}/>
                     <Route path="/subscribe" element={<Subscription/>}/>
+                    <Route path="/profile" element={<Profile/>}/>
+                    <Route path="/forgotPassword" element={<ForgotPassword/>}/>
                 </Routes>
             </div>
         </Router>
