@@ -159,8 +159,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     private boolean containsPersonalInfo(String password, String name, String email, Long phoneNumber) {
 
-        if (password.contains(name) || password.contains(email) || password.contains(String.valueOf(phoneNumber))) {
-            throw new PasswordInvalidException("Password must not contain personal info [Name,Email,Phone] ");
+        if (password.contains(name) ||
+                password.contains(email) ||
+                password.contains(String.valueOf(phoneNumber))) {
+            throw new PasswordInvalidException("Password must " +
+                    "not contain personal info [Name,Email,Phone] ");
         }
         return false;
     }

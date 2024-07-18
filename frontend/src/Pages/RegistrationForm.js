@@ -4,12 +4,12 @@ import {useDispatch, useSelector} from "react-redux";
 import {Link, useNavigate} from "react-router-dom";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {resetErrorMessage} from "../redux/userSlice";
-import EmailReg from "../Components/EmailReg";
 import Box from "@mui/material/Box";
 import {register} from "../Network/ApiCalls";
 import {getDownloadURL, getStorage, ref, uploadBytesResumable,} from "firebase/storage";
 import LinearProgress from "@mui/material/LinearProgress";
 import {app} from "../Firebase";
+import EmailVerifyUser from "../Components/EmailVerifyUser";
 
 const Register = () => {
     const [name, setName] = useState("");
@@ -190,7 +190,7 @@ const Register = () => {
                                 required
                             />
                         </div>
-                        <EmailReg
+                        <EmailVerifyUser
                             onEmailUpdate={handleEmailChange}
                             onEmailVerified={handleEmailVerified}
                         />
@@ -245,7 +245,8 @@ const Register = () => {
                                 {confirmPassword && (
                                     <p
                                         style={{
-                                            fontSize: "15px",
+                                            fontSize: "17px",
+                                            marginTop: "10px",
                                             color:
                                                 password === confirmPassword ? "lightGreen" : "red",
                                         }}

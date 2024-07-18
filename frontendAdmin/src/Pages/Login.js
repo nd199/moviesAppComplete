@@ -25,6 +25,7 @@ const Login = () => {
         try {
             await login(dispatch, {username, password});
             nav('/');
+            window.location.reload();
         } catch (err) {
             console.error(
                 "Login error: ",

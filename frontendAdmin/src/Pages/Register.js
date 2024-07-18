@@ -4,8 +4,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {Link, useNavigate} from "react-router-dom";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {resetErrorMessage} from "../redux/userSlice";
-import EmailReg from "../components/EmailReg";
 import {register} from "../redux/ApiCalls";
+import EmailVerifyAdmin from "../components/EmailVerifyAdmin";
 
 const Register = () => {
     const [name, setName] = useState("");
@@ -91,7 +91,10 @@ const Register = () => {
                                 required
                             />
                         </div>
-                        <EmailReg onEmailUpdate={handleEmailChange} onEmailVerified={handleEmailVerified}/>
+                        <EmailVerifyAdmin
+                            onEmailUpdate={handleEmailChange}
+                            onEmailVerified={handleEmailVerified}
+                        />
                         <div className="inputs">
                             <label>PHONE NUMBER :</label>
                             <input
@@ -138,7 +141,9 @@ const Register = () => {
                                 {confirmPassword && (
                                     <p
                                         style={{
-                                            fontSize: "15px",
+                                            fontSize: "18px",
+                                            marginTop: "10px",
+                                            marginBottom: "-35px",
                                             color:
                                                 password === confirmPassword ? "lightGreen" : "red",
                                         }}

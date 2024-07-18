@@ -1,8 +1,8 @@
 import React, {useCallback, useEffect, useState} from "react";
-import EmailReg from "../Components/EmailReg";
 import "./EmailVerification.css";
 import {useDispatch, useSelector} from "react-redux";
 import {pushToPaymentModule} from "../Network/ApiCalls";
+import EmailSubscriptionVerify from "../Components/EmailSubscriptionVerify";
 
 const EmailVerification = () => {
     const selectedPlan = useSelector(state => state?.payment.paymentPlan);
@@ -35,7 +35,7 @@ const EmailVerification = () => {
         <div className="email-verification-page">
             <h2>Email Verification</h2>
             <div className="email-verify-box">
-                <EmailReg
+                <EmailSubscriptionVerify
                     onEmailUpdate={handleEmailUpdate}
                     onEmailVerified={handleEmailVerified}
                     onEmailError={handleEmailError}

@@ -65,7 +65,7 @@ const List = ({title}) => {
                         />
                     </div>
                     <div className="mv-listContainer-full" ref={listRef}>
-                        (
+
                         {title === "Movies" &&
                             movies?.map((movie, id) => (
                                 <ListItem
@@ -81,7 +81,6 @@ const List = ({title}) => {
                                     genre={movie.genre}
                                 />
                             ))}
-                        &&
                         {title === "Shows" &&
                             shows?.map((show, id) => (
                                 <ListItem
@@ -97,7 +96,6 @@ const List = ({title}) => {
                                     genre={show.genre}
                                 />
                             ))}
-                        )
                     </div>
                     <div className="right-full">
                         <ArrowForwardIosOutlined

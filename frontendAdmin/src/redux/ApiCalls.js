@@ -86,7 +86,7 @@ export const forgotPassword = async (dispatch, data) => {
 export const login = async (dispatch, userInfo) => {
     dispatch(loginStart());
     try {
-        const res = await authRequest.post("/login", userInfo);
+        const res = await authRequest.post("/loginAdmin", userInfo);
         dispatch(loginSuccess(res.data));
         localStorage.setItem(
             "persist:root",
