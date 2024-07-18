@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from "react";
 import Lottie from "react-lottie";
 import {validateOtp, verifyEmail} from "../redux/ApiCalls";
-import "./EmailReg.css";
+import "./EmailVerifyAdmin.css";
 import CrossMark from "../animations/CrossMark.json";
 import TickMark from "../animations/TickMark.json";
 import {Send} from "@mui/icons-material";
 import {useDispatch, useSelector} from "react-redux";
 import {resetErrorMessage} from "../redux/userSlice";
 
-const EmailReg = ({onEmailUpdate, onEmailVerified}) => {
+const EmailVerifyAdmin = ({onEmailUpdate, onEmailVerified}) => {
     const [email, setEmail] = useState("");
     const [emVerify, setEmShowVerify] = useState(false);
     const [mailOtp, setMailOTP] = useState("");
@@ -33,6 +33,9 @@ const EmailReg = ({onEmailUpdate, onEmailVerified}) => {
         };
     }, [dispatch]);
 
+    useEffect(() => {
+        onEmailUpdate(email);
+    }, [email, onEmailUpdate]);
 
     useEffect(() => {
         let timer;
@@ -71,9 +74,7 @@ const EmailReg = ({onEmailUpdate, onEmailVerified}) => {
 
     const otpValidationHandler = async () => {
         if (otpTimer <= 0 && mailOtp.length !== 0) {
-            setShowSuccessErrorMessage(
-                "Otp has expired Please re enter your email to try again"
-            );
+            setShowSuccessErrorMessage("Otp has expired Please re enter your email to try again");
             setEmShowVerify(true);
             setShowEmailOtp(false);
             setOtpMessage("");
@@ -97,9 +98,7 @@ const EmailReg = ({onEmailUpdate, onEmailVerified}) => {
         } catch (error) {
             setShowEmailOtp(false);
             setOtpMessage(error?.response?.data);
-            setShowSuccessErrorMessage(
-                error?.response?.data + " Please enter you email again to re-verify"
-            );
+            setShowSuccessErrorMessage(error?.response?.data + " Please enter you email again to re-verify");
             setPlaceHolder("Cena@gmail.com");
             setEmail("");
             setMailOTP("");
@@ -109,6 +108,7 @@ const EmailReg = ({onEmailUpdate, onEmailVerified}) => {
             setIsVerifyingOtp(false);
         }
     };
+
     const TickMarkOptions = {
         loop: true,
         autoplay: true,
@@ -131,7 +131,7 @@ const EmailReg = ({onEmailUpdate, onEmailVerified}) => {
         <>
             <div className="inputs">
                 <label>EMAIL :</label>
-                <div className="envVerify-message">
+                <div className="email-verify-message">
                     <input
                         type="email"
                         placeholder={placeholder}
@@ -139,9 +139,7 @@ const EmailReg = ({onEmailUpdate, onEmailVerified}) => {
                         onChange={(e) => {
                             setEmail(e.target.value.toLocaleLowerCase());
                             {
-                                email.length > 1
-                                    ? setEmShowVerify(true)
-                                    : setEmShowVerify(false);
+                                email.length > 1 ? setEmShowVerify(true) : setEmShowVerify(false);
                             }
                             setOtpMessage("");
                         }}
@@ -172,16 +170,12 @@ const EmailReg = ({onEmailUpdate, onEmailVerified}) => {
                         style={{
                             cursor: !isValidEmail(email) ? "not-allowed" : "pointer",
                         }}
-                        title={
-                            !isValidEmail(email)
-                                ? "Please enter a valid email"
-                                : "Click to verify your email"
-                        }
+                        title={!isValidEmail(email) ? "Please enter a valid email" : "Click to verify your email"}
                     >
                         Verify Email
                     </button>
                 ) : EmailOtp ? (
-                    <div className="otp-container">
+                    <div className="email-otp-container">
                         {isVerifyingOtp ? (
                             <p>Verifying OTP...</p>
                         ) : (
@@ -196,30 +190,20 @@ const EmailReg = ({onEmailUpdate, onEmailVerified}) => {
                                     {isSendingEmail ? (
                                         <p>Sending Mail...</p>
                                     ) : (
-                                        <div className="otp-Actions">
+                                        <div className="otp-actions">
                                             <button
                                                 disabled={!isValidOtp(mailOtp)}
                                                 onClick={otpValidationHandler}
                                                 style={{
-                                                    cursor: !isValidOtp(mailOtp)
-                                                        ? "not-allowed"
-                                                        : "pointer",
+                                                    cursor: !isValidOtp(mailOtp) ? "not-allowed" : "pointer",
                                                 }}
-                                                title={
-                                                    !isValidEmail(mailOtp)
-                                                        ? "Please enter a valid OTP"
-                                                        : "Click to verify your OTP"
-                                                }
+                                                title={!isValidEmail(mailOtp) ? "Please enter a valid OTP" : "Click to verify your OTP"}
                                             >
                                                 <Send className="send-icon"/>
                                             </button>
                                             <span>
-                        {" "}
-                                                OTP Expires in <span className="timer">
-                          {otpTimer}
-                        </span>{" "}
-                                                seconds
-                      </span>
+                                                OTP Expires in <span className="timer">{otpTimer}</span> seconds
+                                            </span>
                                         </div>
                                     )}
                                 </div>
@@ -235,4 +219,4 @@ const EmailReg = ({onEmailUpdate, onEmailVerified}) => {
     );
 };
 
-export default EmailReg;
+export default EmailVerifyAdmin;

@@ -1,0 +1,124 @@
+.email-otp-container-user- {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.email-otp-container-user- input {
+    width: 90px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    font-size: 20px;
+    transition: border-color 0.3s;
+}
+
+.email-otp-container-user- input:focus {
+    border: none;
+    outline: none;
+}
+
+.email-otp-container-user- .send-icon-user- {
+    color: var(--secondary-color);
+    cursor: pointer;
+    font-size: 24px;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.email-otp-container-user- .send-icon-user-:hover {
+    color: var(--secondary-color);
+    transform: scale(1.1);
+}
+
+.email-otp-container-user- p {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.email-otp-container-user- span {
+    font-size: 13px;
+    color: #fff;
+}
+
+.otp-actions-user- {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 10px;
+}
+
+.timer-user- {
+    background-color: white;
+    padding: 2px;
+    font-size: 18px !important;
+    color: var(--secondary-color) !important;
+}
+
+.reg-form-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: -75px;
+    font-size: 20px;
+    padding: 0;
+    color: #fff !important;
+}
+
+.reg-login-link {
+    color: green;
+}
+
+.email-verify-message-user- {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.email-verify-message-user- input {
+    width: 90%;
+    padding: 10px;
+    border: none;
+    background: none;
+    color: #fff;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.email-verify-message-user- input:focus {
+    border: 1px solid #fff;
+    outline: none;
+}
+
+.inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.verify-button-user- {
+    margin-top: 10px;
+    background-color: var(--secondary-color);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.verify-button-user-:disabled {
+    background-color: rgba(0, 0, 0, 0.3);
+    cursor: not-allowed;
+}
+
+.verify-button-user-:hover:not(:disabled) {
+    background-color: #ff7f50;
+}

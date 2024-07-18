@@ -9,7 +9,7 @@ import {format} from "date-fns";
 
 const UserList = () => {
     const dispatch = useDispatch();
-    const users = useSelector((state) => state?.user?.users);
+    const users = useSelector((state) => state?.user?.users.filter(user => user.roles[0] !== 'ROLE_ADMIN'));
 
     const defaultUserPicture = [
         "https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/christian-buehner-DItYlc26zVI-unsplash.jpg?alt=media&token=f1deb5ac-78ee-4a8f-8337-f9ba956e87ea",

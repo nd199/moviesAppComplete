@@ -32,13 +32,13 @@ function AppWithNavigation() {
                         path="/Login"
                         element={isLoggedIn ? <Home/> : <LoginForm/>}
                     />
-                    <Route path="/about" element={<AboutUs/>}/>
-                    <Route path="/movies" element={<Movies/>}/>
-                    <Route path="/shows" element={<Shows/>}/>
-                    <Route path="/vfs" element={<VideoFullScreen/>}/>
-                    <Route path="/email-verification" element={<EmailVerification/>}/>
-                    <Route path="/subscribe" element={<Subscription/>}/>
-                    <Route path="/profile" element={<Profile/>}/>
+                    <Route path="/about" element={isLoggedIn ? <AboutUs/> : <LoginForm/>}/>
+                    <Route path="/movies" element={isLoggedIn ? <Movies/> : <LoginForm/>}/>
+                    <Route path="/shows" element={isLoggedIn ? <Shows/> : <LoginForm/>}/>
+                    <Route path="/vfs" element={isLoggedIn ? <VideoFullScreen/> : <LoginForm/>}/>
+                    <Route path="/email-verification" element={isLoggedIn ? <EmailVerification/> : <LoginForm/>}/>
+                    <Route path="/subscribe" element={isLoggedIn ? <Subscription/> : <LoginForm/>}/>
+                    <Route path="/profile" element={isLoggedIn ? <Profile/> : <LoginForm/>}/>
                     <Route path="/forgotPassword" element={<ForgotPassword/>}/>
                 </Routes>
             </div>

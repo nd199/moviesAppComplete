@@ -17,12 +17,13 @@ import ForgotPassword from "./Pages/ForgotPassword";
 function AppContent() {
     const user = useSelector((state) => state.user);
     const isLoggedIn = user?.currentUser?.customerDTO?.isLogged || false;
+    console.log(isLoggedIn);
 
     return (
         <>
             {isLoggedIn && <Navbar/>}
             <div className="container">
-                <SideNav/>
+                {isLoggedIn && <SideNav/>}
                 <Routes>
                     <Route
                         path="/registerAdmin"
@@ -36,12 +37,13 @@ function AppContent() {
                         path="/Home"
                         element={isLoggedIn ? <Home/> : <Navigate to="/"/>}
                     />
-                    <Route path="/users" element={<UserList/>}/>
-                    <Route path="/user/:userId" element={<UserInfoAndEdit/>}/>
-                    <Route path="/newUser" element={<NewUser/>}/>
-                    <Route path="/products" element={<ProductList/>}/>
-                    <Route path="/product/:productId" element={<ProductInfoAndEdit/>}/>
-                    <Route path="/newProduct" element={<NewProduct/>}/>
+                    <Route path="/users" element={isLoggedIn ? <UserList/> : <Navigate to="/"/>}/>
+                    <Route path="/user/:userId" element={isLoggedIn ? <UserInfoAndEdit/> : <Navigate to="/"/>}/>
+                    <Route path="/newUser" element={isLoggedIn ? <NewUser/> : <Navigate to="/"/>}/>
+                    <Route path="/products" element={isLoggedIn ? <ProductList/> : <Navigate to="/"/>}/>
+                    <Route path="/product/:productId"
+                           element={isLoggedIn ? <ProductInfoAndEdit/> : <Navigate to="/"/>}/>
+                    <Route path="/newProduct" element={isLoggedIn ? <NewProduct/> : <Navigate to="/"/>}/>
                     <Route path="/forgotPassword" element={<ForgotPassword/>}/>
                 </Routes>
             </div>

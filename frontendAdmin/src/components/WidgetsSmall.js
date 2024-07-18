@@ -6,9 +6,9 @@ import {Link} from "react-router-dom";
 import {useSelector} from "react-redux";
 
 const WidgetsSmall = () => {
-    const usersState = useSelector((state) => state.user.users);
+    const usersState = useSelector((state) => state?.user?.users);
 
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState(usersState || "");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const defaultUserPicture = [
@@ -47,10 +47,10 @@ const WidgetsSmall = () => {
             ) : (
                 <ul className="wsList">
                     {users?.length > 0 ? (
-                        users?.map((user) => (
+                        users?.filter(user => user.roles[0] !== 'ROLE_ADMIN').map((user) => (
                             <li className="wsListItem" key={user.id}>
                                 <img
-                                    src={user?.image || defaultSelected}
+                                    src={user?.imageUrl || defaultSelected}
                                     alt=""
                                     className="wsImage"
                                 />

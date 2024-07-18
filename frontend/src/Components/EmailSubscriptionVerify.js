@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from "react";
-import Lottie from "react-lottie";
-import {validateOtp, verifyEmail} from "../Network/ApiCalls";
-import "./EmailReg.css";
-import CrossMark from "../animations/CrossMark.json";
-import TickMark from "../animations/TickMark.json";
-import {Send} from "@mui/icons-material";
 import {useDispatch, useSelector} from "react-redux";
 import {resetErrorMessage} from "../redux/userSlice";
+import {validateOtp, verifyEmail} from "../Network/ApiCalls";
+import TickMark from "../animations/TickMark.json";
+import CrossMark from "../animations/CrossMark.json";
+import Lottie from "react-lottie";
+import {Send} from "@mui/icons-material";
 
-const EmailReg = ({onEmailUpdate, onEmailVerified, onEmailError}) => {
+const EmailSubscriptionVerify = ({onEmailUpdate, onEmailVerified, onEmailError}) => {
     const [email, setEmail] = useState("");
     const [emVerify, setEmShowVerify] = useState(false);
     const [mailOtp, setMailOTP] = useState("");
@@ -245,6 +244,6 @@ const EmailReg = ({onEmailUpdate, onEmailVerified, onEmailError}) => {
             </p>
         </>
     );
-};
+}
 
-export default EmailReg;
+export default EmailSubscriptionVerify;

@@ -39,7 +39,7 @@ const NavBar = () => {
         setDropdownOpen(!dropdownOpen);
         dropdownTimeout = setTimeout(() => {
             setDropdownOpen(false);
-        }, 20000);
+        }, 1600);
     };
 
     const toggleMenu = () => {
@@ -77,9 +77,6 @@ const NavBar = () => {
                         </Link>
                         <Link to={"/Shows"} onClick={() => setMenuOpen(false)}>
                             <span>Shows</span>
-                        </Link>
-                        <Link to={"/"} onClick={() => setMenuOpen(false)}>
-                            <span>My WishList</span>
                         </Link>
                     </div>
                 </div>
