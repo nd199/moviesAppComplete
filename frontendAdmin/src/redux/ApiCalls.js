@@ -21,15 +21,9 @@ import {
     fetchUserByEmailFailure,
     fetchUserByEmailStart,
     fetchUserByEmailSuccess,
-    fetchUserByPhoneNumberFailure,
-    fetchUserByPhoneNumberStart,
-    fetchUserByPhoneNumberSuccess,
     fetchUsersFailure,
     fetchUsersStart,
     fetchUsersSuccess,
-    forgotPasswordFailure,
-    forgotPasswordStart,
-    forgotPasswordSuccess,
     loginFailure,
     loginStart,
     loginSuccess,
@@ -64,23 +58,24 @@ export const register = async (dispatch, adminInfo) => {
     }
 };
 
-export const forgotPassword = async (dispatch, data) => {
-    dispatch(forgotPasswordStart());
-    try {
-        const res = await publicRequest.put("/customers/${customerId}", data);
-        dispatch(forgotPasswordSuccess(res.data));
-    } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-            dispatch(forgotPasswordFailure(error.response.data));
-            throw error;
-        } else {
-            dispatch(
-                forgotPasswordFailure({error: "an unexpected error occurred"})
-            );
-            throw new Error("An unexpected error occurred");
-        }
-    }
-};
+// export const forgotPassword = async (dispatch, data) => {
+//     dispatch(forgotPasswordStart());
+//     try {
+//         const res = await publicRequest.put("/customers/${customerId}", data);
+//         dispatch(forgotPasswordSuccess(res.data));
+//     } catch (error) {
+//         if (axios.isAxiosError(error) && error.response) {
+//             dispatch(forgotPasswordFailure(error.response.data));
+//             throw error;
+//         } else {
+//             dispatch(
+//                 forgotPasswordFailure({error: "an unexpected error occurred"})
+//             );
+//             throw new Error("An unexpected error occurred");
+//         }
+//     }
+// };
+
 
 // Login
 export const login = async (dispatch, userInfo) => {
@@ -240,21 +235,21 @@ export const fetchUserByEmail = async (email, dispatch) => {
     }
 };
 
-export const fetchUserByPhoneNumber = async (phoneNumber, dispatch) => {
-    dispatch(fetchUserByPhoneNumberStart());
-    try {
-        const res = await userRequest().get(`/customers/phone`, phoneNumber);
-        dispatch(fetchUserByPhoneNumberSuccess(res.data));
-        return res.data;
-    } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-            dispatch(fetchUserByPhoneNumberFailure(error.response.data.message));
-        } else {
-            dispatch(fetchUserByPhoneNumberFailure("An unexpected error occurred"));
-        }
-        return null;
-    }
-};
+// export const fetchUserByPhoneNumber = async (phoneNumber, dispatch) => {
+//     dispatch(fetchUserByPhoneNumberStart());
+//     try {
+//         const res = await userRequest().get(`/customers/phone`, phoneNumber);
+//         dispatch(fetchUserByPhoneNumberSuccess(res.data));
+//         return res.data;
+//     } catch (error) {
+//         if (axios.isAxiosError(error) && error.response) {
+//             dispatch(fetchUserByPhoneNumberFailure(error.response.data.message));
+//         } else {
+//             dispatch(fetchUserByPhoneNumberFailure("An unexpected error occurred"));
+//         }
+//         return null;
+//     }
+// };
 
 export const verifyEmail = async (dispatch, email) => {
     dispatch(verifyEmailStart());

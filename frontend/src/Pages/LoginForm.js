@@ -12,7 +12,7 @@ const LoginForm = () => {
     const dispatch = useDispatch();
     const nav = useNavigate();
     const user = useSelector((state) => state?.user);
-    const error = user?.errorMessage?.message;
+    let error = user?.errorMessage?.message;
 
     useEffect(() => {
         return () => {
@@ -26,6 +26,7 @@ const LoginForm = () => {
             await login(dispatch, {username: email, password});
             nav("/");
             window.location.reload();
+            error = null;
         } catch (err) {
             console.error("Login failed: ", err);
         }
