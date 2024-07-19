@@ -12,7 +12,7 @@ import NewProduct from "./Pages/NewProduct";
 import Login from "./Pages/Login";
 import {useSelector} from "react-redux";
 import Register from "./Pages/Register";
-import ForgotPassword from "./Pages/ForgotPassword";
+import ForgotPasswordAdmin from "./Pages/ForgotPasswordAdmin";
 
 function AppContent() {
     const user = useSelector((state) => state.user);
@@ -44,7 +44,7 @@ function AppContent() {
                     <Route path="/product/:productId"
                            element={isLoggedIn ? <ProductInfoAndEdit/> : <Navigate to="/"/>}/>
                     <Route path="/newProduct" element={isLoggedIn ? <NewProduct/> : <Navigate to="/"/>}/>
-                    <Route path="/forgotPassword" element={<ForgotPassword/>}/>
+                    <Route path="/forgotPassword" element={<ForgotPasswordAdmin/>}/>
                 </Routes>
             </div>
         </>

@@ -26,7 +26,8 @@
         }
 
         .logo {
-            max-width: 150px;
+            max-width: 350px;
+            object-fit: cover;
         }
 
         .otp {
@@ -57,12 +58,14 @@
 <body>
 <div class="container">
     <div class="header">
-        <img alt="CN.io" class="logo" src="cid:logoImage"/>
+        <img alt="CN.io" class="logo"
+             src="https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/logo-no-background.png?alt=media&token=92ec1c0b-7d96-43f3-9427-4fd3cfe87460"/>
     </div>
     <p style="font-size: 18px;">Hi,</p>
     <p style="font-size: 18px;">
         Thanks for Registering With us. Please confirm it's you by entering the OTP below on our
         app:</p>
+    <p>This email is meant for [[${email}]] If it was not requested by you, please ignore it.</p>
     <div class="otp" id="otp">[[${otp}]]</div>
     <div class="footer">
         <p>Follow us on:</p>

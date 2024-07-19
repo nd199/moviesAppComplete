@@ -32,6 +32,7 @@ public class EmailService {
             helper.setSubject("Your OTP");
 
             Context context = new Context();
+            context.setVariable("email", toEmail);
             context.setVariable("otp", otp);
             String htmlContent = templateEngine.process("otp-email", context);
 
@@ -52,6 +53,7 @@ public class EmailService {
             helper.setSubject("Password Reset Request");
 
             Context context = new Context();
+            context.setVariable("email", toMail);
             context.setVariable("resetLink", "http://localhost:3000/forgotPassword?token=" + token);
             String htmlContent = templateEngine.process("password-reset-mail", context);
 

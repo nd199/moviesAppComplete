@@ -1,16 +1,40 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import "./ForgotPassword.css";
 import PasswordStrengthBar from "react-password-strength-bar";
-import {useDispatch} from "react-redux";
-import {forgotPassword} from "../Network/ApiCalls";
+import {useDispatch, useSelector} from "react-redux";
+import {updatePasswordAndPushToLoginPage} from "../Network/ApiCalls";
+import {useNavigate} from "react-router-dom";
 
 const ForgotPassword = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [matchText, setMatchText] = useState("");
-    const [typeOfVerification, setTypeOfVerification] = useState("");
-    const [enteredOtp, setEnteredOtp] = useState("");
+    const [token, setToken] = useState("");
+    const [error, setError] = useState('');
     const dispatch = useDispatch();
+    const errorMessage = useSelector((state) => state);
+    console.log(errorMessage);
+    const nav = useNavigate();
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        setToken(token);
+
+        const validateToken = async () => {
+            try {
+                const response = await fetch(`/api/password-reset/validate-token?token=${token}`);
+                if (response.ok) {
+                    return response;
+                } else {
+                    setError(`Failed to validate token. Status: ${response.status}`);
+                }
+            } catch (error) {
+                setError('Error validating token. Please try again later.');
+            }
+        };
+        validateToken();
+    }, [token]);
 
     const handleConfirmPasswordChange = (e) => {
         const confirmPasswordValue = e.target.value;
@@ -25,12 +49,14 @@ const ForgotPassword = () => {
     const handlePasswordChange = async (e) => {
         e.preventDefault();
         try {
-            const res = await forgotPassword(dispatch, {
-                resetPassword: password,
-                typeOfVerification,
-                enteredOtp,
-            });
-            // Handle response if needed
+            if (matchText === "Passwords Match") {
+                try {
+                    updatePasswordAndPushToLoginPage(dispatch, {token, newPassword: password});
+                    nav("/Login");
+                } catch (err) {
+                    console.log(err);
+                }
+            }
         } catch (error) {
             console.error(error);
         }
@@ -90,35 +116,18 @@ const ForgotPassword = () => {
                                 )}
                             </div>
                         </div>
-                        <div className="form-input">
-                            <label>Verification Type:</label>
-                            <select
-                                name="verificationType"
-                                value={typeOfVerification}
-                                onChange={(e) => setTypeOfVerification(e.target.value)}
-                                required
-                            >
-                                <option value="" disabled>
-                                    Select verification type
-                                </option>
-                                <option value="Email">Email</option>
-                                <option value="Mobile">Mobile</option>
-                            </select>
-                        </div>
-                        <div className="form-input">
-                            <label>One Time Password:</label>
-                            <input
-                                type="number"
-                                placeholder="One Time Password"
-                                value={enteredOtp}
-                                onChange={(e) => setEnteredOtp(e.target.value)}
-                                required
-                            />
-                        </div>
                         <button className="forgot-password-btn" type="submit">
                             Submit
                         </button>
                     </form>
+                    {error && (
+                        <div className="popup">
+                            <div className="popup-content">
+                                <span className="close" onClick={() => setError('')}>&times;</span>
+                                <p>{error}</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
