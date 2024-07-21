@@ -49,8 +49,7 @@ const ProductList = () => {
                     <div className="plProduct">
                         <img
                             className="plImg"
-                            src={params.row.poster && "/images/REGBack.jpg"}
-                        />
+                            src={params.row.poster && "/images/REGBack.jpg"}/>
                         {params.row.name}
                     </div>
                 );

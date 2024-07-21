@@ -122,3 +122,8 @@
 .verify-button-user-:hover:not(:disabled) {
     background-color: #ff7f50;
 }
+
+.error-message-user {
+    color: red;
+    margin: 10px 0;
+}
