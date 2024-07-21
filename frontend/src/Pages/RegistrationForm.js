@@ -6,7 +6,7 @@ import PasswordStrengthBar from "react-password-strength-bar";
 import {resetErrorMessage} from "../redux/userSlice";
 import Box from "@mui/material/Box";
 import {register} from "../Network/ApiCalls";
-import {getDownloadURL, getStorage, ref, uploadBytesResumable,} from "firebase/storage";
+import {getDownloadURL, getStorage, ref, uploadBytesResumable} from "firebase/storage";
 import LinearProgress from "@mui/material/LinearProgress";
 import {app} from "../Firebase";
 import EmailVerifyUser from "../Components/EmailVerifyUser";
@@ -24,6 +24,7 @@ const Register = () => {
     const [matchText, setMatchText] = useState("");
     const [otpTimer, setOtpTimer] = useState(0);
     const [isEmailVerified, setIsEmailVerified] = useState(false);
+    const [phoneError, setPhoneError] = useState("");
     const [error, setError] = useState(null);
     const dispatch = useDispatch();
     const nav = useNavigate();
@@ -62,7 +63,8 @@ const Register = () => {
         setConfirmPassword(confirmPasswordValue);
         if (password !== confirmPasswordValue && password && confirmPasswordValue) {
             setMatchText("Passwords Do Not Match");
-        } else {
+        }
+        if (password === confirmPasswordValue) {
             setMatchText("Passwords Match");
         }
     };
@@ -73,6 +75,19 @@ const Register = () => {
 
     const handleEmailVerified = (status) => {
         setIsEmailVerified(status);
+    };
+
+    const handlePhoneNumberChange = (e) => {
+        const phoneNumberValue = e.target.value;
+        setPhoneNumber(phoneNumberValue);
+
+        const phoneNumberPattern = /^[+][0-9]{1,4}[0-9]{7,12}$/;
+        if (!phoneNumberPattern.test(phoneNumberValue)) {
+            setPhoneError("Phone number must contain only numbers and " +
+                "follow the format (+Country code) (123 - 456 - 789)");
+        } else {
+            setPhoneError("");
+        }
     };
 
     const registerHandler = async (e) => {
@@ -203,9 +218,10 @@ const Register = () => {
                                 placeholder="(+91) (123 - 456 - 789)"
                                 pattern="[+][0-9]{1,4}[0-9]{7,12}"
                                 value={phoneNumber}
-                                onChange={(e) => setPhoneNumber(e.target.value)}
+                                onChange={handlePhoneNumberChange}
                                 required
                             />
+                            {phoneError && <p className="error">{phoneError}</p>}
                         </div>
                         <div className="inputs">
                             <label className="lblPassword" htmlFor="password">
@@ -256,8 +272,8 @@ const Register = () => {
                                 )}
                             </div>
                         </div>
-                        {error && <div className="error">{error}</div>}
-                        {lError && <div className="error">{lError}</div>}
+                        {error && <div className="error" style={{color: "red"}}>{error}</div>}
+                        {lError && <div className="error" style={{color: "red"}}>{lError}</div>}
                         <p style={{color: "white"}}>
                             {!isEmailVerified ? "Verify Your Email To continue" : ""}
                         </p>
@@ -265,18 +281,16 @@ const Register = () => {
                             className="RegisterButton"
                             type="submit"
                             disabled={!isEmailVerified}
-                            style={{cursor: !isEmailVerified ? "not-allowed" : "pointer"}}
                         >
                             R E G I S T E R
                         </button>
-                        <div className="reg-form-links">
-                            <Link to={"/Login"}>
-                                <p>
-                                    Have an account? Login{" "}
-                                    <span className="reg-login-link">here</span>
-                                </p>
+                        <p className="text"
+                           style={{color: "white", fontSize: "18px", marginTop: "10px", marginBottom: "-40px"}}>
+                            Have an Account ?
+                            <Link className="Login--link" to="/login" style={{color: "orange"}}>
+                                {"  "}L O G I N
                             </Link>
-                        </div>
+                        </p>
                     </form>
                 </div>
             </div>

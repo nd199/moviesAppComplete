@@ -8,11 +8,9 @@ import {resetErrorMessage} from "../redux/userSlice";
 const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [phoneNumber, setPhoneNumber] = useState("");
     const dispatch = useDispatch();
     const nav = useNavigate();
-
-    let lError = useSelector((state) => state?.user?.errorMessage?.message);
+    const lError = useSelector((state) => state?.user?.errorMessage?.message);
 
     useEffect(() => {
         return () => {
@@ -63,16 +61,6 @@ const Login = () => {
                             required
                         />
                     </div>
-                    <div className="login-inputs">
-                        <label>PHONE NUMBER :</label>
-                        <input
-                            type="text"
-                            placeholder="Phone Number"
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                            required
-                        />
-                    </div>
                     {lError && <div className="error">{lError}</div>}
                     <button className="login-button" type="submit">
                         L O G I N
@@ -85,12 +73,14 @@ const Login = () => {
                             <span className="login-register-link">here</span>
                         </Link>
                     </p>
-                    <p>
-                        Forgot Password? Click{" "}
-                        <Link to="/forgotPassword">
-                            <span className="login-forgot-link">here</span>
-                        </Link>
-                    </p>
+                    {lError !== "Profile Not Found, If you are new here consider registering first, else contact us" && (
+                        <p>
+                            Forgot Password? Click{" "}
+                            <Link to="/forgotPassword">
+                                <span className="login-forgot-link">here</span>
+                            </Link>
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

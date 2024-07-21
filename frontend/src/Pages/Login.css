@@ -59,8 +59,11 @@
 
 .error {
     color: #e87c03;
-    margin-bottom: 15px;
-    font-size: 14px;
+    font-size: 15px;
+    margin: 15px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .login-button {

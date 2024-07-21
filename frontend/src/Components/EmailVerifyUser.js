@@ -204,7 +204,7 @@ const EmailVerifyUser = ({onEmailUpdate, onEmailVerified}) => {
                     </div>
                 ) : null}
             </div>
-            <p className="error-message-user-">
+            <p className="error-message-user">
                 {showSuccessErrorMessage}
             </p>
         </>

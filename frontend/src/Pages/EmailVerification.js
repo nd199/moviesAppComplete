@@ -41,7 +41,7 @@ const EmailVerification = () => {
                     onEmailError={handleEmailError}
                 />
             </div>
-            {isVerifiedError && <p className="error-message">{isVerifiedError}</p>}
+            {isVerifiedError && <p className="error-message" style={{color: "red"}}>{isVerifiedError}</p>}
             {isVerified && selectedPlan && (
                 <div style={{
                     marginTop: "30px",
