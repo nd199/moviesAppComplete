@@ -15,7 +15,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -30,7 +30,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: codenaren@gmail.com #Please provide your Google app acc email
-    password: "xyrczitcxbngdesa" #This will not Work Please provide your app Pass from your google account
+    password: "" #This will not Work Please provide your app Pass from your google account
     properties:
       mail:
         smtp:
