@@ -40,7 +40,7 @@ public class Show {
     @Column(name = "rating", nullable = false)
     private Double rating;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
@@ -58,7 +58,7 @@ public class Show {
     @Column(nullable = false)
     private String genre;
 
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'shows'")
+    @Column(nullable = false, columnDefinition = "TEXT default 'shows'")
     private String type;
 
     @ManyToOne
