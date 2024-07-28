@@ -1,3 +1,7 @@
+:root{
+    ---secondary-color: "#fbfbfbd"
+}
+
 .otp-container {
     display: flex;
     align-items: center;
@@ -29,6 +33,7 @@
 .otp-container .send-icon:hover {
     color: var(--secondary-color);
     transform: scale(1.1);
+    background-color: #fff;
 }
 
 .otp-container p {
@@ -38,7 +43,7 @@
 }
 
 .otp-container span {
-    font-size: 13px;
+    font-size: 17px;
     color: #fff;
 }
 
@@ -86,6 +91,7 @@
     width: 90%;
     border: none;
     outline: none;
+    font-size: 19px;
 }
 
 .envVerify-message input:focus {

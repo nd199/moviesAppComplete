@@ -32,7 +32,7 @@ class CustomerDaoImplTest extends AbstractTestContainers {
 
         customer = new Customer(1L, FAKER.name().name(),
                 FAKER.internet().emailAddress(), FAKER.internet().password(),
-                Long.valueOf(FAKER.phoneNumber().subscriberNumber(9)), false, false, false, "Chennai, India");
+                Long.valueOf(FAKER.phoneNumber().subscriberNumber(9)), false, false, false, "Chennai, India", false);
     }
 
     @AfterEach

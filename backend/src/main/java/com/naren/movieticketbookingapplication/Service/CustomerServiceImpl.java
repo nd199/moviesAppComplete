@@ -10,6 +10,7 @@ import com.naren.movieticketbookingapplication.Entity.Movie;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Exception.*;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
+import com.naren.movieticketbookingapplication.Record.CustomerSubscription;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
 import com.naren.movieticketbookingapplication.Record.EmailVerificationRequest;
 import com.naren.movieticketbookingapplication.Utils.OtpService;
@@ -146,7 +147,7 @@ public class CustomerServiceImpl implements CustomerService {
                 customerRegistration.email().toLowerCase(),
                 passwordEncoder.encode(customerRegistration.password()),
                 customerRegistration.phoneNumber(),
-                false, false, false, "Chennai, India");
+                false, false, false, "Chennai, India", false);
     }
 
     private boolean validatePassword(String password, String name, String email, Long phoneNumber) {
@@ -397,5 +398,19 @@ public class CustomerServiceImpl implements CustomerService {
                 .map(result -> new CustomerStatsDTO(((Number) result[0]).intValue(),
                         ((Number) result[1]).longValue()))
                 .toList();
+    }
+
+    @Override
+    public ResponseEntity<?> pingSubscription(CustomerSubscription customerSubscription) {
+
+        Customer customer = customerDao.getCustomerByUsername(customerSubscription.email())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Could not find customer by email "
+                                + customerSubscription.email())
+                );
+
+        customer.setIsSubscribed(true);
+        customerDao.updateCustomer(customer);
+        return ResponseEntity.ok("Customer Subscribed");
     }
 }

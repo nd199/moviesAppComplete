@@ -1,64 +1,86 @@
 .email-verification-page {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.9);
-    background-size: cover;
-    background-position: center;
-    padding: 20px;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.9);
+  background-size: cover;
+  background-position: center;
+  padding: 40px;
+  transition: all 1s ease-in-out;
 }
 
 .email-verify-box {
-    width: 80%;
-    max-width: 600px;
-    padding: 40px;
-    background-color: rgba(89, 180, 62, 0.532);
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 12px 20px rgba(195, 219, 15, 0.937);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  width: 80%;
+  max-width: 800px;
+  padding: 80px;
+  background-color: rgba(34, 34, 34, 0.8);
+  border: 1px solid #444;
+  border-radius: 20px;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 1s ease-in-out;
 }
 
 .email-verify-box > * {
-    color: black;
+  color: white;
+  transition: all 1s ease-in-out;
 }
 
 .email-verification-page h2 {
-    color: #fff;
-    font-size: 28px;
-    margin-bottom: 20px;
-    text-align: center;
+  color: #fff;
+  font-size: 42px;
+  margin-bottom: 40px;
+  text-align: center;
+  transition: all 1s ease-in-out;
 }
 
 .email-verification-page .verification-container {
-    margin-top: 20px;
-    width: 100%;
+  margin-top: 30px;
+  width: 100%;
 }
 
 .error-message {
-    color: darksalmon;
-    font-size: 24px;
-    margin-top: 20px;
-    text-align: center;
+  color: darksalmon;
+  font-size: 24px;
+  margin-top: 30px;
+  text-align: center;
+  transition: all 1s ease-in-out;
 }
 
 @media (max-width: 768px) {
-    .email-verification-page {
-        padding: 10px;
-    }
+  .email-verification-page {
+    padding: 20px;
+  }
 
-    .email-verify-box {
-        width: 90%;
-        padding: 20px;
-    }
+  .email-verify-box {
+    width: 90%;
+    padding: 40px;
+  }
 
-    .email-verification-page h2 {
-        font-size: 24px;
-    }
+  .email-verification-page h2 {
+    font-size: 36px;
+  }
+
+  .error-message {
+    font-size: 22px;
+  }
+}
+
+.success-message {
+  margin-top: 40px;
+  color: lightgreen;
+  font-size: 24px;
+  padding: 15px;
+  border: 2px solid white;
+  text-align: center;
+  border-radius: 15px;
+  box-shadow: 2px 6px 25px lightgreen;
+  background-color: rgba(0, 0, 0, 0.6);
+  transition: all 1s ease-in-out;
 }

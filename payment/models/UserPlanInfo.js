@@ -19,6 +19,7 @@ const UserPlanSchema = new mongoose.Schema({
     address: String,
     isLogged: Boolean,
     isRegistered: Boolean,
+    isSubscribed: Boolean,
     imageUrl: String,
     createdAt: Date,
     updatedAt: Date,

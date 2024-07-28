@@ -16,6 +16,7 @@ public record CustomerDTO(
         String address,
         Boolean isLogged,
         Boolean isRegistered,
+        Boolean isSubscribed,
         String imageUrl,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

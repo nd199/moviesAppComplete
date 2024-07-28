@@ -61,9 +61,9 @@ const Shows = () => {
                     setRating={setRating}
                 />
                 <div className="showContainerContent">
-                    {filteredShows.map((show) => (
+                    {filteredShows.map((show, id) => (
                         <ColListItem
-                            key={show.id}
+                            key={id}
                             name={show.name}
                             desc={show.description}
                             year={show.year}

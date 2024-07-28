@@ -21,6 +21,7 @@ const FinalUserSchema = new Schema({
     address: {type: String, required: true},
     isLogged: {type: Boolean, required: true},
     isRegistered: {type: Boolean, required: true},
+    isSubscribed: {type: Boolean, required: true},
     imageUrl: {type: String, required: true},
     createdAt: {type: Date, required: true},
     updatedAt: {type: Date, required: true}

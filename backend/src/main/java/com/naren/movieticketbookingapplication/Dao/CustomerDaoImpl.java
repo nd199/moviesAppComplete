@@ -99,4 +99,5 @@ public class CustomerDaoImpl implements CustomerDao {
     public List<Object[]> getCustomerStats() {
         return customerRepository.getCustomerCountByEachMonthInYear();
     }
+
 }

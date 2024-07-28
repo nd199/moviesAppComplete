@@ -107,8 +107,8 @@ const ListItem = ({
                                         <p>{desc}</p>
                                     </div>
                                     <div className="li-genre">
-                                        {genre?.split(",").map((genre) => (
-                                            <p key={genre}>{genre}</p>
+                                        {genre?.split(",").map((genre,id) => (
+                                            <p key={id}>{genre}</p>
                                         ))}
                                     </div>
                                 </div>

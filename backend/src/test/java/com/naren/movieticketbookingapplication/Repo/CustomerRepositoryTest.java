@@ -19,4 +19,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestConfig.class)
 class CustomerRepositoryTest extends AbstractTestContainers {
 
+    @Autowired
+    private CustomerRepository underTest;
+    private Customer customer;
+
+    @BeforeEach
+    void setUp() {
+        var customerName = FAKER.name().name();
+        var customerEmail = customerName + "@codeNaren.com";
+        var password = FAKER.internet().password(8, 12);
+        Long phoneNumber = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
+        customer = new Customer(customerEmail, customerName, password, phoneNumber, false, false, false, "Chennai, India", false);
+    }
+
+    @Test
+    void existsByEmail() {
+        underTest.save(customer);
+        var actual = underTest.existsByEmail(customer.getEmail());
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void existsByPhoneNumber() {
+        underTest.save(customer);
+        var actual = underTest.existsByPhoneNumber(customer.getPhoneNumber());
+        assertThat(actual).isTrue();
+    }
 }

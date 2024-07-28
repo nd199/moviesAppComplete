@@ -5,6 +5,7 @@ import com.naren.movieticketbookingapplication.Dto.CustomerStatsDTO;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Record.CustomerRegistration;
+import com.naren.movieticketbookingapplication.Record.CustomerSubscription;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
 import com.naren.movieticketbookingapplication.Record.EmailVerificationRequest;
 import org.springframework.http.ResponseEntity;
@@ -52,4 +53,6 @@ public interface CustomerService {
     List<CustomerDTO> getLatestCustomerList();
 
     List<CustomerStatsDTO> getCustomerStats();
+
+    ResponseEntity<?> pingSubscription(CustomerSubscription customerSubscription);
 }

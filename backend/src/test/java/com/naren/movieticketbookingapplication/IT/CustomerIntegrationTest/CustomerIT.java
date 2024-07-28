@@ -286,7 +286,7 @@ public class CustomerIT {
         CustomerDTO expectedCustomerDTO = new CustomerDTO(customerId, updateRequest.name(),
                 updateRequest.email(),
                 List.of("ROLE_USER"), updateRequest.phoneNumber(),
-                List.of(), true, "Chennai, India", false, true,
+                List.of(), true, "Chennai, India", false, true, false,
                 "",
                 updatedCustomerDTO.createdAt(), updatedCustomerDTO.updatedAt());
 
