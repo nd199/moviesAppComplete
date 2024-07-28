@@ -55,8 +55,8 @@ public class CustomerController {
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/customers/byEmail")
-    public ResponseEntity<CustomerDTO> getCustomerByEmail(@RequestParam String email) {
+    @GetMapping("/customers/currentUser/{email}")
+    public ResponseEntity<CustomerDTO> getCustomerByEmail(@PathVariable("email") String email) {
         log.info("Fetching customer by email: {}", email);
         CustomerDTO customerDTO = customerService.getCustomerByEmail(email);
         log.info("Customer _found:{}", customerDTO);

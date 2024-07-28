@@ -52,7 +52,7 @@ public class MovieTicketBookingApplication {
         String imageUrl = FAKER.internet().image(200, 200, false, "");
         Boolean isLoggedIn = FAKER.options().option(true, false);
         Customer customer = new Customer(customerName, customerEmail, password,
-                phoneNumber, imageUrl, false, "Chennai, India", isLoggedIn, false);
+                phoneNumber, imageUrl, false, "Chennai, India", isLoggedIn, false, false);
 
         customerRepository.save(customer);
         log.info("Created new customer: {}", customer);

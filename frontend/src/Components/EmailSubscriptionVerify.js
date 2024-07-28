@@ -6,6 +6,7 @@ import TickMark from "../animations/TickMark.json";
 import CrossMark from "../animations/CrossMark.json";
 import Lottie from "react-lottie";
 import {Send} from "@mui/icons-material";
+import './EmailSubscriptionVerify.css';
 
 const EmailSubscriptionVerify = ({onEmailUpdate, onEmailVerified, onEmailError}) => {
     const [email, setEmail] = useState("");

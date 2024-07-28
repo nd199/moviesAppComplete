@@ -61,9 +61,9 @@ const Movies = () => {
                     setRating={setRating}
                 />
                 <div className="movieContainerContent">
-                    {filteredMovies.map((movie) => (
+                    {filteredMovies.map((movie, id) => (
                         <ColListItem
-                            key={movie.id}
+                            key={id}
                             name={movie.name}
                             desc={movie.description}
                             year={movie.year}

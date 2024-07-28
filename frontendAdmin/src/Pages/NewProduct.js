@@ -68,7 +68,7 @@ const NewProduct = () => {
                         poster: downloadURL,
                         genre: categories.join(",")
                     };
-                    addProduct(product, dispatch);
+                    addProduct({product}, dispatch);
 
                 } catch (error) {
                     console.error("Error getting download URL: ", error);
@@ -189,8 +189,7 @@ const NewProduct = () => {
                     <button
                         onClick={clickHandler}
                         className={`pButton ${isButtonDisabled ? "disabled" : ""}`}
-                        disabled={isButtonDisabled}
-                    >
+                        disabled={isButtonDisabled}>
                         Create
                     </button>
                 </form>

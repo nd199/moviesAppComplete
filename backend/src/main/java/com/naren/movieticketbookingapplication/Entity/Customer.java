@@ -64,6 +64,8 @@ public class Customer implements UserDetails {
     @Column(nullable = false)
     private Boolean isRegistered;
 
+    private Boolean isSubscribed;
+
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = {DETACH, REFRESH, PERSIST, MERGE})
     @JsonIgnore
     private List<Movie> movies = new ArrayList<>();
@@ -86,7 +88,7 @@ public class Customer implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, List<Movie> movies, Set<Role> roles) {
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, List<Movie> movies, Set<Role> roles, Boolean isSubscribed) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -98,9 +100,10 @@ public class Customer implements UserDetails {
         this.isRegistered = isRegistered;
         this.movies = movies;
         this.roles = roles;
+        this.isSubscribed = isSubscribed;
     }
 
-    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address) {
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address, Boolean isSubscribed) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -110,9 +113,11 @@ public class Customer implements UserDetails {
         this.address = address;
         this.isLogged = isLogged;
         this.isRegistered = isRegistered;
+        this.isSubscribed = isSubscribed;
+
     }
 
-    public Customer(Long id, String name, String email, String password, Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered) {
+    public Customer(Long id, String name, String email, String password, Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, Boolean isSubscribed) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -123,10 +128,11 @@ public class Customer implements UserDetails {
         this.address = address;
         this.isLogged = isLogged;
         this.isRegistered = isRegistered;
+        this.isSubscribed = isSubscribed;
 
     }
 
-    public Customer(String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address) {
+    public Customer(String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address, Boolean isSubscribed) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -135,10 +141,11 @@ public class Customer implements UserDetails {
         this.address = address;
         this.isLogged = isLogged;
         this.isRegistered = isRegistered;
+        this.isSubscribed = isSubscribed;
     }
 
     public Customer(String name, String email, String password,
-                    Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered) {
+                    Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, Boolean isSubscribed) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -148,7 +155,9 @@ public class Customer implements UserDetails {
         this.address = address;
         this.isLogged = isLogged;
         this.isRegistered = isRegistered;
+        this.isSubscribed = isSubscribed;
     }
+
 
     @Override
     public String toString() {
@@ -163,6 +172,7 @@ public class Customer implements UserDetails {
                 ", address='" + address + '\'' +
                 ", isLogged=" + isLogged +
                 ", isRegistered=" + isRegistered +
+                ", isSubscribed=" + isSubscribed +
                 ", movies=" + movies +
                 ", roles=" + roles +
                 ", createdAt=" + createdAt +
@@ -175,12 +185,12 @@ public class Customer implements UserDetails {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return Objects.equals(id, customer.id) && Objects.equals(name, customer.name) && Objects.equals(email, customer.email) && Objects.equals(password, customer.password) && Objects.equals(phoneNumber, customer.phoneNumber) && Objects.equals(imageUrl, customer.imageUrl) && Objects.equals(isEmailVerified, customer.isEmailVerified) && Objects.equals(address, customer.address) && Objects.equals(isLogged, customer.isLogged) && Objects.equals(isRegistered, customer.isRegistered) && Objects.equals(movies, customer.movies) && Objects.equals(roles, customer.roles) && Objects.equals(createdAt, customer.createdAt) && Objects.equals(updatedAt, customer.updatedAt);
+        return Objects.equals(id, customer.id) && Objects.equals(name, customer.name) && Objects.equals(email, customer.email) && Objects.equals(password, customer.password) && Objects.equals(phoneNumber, customer.phoneNumber) && Objects.equals(imageUrl, customer.imageUrl) && Objects.equals(isEmailVerified, customer.isEmailVerified) && Objects.equals(address, customer.address) && Objects.equals(isLogged, customer.isLogged) && Objects.equals(isRegistered, customer.isRegistered) && Objects.equals(isSubscribed, customer.isSubscribed) && Objects.equals(movies, customer.movies) && Objects.equals(roles, customer.roles) && Objects.equals(createdAt, customer.createdAt) && Objects.equals(updatedAt, customer.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, email, password, phoneNumber, imageUrl, isEmailVerified, address, isLogged, isRegistered, movies, roles, createdAt, updatedAt);
+        return Objects.hash(id, name, email, password, phoneNumber, imageUrl, isEmailVerified, address, isLogged, isRegistered, isSubscribed, movies, roles, createdAt, updatedAt);
     }
 
     @Override
@@ -252,6 +262,4 @@ public class Customer implements UserDetails {
             role.getCustomers().add(this);
         }
     }
-
-
 }
