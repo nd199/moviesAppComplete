@@ -63,12 +63,12 @@ const UserList = () => {
                 return (
                     <div
                         style={{
-                            color: params.row.isLogged ? "green" : "red",
+                            color: (params.row.isLogged || params.row.isRegistered) ? "green" : "red",
                             display: "flex",
                             justifyContent: "center",
                         }}
                     >
-                        {params.row.isLogged ? "Online" : "Not Online"}
+                        {(params.row.isLogged || params.row.isRegistered) ? "Online" : "Not Online"}
                     </div>
                 );
             },
@@ -109,7 +109,7 @@ const UserList = () => {
         },
         {
             field: "action",
-            headerName: "Action",
+            headerName: "Profile Actions",
             width: 150,
             renderCell: (params) => {
                 return (

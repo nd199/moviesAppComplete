@@ -34,13 +34,18 @@
 
 .email-otp-container-user- p {
     color: #fff;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
+    padding: 5px;
+    line-height: 1.4;
 }
 
 .email-otp-container-user- span {
     font-size: 13px;
     color: #fff;
+    padding: 2px;
+    margin-left: -2px;
+    margin-right: 5px;
 }
 
 .otp-actions-user- {

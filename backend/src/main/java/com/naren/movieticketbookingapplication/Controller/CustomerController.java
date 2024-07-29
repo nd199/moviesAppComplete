@@ -63,6 +63,14 @@ public class CustomerController {
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/customers/currentAdmin/{email}")
+    public ResponseEntity<CustomerDTO> getAdminByEmail(@PathVariable("email") String email) {
+        log.info("Fetching admin by email: {}", email);
+        CustomerDTO customerDTO = customerService.getCustomerByEmail(email);
+        log.info("Admin _found:{}", customerDTO);
+        return new ResponseEntity<>(customerDTO, HttpStatus.OK);
+    }
+
     @GetMapping("/customers/byPhone")
     public ResponseEntity<CustomerDTO> getCustomerByPhoneNumber(@RequestParam String phoneNumber) {
         log.info("Fetching customer by phoneNumber: {}", phoneNumber);

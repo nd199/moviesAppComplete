@@ -5,6 +5,8 @@ import com.naren.movieticketbookingapplication.Dto.CustomerDTOMapper;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import com.naren.movieticketbookingapplication.Exception.UserNotFoundException;
+import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
+import com.naren.movieticketbookingapplication.Service.CustomerService;
 import com.naren.movieticketbookingapplication.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +25,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final CustomerDTOMapper customerDTOMapper;
     private final JwtUtil jwtUtil;
+    private final CustomerService customerService;
 
     public AuthResponse login(AuthRequest authRequest) {
         try {
@@ -32,12 +35,33 @@ public class AuthService {
                             authRequest.password())
             );
 
-            Customer principal;
+            Customer principal = (Customer) authentication.getPrincipal();
 
-            principal = (Customer) authentication.getPrincipal();
-            principal.setIsLogged(true);
+            if(Boolean.FALSE.equals(principal.getIsLogged())) {
+                CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                        principal.getName(),
+                        principal.getEmail(),
+                        principal.getPhoneNumber(),
+                        principal.getAddress(),
+                        principal.getIsEmailVerified(),
+                        principal.getImageUrl(),
+                        true,
+                        principal.getIsRegistered()
+                );
+
+                CustomerDTO updatedCustomerDTO = customerService.updateCustomer(updateRequest, principal.getId());
+
+                Set<Role> roles = updatedCustomerDTO.roles()
+                        .stream().map(Role::new)
+                        .collect(Collectors.toSet());
+
+                String token = jwtUtil.issueToken(updatedCustomerDTO.email(), roles);
+
+                return new AuthResponse(updatedCustomerDTO, token);
+            }
 
             CustomerDTO customerDTO = customerDTOMapper.apply(principal);
+
             Set<Role> roles = customerDTO.roles()
                     .stream().map(Role::new)
                     .collect(Collectors.toSet());
@@ -45,6 +69,7 @@ public class AuthService {
             String token = jwtUtil.issueToken(customerDTO.email(), roles);
 
             return new AuthResponse(customerDTO, token);
+
         } catch (UserNotFoundException e) {
             throw new UserNotFoundException("Profile Not Found, " +
                     "If you are new here consider registering first, else contact us");
@@ -53,4 +78,3 @@ public class AuthService {
         }
     }
 }
-

@@ -154,7 +154,7 @@ const Register = () => {
                             </div>
                         </div>
                         {lError && <div className="error">{lError}</div>}
-                        <p style={{color: "white"}}>{!isEmailVerified ? "Verify Your Email To continue" : ""}</p>
+                        {isEmailVerified && <p style={{color: "white"}}> {!isEmailVerified ? "Verify Your Email To continue" : ""}</p>}
                         <button
                             className="RegisterButton"
                             type="submit"
