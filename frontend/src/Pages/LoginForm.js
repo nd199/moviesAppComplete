@@ -21,7 +21,6 @@ const LoginForm = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    // Add an event listener to prevent going back to the login page
     const handlePopState = () => {
       navigate("/", { replace: true });
     };
@@ -37,7 +36,7 @@ const LoginForm = () => {
     e.preventDefault();
     try {
       await login(dispatch, { username: email, password });
-      navigate("/", { replace: true }); // Use replace to prevent going back to login
+      navigate("/", { replace: true });
     } catch (err) {
       console.error("Login failed: ", err);
     }

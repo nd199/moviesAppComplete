@@ -106,6 +106,9 @@ public class CustomerServiceImpl implements CustomerService {
                     return ResponseEntity.badRequest().body("Role " + roleName + " not found");
                 }
                 roles.add(role);
+                if(role.getName().equals("ROLE_ADMIN")){
+                    registeredCustomer.setAddress("CN.io, Inc.");
+                }
             }
 
             roles.forEach(registeredCustomer::addRole);
@@ -143,6 +146,8 @@ public class CustomerServiceImpl implements CustomerService {
             log.error("Phone number already taken: {}", customerRegistration.phoneNumber());
             throw new ResourceAlreadyExists("Phone number already taken");
         }
+
+
         return new Customer(customerRegistration.name(),
                 customerRegistration.email().toLowerCase(),
                 passwordEncoder.encode(customerRegistration.password()),
@@ -204,6 +209,9 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setEmail(request.email());
             changes = true;
         }
+
+
+
         if (request.phoneNumber() != null && !request.phoneNumber().equals(customer.getPhoneNumber())) {
             customer.setPhoneNumber(request.phoneNumber());
             changes = true;

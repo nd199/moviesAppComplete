@@ -1,6 +1,7 @@
 package com.naren.movieticketbookingapplication.Dto;
 
 import com.naren.movieticketbookingapplication.Entity.Customer;
+import com.naren.movieticketbookingapplication.Entity.Role;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -20,16 +21,15 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                 customer.getId(),
                 customer.getName(),
                 customer.getEmail(),
-                customer.getAuthorities()
-                        .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()),
                 customer.getPhoneNumber(),
-                customer.getMovies(),
+                customer.getImageUrl(),
                 customer.getIsEmailVerified(),
                 customer.getAddress(),
                 customer.getIsLogged(),
                 customer.getIsRegistered(),
                 customer.getIsSubscribed(),
-                customer.getImageUrl(),
+                customer.getMovies(),
+                customer.getRoles().stream().map(Role::getName).toList(),
                 customer.getCreatedAt(),
                 customer.getUpdatedAt()
         );

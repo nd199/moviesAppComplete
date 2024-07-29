@@ -1,7 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 export const PaymentRedux = createSlice({
-  name: "payment",
+  name: 'payment',
   initialState: {
     paymentPlan: {},
     userInfoAndSelectedPlan: {},
@@ -10,18 +10,17 @@ export const PaymentRedux = createSlice({
     error: null,
     errorMessage: null,
   },
-
   reducers: {
     SavePaymentStart: (state) => {
       state.isFetching = true;
       state.error = false;
-      state.errorMessage = "";
+      state.errorMessage = '';
     },
     SavePaymentSuccess: (state, action) => {
       state.paymentPlan = action.payload;
       state.isFetching = false;
       state.error = false;
-      state.errorMessage = "";
+      state.errorMessage = '';
     },
     SavePaymentFailure: (state, action) => {
       state.isFetching = false;
@@ -31,13 +30,13 @@ export const PaymentRedux = createSlice({
     userInfoAndSelectedPlanStart: (state) => {
       state.isFetching = true;
       state.error = false;
-      state.errorMessage = "";
+      state.errorMessage = '';
     },
     userInfoAndSelectedPlanSuccess: (state, action) => {
       state.isFetching = false;
       state.userInfoAndSelectedPlan = action.payload;
       state.error = false;
-      state.errorMessage = "";
+      state.errorMessage = '';
     },
     userInfoAndSelectedPlanFailure: (state, action) => {
       state.isFetching = false;
@@ -47,13 +46,13 @@ export const PaymentRedux = createSlice({
     updateFinalUserStart: (state) => {
       state.isFetching = true;
       state.error = false;
-      state.errorMessage = "";
+      state.errorMessage = '';
     },
     updateFinalUserSuccess: (state, action) => {
       state.isFetching = false;
-      state.userInfoAndSelectedPlan = action.payload;
+      state.finalUser = action.payload;
       state.error = false;
-      state.errorMessage = "";
+      state.errorMessage = '';
     },
     updateFinalUserFailure: (state, action) => {
       state.isFetching = false;
@@ -63,12 +62,12 @@ export const PaymentRedux = createSlice({
     pingStart: (state) => {
       state.isFetching = true;
       state.error = false;
-      state.errorMessage = "";
+      state.errorMessage = '';
     },
     pingSuccess: (state) => {
       state.isFetching = false;
       state.error = false;
-      state.errorMessage = "";
+      state.errorMessage = '';
     },
     pingFailure: (state, action) => {
       state.isFetching = false;

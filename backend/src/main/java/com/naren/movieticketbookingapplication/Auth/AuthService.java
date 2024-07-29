@@ -37,14 +37,14 @@ public class AuthService {
 
             Customer principal = (Customer) authentication.getPrincipal();
 
-            if(Boolean.FALSE.equals(principal.getIsLogged())) {
+            if (Boolean.FALSE.equals(principal.getIsLogged())) {
                 CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
                         principal.getName(),
                         principal.getEmail(),
                         principal.getPhoneNumber(),
-                        principal.getAddress(),
-                        principal.getIsEmailVerified(),
                         principal.getImageUrl(),
+                        principal.getIsEmailVerified(),
+                        principal.getAddress(),
                         true,
                         principal.getIsRegistered()
                 );
