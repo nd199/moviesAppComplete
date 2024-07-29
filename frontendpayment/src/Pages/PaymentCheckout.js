@@ -155,7 +155,7 @@ const PaymentCheckout = () => {
                   className="paymentPage-profile-img"
                 />
               </div>
-              <p className="paymentPage-instructions">
+              <p className="paymentPage-instructions" style={{margin:"20px", color: "#fff"}}>
                 Check your details. You can edit them except your email and
                 plan.
               </p>

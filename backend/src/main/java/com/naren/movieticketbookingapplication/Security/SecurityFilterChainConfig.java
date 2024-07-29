@@ -37,7 +37,8 @@ public class SecurityFilterChainConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
-                        .requestMatchers("/api/v1/verify/email", "/api/v1/validate/Otp", "/pingSpring", "/api/v1/customers/currentUser/{email}")
+                        .requestMatchers("/api/v1/verify/email", "/api/v1/validate/Otp", "/pingSpring",
+                                "/api/v1/customers/currentUser/{email}")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/customers", "/api/v1/auth/admins",
                                 "/api/v1/auth/login", "/api/v1/auth/loginAdmin", "/api/password-reset/request",
@@ -56,7 +57,7 @@ public class SecurityFilterChainConfig {
                         .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/customers/{id}", "/api/v1/customers/byEmail",
                                 "/api/v1/customers/byPhone", "/api/v1/customers",
-                                "/api/v1/products/AllProducts", "/api/v1/roles")
+                                "/api/v1/products/AllProducts", "/api/v1/roles", "/api/v1/customers/currentAdmin/*")
                         .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/{id}", "/api/v1/roles/{id}")
                         .hasRole("ADMIN")

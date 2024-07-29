@@ -147,7 +147,7 @@ public class CustomerServiceImpl implements CustomerService {
                 customerRegistration.email().toLowerCase(),
                 passwordEncoder.encode(customerRegistration.password()),
                 customerRegistration.phoneNumber(),
-                false, false, false, "Chennai, India", false);
+                false, false, false, customerRegistration.address() ,false);
     }
 
     private boolean validatePassword(String password, String name, String email, Long phoneNumber) {
@@ -215,6 +215,11 @@ public class CustomerServiceImpl implements CustomerService {
 
         if (request.imageUrl() != null && !request.imageUrl().equals(customer.getImageUrl())) {
             customer.setImageUrl(request.imageUrl());
+            changes = true;
+        }
+
+        if (request.isLogged() != null && !Objects.equals(request.isLogged(), customer.getIsLogged())) {
+            customer.setIsLogged(request.isLogged());
             changes = true;
         }
 
@@ -410,6 +415,7 @@ public class CustomerServiceImpl implements CustomerService {
                 );
 
         customer.setIsSubscribed(true);
+        customer.setIsLogged(true);
         customerDao.updateCustomer(customer);
         return ResponseEntity.ok("Customer Subscribed");
     }

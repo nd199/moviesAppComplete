@@ -14,7 +14,8 @@ import {useSelector} from "react-redux";
 import Register from "./Pages/Register";
 
 function AppContent() {
-    const user = useSelector((state) => state.user);
+    const user = useSelector((state) => state?.user);
+    const isRegistered = user?.currentUser?.customerDTO || false;
     const isLoggedIn = user?.currentUser?.customerDTO?.isLogged || false;
     console.log(isLoggedIn);
 
@@ -26,7 +27,7 @@ function AppContent() {
                 <Routes>
                     <Route
                         path="/registerAdmin"
-                        element={isLoggedIn ? <Navigate to="/Home"/> : <Register/>}
+                        element={isRegistered ? <Navigate to="/Home"/> : <Register/>}
                     />
                     <Route
                         path="/"

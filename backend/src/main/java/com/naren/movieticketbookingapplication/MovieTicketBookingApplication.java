@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
 import java.util.Random;
 
 @Slf4j
@@ -49,17 +50,17 @@ public class MovieTicketBookingApplication {
         String customerEmail = customerName.toLowerCase().replace(" ", "") + "@codeNaren.com";
         String password = encoder.encode(FAKER.internet().password(8, 12));
         Long phoneNumber = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
-        String imageUrl = FAKER.internet().image(200, 200, false, "");
         Boolean isLoggedIn = FAKER.options().option(true, false);
+        Boolean isRegistered = FAKER.options().option(true, false);
         Customer customer = new Customer(customerName, customerEmail, password,
-                phoneNumber, imageUrl, false, "Chennai, India", isLoggedIn, false, false);
+                phoneNumber, "", false, "Chennai, India", isLoggedIn, isRegistered, false);
 
         customerRepository.save(customer);
         log.info("Created new customer: {}", customer);
     }
 
     private void createRandomMovie(MovieRepository movieRepository) {
-        String movieName = FAKER.book().title() + Math.random();
+        String movieName = FAKER.book().title();
         var rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
         var cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
         String description = FAKER.lorem().sentence(40);
@@ -69,9 +70,9 @@ public class MovieTicketBookingApplication {
         String runtime = RANDOM.nextInt(80, 180) + " mins";
         String genre1 = FAKER.book().genre();
         String genre2 = FAKER.book().genre();
-        int Random = RANDOM.nextInt(100);
+        var instant = Instant.now().toString().substring(20, 24);
 
-        Movie movie = new Movie(movieName + "-" + Random, cost, rating,
+        Movie movie = new Movie(movieName + "-" + instant, cost, rating,
                 description, poster, ageRating, year, runtime, genre1 + "," + genre2, "movies");
         movieRepository.save(movie);
 
@@ -89,9 +90,9 @@ public class MovieTicketBookingApplication {
         String runtime = RANDOM.nextInt(20, 60) + " mins";
         String genre1 = FAKER.book().genre();
         String genre2 = FAKER.book().genre();
-        int Random = RANDOM.nextInt(100);
+        var instant = Instant.now().toString().substring(20, 24);
 
-        Show show = new Show(showName + "-" + Random, cost, rating, description, poster,
+        Show show = new Show(showName + "-" + instant, cost, rating, description, poster,
                 ageRating, year, runtime, genre1 + "," + genre2, "shows");
         showRepository.save(show);
         log.info("Created new show: {}", show);

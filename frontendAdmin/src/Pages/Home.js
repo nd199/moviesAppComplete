@@ -5,8 +5,17 @@ import Chart from "../components/Chart";
 import WidgetsSmall from "../components/WidgetsSmall";
 import WidgetsLarge from "../components/WidgetsLarge";
 import {publicRequest} from "../AxiosMethods";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCurrentAdminDetails } from "../redux/ApiCalls";
 
 const Home = () => {
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state?.user);
+    const currentUser = user?.currentUser;
+    useEffect(() => {
+      fetchCurrentAdminDetails(dispatch, currentUser?.email);
+    }, [dispatch, currentUser.email]);
+
     const [userStats, setUserStats] = useState([]);
 
     const MONTHS = useMemo(() => {

@@ -11,9 +11,10 @@ const Home = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.user);
   const currentUser = user?.currentUser;
+
   useEffect(() => {
     fetchCurrentUserDetails(dispatch, currentUser?.email);
-  }, [dispatch]);
+  }, [dispatch, currentUser.email]);
   return (
     <div className="home">
       <NavBar />
