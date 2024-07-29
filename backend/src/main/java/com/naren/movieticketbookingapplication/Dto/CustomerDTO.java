@@ -9,15 +9,15 @@ public record CustomerDTO(
         Long id,
         String name,
         String email,
-        List<String> roles,
         Long phoneNumber,
-        List<Movie> movies,
+        String imageUrl,
         Boolean isEmailVerified,
         String address,
         Boolean isLogged,
         Boolean isRegistered,
         Boolean isSubscribed,
-        String imageUrl,
+        List<Movie> movies,
+        List<String> roles,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {

@@ -285,9 +285,15 @@ public class CustomerIT {
         // Create the expected customer DTO
         CustomerDTO expectedCustomerDTO = new CustomerDTO(customerId, updateRequest.name(),
                 updateRequest.email(),
-                List.of("ROLE_USER"), updateRequest.phoneNumber(),
-                List.of(), true, "Chennai, India", false, true, false,
-                "",
+                updatedCustomerDTO.phoneNumber(),
+                updatedCustomerDTO.imageUrl(),
+                updatedCustomerDTO.isEmailVerified(),
+                updatedCustomerDTO.address(),
+                updatedCustomerDTO.isLogged(),
+                updatedCustomerDTO.isRegistered(),
+                updatedCustomerDTO.isSubscribed(),
+                updatedCustomerDTO.movies(),
+                updatedCustomerDTO.roles(),
                 updatedCustomerDTO.createdAt(), updatedCustomerDTO.updatedAt());
 
         // Assert other fields

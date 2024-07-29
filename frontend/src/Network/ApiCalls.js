@@ -97,6 +97,7 @@ export const login = async (dispatch, userInfo) => {
     const res = await authRequest.post("/login", userInfo);
     const { data: customerDTO, headers } = res;
     dispatch(loginSuccess(customerDTO));
+    if(loginSuccess){
     localStorage.setItem(
       "persist:root",
       JSON.stringify({
@@ -104,7 +105,7 @@ export const login = async (dispatch, userInfo) => {
           currentUser: customerDTO,
         }),
       })
-    );
+    );}
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(loginFailure(error.response.data));

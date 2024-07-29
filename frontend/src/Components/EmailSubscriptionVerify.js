@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {resetErrorMessage} from "../redux/userSlice";
-import {validateOtp, verifyEmail} from "../Network/ApiCalls";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { resetErrorMessage } from "../redux/userSlice";
+import { validateOtp, verifyEmail } from "../Network/ApiCalls";
 import TickMark from "../animations/TickMark.json";
 import CrossMark from "../animations/CrossMark.json";
 import Lottie from "react-lottie";
-import {Send} from "@mui/icons-material";
+import { Send } from "@mui/icons-material";
 import './EmailSubscriptionVerify.css';
 
-const EmailSubscriptionVerify = ({onEmailUpdate, onEmailVerified, onEmailError}) => {
+const EmailSubscriptionVerify = ({ onEmailUpdate, onEmailVerified, onEmailError }) => {
     const [email, setEmail] = useState("");
     const [emVerify, setEmShowVerify] = useState(false);
     const [mailOtp, setMailOTP] = useState("");
@@ -63,7 +63,7 @@ const EmailSubscriptionVerify = ({onEmailUpdate, onEmailVerified, onEmailError})
         try {
             setEmShowVerify(false);
             setShowEmailOtp(true);
-            const res = await verifyEmail(dispatch, {email});
+            const res = await verifyEmail(dispatch, { email });
             setOtpMessage(res);
             setOtpTimer(60);
         } catch (error) {
@@ -89,7 +89,7 @@ const EmailSubscriptionVerify = ({onEmailUpdate, onEmailVerified, onEmailError})
 
         try {
             setIsVerifyingOtp(true);
-            const validateInfo = {customerEmail: email, enteredOTP: mailOtp};
+            const validateInfo = { customerEmail: email, enteredOTP: mailOtp };
             const res = await validateOtp(dispatch, validateInfo);
             setOtpMessage(res);
             setShowEmailOtp(false);
@@ -144,16 +144,16 @@ const EmailSubscriptionVerify = ({onEmailUpdate, onEmailVerified, onEmailError})
                         onChange={(e) => {
                             const inputEmail = e.target.value.toLowerCase();
                             setEmail(inputEmail);
-                            if (inputEmail.length > 1 && inputEmail !== currUserEmail) {
-                                onEmailError(
-                                    "Your email is incorrect, check and provide correct Email to proceed with verification"
-                                );
-                            } else if (
-                                inputEmail.length > 1 &&
-                                inputEmail === currUserEmail
-                            ) {
-                                setEmShowVerify(true);
-                                onEmailError("");
+                            if (isValidEmail(inputEmail)) {
+                                if (inputEmail === currUserEmail) {
+                                    setEmShowVerify(true);
+                                    onEmailError("");
+                                } else {
+                                    onEmailError(
+                                        "Your email is incorrect, check and provide correct Email to proceed with verification"
+                                    );
+                                    setEmShowVerify(false);
+                                }
                             } else {
                                 setEmShowVerify(false);
                                 onEmailError("");
@@ -162,18 +162,18 @@ const EmailSubscriptionVerify = ({onEmailUpdate, onEmailVerified, onEmailError})
                         }}
                         required
                         disabled={isEmailDisabled}
-                        style={{cursor: !isEmailDisabled ? "pointer" : "not-allowed"}}
+                        style={{ cursor: !isEmailDisabled ? "pointer" : "not-allowed" }}
                     />
                     {otpMessage === "OTP verified successfully" ? (
                         <Lottie
                             options={TickMarkOptions}
-                            style={{width: "40px", height: "40px"}}
+                            style={{ width: "40px", height: "40px" }}
                             title="OTP verified successfully"
                         />
                     ) : otpMessage === "Invalid OTP or OTP expired" ? (
                         <Lottie
                             options={CrossMarkOptions}
-                            style={{width: "40px", height: "40px"}}
+                            style={{ width: "40px", height: "40px" }}
                             title="Invalid OTP or OTP expired"
                         />
                     ) : null}
@@ -226,12 +226,12 @@ const EmailSubscriptionVerify = ({onEmailUpdate, onEmailVerified, onEmailError})
                                                         : "Click to verify your OTP"
                                                 }
                                             >
-                                                <Send className="send-icon"/>
+                                                <Send className="send-icon" />
                                             </button>
                                             <span>
-                        OTP Expires in <span className="timer">{otpTimer}</span>{" "}
+                                                OTP Expires in <span className="timer">{otpTimer}</span>{" "}
                                                 seconds
-                      </span>
+                                            </span>
                                         </div>
                                     )}
                                 </div>
@@ -240,11 +240,11 @@ const EmailSubscriptionVerify = ({onEmailUpdate, onEmailVerified, onEmailError})
                     </div>
                 ) : null}
             </div>
-            <p style={{marginBottom: "10px", color: "white"}}>
+            <p style={{ marginBottom: "10px", color: "white" }}>
                 {showSuccessErrorMessage}
             </p>
         </>
     );
-}
+};
 
 export default EmailSubscriptionVerify;

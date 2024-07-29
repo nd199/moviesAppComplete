@@ -1,8 +1,9 @@
-import { paymentRequests, springRequest } from "./AxiosMethods";
-import axios from "axios";
-import { SavePaymentStart, SavePaymentSuccess } from "../redux/PaymentRedux";
-
-const {
+import { paymentRequests, springRequest } from './AxiosMethods';
+import axios from 'axios';
+import {
+  SavePaymentStart,
+  SavePaymentSuccess,
+  SavePaymentFailure,
   userInfoAndSelectedPlanStart,
   userInfoAndSelectedPlanSuccess,
   userInfoAndSelectedPlanFailure,
@@ -12,21 +13,19 @@ const {
   pingStart,
   pingSuccess,
   pingFailure,
-} = require("../redux/PaymentRedux");
+} from '../redux/PaymentRedux';
 
 export const updateFinalUser = async (dispatch, finalUser) => {
   dispatch(updateFinalUserStart());
   try {
-    const res = await paymentRequests.post("/updateFinalUser", { finalUser });
+    const res = await paymentRequests.post('/updateFinalUser', { finalUser });
     dispatch(updateFinalUserSuccess(res.data));
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(updateFinalUserFailure(error.response.data));
     } else {
-      dispatch(
-        updateFinalUserFailure({ error: "An unexpected error occurred" })
-      );
+      dispatch(updateFinalUserFailure({ error: 'An unexpected error occurred' }));
     }
   }
 };
@@ -34,14 +33,14 @@ export const updateFinalUser = async (dispatch, finalUser) => {
 export const pingSpring = async (dispatch, email) => {
   dispatch(pingStart());
   try {
-    const res = await springRequest.post("/pingSpring", {email});
+    const res = await springRequest.post('/pingSpring', { email });
     dispatch(pingSuccess(res.data));
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(pingFailure(error.response.data));
     } else {
-      dispatch(pingFailure({ error: "An unexpected error occurred" }));
+      dispatch(pingFailure({ error: 'An unexpected error occurred' }));
     }
   }
 };
@@ -49,27 +48,18 @@ export const pingSpring = async (dispatch, email) => {
 export const getPaymentDetails = async (dispatch, userId) => {
   dispatch(userInfoAndSelectedPlanStart());
   try {
-    const res = await paymentRequests.get("/paymentDetails", {
-      params: { userId },
-    });
+    const res = await paymentRequests.get('/paymentDetails', { params: { userId } });
     dispatch(userInfoAndSelectedPlanSuccess(res.data));
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(userInfoAndSelectedPlanFailure(error.response.data));
     } else {
-      dispatch(
-        userInfoAndSelectedPlanFailure({
-          error: "An unexpected error occurred",
-        })
-      );
+      dispatch(userInfoAndSelectedPlanFailure({ error: 'An unexpected error occurred' }));
     }
   }
 };
 
-export const saveFinalPayment = async (
-  dispatch,
-  { finalUser, finalPlan, paymentMethod, transactionId }
-) => {
+export const saveFinalPayment = async (dispatch, { finalUser, finalPlan, paymentMethod, transactionId }) => {
   const finalPayment = {
     finalUser: {
       _id: finalUser._id,
@@ -100,18 +90,14 @@ export const saveFinalPayment = async (
   };
   dispatch(SavePaymentStart());
   try {
-    const res = await paymentRequests.post("/submitPayment", { finalPayment });
+    const res = await paymentRequests.post('/submitPayment', { finalPayment });
     dispatch(SavePaymentSuccess(res.data));
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      dispatch(userInfoAndSelectedPlanFailure(error.response.data));
+      dispatch(SavePaymentFailure(error.response.data));
     } else {
-      dispatch(
-        userInfoAndSelectedPlanFailure({
-          error: "An unexpected error occurred",
-        })
-      );
+      dispatch(SavePaymentFailure({ error: 'An unexpected error occurred' }));
     }
   }
 };
