@@ -132,23 +132,23 @@ MoviesApp is an example of an Internet Streaming Service Platform (OTT applicati
 6. Use the payment interface for processing payments.
 
 ## API Endpoints
-### Authentication
+### Authentication(Spring backend)
 - `POST /api/v1/auth/register` - Register a new user
 - `POST /api/v1/auth/login` - Log in a user
 
-### Movies
+### Movies(Spring backend)
 - `GET /api/v1/movies` - Get a list of all movies
 - `POST /api/v1/movies` - Add a new movie (admin only)
 - `PUT /api/v1/movies/{id}` - Update a movie (admin only)
 - `DELETE /api/v1/movies/{id}` - Delete a movie (admin only)
 
-### Bookings
-- `GET /api/v1/users` - Get a list of all bookings (admin only)
-- `GET /api/v1/products` - Create a new booking
+### Bookings(Spring backend)
+- `GET /api/v1/users` - Get a list of all users (admin only)
+- `GET /api/v1/products` - Create a new product (Under development)
 - `POST /api/v1/products` - Add a new product (Movie or Show)
 - `DELETE /api/v1/bookings/{id}` - Delete a product (Movie or Show)
 
-### Payments
+### Payments(Node backend)
 - `POST /api/v1/payments` - Process a payment
 - `GET /api/v1/payments/{id}` - Get payment details
 
