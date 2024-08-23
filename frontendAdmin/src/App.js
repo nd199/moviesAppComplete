@@ -15,9 +15,8 @@ import Register from "./Pages/Register";
 
 function AppContent() {
     const user = useSelector((state) => state?.user);
-    const isRegistered = user?.currentUser?.customerDTO || false;
+    const isRegistered = user?.currentUser?.customerDTO?.isRegistered || false;
     const isLoggedIn = user?.currentUser?.customerDTO?.isLogged || false;
-    console.log(isLoggedIn);
 
     return (
         <>

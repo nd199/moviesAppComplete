@@ -19,7 +19,7 @@ export const passResetRequest = axios.create({
 export const userRequest = () => {
     const persistRoot = localStorage.getItem("persist:root");
     const TOKEN = persistRoot
-        ? JSON.parse(JSON.parse(persistRoot).user)?.currentUser.token
+        ? JSON.parse(JSON.parse(persistRoot).user)?.currentUser?.token
         : null;
 
     return axios.create({

@@ -10,11 +10,11 @@ import { fetchCurrentAdminDetails } from "../redux/ApiCalls";
 
 const Home = () => {
     const dispatch = useDispatch();
-    const user = useSelector((state) => state?.user);
-    const currentUser = user?.currentUser;
-    useEffect(() => {
-      fetchCurrentAdminDetails(dispatch, currentUser?.email);
-    }, [dispatch, currentUser.email]);
+    // const user = useSelector((state) => state?.user);
+    // const currentUser = user?.currentUser;
+    // // useEffect(() => {
+    // //   fetchCurrentAdminDetails(dispatch, currentUser?.email);
+    // // }, [dispatch, currentUser.email]);
 
     const [userStats, setUserStats] = useState([]);
 

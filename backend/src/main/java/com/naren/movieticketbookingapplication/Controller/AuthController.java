@@ -58,7 +58,7 @@ public class AuthController {
         AuthResponse authResponse = authService.login(authRequest);
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION)
-                .body(authResponse.customerDTO());
+                .body(authResponse);
     }
 
 }

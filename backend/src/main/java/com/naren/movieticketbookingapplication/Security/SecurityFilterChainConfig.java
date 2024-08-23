@@ -57,7 +57,7 @@ public class SecurityFilterChainConfig {
                         .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/customers/{id}", "/api/v1/customers/byEmail",
                                 "/api/v1/customers/byPhone", "/api/v1/customers",
-                                "/api/v1/products/AllProducts", "/api/v1/roles", "/api/v1/customers/currentAdmin/*")
+                                "/api/v1/products/AllProducts", "/api/v1/roles", "/api/v1/customers/currentAdmin/{email}")
                         .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/{id}", "/api/v1/roles/{id}")
                         .hasRole("ADMIN")
