@@ -205,12 +205,15 @@ export const updateProfile = async (dispatch, userUpdateInfo, id) => {
   try {
     const res = await publicRequest.put(`/profile/${id}`, userUpdateInfo);
     dispatch(updateUserSuccess(res.data));
+    return { success: true, data: res.data };
   } catch (error) {
     console.error("Error during update:", error);
     if (axios.isAxiosError(error) && error.response) {
       dispatch(updateUserFailure(error.response.data));
+      return { success: false, error: error.response.data };
     } else {
       dispatch(updateUserFailure("An unexpected error occurred"));
+      return { success: false, error: "An unexpected error occurred" };
     }
   }
 };
