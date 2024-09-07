@@ -14,6 +14,7 @@ import Profile from "./Pages/Profile";
 import ForgotPassword from "./Pages/ForgotPassword";
 import { useEffect } from "react";
 import { fetchCurrentUserDetails } from "./Network/ApiCalls";
+import ErrorBoundary from "./ErrorBoundary";
 
 function AppWithNavigation() {
   const dispatch = useDispatch();
@@ -24,57 +25,63 @@ function AppWithNavigation() {
   const isSubscribed = currentUser?.isSubscribed || false;
 
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route
-            path="/"
-            element={isRegistered ? <Home /> : <RegistrationForm />}
-          />
-          <Route
-            path="/Login"
-            element={isLoggedIn ? <Home /> : <LoginForm />}
-          />
-          <Route
-            path="/about"
-            element={isLoggedIn || isRegistered ? <AboutUs /> : <LoginForm />}
-          />
-          <Route
-            path="/movies"
-            element={isLoggedIn || isRegistered ? <Movies /> : <LoginForm />}
-          />
-          <Route
-            path="/shows"
-            element={isLoggedIn || isRegistered ? <Shows /> : <LoginForm />}
-          />
-          <Route
-            path="/vfs"
-            element={isSubscribed ? <VideoFullScreen /> : <Subscription />}
-          />
-          <Route
-            path="/email-verification"
-            element={
-              isLoggedIn || isRegistered ? <EmailVerification /> : <LoginForm />
-            }
-          />
-          <Route
-            path="/subscribe"
-            element={isSubscribed ? <Home /> : <Subscription />}
-          />
-          <Route
-            path="/subscribe"
-            element={
-              isLoggedIn || isRegistered ? <Subscription /> : <LoginForm />
-            }
-          />
-          <Route
-            path="/profile"
-            element={isLoggedIn || isRegistered ? <Profile /> : <LoginForm />}
-          />
-          <Route path="/forgotPassword" element={<ForgotPassword />} />
-        </Routes>
-      </div>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route
+              path="/"
+              element={isRegistered ? <Home /> : <RegistrationForm />}
+            />
+            <Route
+              path="/Login"
+              element={isLoggedIn ? <Home /> : <LoginForm />}
+            />
+            <Route
+              path="/about"
+              element={isLoggedIn || isRegistered ? <AboutUs /> : <LoginForm />}
+            />
+            <Route
+              path="/movies"
+              element={isLoggedIn || isRegistered ? <Movies /> : <LoginForm />}
+            />
+            <Route
+              path="/shows"
+              element={isLoggedIn || isRegistered ? <Shows /> : <LoginForm />}
+            />
+            <Route
+              path="/vfs"
+              element={isSubscribed ? <VideoFullScreen /> : <Subscription />}
+            />
+            <Route
+              path="/email-verification"
+              element={
+                isLoggedIn || isRegistered ? (
+                  <EmailVerification />
+                ) : (
+                  <LoginForm />
+                )
+              }
+            />
+            <Route
+              path="/subscribe"
+              element={isSubscribed ? <Home /> : <Subscription />}
+            />
+            <Route
+              path="/subscribe"
+              element={
+                isLoggedIn || isRegistered ? <Subscription /> : <LoginForm />
+              }
+            />
+            <Route
+              path="/profile"
+              element={isLoggedIn || isRegistered ? <Profile /> : <LoginForm />}
+            />
+            <Route path="/forgotPassword" element={<ForgotPassword />} />
+          </Routes>
+        </div>
+      </Router>
+    </ErrorBoundary>
   );
 }
 
