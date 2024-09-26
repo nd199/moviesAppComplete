@@ -98,6 +98,7 @@
   border: none;
   border-radius: 10px;
   display: flex;
+  font-size: 13px;
   justify-content: center;
   align-items: center;
   flex: 0.2;
