@@ -88,7 +88,7 @@ const ProductInfoAndEdit = () => {
         <div className="productTopRight">
           <div className="productInfoTop">
             <img
-              src={imageUrl || "https://example.com/default-image.jpg"}
+              src={imageUrl && "/images/REGBack.jpg"}
               alt=""
               className="productInfoImage"
             />
@@ -168,7 +168,7 @@ const ProductInfoAndEdit = () => {
           <div className="productFormCentre">
             <h5>{name || product.name}</h5>
             <img
-              src={imageUrl || "https://example.com/default-image.jpg"}
+              src={imageUrl && "/images/REGBack.jpg"}
               alt=""
               className="productUploadImg"
             />

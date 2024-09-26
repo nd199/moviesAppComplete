@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./NavBar.css";
 import Lottie from "react-lottie";
-import popcornAnimation from "../animations/popcorn.json";
+import popcornAnimation from "../Utils/animations/popcorn.json";
 import { ArrowDropDown, Close, Menu, Notifications } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
