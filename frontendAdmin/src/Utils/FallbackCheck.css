@@ -1,0 +1,52 @@
+.fallback-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    text-align: center;
+    font-family: "Arial", sans-serif;
+}
+
+.fallback-image {
+    width: 500px;
+    height: 500px;
+    object-fit: cover;
+}
+
+.fallback-content {
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.fallback-content-title {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.fallback-content-text {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.retry-button {
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #47ff5fe5;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.retry-button:hover {
+    background-color: #e84118;
+    transform: scale(1.05);
+}

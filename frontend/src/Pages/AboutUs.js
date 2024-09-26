@@ -14,7 +14,7 @@ import {
     personalizedOptions,
     streamOptions,
     vastOptions,
-} from "../Components/AboutUsAnimationData";
+} from "../Utils/AnimationData";
 
 const AboutUs = () => {
     return (

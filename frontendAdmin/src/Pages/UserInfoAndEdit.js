@@ -14,6 +14,13 @@ import { fetchUsers, updateUser } from "../redux/ApiCalls";
 import { format } from "date-fns";
 
 const UserInfoAndEdit = () => {
+  const defaultUserPicture = [
+    "https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/christian-buehner-DItYlc26zVI-unsplash.jpg?alt=media&token=f1deb5ac-78ee-4a8f-8337-f9ba956e87ea",
+    "https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/michael-dam-mEZ3PoFGs_k-unsplash.jpg?alt=media&token=1d499901-1596-458c-9f52-6dd9a7c985b2",
+  ];
+  const defaultSelected =
+      defaultUserPicture[Math.floor(Math.random() * defaultUserPicture.length)];
+
   const dispatch = useDispatch();
   const location = useLocation();
   const userId = Number(location.pathname.split("/")[2]);
@@ -80,7 +87,7 @@ const UserInfoAndEdit = () => {
         <div className="uInfo">
           <div className="uInfoContainer">
             <img
-              src={imageUrl || "https://example.com/default-image.jpg"}
+              src={imageUrl || defaultSelected}
               alt=""
               className="userInfoImg"
             />
@@ -174,7 +181,7 @@ const UserInfoAndEdit = () => {
             <div className="uUpRight">
               <div className="uUpRightUpload">
                 <img
-                  src={imageUrl || "https://example.com/default-image.jpg"}
+                  src={imageUrl || defaultSelected}
                   alt=""
                   className="userUpdateImg"
                 />

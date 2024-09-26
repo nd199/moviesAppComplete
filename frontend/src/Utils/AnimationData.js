@@ -1,13 +1,14 @@
-import AboutUsAnimation from "../animations/AboutUs.json";
-import vastAnimation from "../animations/vast.json";
-import offlineAnimation from "../animations/offline.json";
-import AffordAnimation from "../animations/Afford.json";
-import AccessAnimation from "../animations/Access.json";
-import personalizedAnimation from "../animations/personalized.json";
-import streamingAnimation from "../animations/Streaming.json";
-import AdBlock from "../animations/AdBlock.json";
-import parental from "../animations/Parental.json";
-import down from "../animations/download.json";
+import AboutUsAnimation from "./animations/AboutUs.json";
+import vastAnimation from "./animations/vast.json";
+import offlineAnimation from "./animations/offline.json";
+import AffordAnimation from "./animations/Afford.json";
+import AccessAnimation from "./animations/Access.json";
+import personalizedAnimation from "./animations/personalized.json";
+import streamingAnimation from "./animations/Streaming.json";
+import AdBlock from "./animations/AdBlock.json";
+import parental from "./animations/Parental.json";
+import down from "./animations/download.json";
+import Check from "./animations/Check.json";
 
 export const AboutUsOptions = {
     loop: true,
@@ -94,6 +95,16 @@ export const downOption = {
     loop: true,
     autoplay: true,
     animationData: down,
+    rendererSettings: {
+        preserveAspectRatio: "xMidYMid slice",
+    },
+};
+
+
+export const CheckOption = {
+    loop: true,
+    autoplay: true,
+    animationData: Check,
     rendererSettings: {
         preserveAspectRatio: "xMidYMid slice",
     },

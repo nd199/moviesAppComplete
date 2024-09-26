@@ -37,6 +37,7 @@ public class SecurityFilterChainConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
+                        .requestMatchers(HttpMethod.GET, "/ping").permitAll()
                         .requestMatchers("/api/v1/verify/email", "/api/v1/validate/Otp", "/pingSpring",
                                 "/api/v1/customers/currentUser/{email}")
                         .permitAll()

@@ -12,6 +12,46 @@ import NewProduct from "./Pages/NewProduct";
 import Login from "./Pages/Login";
 import {useSelector} from "react-redux";
 import Register from "./Pages/Register";
+import Fallback from "./Utils/FallBackPage";
+import {useEffect, useState} from "react";
+import axios from "axios";
+
+function AppWithHealthCheck() {
+    const [backendStatus, setBackendStatus] = useState('loading');
+
+    const checkBackendStatus = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/ping');
+            if (response.status === 200 && response.data === 'Pong') {
+                setBackendStatus('Up');
+            } else {
+                setBackendStatus('Down');
+            }
+        } catch (err) {
+            setBackendStatus('Down');
+        }
+    };
+
+    useEffect(() => {
+        const checkStatus = async () => {
+            await checkBackendStatus();
+        }
+        checkStatus()
+        const interval = setInterval(checkBackendStatus, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    if (backendStatus === 'loading') {
+        return <div>Checking Backend Health...</div>;
+    }
+
+    if (backendStatus === 'Down') {
+        return <Fallback/>;
+    }
+
+    return <App/>;
+}
+
 
 function AppContent() {
     const user = useSelector((state) => state?.user);
@@ -57,4 +97,4 @@ function App() {
     );
 }
 
-export default App;
+export default AppWithHealthCheck;
