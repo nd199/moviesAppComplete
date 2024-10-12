@@ -5,14 +5,14 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongo:/data/mongov
+      - mongo:/data/db  # Default MongoDB path
     environment:
       - MONGO_INITDB_ROOT_USERNAME=codeNaren
       - MONGO_INITDB_ROOT_PASSWORD=password
 
   db:
     container_name: postgres-mv
-    image: postgres:15
+    image: postgres
     environment:
       POSTGRES_USER: codeNaren
       POSTGRES_PASSWORD: password
@@ -24,8 +24,13 @@ services:
     networks:
       - db
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U codeNaren" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  redis:
+  db_message:
     container_name: redis-mv
     image: redis:latest
     ports:
@@ -34,9 +39,28 @@ services:
       - db
     restart: unless-stopped
 
+  movie_ticket_app:
+    image: codenaren23/movieticket-api
+    container_name: movie_ticket_booking_app
+    ports:
+      - "8080:8080"
+    networks:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/movieott
+      SPRING_DATASOURCE_USERNAME: codeNaren
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_REDIS_URL: jdbc:redis://db_message:6379
+      SPRING_REDIS_HOST: db_message
+      SPRING_REDIS_PORT: 6379
+    depends_on:
+      - db
+      - db_message
+
 networks:
   db:
     driver: bridge
+
 volumes:
   db:
   mongo: { }

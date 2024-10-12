@@ -4,5 +4,4 @@ public record VerifyOtpRequest(
         String customerEmail,
         String enteredOTP
 ) {
-
 }
