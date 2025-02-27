@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const Base_url = "http://localhost:8080/api/v1";
-const BaseAuthUrl = "http://localhost:8080/api/v1/auth";
-const PassAuthUrl = "http://localhost:8080/api/password-reset";
+const Base_url = "https://movieticket-api.onrender.com/api/v1";
+const BaseAuthUrl = "https://movieticket-api.onrender.com/api/v1/auth";
+const PassAuthUrl = "https://movieticket-api.onrender.com/api/password-reset";
 
 export const publicRequest = axios.create({
     baseURL: Base_url,
