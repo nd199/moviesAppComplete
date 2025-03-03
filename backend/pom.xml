@@ -118,7 +118,12 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.30</version>  <!-- Latest version -->
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.12</version>  <!-- Ensure SLF4J is present -->
         </dependency>
         <dependency>
             <groupId>com.github.javafaker</groupId>
@@ -193,6 +198,20 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.30</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
@@ -246,7 +265,9 @@
                 </executions>
                 <configuration>
                     <from>
-                        <image>eclipse-temurin:17@sha256:49f9bff5392fcf25f2d5268858258f1ba36b9f127ab6fe418bb68baf9a9af945</image>
+                        <image>
+                            eclipse-temurin:17@sha256:49f9bff5392fcf25f2d5268858258f1ba36b9f127ab6fe418bb68baf9a9af945
+                        </image>
                         <platforms>
                             <platform>
                                 <architecture>arm64</architecture>
