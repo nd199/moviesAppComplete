@@ -54,7 +54,7 @@ public class EmailService {
 
             Context context = new Context();
             context.setVariable("email", toMail);
-            context.setVariable("resetLink", "http://localhost:3000/forgotPassword?token=" + token);
+            context.setVariable("resetLink", "https://movies-app-complete.vercel.app/forgotPassword?token=" + token);
             String htmlContent = templateEngine.process("password-reset-mail", context);
 
             helper.setText(htmlContent, true);
