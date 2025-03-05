@@ -28,7 +28,7 @@ const EmailVerification = () => {
     if (isVerified && selectedPlan) {
       pushToPaymentModule(dispatch, { currentUser, selectedPlan });
       window.location.reload();
-      window.location.href = `http://localhost:5001/${currentUser.id}`;
+      window.location.href = `https://movies-app-complete-ilnf.vercel.app/${currentUser.id}`;
     }
   }, [isVerified, selectedPlan, currentUser, dispatch]);
 
