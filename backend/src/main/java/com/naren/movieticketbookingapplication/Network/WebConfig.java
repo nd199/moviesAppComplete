@@ -15,7 +15,9 @@ public class WebConfig implements WebMvcConfigurer {
         log.info("Adding CORS");
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000", "http://localhost:3006","http://localhost:5001",
-                        "https://movies-app-complete.vercel.app/", "https://movies-app-complete-gmco.vercel.app/", "https://movies-app-complete-payment.vercel.app/")
+                        "https://movies-app-complete.vercel.app/", "https://movies-app-complete-gmco.vercel.app/",
+                        "https://movies-app-complete-payment.vercel.app/", "https://movieticket-api.onrender.com"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
