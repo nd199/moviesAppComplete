@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const BASEURL = "https://movieticket-api.onrender.com/";
-const baseURL = "https://moviesappcomplete.onrender.com/"
+const BASEURL = "https://moviesappcomplete.onrender.com/";
+const baseURL = "https://movieticket-api.onrender.com"
 
 export const paymentRequests = axios.create({
     baseURL: BASEURL
