@@ -30,7 +30,6 @@ const EmailVerification = () => {
       window.location.reload();
       window.location.href = `https://movies-app-complete-payment.vercel.app/${currentUser.id}`;
     }
-
   }, [isVerified, selectedPlan, currentUser, dispatch]);
 
   return (

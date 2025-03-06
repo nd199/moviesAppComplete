@@ -186,7 +186,7 @@ export const pushToPaymentModule = async (dispatch, userPaymentInfo) => {
   dispatch(pushToPaymentStart());
   try {
     const res = await axios.post(
-      "https://movies-app-complete-payment.vercel.app/api/auth/payment",
+      "https://moviesappcomplete.onrender.com/api/auth/payment",
       userPaymentInfo
     );
     dispatch(pushToPaymentSuccess(res.data));
@@ -262,5 +262,3 @@ export const updatePasswordAndPushToLoginPage = async (dispatch, data) => {
     }
   }
 };
-
-
