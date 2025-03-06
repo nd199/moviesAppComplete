@@ -186,7 +186,7 @@ export const pushToPaymentModule = async (dispatch, userPaymentInfo) => {
   dispatch(pushToPaymentStart());
   try {
     const res = await axios.post(
-      "https://movies-app-complete-ilnf.vercel.app/api/auth/payment",
+      "https://movies-app-complete-payment.vercel.app/api/auth/payment",
       userPaymentInfo
     );
     dispatch(pushToPaymentSuccess(res.data));
