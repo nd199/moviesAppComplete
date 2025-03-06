@@ -126,5 +126,5 @@ mongoose
   .catch((err) => console.error("Failed to connect to MongoDB", err));
 
 app.listen(port, () => {
-  console.log(`App listening on {port}`);
+  console.log(`App listening`);
 });
