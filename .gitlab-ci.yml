@@ -1,0 +1,103 @@
+stages:
+  - build
+  - test
+  - deploy
+
+# 🌟 Build React Frontend
+build-react:
+  stage: build
+  image: node:18
+  script:
+    - cd frontend
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/build
+  only:
+    - main
+
+# 🌟 Build Node.js Backend
+build-node:
+  stage: build
+  image: node:18
+  script:
+    - cd backend-node
+    - npm install
+  only:
+    - main
+
+# 🌟 Build Spring Boot Backend
+build-springboot:
+  stage: build
+  image: maven:3.8.6-openjdk-17
+  script:
+    - cd backend-springboot
+    - mvn clean package
+  artifacts:
+    paths:
+      - backend-springboot/target/*.jar
+  only:
+    - main
+
+# 🔍 Test React Frontend
+test-react:
+  stage: test
+  image: node:18
+  script:
+    - cd frontend
+    - npm test
+  only:
+    - main
+
+# 🔍 Test Node.js Backend
+test-node:
+  stage: test
+  image: node:18
+  script:
+    - cd backend-node
+    - npm test
+  only:
+    - main
+
+# 🔍 Test Spring Boot Backend
+test-springboot:
+  stage: test
+  image: maven:3.8.6-openjdk-17
+  script:
+    - cd backend-springboot
+    - mvn test
+  only:
+    - main
+
+# 🚀 Deploy React Frontend (to Firebase/Vercel)
+deploy-react:
+  stage: deploy
+  image: node:18
+  script:
+    - cd frontend
+    - npm install -g vercel
+    - vercel --token $VERCEL_TOKEN --prod
+  only:
+    - main
+
+# 🚀 Deploy Node.js Backend (to Render/Heroku)
+deploy-node:
+  stage: deploy
+  image: node:18
+  script:
+    - cd backend-node
+    - npm install -g pm2
+    - pm2 start index.js
+  only:
+    - main
+
+# 🚀 Deploy Spring Boot Backend (to AWS/Heroku)
+deploy-springboot:
+  stage: deploy
+  image: maven:3.8.6-openjdk-17
+  script:
+    - cd backend-springboot
+    - java -jar target/*.jar
+  only:
+    - main
