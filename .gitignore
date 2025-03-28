@@ -19,3 +19,5 @@ backend/target/
 backend/movieticketbookingapplication.iml
 
 >>>>>>> 4ee0c34 (backend and frontend ready just merging mut be done)
+# React Component Preview
+previewConfig.json

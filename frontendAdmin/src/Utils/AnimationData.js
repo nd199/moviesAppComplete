@@ -1,4 +1,5 @@
-import Check from './animations/Check.json'
+import Check from './animations/Check.json';
+import SLoad from './animations/SLoad.json';
 
 
 export const CheckOption = {
@@ -8,4 +9,13 @@ export const CheckOption = {
     rendererSettings: {
         preserveAspectRatio: "xMidYMid slice",
     },
+};
+
+export const ServerConnectingOptions = {
+  loop: true,
+  autoplay: true,
+  animationData: SLoad,
+  rendererSettings: {
+    preserveAspectRatio: "xMidYMid slice",
+  },
 };
