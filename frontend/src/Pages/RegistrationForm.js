@@ -143,156 +143,154 @@ const Register = () => {
 
     return (
         <div className="register_Admin">
-            <div>
-                <div className="regisCard">
-                    <div className="image-container">
-                        <div className="rg--title">
-                            <h1>R E G I S T E R</h1>
-                        </div>
-                        <div className="upload-section">
-                            <label htmlFor="avatar" className="upload-label">
-                                Upload Avatar
-                            </label>
+            <div className="regisCard">
+                <div className="image-container">
+                    <div className="rg--title">
+                        <h1 className="rg--title-heading">R E G I S T E R</h1>
+                    </div>
+                    <div className="upload-section">
+                        <label htmlFor="avatar" className="upload-label">
+                            Upload Avatar
+                        </label>
+                        <input
+                            type="file"
+                            id="avatar"
+                            name="avatar"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="input"
+                            required
+                        />
+                        {avatarPreview && (
+                            <img
+                                src={avatarPreview}
+                                alt="Avatar Preview"
+                                className="avatar-preview"
+                            />
+                        )}
+                        <Box sx={{width: "100%"}}>
+                            <LinearProgress
+                                variant="determinate"
+                                value={uploadProgress}
+                                style={{
+                                    height: "10px",
+                                    borderRadius: "5px",
+                                    marginBottom: "10px",
+                                }}
+                            />
+                        </Box>
+                    </div>
+                    <div className="inputs">
+                        <label htmlFor="name">ADDRESS :</label>
+                        <input
+                            type="text"
+                            id="address"
+                            placeholder="Chennai, India"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            required
+                        />
+                    </div>
+                </div>
+                <form onSubmit={registerHandler} className="reg-form">
+                    <div className="inputs">
+                        <label htmlFor="name">NAME :</label>
+                        <input
+                            type="text"
+                            id="name"
+                            placeholder="John-Cena"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <EmailVerifyUser
+                        onEmailUpdate={handleEmailChange}
+                        onEmailVerified={handleEmailVerified}
+                    />
+                    <div className="inputs">
+                        <label htmlFor="phoneNumber">PHONE NUMBER :</label>
+                        <input
+                            type="tel"
+                            id="phoneNumber"
+                            inputMode="tel"
+                            placeholder="(+91) (123 - 456 - 789)"
+                            pattern="[+][0-9]{1,4}[0-9]{7,12}"
+                            value={phoneNumber}
+                            onChange={handlePhoneNumberChange}
+                            required
+                        />
+                        {phoneError && <p className="error">{phoneError}</p>}
+                    </div>
+                    <div className="inputs">
+                        <label className="lblPassword" htmlFor="password">
+                            PASSWORD :
+                        </label>
+                        <div className="passInput">
                             <input
-                                type="file"
-                                id="avatar"
-                                name="avatar"
-                                accept="image/*"
-                                onChange={handleFileChange}
-                                className="input"
+                                type="password"
+                                id="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
-                            {avatarPreview && (
-                                <img
-                                    src={avatarPreview}
-                                    alt="Avatar Preview"
-                                    className="avatar-preview"
+                            {password && (
+                                <PasswordStrengthBar
+                                    scoreWordStyle={{fontSize: "17px"}}
+                                    style={{height: "20px"}}
+                                    password={password}
                                 />
                             )}
-                            <Box sx={{width: "100%"}}>
-                                <LinearProgress
-                                    variant="determinate"
-                                    value={uploadProgress}
-                                    style={{
-                                        height: "10px",
-                                        borderRadius: "5px",
-                                        marginBottom: "10px",
-                                    }}
-                                />
-                            </Box>
-                        </div>
-                        <div className="inputs">
-                            <label htmlFor="name">ADDRESS :</label>
-                            <input
-                                type="text"
-                                id="address"
-                                placeholder="Chennai, India"
-                                value={address}
-                                onChange={(e) => setAddress(e.target.value)}
-                                required
-                            />
                         </div>
                     </div>
-                    <form onSubmit={registerHandler} className="reg-form">
-                        <div className="inputs">
-                            <label htmlFor="name">NAME :</label>
+                    <div className="inputs">
+                        <label className="lblPassword" htmlFor="confirmPassword">
+                            CONFIRM PASSWORD :
+                        </label>
+                        <div className="passInput">
                             <input
-                                type="text"
-                                id="name"
-                                placeholder="John-Cena"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                type="password"
+                                id="confirmPassword"
+                                placeholder="Confirm Password"
+                                value={confirmPassword}
+                                onChange={handleConfirmPasswordChange}
                                 required
                             />
+                            {confirmPassword && (
+                                <p
+                                    style={{
+                                        fontSize: "17px",
+                                        marginTop: "10px",
+                                        color:
+                                            password === confirmPassword ? "lightGreen" : "red",
+                                    }}
+                                >
+                                    {matchText}
+                                </p>
+                            )}
                         </div>
-                        <EmailVerifyUser
-                            onEmailUpdate={handleEmailChange}
-                            onEmailVerified={handleEmailVerified}
-                        />
-                        <div className="inputs">
-                            <label htmlFor="phoneNumber">PHONE NUMBER :</label>
-                            <input
-                                type="tel"
-                                id="phoneNumber"
-                                inputMode="tel"
-                                placeholder="(+91) (123 - 456 - 789)"
-                                pattern="[+][0-9]{1,4}[0-9]{7,12}"
-                                value={phoneNumber}
-                                onChange={handlePhoneNumberChange}
-                                required
-                            />
-                            {phoneError && <p className="error">{phoneError}</p>}
-                        </div>
-                        <div className="inputs">
-                            <label className="lblPassword" htmlFor="password">
-                                PASSWORD :
-                            </label>
-                            <div className="passInput">
-                                <input
-                                    type="password"
-                                    id="password"
-                                    placeholder="Password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                                {password && (
-                                    <PasswordStrengthBar
-                                        scoreWordStyle={{fontSize: "17px"}}
-                                        style={{height: "20px"}}
-                                        password={password}
-                                    />
-                                )}
-                            </div>
-                        </div>
-                        <div className="inputs">
-                            <label className="lblPassword" htmlFor="confirmPassword">
-                                CONFIRM PASSWORD :
-                            </label>
-                            <div className="passInput">
-                                <input
-                                    type="password"
-                                    id="confirmPassword"
-                                    placeholder="Confirm Password"
-                                    value={confirmPassword}
-                                    onChange={handleConfirmPasswordChange}
-                                    required
-                                />
-                                {confirmPassword && (
-                                    <p
-                                        style={{
-                                            fontSize: "17px",
-                                            marginTop: "10px",
-                                            color:
-                                                password === confirmPassword ? "lightGreen" : "red",
-                                        }}
-                                    >
-                                        {matchText}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                        {error && <div className="error" style={{color: "red"}}>{error}</div>}
-                        {lError && <div className="error" style={{color: "red"}}>{lError}</div>}
-                        <p style={{color: "white"}}>
-                            {!isEmailVerified ? "Verify Your Email To continue" : ""}
-                        </p>
-                        <button
-                            className="RegisterButton"
-                            type="submit"
-                            disabled={!isEmailVerified}
-                        >
-                            R E G I S T E R
-                        </button>
-                        <p className="text"
-                           style={{color: "white", fontSize: "18px", marginTop: "10px", marginBottom: "-40px"}}>
-                            Have an Account ?
-                            <Link className="Login--link" to="/login" style={{color: "orange"}}>
-                                {"  "}L O G I N
-                            </Link>
-                        </p>
-                    </form>
-                </div>
+                    </div>
+                    {error && <div className="error" style={{color: "red"}}>{error}</div>}
+                    {lError && <div className="error" style={{color: "red"}}>{lError}</div>}
+                    <p style={{color: "white"}}>
+                        {!isEmailVerified ? "Verify Your Email To continue" : ""}
+                    </p>
+                    <button
+                        className="RegisterButton"
+                        type="submit"
+                        disabled={!isEmailVerified}
+                    >
+                        R E G I S T E R
+                    </button>
+                    <p className="text last-text"
+                       style={{color: "white", fontSize: "18px", marginTop: "10px", marginBottom: "-40px"}}>
+                        Have an Account ?
+                        <Link className="Login--link" to="/login" style={{color: "orange"}}>
+                            {"  "}L O G I N
+                        </Link>
+                    </p>
+                </form>
             </div>
         </div>
     );

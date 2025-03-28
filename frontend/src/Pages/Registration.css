@@ -199,28 +199,77 @@
 }
 
 @media (max-width: 768px) {
-    .regisCard {
-        flex-direction: column;
-        width: 90%;
-        height: auto;
-    }
-
-    .regisCard .image-container,
-    .regisCard .reg-form {
-        flex: none;
+    .register_Admin {
         width: 100%;
-        padding: 10px;
+        height: 100vh;
     }
 
-    .regisCard h1 {
-        font-size: 36px;
+    .regisCard {
+        width: 100%;
+        height: 100%;
+    }
+
+    .rg--title {
+        width: 100%;
+    }
+
+    .rg--title h1 {
+        font-size: 56px;
+    }
+}
+
+@media (max-width: 640px) {
+    .register_Admin {
+        width: 100%;
+        height: auto;
+        padding: 20px 10px;
+        overflow: scroll;
+        scroll-behavior: smooth;
+    }
+
+    rg--title-heading {
+        font-size: 80px;
+    }
+
+    .regisCard {
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .rg--title h1 {
+        font-size: 20px;
     }
 
     .inputs label {
-        font-size: 16px;
+        font-size: 15px;
     }
 
-    .verify-button {
-        font-size: 16px;
+    .inputs::placeholder {
+        font-size: 14px;
+    }
+
+    .last-text {
+        font-size: 18px;
+    }
+}
+
+
+@media (max-width: 340px) {
+
+    .register_Admin {
+        padding: 0;
+    }
+
+    .regisCard {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        padding-bottom: 10px;
+    }
+
+    .inputs input {
+        width: 100%;
     }
 }
