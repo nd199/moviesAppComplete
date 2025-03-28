@@ -138,8 +138,8 @@
         padding: 0 15px;
     }
 
-    .title {
-        font-size: 30px;
+    .logo .title {
+        font-size: 20px;
     }
 
     .nav-links {
@@ -175,8 +175,7 @@
     }
 }
 
-/* Medium Phones (481px - 768px) */
-@media (min-width: 481px) and (max-width: 768px) {
+@media (max-width: 768px) {
     .nav-wrapper {
         padding: 0 20px;
     }

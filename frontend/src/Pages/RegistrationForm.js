@@ -283,8 +283,7 @@ const Register = () => {
                     >
                         R E G I S T E R
                     </button>
-                    <p className="text last-text"
-                       style={{color: "white", fontSize: "18px", marginTop: "10px", marginBottom: "-40px"}}>
+                    <p className="last-text">
                         Have an Account ?
                         <Link className="Login--link" to="/login" style={{color: "orange"}}>
                             {"  "}L O G I N
