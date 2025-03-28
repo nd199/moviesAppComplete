@@ -11,7 +11,9 @@ const Fallback = () => {
           <Lottie options={CheckOption} />
         </div>
         <h1 className="fallback-content-title">⚠️ Service Unavailable</h1>
-        <p className="fallback-content-text">It seems the server is down. Please try again later.</p>
+        <p className="fallback-content-text">
+          It seems the server is down. Please try again later.
+        </p>
         <button
           className="retry-button"
           onClick={() => window.location.reload()}

@@ -42,7 +42,9 @@ public class CustomerServiceImpl implements CustomerService {
     private final JwtUtil jwtUtil;
     private final OtpService otpService;
 
-    public CustomerServiceImpl(CustomerDao customerDao, PasswordEncoder passwordEncoder, CustomerDTOMapper customerDTOMapper, RoleService roleService, MovieDao movieDao, JwtUtil jwtUtil, OtpService otpService) {
+    public CustomerServiceImpl(CustomerDao customerDao, PasswordEncoder passwordEncoder,
+                               CustomerDTOMapper customerDTOMapper, RoleService roleService,
+                               MovieDao movieDao, JwtUtil jwtUtil, OtpService otpService) {
         this.customerDao = customerDao;
         this.passwordEncoder = passwordEncoder;
         this.customerDTOMapper = customerDTOMapper;

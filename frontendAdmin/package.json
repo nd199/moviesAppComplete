@@ -58,6 +58,7 @@
     ]
   },
   "devDependencies": {
-    "@types/react-lottie": "^1.2.10"
+    "@types/react-lottie": "^1.2.10",
+    "postcss-normalize": "^13.0.1"
   }
 }
