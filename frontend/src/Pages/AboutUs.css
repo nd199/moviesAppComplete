@@ -47,7 +47,6 @@
 }
 
 .aboutUsImage {
-    width: 750px;
     width: 100%;
 }
 
@@ -137,4 +136,112 @@
 .aboutUs__animations .aboutUs__animation {
     max-width: 250px;
     width: 100%;
+}
+
+@media screen and (max-width: 1240px) {
+    .aboutContainer {
+        max-width: 95%;
+        margin: 20px auto;
+    }
+
+    .aboutDesc {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .aboutUsText {
+        width: 90%;
+    }
+
+    .aboutUsImage {
+        max-width: 500px;
+    }
+
+    .offer-card {
+        width: calc(50% - 20px);
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .aboutContainer {
+        padding: 15px;
+    }
+
+    .aboutUsText {
+        font-size: 18px;
+    }
+
+    .offer-card {
+        width: calc(50% - 15px);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .aboutContainer {
+        padding: 10px;
+        gap: 30px;
+    }
+
+    .aboutUsText {
+        width: 100%;
+        font-size: 17px;
+    }
+
+    .about-container h2 {
+        font-size: 28px;
+    }
+
+    .offer-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .offer-card {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .aboutContainer > h1 {
+        font-size: 36px;
+    }
+
+    .about-container h2 {
+        font-size: 24px;
+    }
+
+    .about-container p {
+        font-size: 16px;
+    }
+
+    .offer-card h3 {
+        font-size: 20px;
+    }
+
+    .offer-card p {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 320px) {
+    .aboutContainer > h1 {
+        font-size: 28px;
+    }
+
+    .about-container h2 {
+        font-size: 22px;
+    }
+
+    .about-container p {
+        font-size: 14px;
+    }
+
+    .offer-card h3 {
+        font-size: 18px;
+    }
+
+    .offer-card p {
+        font-size: 12px;
+    }
 }
