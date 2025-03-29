@@ -22,36 +22,35 @@ const Featured = () => {
 
     return (
         <div className="featured">
-            <div className="slider-container">
-                <div className="sliderWrapper">
-                    <div className="video">
-                        {isLoading && (
-                            <div className="loader">
-                                <ThreeDots color="#fff" height={80} width={80}/>
-                            </div>
-                        )}
-                        <VideoComponent
-                            className="videoFeature"
-                            filePath={filepath}
-                            isMuted={isMuted}
-                            onLoadedData={handleLoadedData}
-                        />
-                    </div>
-                    <div className="info">
-                        <div className="info-top">
-                            <h1>John Wick 4 (2023)</h1>
-                            {more && <button
-                                style={{
-                                    width: "15px",
-                                    height: "15px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center"
-                                }}
-                                onClick={() => setMore(!more)}>X
-                            </button>}
+            <div className="sliderWrapper">
+                <div className="video">
+                    {isLoading && (
+                        <div className="loader">
+                            <ThreeDots color="#fff" height={80} width={80}/>
                         </div>
-                        <span className="desc">
+                    )}
+                    <VideoComponent
+                        className="videoFeature"
+                        filePath={filepath}
+                        isMuted={isMuted}
+                        onLoadedData={handleLoadedData}
+                    />
+                </div>
+                <div className="info">
+                    <div className="info-top">
+                        <h1>John Wick 4 (2023)</h1>
+                        {more && <button
+                            style={{
+                                width: "15px",
+                                height: "15px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                            }}
+                            onClick={() => setMore(!more)}>X
+                        </button>}
+                    </div>
+                    <span className="desc">
                               An action-packed thriller that follows the legendary hitman John
                               Wick (Keanu Reeves) as he continues his relentless quest for
                               freedom. With the bounty on his head ever-increasing, Wick faces
@@ -62,7 +61,7 @@ const Featured = () => {
                               the franchise's mythology and delivers exhilarating action and
                               suspense.
                         </span>
-                        {more && <span className="desc-more">
+                    {more && <span className="desc-more">
                               An action-packed thriller that follows the legendary hitman John
                               Wick (Keanu Reeves) as he continues his relentless quest for
                               freedom. With the bounty on his head ever-increasing, Wick faces
@@ -73,27 +72,26 @@ const Featured = () => {
                               the franchise's mythology and delivers exhilarating action and
                               suspense.
                         </span>}
-                        {!more && <span className="short-desc" style={{display: "none"}}>
+                    {!more && <span className="short-desc" style={{display: "none"}}>
                             An action-packed thriller that follows the legendary hitman John
                             Wick (Keanu Reeves) as he continues his relentless quest for
                             freedom. <button onClick={() => setMore(true)}>More...</button>
                         </span>}
-                        <div className="buttons">
-                            <button className="watchBtn">
-                                <PlayArrowOutlined/>
-                                <p className="btns-text">Watch</p>
-                            </button>
-                            <button className="watchListBtn">
-                                <AddToQueueOutlined/>
-                                <p className="btns-text"><span className="sm-screen">Add to</span> WatchList</p>
-                            </button>
-                            <button className="audioBtn"
-                                    onClick={() => toggleAudioHandler()}>
-                                {isMuted ? <VolumeOff/> : <VolumeUp/>}
-                                {isMuted ? <p className="btns-text">UnMute</p> :
-                                    <p className="btns-text">Mute</p>}
-                            </button>
-                        </div>
+                    <div className="buttons">
+                        <button className="watchBtn">
+                            <PlayArrowOutlined/>
+                            <p className="btns-text">Watch</p>
+                        </button>
+                        <button className="watchListBtn">
+                            <AddToQueueOutlined/>
+                            <p className="btns-text"><span className="sm-screen">Add to</span> WatchList</p>
+                        </button>
+                        <button className="audioBtn"
+                                onClick={() => toggleAudioHandler()}>
+                            {isMuted ? <VolumeOff/> : <VolumeUp/>}
+                            {isMuted ? <p className="btns-text">UnMute</p> :
+                                <p className="btns-text">Mute</p>}
+                        </button>
                     </div>
                 </div>
             </div>
