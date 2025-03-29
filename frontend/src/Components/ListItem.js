@@ -14,9 +14,7 @@ const ListItem = ({
   name,
   desc,
   year,
-  img,
   ageRating,
-  cost,
   rating,
   runtime,
   genre,
@@ -51,7 +49,7 @@ const ListItem = ({
                     type="video/mp4"
                   />
                 </video>
-                <p className="trailer-p">Trailer</p>
+                <p className="trailer-p">Preview</p>
                 <button className="audio-toggle-button" onClick={toggleAudio}>
                   {isMuted ? <VolumeOff /> : <VolumeUp />}
                 </button>
