@@ -1,11 +1,12 @@
 :root {
     --text-color: #fff;
-    --main-color: #000; /* Add a main color */
+    --main-color: #000;
 }
 
 .nav-bar {
     width: 100%;
     height: 80px;
+    margin-bottom: 20px;
     background: transparent;
     position: fixed;
     top: 0;
@@ -132,7 +133,6 @@
     font-size: 30px;
 }
 
-/* Small Phones (360px - 480px) */
 @media (max-width: 480px) {
     .nav-wrapper {
         padding: 0 15px;
@@ -213,7 +213,6 @@
     }
 }
 
-/* Tablets (769px - 992px) */
 @media (min-width: 769px) and (max-width: 992px) {
     .nav-wrapper {
         padding: 0 25px;
@@ -240,7 +239,6 @@
     }
 }
 
-/* Small Laptops (993px - 1200px) */
 @media (min-width: 993px) and (max-width: 1200px) {
     .nav-wrapper {
         padding: 0 30px;

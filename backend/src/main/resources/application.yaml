@@ -7,49 +7,5 @@ spring:
   mvc:
     static-path-pattern: /**
 
-  datasource:
-    url: ${POSTGRES_URL}
-    username: ${POSTGRES_USERNAME}
-    password: ${POSTGRES_PASSWORD}
-
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-    show-sql: true
-
-  main:
-    web-application-type: servlet
-
-
-  mail:
-    host: ${SMTP_HOST}
-    port: ${SMTP_PORT}
-    username: ${SMTP_USERNAME} #Please provide your Google app acc email
-    password: ${SMTP_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: ${SMTP_AUTH}
-          starttls:
-            enable: ${SMTP_STARTTLS}
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      username: ${REDIS_USERNAME}
-      password: ${REDIS_PASSWORD}
-
-logging:
-  level:
-    web: debug
-    sql: debug
-    org:
-      springframework:
-        security: debug
+  profiles:
+    active: dev
