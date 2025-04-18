@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface MovieDao {
 
-    void addMovie(Movie movie);
+    Movie addMovie(Movie movie);
 
     Movie findByName(String name);
 

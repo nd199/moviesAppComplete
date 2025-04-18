@@ -21,10 +21,11 @@ public class MovieDaoImpl implements MovieDao {
     }
 
     @Override
-    public void addMovie(Movie movie) {
+    public Movie addMovie(Movie movie) {
         log.info("Adding movie: {}", movie);
-        movieRepository.save(movie);
+        Movie savedMovie = movieRepository.save(movie);
         log.info("Movie added successfully: {}", movie);
+        return savedMovie;
     }
 
     @Override

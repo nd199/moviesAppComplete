@@ -6,6 +6,5 @@ server:
 spring:
   mvc:
     static-path-pattern: /**
-
   profiles:
     active: dev

@@ -20,11 +20,13 @@ public class ShowDaoImpl implements ShowDao {
         this.showRepository = showRepository;
     }
 
+
     @Override
-    public void addShow(Show show) {
+    public Show addShow(Show show) {
         log.info("Adding show: {}", show);
-        showRepository.save(show);
+        Show saved =  showRepository.save(show);
         log.info("Show added successfully: {}", show);
+        return saved;
     }
 
     @Override

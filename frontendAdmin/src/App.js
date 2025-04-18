@@ -28,7 +28,7 @@ function AppWithHealthCheck() {
   const checkBackendStatus = async () => {
     try {
       const response = await axios.get(
-        "https://movieticket-api.onrender.com/ping"
+        "http://localhost:8080/ping"
       );
       if (response.status === 200 && response.data === "Pong") {
         setBackendStatus("Up");

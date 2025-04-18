@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ShowDao {
-    void addShow(Show show);
+    Show addShow(Show show);
 
     void removeShow(Show show);
 

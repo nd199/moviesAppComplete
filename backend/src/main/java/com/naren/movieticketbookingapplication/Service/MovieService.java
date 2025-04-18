@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface MovieService {
 
-    void addMovie(MovieRegistration registration);
+    Movie addMovie(MovieRegistration registration);
 
     void removeMovie(Long id);
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ShowService {
 
-    void addShow(ShowRegistration registration);
+    Show addShow(ShowRegistration registration);
 
     void removeShow(Long id);
 

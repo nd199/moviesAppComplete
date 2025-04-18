@@ -25,7 +25,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public void addMovie(MovieRegistration registration) {
+    public Movie addMovie(MovieRegistration registration) {
         log.info("Creating movie: {}", registration);
         Movie movie = createMovie(registration);
         if (movieDao.existsByName(registration.name())) {
@@ -33,8 +33,9 @@ public class MovieServiceImpl implements MovieService {
             log.error(errorMessage, registration.name());
             throw new ResourceAlreadyExists(errorMessage);
         }
-        movieDao.addMovie(movie);
+        Movie savedMovie = movieDao.addMovie(movie);
         log.info("Movie added successfully: {}", movie);
+        return savedMovie;
     }
 
     private Movie createMovie(MovieRegistration registration) {

@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.RoleNotFoundException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -105,12 +106,10 @@ public class CustomerServiceImpl implements CustomerService {
                 Role role = roleService.findRoleByName(roleName);
                 if (role == null) {
                     log.error("Role not found: {}", roleName);
-                    return ResponseEntity.badRequest().body("Role " + roleName + " not found");
+                    throw new RoleNotFoundException("Role " + roleName + " not found");
                 }
                 roles.add(role);
-                if(role.getName().equals("ROLE_ADMIN")){
-                    registeredCustomer.setAddress("CN.io, Inc.");
-                }
+                applyAdminDefaults(registeredCustomer, roles);
             }
 
             roles.forEach(registeredCustomer::addRole);
@@ -128,6 +127,9 @@ public class CustomerServiceImpl implements CustomerService {
                     .body(customerDTO);
         } catch (InvalidRegistration e) {
             log.error("Registration failed: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RoleNotFoundException e) {
+            log.error("Role assignment failed: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -154,7 +156,7 @@ public class CustomerServiceImpl implements CustomerService {
                 customerRegistration.email().toLowerCase(),
                 passwordEncoder.encode(customerRegistration.password()),
                 customerRegistration.phoneNumber(),
-                false, false, false, customerRegistration.address() ,false);
+                false, false, false, customerRegistration.address(), false);
     }
 
     private boolean validatePassword(String password, String name, String email, Long phoneNumber) {
@@ -174,6 +176,12 @@ public class CustomerServiceImpl implements CustomerService {
                     "not contain personal info [Name,Email,Phone] ");
         }
         return false;
+    }
+
+    private void applyAdminDefaults(Customer registeredCustomer, Set<Role> roles) {
+        if (roles.stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getName()))) {
+            registeredCustomer.setAddress("CN.io, Inc.");
+        }
     }
 
     @Override
@@ -211,7 +219,6 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setEmail(request.email());
             changes = true;
         }
-
 
 
         if (request.phoneNumber() != null && !request.phoneNumber().equals(customer.getPhoneNumber())) {

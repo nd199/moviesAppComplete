@@ -23,7 +23,7 @@ public class ShowServiceImpl implements ShowService {
     }
 
     @Override
-    public void addShow(ShowRegistration registration) {
+    public Show addShow(ShowRegistration registration) {
         log.info("Creating show: {}", registration);
         Show show = createShow(registration);
         if (showDao.existsByName(registration.name())) {
@@ -31,8 +31,9 @@ public class ShowServiceImpl implements ShowService {
             log.error(errorMessage, registration.name());
             throw new ResourceAlreadyExists(errorMessage);
         }
-        showDao.addShow(show);
+        Show saved = showDao.addShow(show);
         log.info("Show added successfully: {}", show);
+        return saved;
     }
 
     private Show createShow(ShowRegistration registration) {

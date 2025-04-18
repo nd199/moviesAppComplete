@@ -3,12 +3,14 @@ package com.naren.movieticketbookingapplication.Exception.ApiError;
 import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.management.relation.RoleNotFoundException;
 import java.time.LocalDateTime;
 
 import static org.springframework.http.HttpStatus.*;
@@ -71,5 +73,10 @@ public class DefaultExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(apiError, INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<String> handleRoleNotFound(RoleNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }
