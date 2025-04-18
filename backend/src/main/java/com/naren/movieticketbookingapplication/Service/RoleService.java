@@ -22,6 +22,10 @@ public class RoleService {
         }
     }
 
+    void setAddress(String RoleName) {
+
+    }
+
     Role findRoleById(Long roleId) {
         return roleRepository.findById(roleId).orElse(null);
     }

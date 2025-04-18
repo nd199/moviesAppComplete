@@ -90,11 +90,7 @@ export const fetchProducts = async (dispatch) => {
   try {
     const res = await userRequest().get("/products/AllProducts");
     const products = [...res.data.movies, ...res.data.shows];
-    const productsWithId = products.map((product, index) => ({
-      ...product,
-      id: index + 1,
-    }));
-    dispatch(fetchProductsSuccess(productsWithId));
+    dispatch(fetchProductsSuccess(products));
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       dispatch(fetchProductsFailure(error.response.data));
@@ -151,7 +147,7 @@ export const addProduct = async (product, dispatch) => {
       dispatch(addProductsFailure({ error: "An unexpected error occurred" }));
     }
   }
-  fetchProducts();
+  fetchProducts(dispatch);
 };
 
 // Update User
