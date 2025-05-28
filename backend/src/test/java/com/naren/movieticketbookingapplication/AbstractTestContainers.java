@@ -14,6 +14,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class AbstractTestContainers {
 
     protected static final Faker FAKER = new Faker();
+
     @Container
     protected static final PostgreSQLContainer<?> postgresContainer =
             new PostgreSQLContainer<>("postgres:15")

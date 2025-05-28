@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Slf4j
 public class AlgorithmNotSupportedException extends RuntimeException {
 
-
     public AlgorithmNotSupportedException(String message) {
         super(message);
         log.error("AlgorithmNotSupportedException: {}", message);

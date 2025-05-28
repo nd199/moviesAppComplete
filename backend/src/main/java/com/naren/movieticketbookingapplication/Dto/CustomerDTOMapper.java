@@ -3,11 +3,8 @@ package com.naren.movieticketbookingapplication.Dto;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
-
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

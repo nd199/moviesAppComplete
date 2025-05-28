@@ -54,7 +54,6 @@ public class JwtUtil {
 
     public String issueToken(String subject, Set<Role> roles) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("subject", subject);
         claims.put("roles", roles);
 
         return Jwts
