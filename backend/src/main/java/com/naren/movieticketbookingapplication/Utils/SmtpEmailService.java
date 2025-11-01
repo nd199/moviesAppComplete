@@ -12,7 +12,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 @Profile("local")
 @Service
-public class SmtpEmailService implements EmailSender {
+public class SmtpEmailService implements EmailService {
 
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;

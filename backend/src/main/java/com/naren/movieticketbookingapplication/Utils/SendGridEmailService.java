@@ -16,7 +16,7 @@ import java.io.IOException;
 
 @Profile("prod")
 @Service
-public class SendGridEmailService implements EmailSender {
+public class SendGridEmailService implements EmailService {
 
     private final SpringTemplateEngine templateEngine;
 
