@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-@Profile("local")
+@Profile("dev")
 @Service
 public class SmtpEmailService implements EmailService {
 

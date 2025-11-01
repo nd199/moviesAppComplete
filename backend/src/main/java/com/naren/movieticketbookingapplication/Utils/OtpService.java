@@ -3,15 +3,15 @@ package com.naren.movieticketbookingapplication.Utils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-@Component
+@Service
 public class OtpService {
 
     private static final long OTP_EXPIRE_INTERVAL = 5;
-
 
     private final StringRedisTemplate redisTemplate;
 
