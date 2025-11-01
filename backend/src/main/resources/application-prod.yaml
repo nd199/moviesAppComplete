@@ -4,7 +4,6 @@ spring:
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
 
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,21 +15,11 @@ spring:
   main:
     web-application-type: servlet
 
-
-  mail:
-    host: ${SMTP_HOST}
-    port: ${SMTP_PORT}
-    username: ${SMTP_USERNAME} #Please provide your Google app acc email
-    password: ${SMTP_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: ${SMTP_AUTH}
-          starttls:
-            enable: ${SMTP_STARTTLS}
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
+  sendgrid:
+    api:
+      key: ${SENDGRID_API_KEY}
+    from:
+      email: ${SENDGRID_FROM_EMAIL}
   data:
     redis:
       host: ${REDIS_HOST}

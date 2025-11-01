@@ -43,7 +43,7 @@ services:
     image: codenaren23/movieticket-api
     container_name: movie_ticket_booking_app
     ports:
-      - "8080:8080"
+      - "8080:8081"
     networks:
       - db
     environment:

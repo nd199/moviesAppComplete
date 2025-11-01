@@ -1,10 +1,12 @@
-import {combineReducers, configureStore} from "@reduxjs/toolkit";
-import userReducer from "./userSlice";
-import productReducer from "./ProductsRedux";
-import paymentReducer from "./PaymentRedux";
-import {FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE,
-     REGISTER, REHYDRATE,} from "redux-persist";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import {
+  FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE,
+  REGISTER, REHYDRATE,
+} from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import paymentReducer from "./PaymentRedux";
+import productReducer from "./ProductsRedux";
+import userReducer from "./userSlice";
 
 const persistConfig = {
     key: "root",

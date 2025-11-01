@@ -24,7 +24,7 @@ public class ShowDaoImpl implements ShowDao {
     @Override
     public Show addShow(Show show) {
         log.info("Adding show: {}", show);
-        Show saved =  showRepository.save(show);
+        Show saved = showRepository.save(show);
         log.info("Show added successfully: {}", show);
         return saved;
     }
