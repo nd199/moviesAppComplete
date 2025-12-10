@@ -1,242 +1,239 @@
 .featured {
-    height: calc(100vh - 80px);
-    background-color: black;
-    position: relative;
-    overflow: hidden;
+  height: calc(100vh - 80px);
+  background-color: black;
+  position: relative;
+  overflow: hidden;
 }
 
 .video {
-    width: 100%;
-    position: absolute;
-    height: 100%;
-    top: -35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 100%;
+  position: absolute;
+  height: 100%;
+  top: -35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .loader {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
 }
 
 .category {
-    position: absolute;
-    top: 80px;
-    left: 50px;
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-    display: flex;
-    align-items: center;
-    z-index: 200;
+  position: absolute;
+  top: 80px;
+  left: 50px;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  display: flex;
+  align-items: center;
+  z-index: 200;
 }
 
 .category select {
-    cursor: pointer;
-    background-color: var(--main-color);
-    border: 1px solid white;
-    color: white;
-    margin-left: 20px;
-    padding: 8px;
+  cursor: pointer;
+  background-color: var(--main-color);
+  border: 1px solid white;
+  color: white;
+  margin-left: 20px;
+  padding: 8px;
 }
 
 .videoFeature {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: relative;
-    transform: scaleY(1.35);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: relative;
+  transform: scaleY(1.35);
 }
 
 .info {
-    width: 35%;
-    position: absolute;
-    bottom: 10px;
-    padding: 10px;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    border-radius: 10px;
-    left: 50px;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    background-color: rgba(
-            0,
-            0,
-            0,
-            0.5
-    );
+  width: 35%;
+  position: absolute;
+  bottom: 10px;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  left: 50px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .info-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .desc {
-    margin: 20px 0;
+  margin: 20px 0;
 }
 
 .buttons {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .buttons button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    width: auto;
-    height: auto;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  width: auto;
+  height: auto;
 }
 
 .watchBtn,
 .watchListBtn,
 .audioBtn {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    gap: 4px;
-    font-size: 18px;
-    font-weight: 500;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 4px;
+  font-size: 18px;
+  font-weight: 500;
 }
 
 .watchBtn:hover,
 .watchListBtn:hover {
-    color: #f9f9f9;
-    background-color: var(--main-color);
+  color: #f9f9f9;
+  background-color: var(--main-color);
 }
 
 .audioBtn {
-    background-color: #333;
-    color: #fff;
+  background-color: #333;
+  color: #fff;
 }
 
 .short-desc {
-    margin: 10px 0;
+  margin: 10px 0;
 }
 
 @media (max-width: 640px) {
-    .category {
-        top: 50px;
-        left: 20px;
-        font-size: 16px;
-    }
-    .info {
-        position: absolute;
-        width: 80%;
-        bottom: 30px;
-        padding: 8px;
-        margin: 20px auto 0 auto;
-    }
+  .category {
+    top: 50px;
+    left: 20px;
+    font-size: 16px;
+  }
+  .info {
+    position: absolute;
+    width: 80%;
+    bottom: 30px;
+    padding: 8px;
+    margin: 20px auto 0 auto;
+  }
 
-    .buttons button {
-        padding: 8px 18px;
-        font-size: 16px;
-    }
+  .buttons button {
+    padding: 8px 18px;
+    font-size: 16px;
+  }
 
-    .videoFeature {
-        transform: scaleY(1.2);
-    }
+  .videoFeature {
+    transform: scaleY(1.2);
+  }
 }
 
 @media (max-width: 768px) {
-    .category {
-        top: 70px;
-        left: 30px;
-        font-size: 18px;
-    }
+  .category {
+    top: 70px;
+    left: 30px;
+    font-size: 18px;
+  }
 
-    .info {
-        width: 70%;
-        left: 0;
-        bottom: 20px;
-        padding: 10px;
-    }
+  .info {
+    width: 70%;
+    left: 0;
+    bottom: 20px;
+    padding: 10px;
+  }
 
-    .desc {
-        display: none;
-    }
+  .desc {
+    display: none;
+  }
 
-    .short-desc {
-        display: block !important;
-    }
+  .short-desc {
+    display: block !important;
+  }
 
-    .desc-more {
-        margin: 5px 0 !important;
-    }
+  .desc-more {
+    margin: 5px 0 !important;
+  }
 
-    .buttons button {
-        padding: 10px 20px;
-        font-size: 17px;
-    }
+  .buttons button {
+    padding: 10px 20px;
+    font-size: 17px;
+  }
 
-    .videoFeature {
-        transform: scaleY(1.25);
-    }
+  .videoFeature {
+    transform: scaleY(1.25);
+  }
 
-    .sm-screen {
-        display: none;
-    }
+  .sm-screen {
+    display: none;
+  }
 }
 
 @media (max-width: 1024px) {
-    .category {
-        top: 80px;
-        left: 40px;
-        font-size: 19px;
+  .category {
+    top: 80px;
+    left: 40px;
+    font-size: 19px;
+  }
+
+  .info {
+    width: 300px;
+    left: 0;
+    bottom: 50px;
+    padding: 10px;
+
+    h1 {
+      font-size: 18px;
     }
+  }
 
-    .info {
-        width: 300px;
-        left: 0;
-        bottom: 50px;
-        padding: 10px;
+  .desc {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
 
-        h1 {
-            font-size: 18px;
-        }
-    }
+  .buttons {
+    gap: 8px;
 
-    .desc {
+    button {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 2px 4px;
+      margin: 0;
+
+      p {
         font-size: 14px;
-        margin-bottom: 8px;
+      }
     }
-
-    .buttons {
-        gap: 8px;
-
-        button {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 2px 4px;
-            margin: 0;
-
-            p {
-                font-size: 14px;
-            }
-        }
-    }
+  }
 }
 
 @media (min-width: 1201px) {
-    .category {
-        top: 80px;
-        left: 50px;
-        font-size: 20px;
-    }
+  .category {
+    top: 80px;
+    left: 50px;
+    font-size: 20px;
+  }
 
-    .info {
-        width: 35%;
-        left: 50px;
-        bottom: 10px;
-        padding: 10px;
-    }
+  .info {
+    width: 35%;
+    left: 50px;
+    bottom: 10px;
+    padding: 10px;
+  }
 }

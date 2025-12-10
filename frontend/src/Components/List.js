@@ -42,7 +42,6 @@ const List = ({title}) => {
                     modules={[Navigation, Pagination]}
                     spaceBetween={10}
                     slidesPerView={4}
-                    navigation
                     pagination={{clickable: true}}
                     breakpoints={{
                         1240: {slidesPerView: 4},

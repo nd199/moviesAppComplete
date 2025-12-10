@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   LocationOnOutlined,
   MailOutlined,
@@ -7,13 +5,14 @@ import {
   PhoneOutlined,
   PublishOutlined,
 } from "@mui/icons-material";
-import { fetchUsers, updateProfile } from "../Network/ApiCalls";
 import LinearProgress from "@mui/material/LinearProgress";
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { uploadToImgBB } from "../ImgBB";
+import { fetchUsers, updateProfile } from "../Network/ApiCalls";
 import "./Profile.css";
-import { app } from "../Firebase";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -33,36 +32,28 @@ const Profile = () => {
       let updatedImageUrl = imageUrl;
 
       if (avatar) {
-        const fileName = new Date().getTime() + avatar.name;
-        const storage = getStorage(app);
-        const storageRef = ref(storage, fileName);
-        const uploadTask = uploadBytesResumable(storageRef, avatar);
-
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            const progress = Math.round(
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-            );
-            setUploadProgress(progress);
-          },
-          (error) => {
-            console.error("Upload failed: ", error);
-          },
-          async () => {
-            updatedImageUrl = await getDownloadURL(uploadTask.snapshot.ref);
-            setImageUrl(updatedImageUrl);
-          }
-        );
+        try {
+          const url = await uploadToImgBB(avatar, setUploadProgress);
+          updatedImageUrl = url;
+          setImageUrl(url);
+        } catch (err) {
+          console.error("Upload to ImgBB failed:", err);
+          toast.error("Image upload failed");
+          return;
+        }
       }
 
-      const result = await updateProfile(dispatch, {
-        name,
-        email,
-        phoneNumber,
-        address,
-        imageUrl: updatedImageUrl,
-      }, user.id);
+      const result = await updateProfile(
+        dispatch,
+        {
+          name,
+          email,
+          phoneNumber,
+          address,
+          imageUrl: updatedImageUrl,
+        },
+        user.id
+      );
 
       if (result.success) {
         toast.success("Profile updated successfully!");
@@ -118,21 +109,32 @@ const Profile = () => {
               </div>
               <div className="profileInfoItem">
                 <PhoneOutlined />
-                <span className="profileShowInfo">{phoneNumber || user.phoneNumber}</span>
+                <span className="profileShowInfo">
+                  {phoneNumber || user.phoneNumber}
+                </span>
               </div>
               <div className="profileInfoItem">
                 <LocationOnOutlined />
-                <span className="profileShowInfo">{address || user.address}</span>
+                <span className="profileShowInfo">
+                  {address || user.address}
+                </span>
               </div>
             </div>
-            <button onClick={() => setShowEditForm(true)} className="profileUpdateButton" type="button">
+            <button
+              onClick={() => setShowEditForm(true)}
+              className="profileUpdateButton"
+              type="button"
+            >
               Edit
             </button>
           </div>
         </div>
         {showEditForm && (
           <div className="profileUpdate">
-            <button onClick={() => setShowEditForm(!showEditForm)} className="editProfileCloseButton">
+            <button
+              onClick={() => setShowEditForm(!showEditForm)}
+              className="editProfileCloseButton"
+            >
               X
             </button>
             <form className="profileUpdateForm" onSubmit={userUpdateHandler}>
@@ -143,14 +145,17 @@ const Profile = () => {
                     alt=""
                     className="profileUpdateImg"
                   />
-                  <label htmlFor="file" style={{
-                    padding: "5px",
-                    border: "1px solid orange",
-                    borderRadius: "10px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between"
-                  }}>
+                  <label
+                    htmlFor="file"
+                    style={{
+                      padding: "5px",
+                      border: "1px solid orange",
+                      borderRadius: "10px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <PublishOutlined className="profileUpdateIcon" />
                     <span>Upload</span>
                   </label>
@@ -163,7 +168,11 @@ const Profile = () => {
                   <LinearProgress
                     variant="determinate"
                     value={uploadProgress}
-                    style={{ height: "10px", borderRadius: "5px", marginTop: "10px" }}
+                    style={{
+                      height: "10px",
+                      borderRadius: "5px",
+                      marginTop: "10px",
+                    }}
                   />
                 </div>
               </div>

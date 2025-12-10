@@ -6,7 +6,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -26,6 +26,11 @@ spring:
       port: ${REDIS_PORT}
       username: ${REDIS_USERNAME}
       password: ${REDIS_PASSWORD}
+app:
+  allowed:
+    origins: "https://movies-app-complete-payment.vercel.app,
+    https://movies-app-complete.vercel.app,
+    https://movies-app-complete-gmco.vercel.app"
 
 logging:
   level:

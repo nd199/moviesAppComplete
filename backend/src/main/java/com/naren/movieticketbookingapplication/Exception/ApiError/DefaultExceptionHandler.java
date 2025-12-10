@@ -3,6 +3,7 @@ package com.naren.movieticketbookingapplication.Exception.ApiError;
 import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.management.relation.RoleNotFoundException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 import static org.springframework.http.HttpStatus.*;
@@ -20,10 +22,9 @@ import static org.springframework.http.HttpStatus.*;
 public class DefaultExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiError> handleException(ResourceNotFoundException e,
-                                                    HttpServletRequest request) {
-        log.info("Handling ResourceNotFoundException: {}", e.getMessage());
-
+    public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException e,
+                                                           HttpServletRequest request) {
+        log.warn("Resource not found: {}", e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -34,13 +35,12 @@ public class DefaultExceptionHandler {
     }
 
     @ExceptionHandler(InsufficientAuthenticationException.class)
-    public ResponseEntity<ApiError> handleException(InsufficientAuthenticationException e,
-                                                    HttpServletRequest request) {
-        log.warn("Handling InsufficientAuthenticationException: {}", e.getMessage());
-
+    public ResponseEntity<ApiError> handleInsufficientAuth(InsufficientAuthenticationException e,
+                                                           HttpServletRequest request) {
+        log.warn("Authentication error: {}", e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
-                e.getMessage(),
+                "You are not authorized to access this resource.",
                 FORBIDDEN.value(),
                 LocalDateTime.now()
         );
@@ -48,35 +48,53 @@ public class DefaultExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiError> handleException(BadCredentialsException e,
-                                                    HttpServletRequest request) {
-        log.error("Handling BadCredentialsException: {}", e.getMessage());
-
+    public ResponseEntity<ApiError> handleBadCredentials(BadCredentialsException e,
+                                                         HttpServletRequest request) {
+        log.warn("Invalid credentials: {}", e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
-                e.getMessage(),
+                "Invalid username or password. Please try again.",
                 UNAUTHORIZED.value(),
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(apiError, UNAUTHORIZED);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleException(Exception e,
-                                                    HttpServletRequest request) {
-        log.error("Handling Exception: {}", e.getMessage(), e);
-
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<ApiError> handleRoleNotFound(RoleNotFoundException e,
+                                                       HttpServletRequest request) {
+        log.warn("Role not found: {}", e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
-                e.getMessage(),
+                "The specified role does not exist.",
+                BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(apiError, BAD_REQUEST);
+    }
+
+    @ExceptionHandler({SQLException.class, DataAccessException.class})
+    public ResponseEntity<ApiError> handleDatabaseErrors(Exception e,
+                                                         HttpServletRequest request) {
+        log.error("Database error: {}", e.getMessage(), e);
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                "A database error occurred. Please try again later.",
                 INTERNAL_SERVER_ERROR.value(),
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(apiError, INTERNAL_SERVER_ERROR);
     }
-
-    @ExceptionHandler(RoleNotFoundException.class)
-    public ResponseEntity<String> handleRoleNotFound(RoleNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleGenericException(Exception e,
+                                                           HttpServletRequest request) {
+        log.error("Unexpected error: {}", e.getMessage(), e);
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                "Something went wrong on our side. Please try again later.",
+                INTERNAL_SERVER_ERROR.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(apiError, INTERNAL_SERVER_ERROR);
     }
 }
