@@ -1,14 +1,15 @@
 {
   "name": "payment",
   "version": "1.0.0",
-  "description": "Payment app for movies java application",
+  "description": "Payment service for movie booking application",
   "main": "index.js",
-  "scripts": {
-    "start": "nodemon index.js"
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18 <21"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://nd199/github.com"
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "author": "codeNaren",
   "license": "ISC",
@@ -20,9 +21,9 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.4",
     "morgan": "^1.10.0",
-    "nodemon": "^3.1.7",
-    "path": "^0.12.7",
-    "save": "^2.9.0",
     "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }

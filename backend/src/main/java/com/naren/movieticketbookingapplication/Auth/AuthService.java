@@ -1,9 +1,11 @@
 package com.naren.movieticketbookingapplication.Auth;
 
+import com.naren.movieticketbookingapplication.Dao.CustomerDao;
 import com.naren.movieticketbookingapplication.Dto.CustomerDTO;
 import com.naren.movieticketbookingapplication.Dto.CustomerDTOMapper;
 import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.Role;
+import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import com.naren.movieticketbookingapplication.Exception.UserNotFoundException;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
 import com.naren.movieticketbookingapplication.Service.CustomerService;
@@ -26,8 +28,10 @@ public class AuthService {
     private final CustomerDTOMapper customerDTOMapper;
     private final JwtUtil jwtUtil;
     private final CustomerService customerService;
+    private final CustomerDao customerDao;
 
     public AuthResponse login(AuthRequest authRequest) {
+
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -37,7 +41,12 @@ public class AuthService {
 
             Customer principal = (Customer) authentication.getPrincipal();
 
-            if (Boolean.FALSE.equals(principal.getIsLogged())) {
+            if(!customerDao.existsByEmail(principal.getEmail())) {
+                throw new ResourceNotFoundException("Profile not found. " +
+                        "If you are new here, consider registering first.");
+            }
+
+            if (!Boolean.TRUE.equals(principal.getIsLogged())) {
                 CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
                         principal.getName(),
                         principal.getEmail(),
@@ -49,7 +58,8 @@ public class AuthService {
                         principal.getIsRegistered()
                 );
 
-                CustomerDTO updatedCustomerDTO = customerService.updateCustomer(updateRequest, principal.getId());
+                CustomerDTO updatedCustomerDTO = customerService.updateCustomer
+                        (updateRequest, principal.getId());
 
                 Set<Role> roles = updatedCustomerDTO.roles()
                         .stream().map(Role::new)
@@ -71,10 +81,10 @@ public class AuthService {
             return new AuthResponse(customerDTO, token);
 
         } catch (UserNotFoundException e) {
-            throw new UserNotFoundException("Profile Not Found, " +
-                    "If you are new here consider registering first, else contact us");
+            throw new RuntimeException("Profile not found. If you are new here, " +
+                    "consider registering first.");
         } catch (BadCredentialsException e) {
-            throw new RuntimeException("Bad credentials");
+            throw new RuntimeException("Incorrect email or password. Please try again.");
         }
     }
 }

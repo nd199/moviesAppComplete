@@ -98,6 +98,7 @@ public class MovieOttApplication {
         log.info("Created new show: {}", show);
     }
 
+
     private void createRole(RoleRepository roleRepository) {
 
         if (roleRepository.existsRoleByName("ROLE_USER")) {

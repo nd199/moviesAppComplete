@@ -1,34 +1,34 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const initialState = {
+  currentUser: null,
+  users: [],
+  isFetching: false,
+  error: false,
+  errorMessage: null,
+  successMessage: null,
+};
+
 const userSlice = createSlice({
   name: "user",
-  initialState: {
-    currentUser: null,
-    users: [],
-    isFetching: false,
-    error: false,
-    successMessage: null,
-    errorMessage: null,
-  },
+  initialState,
   reducers: {
-    loginStart: (state) => {
-      state.isFetching = true;
+    /* ================= COMMON ================= */
+    resetErrorMessage: (state) => {
       state.error = false;
       state.errorMessage = null;
+      state.successMessage = null;
     },
-    loginSuccess: (state, action) => {
-      state.isFetching = false;
-      state.currentUser = action.payload;
+
+    logout: (state) => {
+      state.currentUser = null;
+      state.users = [];
     },
-    loginFailure: (state, action) => {
-      state.isFetching = false;
-      state.error = true;
-      state.errorMessage = action.payload;
-    },
+
+    /* ================= REGISTER ================= */
     registerStart: (state) => {
       state.isFetching = true;
       state.error = false;
-      state.errorMessage = null;
     },
     registerSuccess: (state, action) => {
       state.isFetching = false;
@@ -37,47 +37,100 @@ const userSlice = createSlice({
     registerFailure: (state, action) => {
       state.isFetching = false;
       state.error = true;
-      state.errorMessage = action.payload;
+      state.errorMessage = action.payload?.message;
     },
+
+    /* ================= LOGIN ================= */
+    loginStart: (state) => {
+      state.isFetching = true;
+      state.error = false;
+    },
+    loginSuccess: (state, action) => {
+      state.isFetching = false;
+      state.currentUser = action.payload;
+    },
+    loginFailure: (state, action) => {
+      state.isFetching = false;
+      state.error = true;
+      state.errorMessage = action.payload?.message;
+    },
+
+    /* ================= FORGOT PASSWORD ================= */
+    forgotPasswordStart: (state) => {
+      state.isFetching = true;
+      state.error = false;
+    },
+    forgotPasswordSuccess: (state, action) => {
+      state.isFetching = false;
+      state.successMessage = action.payload;
+    },
+    forgotPasswordFailure: (state, action) => {
+      state.isFetching = false;
+      state.error = true;
+      state.errorMessage = action.payload?.message;
+    },
+
+    /* ================= VERIFY EMAIL ================= */
+    verifyEmailStart: (state) => {
+      state.isFetching = true;
+      state.error = false;
+    },
+    verifyEmailSuccess: (state, action) => {
+      state.isFetching = false;
+      state.successMessage = action.payload;
+    },
+    verifyEmailFailure: (state, action) => {
+      state.isFetching = false;
+      state.error = true;
+      state.errorMessage = action.payload?.message;
+    },
+
+    /* ================= VALIDATE OTP ================= */
+    validateOtpStart: (state) => {
+      state.isFetching = true;
+      state.error = false;
+    },
+    validateOtpSuccess: (state, action) => {
+      state.isFetching = false;
+      state.successMessage = action.payload;
+    },
+    validateOtpFailure: (state, action) => {
+      state.isFetching = false;
+      state.error = true;
+      state.errorMessage = action.payload?.message;
+    },
+
+    /* ================= UPDATE PASSWORD ================= */
+    updatePassPushStart: (state) => {
+      state.isFetching = true;
+      state.error = false;
+    },
+    updatePassPushSuccess: (state, action) => {
+      state.isFetching = false;
+      state.successMessage = action.payload;
+    },
+    updatePassPushFailure: (state, action) => {
+      state.isFetching = false;
+      state.error = true;
+      state.errorMessage = action.payload?.message;
+    },
+
+    /* ================= UPDATE PROFILE ================= */
     updateUserStart: (state) => {
       state.isFetching = true;
       state.error = false;
-      state.errorMessage = null;
     },
     updateUserSuccess: (state, action) => {
       state.isFetching = false;
-      const index = state.users.findIndex(
-        (user) => user.id === action.payload.id
-      );
-      if (index !== -1) {
-        state.users[index] = action.payload;
-      }
-      if (state.currentUser && state.currentUser.id === action.payload.id) {
-        state.currentUser = action.payload;
-      }
+      state.currentUser = action.payload;
     },
     updateUserFailure: (state, action) => {
       state.isFetching = false;
       state.error = true;
-      state.errorMessage = action.payload;
+      state.errorMessage = action.payload?.message;
     },
-    deleteUserStart: (state) => {
-      state.isFetching = true;
-      state.error = false;
-      state.errorMessage = null;
-    },
-    deleteUserSuccess: (state, action) => {
-      state.isFetching = false;
-      state.users = state.users.filter((user) => user.id !== action.payload);
-      if (state.currentUser && state.currentUser.id === action.payload) {
-        state.currentUser = null;
-      }
-    },
-    deleteUserFailure: (state, action) => {
-      state.isFetching = false;
-      state.error = true;
-      state.errorMessage = action.payload;
-    },
+
+    /* ================= FETCH USERS ================= */
     fetchUsersStart: (state) => {
       state.isFetching = true;
       state.error = false;
@@ -86,154 +139,68 @@ const userSlice = createSlice({
       state.isFetching = false;
       state.users = action.payload;
     },
-    fetchUsersFailure: (state) => {
+    fetchUsersFailure: (state, action) => {
       state.isFetching = false;
       state.error = true;
+      state.errorMessage = action.payload?.message;
     },
-    fetchUserByEmailStart: (state) => {
-      state.isFetching = true;
-      state.error = false;
-      state.errorMessage = null;
-    },
-    fetchUserByEmailSuccess: (state, action) => {
-      state.isFetching = false;
-      state.currentUser = action.payload;
-    },
-    fetchUserByEmailFailure: (state, action) => {
-      state.isFetching = false;
-      state.error = true;
-      state.errorMessage = action.payload;
-    },
-    fetchUserByPhoneNumberStart: (state) => {
-      state.isFetching = true;
-      state.error = false;
-      state.errorMessage = null;
-    },
-    fetchUserByPhoneNumberSuccess: (state, action) => {
-      state.isFetching = false;
-      state.currentUser = action.payload;
-    },
-    fetchUserByPhoneNumberFailure: (state, action) => {
-      state.isFetching = false;
-      state.error = true;
-      state.errorMessage = action.payload;
-    },
-    forgotPasswordStart: (state) => {
-      state.isFetching = true;
-      state.error = false;
-    },
-    forgotPasswordSuccess: (state, action) => {
-      state.isFetching = false;
-      state.users = action.payload;
-    },
-    forgotPasswordFailure: (state, action) => {
-      state.isFetching = false;
-      state.error = action.payload;
-    },
-    verifyEmailStart: (state) => {
-      state.isFetching = true;
-      state.successMessage = null;
-      state.errorMessage = null;
-    },
-    verifyEmailSuccess: (state, action) => {
-      state.isFetching = false;
-      state.successMessage = action.payload;
-      state.errorMessage = null;
-    },
-    verifyEmailFailure: (state, action) => {
-      state.isFetching = false;
-      state.successMessage = null;
-      state.errorMessage = action.payload;
-    },
-    validateOtpStart: (state) => {
-      state.isFetching = true;
-      state.successMessage = null;
-      state.errorMessage = null;
-    },
-    validateOtpSuccess: (state, action) => {
-      state.isFetching = false;
-      state.successMessage = action.payload;
-      state.errorMessage = null;
-    },
-    validateOtpFailure: (state, action) => {
-      state.isFetching = false;
-      state.successMessage = null;
-      state.error = true;
-      state.errorMessage = action.payload;
-    },
-    updatePassPushStart: (state) => {
-      state.isFetching = true;
-      state.error = false;
-      state.errorMessage = null;
-      state.successMessage = null;
-    },
-    updatePassPushSuccess: (state, action) => {
-      state.isFetching = false;
-      state.successMessage = action.payload;
-      state.error = false;
-    },
-    updatePassPushFailure: (state, action) => {
-      state.isFetching = false;
-      state.error = true;
-      state.errorMessage = action.payload;
-    },
+
+    /* ================= FETCH CURRENT USER ================= */
     fetchCurrentStart: (state) => {
       state.isFetching = true;
       state.error = false;
-      state.errorMessage = null;
-      state.successMessage = null;
     },
     fetchCurrentSuccess: (state, action) => {
       state.isFetching = false;
       state.currentUser = action.payload;
-      state.error = false;
-      state.errorMessage = false;
     },
     fetchCurrentFailure: (state, action) => {
       state.isFetching = false;
       state.error = true;
-      state.errorMessage = action.payload;
-      state.successMessage = null;
-    },
-    resetErrorMessage: (state) => {
-      state.errorMessage = null;
-    },
-    logout: (state) => {
-      state.currentUser = null;
+      state.errorMessage = action.payload?.message;
     },
   },
 });
 
 export const {
-  loginStart,
-  loginSuccess,
-  loginFailure,
+  resetErrorMessage,
+  logout,
+
   registerStart,
   registerSuccess,
   registerFailure,
-  updateUserStart,
-  updateUserSuccess,
-  updateUserFailure,
+
+  loginStart,
+  loginSuccess,
+  loginFailure,
+
   forgotPasswordStart,
   forgotPasswordSuccess,
   forgotPasswordFailure,
+
   verifyEmailStart,
   verifyEmailSuccess,
   verifyEmailFailure,
+
   validateOtpStart,
   validateOtpSuccess,
   validateOtpFailure,
-  resetErrorMessage,
-  fetchUsersStart,
-  fetchUsersSuccess,
-  fetchUsersFailure,
+
   updatePassPushStart,
   updatePassPushSuccess,
   updatePassPushFailure,
+
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+
+  fetchUsersStart,
+  fetchUsersSuccess,
+  fetchUsersFailure,
+
   fetchCurrentStart,
   fetchCurrentSuccess,
   fetchCurrentFailure,
-  logout,
 } = userSlice.actions;
 
 export default userSlice.reducer;

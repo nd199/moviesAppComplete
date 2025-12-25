@@ -1,6 +1,10 @@
 package com.naren.movieticketbookingapplication.Service;
 
+import com.naren.movieticketbookingapplication.Dao.CustomerDao;
+import com.naren.movieticketbookingapplication.Dto.CustomerDTO;
+import com.naren.movieticketbookingapplication.Entity.Customer;
 import com.naren.movieticketbookingapplication.Entity.PasswordResetToken;
+import com.naren.movieticketbookingapplication.Exception.ResourceNotFoundException;
 import com.naren.movieticketbookingapplication.Record.PasswordResetRequest;
 import com.naren.movieticketbookingapplication.Repo.PasswordRTRepository;
 import com.naren.movieticketbookingapplication.Utils.EmailService;
@@ -20,20 +24,25 @@ public class PasswordResetService {
     private final PasswordRTRepository tokenRepository;
     private final EmailService emailService;
     private final CustomerService customerService;
+    private final CustomerDao customerDao;
 
-    public PasswordResetService(PasswordRTRepository tokenRepository, EmailService emailService, CustomerService customerService) {
+    public PasswordResetService(PasswordRTRepository tokenRepository, EmailService emailService, CustomerService customerService, CustomerDao customerDao) {
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
         this.customerService = customerService;
+        this.customerDao = customerDao;
     }
 
     public void createPasswordResetToken(String email) {
+        if(!customerDao.existsByEmail(email)) {
+            throw new ResourceNotFoundException("Your account " +
+                    "is not present please check your email else register first");
+        }
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = new PasswordResetToken();
         resetToken.setToken(token);
         resetToken.setEmail(email);
         resetToken.setExpiry(Instant.now().plus(3, ChronoUnit.HOURS));
-
         tokenRepository.deleteByEmail(email);
         tokenRepository.save(resetToken);
 

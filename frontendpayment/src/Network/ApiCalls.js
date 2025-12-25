@@ -1,65 +1,15 @@
-import { paymentRequests, springRequest } from './AxiosMethods';
-import axios from 'axios';
+import axios from "axios";
 import {
-  SavePaymentStart,
-  SavePaymentSuccess,
-  SavePaymentFailure,
-  userInfoAndSelectedPlanStart,
-  userInfoAndSelectedPlanSuccess,
-  userInfoAndSelectedPlanFailure,
-  updateFinalUserStart,
-  updateFinalUserSuccess,
-  updateFinalUserFailure,
-  pingStart,
-  pingSuccess,
-  pingFailure,
-} from '../redux/PaymentRedux';
+  fetchUserInfoAndPlan,
+  ping,
+  savePayment,
+  updateFinalUser as updateFinalUserThunk,
+} from "../redux/PaymentRedux";
 
-export const updateFinalUser = async (dispatch, finalUser) => {
-  dispatch(updateFinalUserStart());
-  try {
-    const res = await paymentRequests.post('/updateFinalUser', { finalUser });
-    dispatch(updateFinalUserSuccess(res.data));
-    return res.data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      dispatch(updateFinalUserFailure(error.response.data));
-    } else {
-      dispatch(updateFinalUserFailure({ error: 'An unexpected error occurred' }));
-    }
-  }
-};
-
-export const pingSpring = async (dispatch, email) => {
-  dispatch(pingStart());
-  try {
-    const res = await springRequest.post('/pingSpring', { email });
-    dispatch(pingSuccess(res.data));
-    return res.data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      dispatch(pingFailure(error.response.data));
-    } else {
-      dispatch(pingFailure({ error: 'An unexpected error occurred' }));
-    }
-  }
-};
-
-export const getPaymentDetails = async (dispatch, userId) => {
-  dispatch(userInfoAndSelectedPlanStart());
-  try {
-    const res = await paymentRequests.get('/paymentDetails', { params: { userId } });
-    dispatch(userInfoAndSelectedPlanSuccess(res.data));
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      dispatch(userInfoAndSelectedPlanFailure(error.response.data));
-    } else {
-      dispatch(userInfoAndSelectedPlanFailure({ error: 'An unexpected error occurred' }));
-    }
-  }
-};
-
-export const saveFinalPayment = async (dispatch, { finalUser, finalPlan, paymentMethod, transactionId }) => {
+export const saveFinalPayment = async (
+  dispatch,
+  { finalUser, finalPlan, paymentMethod, transactionId }
+) => {
   const finalPayment = {
     finalUser: {
       _id: finalUser._id,
@@ -88,16 +38,54 @@ export const saveFinalPayment = async (dispatch, { finalUser, finalPlan, payment
     paymentMethod,
     transactionId,
   };
-  dispatch(SavePaymentStart());
+
   try {
-    const res = await paymentRequests.post('/submitPayment', { finalPayment });
-    dispatch(SavePaymentSuccess(res.data));
+    return await dispatch(savePayment(finalPayment)).unwrap();
+  } catch (error) {
+    const message =
+      error?.message || error?.response?.data?.message || "Payment save failed";
+    console.error(message);
+    throw new Error(message);
+  }
+};
+
+export const getPaymentDetails = async (dispatch, email) => {
+  try {
+    return await dispatch(fetchUserInfoAndPlan(email)).unwrap();
+  } catch (error) {
+    const message =
+      error?.message ||
+      error?.response?.data?.message ||
+      "Failed to fetch payment details";
+    console.error(message);
+    throw new Error(message);
+  }
+};
+
+export const updateFinalUser = async (dispatch, finalUser) => {
+  try {
+    return await dispatch(updateFinalUserThunk(finalUser)).unwrap();
+  } catch (error) {
+    const message =
+      error?.message ||
+      error?.response?.data?.message ||
+      "Failed to update user";
+    console.error(message);
+    throw new Error(message);
+  }
+};
+
+export const pingSpring = async (dispatch, email) => {
+  try {
+    const res = await axios.post(`https://movieticket-api.onrender.com/ping`, {
+      email,
+    });
+    dispatch(ping(res.data));
     return res.data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      dispatch(SavePaymentFailure(error.response.data));
-    } else {
-      dispatch(SavePaymentFailure({ error: 'An unexpected error occurred' }));
-    }
+    const message =
+      error?.response?.data?.message || "Spring service unavailable";
+    console.error(message);
+    throw new Error(message);
   }
 };

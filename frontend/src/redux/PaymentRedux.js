@@ -1,38 +1,47 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-export const PaymentRedux = createSlice({
-    name: "payment",
-    initialState: {
-        paymentPlan: {},
-        isFetching: false,
-        error: null,
-        errorMessage: null,
+const initialState = {
+  paymentPlan: {},
+  isFetching: false,
+  error: false,
+  errorMessage: null,
+};
+
+const paymentSlice = createSlice({
+  name: "payment",
+  initialState,
+  reducers: {
+    setPaymentPlan: (state, action) => {
+      state.paymentPlan = action.payload;
     },
-    reducers: {
-        setPaymentPlan: (state, action) => {
-            state.paymentPlan = action.payload;
-        },
-        pushToPaymentStart: (state) => {
-            state.isFetching = true;
-            state.error = false;
-            state.errorMessage = "";
-        },
-        pushToPaymentSuccess: (state) => {
-            state.isFetching = false;
-        },
-        pushToPaymentFailure: (state, action) => {
-            state.isFetching = false;
-            state.error = true;
-            state.errorMessage = action.payload;
-        },
+    pushToPaymentStart: (state) => {
+      state.isFetching = true;
+      state.error = false;
+      state.errorMessage = null;
     },
+    pushToPaymentSuccess: (state) => {
+      state.isFetching = false;
+      state.error = false;
+      state.errorMessage = null;
+    },
+    pushToPaymentFailure: (state, action) => {
+      state.isFetching = false;
+      state.error = true;
+      state.errorMessage = action.payload;
+    },
+    resetPaymentError: (state) => {
+      state.error = false;
+      state.errorMessage = null;
+    },
+  },
 });
 
 export const {
-    setPaymentPlan,
-    pushToPaymentStart,
-    pushToPaymentSuccess,
-    pushToPaymentFailure,
-} = PaymentRedux.actions;
+  setPaymentPlan,
+  pushToPaymentStart,
+  pushToPaymentSuccess,
+  pushToPaymentFailure,
+  resetPaymentError,
+} = paymentSlice.actions;
 
-export default PaymentRedux.reducer;
+export default paymentSlice.reducer;

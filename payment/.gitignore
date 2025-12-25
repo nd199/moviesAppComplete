@@ -1,6 +1,5 @@
 <<<<<<< HEAD
 .DS_Store
-payment/.env
 =======
 # Ignore Mac system files
 .DS_Store
@@ -10,6 +9,7 @@ payment/node_modules/
 
 # Ignore IDE specific files
 .idea/
+.env
 
 # Ignore build artifacts
 frontend/build/

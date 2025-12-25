@@ -1,134 +1,130 @@
-.email-otp-container-user- {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
+.inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  position: relative;
 }
 
-.email-otp-container-user- input {
-    width: 90px;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    outline: none;
-    font-size: 20px;
-    transition: border-color 0.3s;
+label {
+  font-weight: 600;
+  color: #fff;
+  font-size: 0.95rem;
 }
 
-.email-otp-container-user- input:focus {
-    border: none;
-    outline: none;
+.email-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
 }
 
-.email-otp-container-user- .send-icon-user- {
-    color: var(--secondary-color);
-    cursor: pointer;
-    font-size: 24px;
-    transition: color 0.3s, transform 0.3s;
+.email-input-wrapper input {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
-.email-otp-container-user- .send-icon-user-:hover {
-    color: var(--secondary-color);
-    transform: scale(1.1);
+.email-input-wrapper input:focus {
+  outline: none;
+  border-color: #f46e0e;
+  box-shadow: 0 0 0 3px rgba(244, 110, 14, 0.2);
 }
 
-.email-otp-container-user- p {
-    color: #fff;
-    font-size: 18px;
-    font-weight: 600;
-    padding: 5px;
-    line-height: 1.4;
+.email-input-wrapper input:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
-.email-otp-container-user- span {
-    font-size: 13px;
-    color: #fff;
-    padding: 2px;
-    margin-left: -2px;
-    margin-right: 5px;
+.email-input-wrapper Lottie {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+button {
+  margin-top: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.otp-container {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.otp-container input {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1rem;
+  width: 100%;
+  text-align: center;
+  letter-spacing: 3px;
 }
 
 .otp-actions-user- {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.otp-actions-user- button {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background-color: #10b981;
+  color: #fff;
 }
 
 .timer-user- {
-    background-color: white;
-    padding: 2px;
-    font-size: 18px !important;
-    color: var(--secondary-color) !important;
+  color: #facc15;
+  font-weight: 700;
 }
 
-.reg-form-links a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20px;
-    margin-bottom: -75px;
-    font-size: 20px;
-    padding: 0;
-    color: #fff !important;
+.otp-message {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: greenyellow;
 }
 
-.reg-login-link {
-    color: green;
+.otp-message-error {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: orangered;
 }
 
-.email-verify-message-user- {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 10px;
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.email-verify-message-user- input {
-    width: 90%;
-    padding: 10px;
-    border: none;
-    background: none;
-    color: #fff;
-    font-size: 16px;
-    transition: border-color 0.3s;
-}
-
-.email-verify-message-user- input:focus {
-    border: 1px solid #fff;
-    outline: none;
-}
-
-.inputs {
-    display: flex;
+@media (max-width: 768px) {
+  .otp-actions-user- {
     flex-direction: column;
-    gap: 10px;
-}
+    align-items: flex-start;
+  }
 
-.verify-button-user- {
-    margin-top: 10px;
-    background-color: var(--secondary-color);
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.verify-button-user-:disabled {
-    background-color: rgba(0, 0, 0, 0.3);
-    cursor: not-allowed;
-}
-
-.verify-button-user-:hover:not(:disabled) {
-    background-color: #ff7f50;
-}
-
-.error-message-user {
-    color: red;
-    margin: 10px 0;
+  .otp-actions-user- p {
+    margin: 0;
+    font-size: 0.85rem;
+  }
 }

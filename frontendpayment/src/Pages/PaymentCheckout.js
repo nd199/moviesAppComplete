@@ -1,260 +1,225 @@
-import "./PaymentCheckout.css";
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { v4 as uuid } from "uuid";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+
+import InputField from "../component/InputComponent";
 import {
   getPaymentDetails,
   pingSpring,
   saveFinalPayment,
   updateFinalUser,
 } from "../Network/ApiCalls";
-import { useNavigate, useParams } from "react-router-dom";
-import { v4 as uuid } from "uuid";
-import PaymentCheckoutForm from "../component/PaymentCheckoutForm";
+
+import "./PaymentCheckout.css";
 
 const PaymentCheckout = () => {
   const dispatch = useDispatch();
   const { userId } = useParams();
-
-  useEffect(() => {
-    const fetchPaymentDetails = async () => {
-      try {
-        await getPaymentDetails(dispatch, userId);
-      } catch (error) {
-        alert("Failed to fetch payment details. Please reload the page");
-      }
-    };
-    fetchPaymentDetails();
-  }, [dispatch, userId]);
+  const nav = useNavigate();
 
   const userAndPaymentData = useSelector(
     (state) => state?.payment?.userInfoAndSelectedPlan
   );
+
   const userDetails = userAndPaymentData?.data;
-  const selectedPlan = userAndPaymentData?.data?.selectedPlan?.selectedPlan;
-  const UUID = uuid();
-  const nav = useNavigate();
+  const selectedPlan = userDetails?.selectedPlan?.selectedPlan;
 
-  const [name, setName] = useState(userDetails?.name || "");
-  const [address, setAddress] = useState(userDetails?.address || "");
-  const [phoneNumber, setPhoneNumber] = useState(
-    userDetails?.phoneNumber || ""
-  );
-  const [planName, setPlanName] = useState(selectedPlan?.name || "");
-  const [planDescription, setPlanDescription] = useState(
-    selectedPlan?.description || ""
-  );
-  const [planPrice, setPlanPrice] = useState(selectedPlan?.price || "");
+  useEffect(() => {
+    getPaymentDetails(dispatch, userId);
+  }, [dispatch, userId]);
 
-  const [paymentDetails, setPaymentDetails] = useState({
-    cardNumber: "",
-    expiry: "",
-    cvv: "",
-    nameOnCard: "",
-    paymentMethod: "",
+  /* ---------------- INITIAL VALUES ---------------- */
+  const initialValues = useMemo(
+    () => ({
+      name: userDetails?.name || "",
+      address: userDetails?.address || "",
+      phoneNumber: userDetails?.phoneNumber || "",
+      nameOnCard: "",
+      cardNumber: "",
+      expiry: "",
+      cvv: "",
+    }),
+    [userDetails]
+  );
+
+  /* ---------------- VALIDATION ---------------- */
+  const validationSchema = Yup.object({
+    name: Yup.string().required("Name is required"),
+    address: Yup.string().required("Address is required"),
+    phoneNumber: Yup.string()
+      .matches(/^\d{10}$/, "Enter valid phone number")
+      .required("Phone number required"),
+    nameOnCard: Yup.string().required("Cardholder name required"),
+    cardNumber: Yup.string()
+      .matches(/^(\d{4} ){2,3}\d{4}$/, "Invalid card number")
+      .required("Card number required"),
+    expiry: Yup.string()
+      .matches(/^(0[1-9]|1[0-2])\/\d{2}$/, "MM/YY format")
+      .required("Expiry required"),
+    cvv: Yup.string()
+      .matches(/^\d{3,4}$/, "Invalid CVV")
+      .required("CVV required"),
   });
 
-  const handleUserDetailsChange = (e) => {
-    const { name, value } = e.target;
-    switch (name) {
-      case "name":
-        setName(value);
-        break;
-      case "address":
-        setAddress(value);
-        break;
-      case "phoneNumber":
-        setPhoneNumber(value);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handlePaymentInputChange = (e) => {
-    const { name, value } = e.target;
-    setPaymentDetails({ ...paymentDetails, [name]: value });
-  };
-
-  const handlePaymentCheckout = async (e) => {
-    e.preventDefault();
-    const transactionId = UUID;
-
-    const finalUser = {
-      ...userDetails,
-      name,
-      address,
-      phoneNumber,
-    };
-
-    const finalPlan = {
-      ...selectedPlan,
-      name: planName,
-      description: planDescription,
-      price: planPrice,
-    };
+  /* ---------------- SUBMIT ---------------- */
+  const handleSubmit = async (values, { setSubmitting }) => {
+    const transactionId = uuid();
 
     try {
+      const finalUser = { ...userDetails, ...values };
+
       const response = await saveFinalPayment(dispatch, {
         finalUser,
-        finalPlan,
-        paymentMethod: paymentDetails.paymentMethod,
+        finalPlan: selectedPlan,
+        paymentMethod: "card",
         transactionId,
       });
+
       if (response) {
         finalUser.isSubscribed = true;
-        console.log("Final user before update:", finalUser);
-        try {
-          const res = await updateFinalUser(dispatch, finalUser);
-          const email = finalUser.email;
-          const res2 = await pingSpring(dispatch, email);
-          if (res && res2) {
-            nav("/success");
-          }
-        } catch (err) {
-          console.error("Failed to update final user:", err);
-          alert(
-            "Subscription failed. If the amount was deducted, it will be refunded within 4 business days. Please try again."
-          );
-        }
+        await updateFinalUser(dispatch, finalUser);
+        await pingSpring(dispatch, finalUser.email);
+        nav("/success");
       }
-    } catch (error) {
-      console.error("Payment checkout failed:", error);
-      alert("Payment checkout failed. Please try again.");
+    } catch (err) {
+      alert("Payment failed. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
-  };
-
-  const formatCardNumber = (cardNumber) => {
-    const digitsOnly = cardNumber.replace(/\D/g, "");
-    return digitsOnly.replace(/(.{4})/g, "$1-").slice(0, 19);
-  };
-
-  const formatExpiry = (expiry) => {
-    const formattedExpiry = expiry
-      .replace(/\D/g, "")
-      .replace(/(\d{2})(\d{0,4})/, "$1/$2");
-    return formattedExpiry.slice(0, 5);
   };
 
   return (
-    <div className="paymentPage-container">
-      <div className="paymentPage-card">
-        <div className="paymentPage-header">
-          <div className="paymentPage-title">Checkout</div>
-          <div className="paymentPage-description">
-            Please check your details below before checkout
-          </div>
-        </div>
-        <div className="paymentPage-content">
-          <div className="paymentPage-left">
-            <div className="paymentPage-left-top">
-              <div className="paymentPage-left-heading">
-                <h2>Your Details</h2>
-                <img
-                  src={userDetails?.imageUrl}
-                  alt="Your Profile"
-                  className="paymentPage-profile-img"
-                />
-              </div>
-              <p className="paymentPage-instructions" style={{margin:"20px", color: "#fff"}}>
-                Check your details. You can edit them except your email and
-                plan.
-              </p>
-              <div className="paymentPage-left-content">
-                <div className="paymentPage-input">
-                  <label htmlFor="name">Your Name</label>
-                  <input
-                    id="name"
-                    type="text"
+    <div className="payment-container">
+      <div className="payment-card">
+        <h1 className="payment-title">Secure Checkout</h1>
+
+        <Formik
+          enableReinitialize
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ values, handleChange, isSubmitting, isValid }) => (
+            <Form>
+              <div className="payment-grid">
+                {/* PERSONAL DETAILS */}
+                <div className="payment-section">
+                  <h2>Personal Details</h2>
+
+                  <InputField
+                    label="Full Name"
                     name="name"
-                    value={name}
-                    onChange={handleUserDetailsChange}
+                    value={values.name}
+                    onChange={handleChange}
                     required
                   />
-                </div>
-                <div className="paymentPage-input">
-                  <label htmlFor="email">Your Email</label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={userDetails?.email}
-                    style={{ cursor: "not-allowed" }}
+
+                  <InputField
+                    label="Email"
+                    value={userDetails?.email || ""}
                     disabled
                   />
-                </div>
-                <div className="paymentPage-input">
-                  <label htmlFor="address">Your Billing Address</label>
-                  <input
-                    id="address"
-                    type="text"
+
+                  <InputField
+                    label="Billing Address"
                     name="address"
-                    value={address}
-                    onChange={handleUserDetailsChange}
+                    value={values.address}
+                    onChange={handleChange}
                     required
                   />
-                </div>
-                <div className="paymentPage-input">
-                  <label htmlFor="phoneNumber">Your Phone</label>
-                  <input
-                    id="phoneNumber"
-                    type="text"
+
+                  <InputField
+                    label="Phone Number"
                     name="phoneNumber"
-                    value={phoneNumber}
-                    onChange={handleUserDetailsChange}
+                    value={values.phoneNumber}
+                    onChange={(e) => {
+                      e.target.value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 10);
+                      handleChange(e);
+                    }}
                     required
                   />
                 </div>
-              </div>
-            </div>
-            <div className="paymentPage-left-bottom">
-              <div className="paymentPage-left-heading">
-                <h2>Your Plan Details</h2>
-              </div>
-              <div className="paymentPage-left-content">
-                <div className="paymentPage-input">
-                  <label htmlFor="planName">Your Plan Name</label>
-                  <input
-                    id="planName"
-                    type="text"
-                    value={planName}
-                    onChange={(e) => setPlanName(e.target.value)}
-                    disabled
+
+                {/* PAYMENT */}
+                <div className="payment-section">
+                  <h2>Payment Method</h2>
+
+                  <InputField
+                    label="Cardholder Name"
+                    name="nameOnCard"
+                    value={values.nameOnCard}
+                    onChange={handleChange}
+                    required
                   />
-                </div>
-                <div className="paymentPage-input">
-                  <label htmlFor="planDescription">Your Plan Description</label>
-                  <input
-                    id="planDescription"
-                    type="text"
-                    value={planDescription}
-                    onChange={(e) => setPlanDescription(e.target.value)}
-                    disabled
+
+                  <InputField
+                    label="Card Number"
+                    name="cardNumber"
+                    value={values.cardNumber}
+                    onChange={(e) => {
+                      e.target.value = e.target.value
+                        .replace(/\D/g, "")
+                        .replace(/(.{4})/g, "$1 ")
+                        .trim()
+                        .slice(0, 19);
+                      handleChange(e);
+                    }}
+                    required
                   />
-                </div>
-                <div className="paymentPage-input">
-                  <label htmlFor="planPrice">Your Plan Price (In Rupees)</label>
-                  <input
-                    id="planPrice"
-                    type="text"
-                    value={planPrice}
-                    onChange={(e) => setPlanPrice(e.target.value)}
-                    disabled
-                  />
+
+                  <div className="card-row">
+                    <InputField
+                      label="Expiry"
+                      name="expiry"
+                      value={values.expiry}
+                      onChange={(e) => {
+                        e.target.value = e.target.value
+                          .replace(/\D/g, "")
+                          .replace(/(\d{2})(\d{0,2})/, "$1/$2")
+                          .slice(0, 5);
+                        handleChange(e);
+                      }}
+                      required
+                    />
+
+                    <InputField
+                      label="CVV"
+                      name="cvv"
+                      value={values.cvv}
+                      onChange={(e) => {
+                        e.target.value = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 4);
+                        handleChange(e);
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div className="plan-summary">
+                    <strong>{selectedPlan?.name}</strong>
+                    <span>₹{selectedPlan?.price}</span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className={`pay-button ${
+                      isSubmitting ? "loading" : ""
+                    }`}
+                    disabled={!isValid || isSubmitting}
+                  >
+                    {isSubmitting ? "Processing..." : "Complete Payment"}
+                  </button>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="paymentPage-right">
-            <div className="paymentPage-right-top">
-              <PaymentCheckoutForm
-                paymentDetails={paymentDetails}
-                handlePaymentInputChange={handlePaymentInputChange}
-                handlePaymentCheckout={handlePaymentCheckout}
-                formatCardNumber={formatCardNumber}
-                formatExpiry={formatExpiry}
-              />
-            </div>
-          </div>
-        </div>
+            </Form>
+          )}
+        </Formik>
       </div>
     </div>
   );
