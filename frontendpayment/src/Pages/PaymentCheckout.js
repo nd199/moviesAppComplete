@@ -1,9 +1,10 @@
+import { Form, Formik } from "formik";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuid } from "uuid";
-import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import "./PaymentCheckout.css";
 
 import InputField from "../component/InputComponent";
 import {
@@ -31,7 +32,6 @@ const PaymentCheckout = () => {
     getPaymentDetails(dispatch, userId);
   }, [dispatch, userId]);
 
-  /* ---------------- INITIAL VALUES ---------------- */
   const initialValues = useMemo(
     () => ({
       name: userDetails?.name || "",
@@ -45,7 +45,6 @@ const PaymentCheckout = () => {
     [userDetails]
   );
 
-  /* ---------------- VALIDATION ---------------- */
   const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
     address: Yup.string().required("Address is required"),
@@ -64,7 +63,6 @@ const PaymentCheckout = () => {
       .required("CVV required"),
   });
 
-  /* ---------------- SUBMIT ---------------- */
   const handleSubmit = async (values, { setSubmitting }) => {
     const transactionId = uuid();
 
@@ -105,10 +103,8 @@ const PaymentCheckout = () => {
           {({ values, handleChange, isSubmitting, isValid }) => (
             <Form>
               <div className="payment-grid">
-                {/* PERSONAL DETAILS */}
                 <div className="payment-section">
                   <h2>Personal Details</h2>
-
                   <InputField
                     label="Full Name"
                     name="name"
@@ -208,9 +204,7 @@ const PaymentCheckout = () => {
 
                   <button
                     type="submit"
-                    className={`pay-button ${
-                      isSubmitting ? "loading" : ""
-                    }`}
+                    className={`pay-button ${isSubmitting ? "loading" : ""}`}
                     disabled={!isValid || isSubmitting}
                   >
                     {isSubmitting ? "Processing..." : "Complete Payment"}
