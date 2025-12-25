@@ -4,7 +4,7 @@ export const savePaymentApi = (data) =>
   paymentRequest.post("/submitPayment", { finalPayment: data });
 
 export const getPaymentDetailsApi = (email) =>
-  paymentRequest.get(`/paymentDetails?email=${email}`);
+  springRequest.get(`/paymentDetails?email=${email}`);
 
 export const updateFinalUserApi = (finalUser) =>
   paymentRequest.post("/updateFinalUser", { finalUser });
