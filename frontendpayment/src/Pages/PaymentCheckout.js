@@ -1,50 +1,35 @@
 import { Form, Formik } from "formik";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import * as Yup from "yup";
-import "./PaymentCheckout.css";
 
-import InputField from "../component/InputComponent";
 import {
-  getPaymentDetails,
+  fetchUserInfoAndPlan,
   pingSpring,
-  saveFinalPayment,
+  savePayment,
   updateFinalUser,
-} from "../Network/ApiCalls";
-
-import "./PaymentCheckout.css";
+} from "../redux/PaymentRedux";
 
 const PaymentCheckout = () => {
   const dispatch = useDispatch();
-  const { userId } = useParams();
   const nav = useNavigate();
+  const { userId } = useParams();
 
-  const userAndPaymentData = useSelector(
-    (state) => state?.payment?.userInfoAndSelectedPlan
+  const { userInfoAndSelectedPlan, isFetching } = useSelector(
+    (state) => state.payment
   );
 
-  const userDetails = userAndPaymentData?.data;
-  const selectedPlan = userDetails?.selectedPlan?.selectedPlan;
+  const user = userInfoAndSelectedPlan?.data;
+  const plan = user?.selectedPlan?.selectedPlan;
 
+  /* FETCH USER + PLAN */
   useEffect(() => {
-    getPaymentDetails(dispatch, userId);
+    dispatch(fetchUserInfoAndPlan(userId));
   }, [dispatch, userId]);
 
-  const initialValues = useMemo(
-    () => ({
-      name: userDetails?.name || "",
-      address: userDetails?.address || "",
-      phoneNumber: userDetails?.phoneNumber || "",
-      nameOnCard: "",
-      cardNumber: "",
-      expiry: "",
-      cvv: "",
-    }),
-    [userDetails]
-  );
-
+  /* VALIDATION */
   const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
     address: Yup.string().required("Address is required"),
@@ -63,25 +48,28 @@ const PaymentCheckout = () => {
       .required("CVV required"),
   });
 
+  /* SUBMIT */
   const handleSubmit = async (values, { setSubmitting }) => {
-    const transactionId = uuid();
-
     try {
-      const finalUser = { ...userDetails, ...values };
+      const transactionId = uuid();
+      const finalUser = { ...user, ...values };
 
-      const response = await saveFinalPayment(dispatch, {
-        finalUser,
-        finalPlan: selectedPlan,
-        paymentMethod: "card",
-        transactionId,
-      });
+      await dispatch(
+        savePayment({
+          finalUser,
+          finalPlan: plan,
+          paymentMethod: "card",
+          transactionId,
+        })
+      ).unwrap();
 
-      if (response) {
-        finalUser.isSubscribed = true;
-        await updateFinalUser(dispatch, finalUser);
-        await pingSpring(dispatch, finalUser.email);
-        nav("/success");
-      }
+      await dispatch(
+        updateFinalUser({ ...finalUser, isSubscribed: true })
+      ).unwrap();
+
+      await dispatch(pingSpring(finalUser.email));
+
+      nav("/success");
     } catch (err) {
       alert("Payment failed. Please try again.");
     } finally {
@@ -89,128 +77,146 @@ const PaymentCheckout = () => {
     }
   };
 
+  if (isFetching || !user) return <p>Loading...</p>;
+
   return (
     <div className="payment-container">
       <div className="payment-card">
-        <h1 className="payment-title">Secure Checkout</h1>
+        <h1>Secure Checkout</h1>
 
         <Formik
           enableReinitialize
-          initialValues={initialValues}
+          initialValues={{
+            name: user.name || "",
+            address: user.address || "",
+            phoneNumber: user.phoneNumber || "",
+            nameOnCard: "",
+            cardNumber: "",
+            expiry: "",
+            cvv: "",
+          }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ values, handleChange, isSubmitting, isValid }) => (
+          {({
+            values,
+            errors,
+            touched,
+            handleChange,
+            handleBlur,
+            isSubmitting,
+            isValid,
+          }) => (
             <Form>
-              <div className="payment-grid">
-                <div className="payment-section">
-                  <h2>Personal Details</h2>
-                  <InputField
-                    label="Full Name"
-                    name="name"
-                    value={values.name}
-                    onChange={handleChange}
-                    required
-                  />
+              {/* PERSONAL DETAILS */}
+              <h3>Personal Details</h3>
 
-                  <InputField
-                    label="Email"
-                    value={userDetails?.email || ""}
-                    disabled
-                  />
+              <input
+                name="name"
+                placeholder="Full Name"
+                value={values.name}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              {touched.name && errors.name && <p>{errors.name}</p>}
 
-                  <InputField
-                    label="Billing Address"
-                    name="address"
-                    value={values.address}
-                    onChange={handleChange}
-                    required
-                  />
+              <input value={user.email} disabled placeholder="Email" />
 
-                  <InputField
-                    label="Phone Number"
-                    name="phoneNumber"
-                    value={values.phoneNumber}
-                    onChange={(e) => {
-                      e.target.value = e.target.value
-                        .replace(/\D/g, "")
-                        .slice(0, 10);
-                      handleChange(e);
-                    }}
-                    required
-                  />
-                </div>
+              <input
+                name="address"
+                placeholder="Billing Address"
+                value={values.address}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              {touched.address && errors.address && <p>{errors.address}</p>}
 
-                {/* PAYMENT */}
-                <div className="payment-section">
-                  <h2>Payment Method</h2>
+              <input
+                name="phoneNumber"
+                placeholder="Phone Number"
+                value={values.phoneNumber}
+                onChange={(e) => {
+                  e.target.value = e.target.value
+                    .replace(/\D/g, "")
+                    .slice(0, 10);
+                  handleChange(e);
+                }}
+                onBlur={handleBlur}
+              />
+              {touched.phoneNumber && errors.phoneNumber && (
+                <p>{errors.phoneNumber}</p>
+              )}
 
-                  <InputField
-                    label="Cardholder Name"
-                    name="nameOnCard"
-                    value={values.nameOnCard}
-                    onChange={handleChange}
-                    required
-                  />
+              {/* PAYMENT */}
+              <h3>Payment Details</h3>
 
-                  <InputField
-                    label="Card Number"
-                    name="cardNumber"
-                    value={values.cardNumber}
-                    onChange={(e) => {
-                      e.target.value = e.target.value
-                        .replace(/\D/g, "")
-                        .replace(/(.{4})/g, "$1 ")
-                        .trim()
-                        .slice(0, 19);
-                      handleChange(e);
-                    }}
-                    required
-                  />
+              <input
+                name="nameOnCard"
+                placeholder="Name on Card"
+                value={values.nameOnCard}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              {touched.nameOnCard && errors.nameOnCard && (
+                <p>{errors.nameOnCard}</p>
+              )}
 
-                  <div className="card-row">
-                    <InputField
-                      label="Expiry"
-                      name="expiry"
-                      value={values.expiry}
-                      onChange={(e) => {
-                        e.target.value = e.target.value
-                          .replace(/\D/g, "")
-                          .replace(/(\d{2})(\d{0,2})/, "$1/$2")
-                          .slice(0, 5);
-                        handleChange(e);
-                      }}
-                      required
-                    />
+              <input
+                name="cardNumber"
+                placeholder="Card Number"
+                value={values.cardNumber}
+                onChange={(e) => {
+                  e.target.value = e.target.value
+                    .replace(/\D/g, "")
+                    .replace(/(.{4})/g, "$1 ")
+                    .trim()
+                    .slice(0, 19);
+                  handleChange(e);
+                }}
+                onBlur={handleBlur}
+              />
+              {touched.cardNumber && errors.cardNumber && (
+                <p>{errors.cardNumber}</p>
+              )}
 
-                    <InputField
-                      label="CVV"
-                      name="cvv"
-                      value={values.cvv}
-                      onChange={(e) => {
-                        e.target.value = e.target.value
-                          .replace(/\D/g, "")
-                          .slice(0, 4);
-                        handleChange(e);
-                      }}
-                      required
-                    />
-                  </div>
+              <input
+                name="expiry"
+                placeholder="MM/YY"
+                value={values.expiry}
+                onChange={(e) => {
+                  e.target.value = e.target.value
+                    .replace(/\D/g, "")
+                    .replace(/(\d{2})(\d{0,2})/, "$1/$2")
+                    .slice(0, 5);
+                  handleChange(e);
+                }}
+                onBlur={handleBlur}
+              />
+              {touched.expiry && errors.expiry && <p>{errors.expiry}</p>}
 
-                  <div className="plan-summary">
-                    <strong>{selectedPlan?.name}</strong>
-                    <span>₹{selectedPlan?.price}</span>
-                  </div>
+              <input
+                name="cvv"
+                placeholder="CVV"
+                value={values.cvv}
+                onChange={(e) => {
+                  e.target.value = e.target.value
+                    .replace(/\D/g, "")
+                    .slice(0, 4);
+                  handleChange(e);
+                }}
+                onBlur={handleBlur}
+              />
+              {touched.cvv && errors.cvv && <p>{errors.cvv}</p>}
 
-                  <button
-                    type="submit"
-                    className={`pay-button ${isSubmitting ? "loading" : ""}`}
-                    disabled={!isValid || isSubmitting}
-                  >
-                    {isSubmitting ? "Processing..." : "Complete Payment"}
-                  </button>
-                </div>
+              {/* SUMMARY */}
+              <div className="plan-summary">
+                <strong>{plan?.name}</strong>
+                <span>₹{plan?.price}</span>
               </div>
+
+              <button type="submit" disabled={!isValid || isSubmitting}>
+                {isSubmitting ? "Processing..." : "Complete Payment"}
+              </button>
             </Form>
           )}
         </Formik>

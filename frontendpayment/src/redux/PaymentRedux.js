@@ -1,98 +1,83 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  getPaymentDetailsApi,
+  pingSpringApi,
+  savePaymentApi,
+  updateFinalUserApi,
+} from "../Network/ApiCalls";
 
 export const savePayment = createAsyncThunk(
-  'payment/savePayment',
-  async (paymentData, { rejectWithValue }) => {
+  "payment/save",
+  async (data, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/submitPayment', paymentData);
-      return response.data;
+      const res = await savePaymentApi(data);
+      return res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data || 'Error saving payment');
+      return rejectWithValue(err.response?.data?.message || "Payment failed");
     }
   }
 );
 
 export const fetchUserInfoAndPlan = createAsyncThunk(
-  'payment/fetchUserInfoAndPlan',
-  async (userEmail, { rejectWithValue }) => {
+  "payment/fetchDetails",
+  async (email, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/paymentDetails', { params: { userId: userEmail } });
-      return response.data;
+      const res = await getPaymentDetailsApi(email);
+      return res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data || 'Error fetching user info');
+      return rejectWithValue("Failed to fetch payment details");
     }
   }
 );
 
 export const updateFinalUser = createAsyncThunk(
-  'payment/updateFinalUser',
+  "payment/updateUser",
   async (finalUser, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/updateFinalUser', { finalUser });
-      return response.data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data || 'Error updating final user');
+      const res = await updateFinalUserApi(finalUser);
+      return res.data;
+    } catch {
+      return rejectWithValue("Failed to update user");
     }
   }
 );
 
-export const PaymentRedux = createSlice({
-  name: 'payment',
+export const pingSpring = createAsyncThunk("payment/ping", async (email) => {
+  await pingSpringApi(email);
+});
+
+const PaymentRedux = createSlice({
+  name: "payment",
   initialState: {
-    paymentPlan: {},
-    userInfoAndSelectedPlan: {},
-    finalUser: {},
+    userInfoAndSelectedPlan: null,
     isFetching: false,
     error: null,
   },
-  reducers: {
-    ping: (state) => {
-      state.isFetching = false;
-      state.error = null;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(savePayment.pending, (state) => {
-        state.isFetching = true;
-        state.error = null;
+      .addCase(fetchUserInfoAndPlan.pending, (s) => {
+        s.isFetching = true;
       })
-      .addCase(savePayment.fulfilled, (state, action) => {
-        state.paymentPlan = action.payload;
-        state.isFetching = false;
+      .addCase(fetchUserInfoAndPlan.fulfilled, (s, a) => {
+        s.userInfoAndSelectedPlan = a.payload;
+        s.isFetching = false;
       })
-      .addCase(savePayment.rejected, (state, action) => {
-        state.isFetching = false;
-        state.error = action.payload;
+      .addCase(fetchUserInfoAndPlan.rejected, (s, a) => {
+        s.error = a.payload;
+        s.isFetching = false;
       })
-      .addCase(fetchUserInfoAndPlan.pending, (state) => {
-        state.isFetching = true;
-        state.error = null;
+      .addCase(savePayment.pending, (s) => {
+        s.isFetching = true;
       })
-      .addCase(fetchUserInfoAndPlan.fulfilled, (state, action) => {
-        state.userInfoAndSelectedPlan = action.payload;
-        state.isFetching = false;
+      .addCase(savePayment.fulfilled, (s) => {
+        s.isFetching = false;
       })
-      .addCase(fetchUserInfoAndPlan.rejected, (state, action) => {
-        state.isFetching = false;
-        state.error = action.payload;
-      })
-      .addCase(updateFinalUser.pending, (state) => {
-        state.isFetching = true;
-        state.error = null;
-      })
-      .addCase(updateFinalUser.fulfilled, (state, action) => {
-        state.finalUser = action.payload;
-        state.isFetching = false;
-      })
-      .addCase(updateFinalUser.rejected, (state, action) => {
-        state.isFetching = false;
-        state.error = action.payload;
+      .addCase(savePayment.rejected, (s, a) => {
+        s.error = a.payload;
+        s.isFetching = false;
       });
   },
 });
-
-export const { ping } = PaymentRedux.actions;
 
 export default PaymentRedux.reducer;

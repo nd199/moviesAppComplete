@@ -1,12 +1,9 @@
 import axios from "axios";
 
-const BASEURL = "https://movie-payment.onrender.com";
-const baseURL = "https://movieticket-api.onrender.com/"
-
-export const paymentRequests = axios.create({
-    baseURL: BASEURL
-})
+export const paymentRequest = axios.create({
+  baseURL: "https://movie-payment.onrender.com",
+});
 
 export const springRequest = axios.create({
-    baseURL: baseURL
-})
+  baseURL: "https://movieticket-api.onrender.com",
+});
