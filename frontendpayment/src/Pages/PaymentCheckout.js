@@ -17,17 +17,47 @@ const PaymentCheckout = () => {
   const nav = useNavigate();
   const { userId } = useParams();
 
-  const { userInfoAndSelectedPlan, isFetching } = useSelector(
+  const { userInfoAndSelectedPlan, loading } = useSelector(
     (state) => state.payment
   );
 
   const user = userInfoAndSelectedPlan?.data;
   const plan = user?.selectedPlan?.selectedPlan;
 
-  /* FETCH USER + PLAN */
   useEffect(() => {
     dispatch(fetchUserInfoAndPlan(userId));
   }, [dispatch, userId]);
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      const transactionId = uuid();
+
+      const finalUser = {
+        ...user,
+        ...values,
+        isSubscribed: true,
+      };
+
+      await dispatch(
+        savePayment({
+          finalUser,
+          finalPlan: plan,
+          paymentMethod: "card",
+          transactionId,
+        })
+      ).unwrap();
+
+      await dispatch(updateFinalUser(finalUser)).unwrap();
+
+      await dispatch(pingSpring(finalUser.email));
+
+      nav("/success");
+    } catch (err) {
+      alert(err || "Payment failed");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   /* VALIDATION */
   const validationSchema = Yup.object({
@@ -48,36 +78,7 @@ const PaymentCheckout = () => {
       .required("CVV required"),
   });
 
-  /* SUBMIT */
-  const handleSubmit = async (values, { setSubmitting }) => {
-    try {
-      const transactionId = uuid();
-      const finalUser = { ...user, ...values };
-
-      await dispatch(
-        savePayment({
-          finalUser,
-          finalPlan: plan,
-          paymentMethod: "card",
-          transactionId,
-        })
-      ).unwrap();
-
-      await dispatch(
-        updateFinalUser({ ...finalUser, isSubscribed: true })
-      ).unwrap();
-
-      await dispatch(pingSpring(finalUser.email));
-
-      nav("/success");
-    } catch (err) {
-      alert("Payment failed. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  if (isFetching || !user) return <p>Loading...</p>;
+  if (loading || !user) return <p>Loading...</p>;
 
   return (
     <div className="payment-container">

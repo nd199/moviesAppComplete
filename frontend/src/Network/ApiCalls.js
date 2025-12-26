@@ -145,21 +145,6 @@ export const validateOtp = async (dispatch, validateInfo) => {
   }
 };
 
-/* ================= PAYMENT ================= */
-export const pushToPaymentModule = async (dispatch, userPaymentInfo) => {
-  dispatch(pushToPaymentStart());
-  try {
-    const res = await axios.post(
-      "https://moviesappcomplete.onrender.com/api/auth/payment",
-      userPaymentInfo
-    );
-    dispatch(pushToPaymentSuccess(res.data));
-  } catch (error) {
-    const message = error.response?.data?.message || "Payment failed";
-    dispatch(pushToPaymentFailure({ message }));
-  }
-};
-
 /* ================= UPDATE PROFILE ================= */
 export const updateProfile = async (dispatch, userUpdateInfo, id) => {
   dispatch(updateUserStart());

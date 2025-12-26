@@ -15,6 +15,28 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
 
+app.get("/api/payment/intent", async (req, res) => {
+  const { token } = req.query;
+
+  if (!token) {
+    return res.status(400).json({ message: "Token is required" });
+  }
+
+  try {
+    const springRes = await axios.get(
+      `${SPRING_BASE_URL}/api/v1/subscription/intent/${token}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Service_JWT}`,
+        },
+      }
+    );
+    return res.json(springRes.data);
+  } catch (err) {
+    return res.status(400).json({ message: "Invalid or expired token" });
+  }
+});
+
 app.post("/updateFinalUser", async (req, res) => {
   try {
     const { finalUser } = req.body;

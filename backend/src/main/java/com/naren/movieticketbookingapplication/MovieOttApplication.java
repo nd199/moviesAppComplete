@@ -1,14 +1,8 @@
 package com.naren.movieticketbookingapplication;
 
 import com.github.javafaker.Faker;
-import com.naren.movieticketbookingapplication.Entity.Customer;
-import com.naren.movieticketbookingapplication.Entity.Movie;
-import com.naren.movieticketbookingapplication.Entity.Role;
-import com.naren.movieticketbookingapplication.Entity.Show;
-import com.naren.movieticketbookingapplication.Repo.CustomerRepository;
-import com.naren.movieticketbookingapplication.Repo.MovieRepository;
-import com.naren.movieticketbookingapplication.Repo.RoleRepository;
-import com.naren.movieticketbookingapplication.Repo.ShowRepository;
+import com.naren.movieticketbookingapplication.Entity.*;
+import com.naren.movieticketbookingapplication.Repo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -36,11 +30,13 @@ public class MovieOttApplication {
     public CommandLineRunner commandLineRunner(CustomerRepository customerRepository,
                                                MovieRepository movieRepository, PasswordEncoder encoder,
                                                RoleRepository roleRepository,
-                                               ShowRepository showRepository) {
+                                               ShowRepository showRepository,
+                                               SubscriptionPlanRepository subscriptionPlanRepository) {
         return args -> {
             createRandomCustomer(customerRepository, encoder);
             createRandomMovie(movieRepository);
             createRandomShow(showRepository);
+            createDefaultPlans(subscriptionPlanRepository);
 //            createRole(roleRepository);
         };
     }
@@ -96,6 +92,44 @@ public class MovieOttApplication {
                 ageRating, year, runtime, genre1 + "," + genre2, "shows");
         showRepository.save(show);
         log.info("Created new show: {}", show);
+    }
+
+    private SubscriptionPlan basicPlan() {
+        return SubscriptionPlan.builder()
+                .planName("Monthly")
+                .description("Access to all content for a month")
+                .price(149.00)
+                .interval("Month")
+                .build();
+    }
+
+    private SubscriptionPlan mediumPlan() {
+        return SubscriptionPlan.builder()
+                .planName("6 Months")
+                .description("Access to all content for 6 months")
+                .price(749.00)
+                .interval("6 Months")
+                .build();
+    }
+
+    private SubscriptionPlan premiumPlan() {
+            return SubscriptionPlan.builder()
+                    .planName("Yearly")
+                    .description("Access to all content for a year")
+                    .price(1499.00)
+                    .interval("Year")
+                    .build();
+    }
+
+    private void createDefaultPlans(SubscriptionPlanRepository planRepository) {
+        if (!planRepository.existsByPlanName("Monthly")) {
+            planRepository.save(basicPlan());
+        }
+        if (!planRepository.existsByPlanName("6 Months")) {
+            planRepository.save(mediumPlan());
+        }
+        if (!planRepository.existsByPlanName("Yearly"))
+            planRepository.save(premiumPlan());
     }
 
 

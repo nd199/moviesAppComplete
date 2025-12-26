@@ -26,70 +26,58 @@ const List = ({ title }) => {
   const getViewAllLink = (title) =>
     title === "Movies" ? "/movies" : title === "Shows" ? "/shows" : "#";
 
-  return (
-    <div className="list-full">
-      <div className="list-wrap">
-        <span className="listTitle-full">
-          <h1 className="lf-title">{title}</h1>
-          <h5 style={{ color: "#fff", fontSize: "17px" }}>
-            <Link
-              to={getViewAllLink(title)}
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              VIEW ALL...
-            </Link>
-          </h5>
-        </span>
+  const items = title === "Movies" ? movies : shows;
 
+  if (!items || items.length === 0) return null;
+
+  return (
+    <section className="row-section">
+      <div className="row-header">
+        <div>
+          <h2 className="row-title">{title}</h2>
+          <p className="row-subtitle">
+            Handpicked {title.toLowerCase()} for you
+          </p>
+        </div>
+        <Link to={getViewAllLink(title)} className="row-view-all">
+          VIEW ALL
+        </Link>
+      </div>
+
+      <div className="row-swiper-wrapper">
         <Swiper
-          key={movies?.length || shows?.length}
+          key={items.length}
           modules={[Navigation, Pagination]}
-          spaceBetween={10}
-          slidesPerView={4}
+          spaceBetween={16}
+          slidesPerView={5}
+          navigation
           pagination={{ clickable: true }}
           breakpoints={{
-            1240: { slidesPerView: 4 },
-            1024: { slidesPerView: 3 },
-            768: { slidesPerView: 2 },
-            480: { slidesPerView: 1 },
-            320: { slidesPerView: 1 },
+            1440: { slidesPerView: 6 },
+            1240: { slidesPerView: 5 },
+            1024: { slidesPerView: 4 },
+            768: { slidesPerView: 3 },
+            480: { slidesPerView: 2 },
+            0: { slidesPerView: 1.2 },
           }}
+          className="row-swiper"
         >
-          {title === "Movies" &&
-            movies?.map((movie, id) => (
-              <SwiperSlide key={id}>
-                <ListItem
-                  name={movie.name}
-                  desc={movie.description}
-                  year={movie.year}
-                  img={movie.poster}
-                  ageRating={movie.ageRating}
-                  cost={movie.cost}
-                  rating={movie.rating}
-                  runtime={movie.runtime}
-                  genre={movie.genre}
-                />
-              </SwiperSlide>
-            ))}
-          {title === "Shows" &&
-            shows?.map((show, id) => (
-              <SwiperSlide key={id}>
-                <ListItem
-                  name={show.name}
-                  desc={show.description}
-                  year={show.year}
-                  img={show.poster}
-                  ageRating={show.ageRating}
-                  cost={show.cost}
-                  rating={show.rating}
-                  runtime={show.runtime}
-                  genre={show.genre}
-                />
-              </SwiperSlide>
-            ))}
+          {items.map((item, idx) => (
+            <SwiperSlide key={item.id || idx} className="row-slide">
+              <ListItem
+                name={item.name}
+                desc={item.description}
+                year={item.year}
+                ageRating={item.ageRating}
+                rating={item.rating}
+                runtime={item.runtime}
+                genre={item.genre}
+              />
+            </SwiperSlide>
+          ))}
         </Swiper>
       </div>
-    </div>
+    </section>
   );
 };
 
