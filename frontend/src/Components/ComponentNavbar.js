@@ -1,91 +1,114 @@
-import React from "react";
+import { useState } from "react";
 import "./ComponentNavbar.css";
 
 const ComponentNavbar = ({
-                             sortBy,
-                             setSortBy,
-                             searchQuery,
-                             setSearchQuery,
-                             genre,
-                             setGenre,
-                             year,
-                             setYear,
-                             rating,
-                             setRating,
-                         }) => {
-    return (
-        <div className="comp-navbar">
-            <div className="comp-navbar-left">
-                <div className="comp-navbar-left-item">
-                    <h3>Sort By</h3>
-                    <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                        <option value="popularity">Popularity</option>
-                        <option value="rating">Rating</option>
-                    </select>
-                </div>
-                <div className="comp-navbar-left-item search">
-                    <h3>Search</h3>
-                    <input
-                        type="text"
-                        placeholder="Search Movies.."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-            </div>
-            <div className="comp-navbar-right right">
-                <div className="comp-navbar-right-item">
-                    <h3>Genres</h3>
-                    <select value={genre} onChange={(e) => setGenre(e.target.value)}>
-                        <option value="">All</option>
-                        <option value="Action">Action</option>
-                        <option value="Adventure">Adventure</option>
-                        <option value="Comedy">Comedy</option>
-                        <option value="Crime">Crime</option>
-                        <option value="Documentary">Documentary</option>
-                        <option value="Drama">Drama</option>
-                        <option value="Family">Family</option>
-                        <option value="Fantasy">Fantasy</option>
-                        <option value="History">History</option>
-                        <option value="Horror">Horror</option>
-                        <option value="Music">Music</option>
-                        <option value="Mystery">Mystery</option>
-                        <option value="Romance">Romance</option>
-                        <option value="Science Fiction">Science Fiction</option>
-                        <option value="TV Movie">TV Movie</option>
-                        <option value="Thriller">Thriller</option>
-                        <option value="War">War</option>
-                        <option value="Western">Western</option>
-                    </select>
-                </div>
-                <div className="comp-navbar-right-item">
-                    <h3>Year</h3>
-                    <select value={year} onChange={(e) => setYear(e.target.value)}>
-                        <option value="">All</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                        <option value="2020">2020</option>
-                    </select>
-                </div>
-                <div className="comp-navbar-right-item">
-                    <h3>Rating</h3>
-                    <select value={rating} onChange={(e) => setRating(e.target.value)}>
-                        <option value="">All</option>
-                        <option value="1.0">1.0 ⭐️</option>
-                        <option value="2.0">2.0 ⭐️</option>
-                        <option value="3.0">3.0 ⭐️</option>
-                        <option value="4.0">4.0 ⭐️</option>
-                        <option value="5.0">5.0 ⭐️</option>
-                        <option value="6.0">6.0 ⭐️</option>
-                        <option value="7.0">7.0 ⭐️</option>
-                        <option value="8.0">8.0 ⭐️</option>
-                        <option value="9.0">9.0 ⭐️</option>
-                        <option value="10.0">10.0 ⭐️</option>
-                    </select>
-                </div>
-            </div>
+  sortBy,
+  setSortBy,
+  searchQuery,
+  setSearchQuery,
+  genre,
+  setGenre,
+  year,
+  setYear,
+  rating,
+  setRating,
+}) => {
+  const [activeFilter, setActiveFilter] = useState(null);
+
+  const genres = [
+    "All",
+    "Action",
+    "Adventure",
+    "Comedy",
+    "Crime",
+    "Drama",
+    "Horror",
+    "Romance",
+    "Thriller",
+    "Sci-Fi",
+    "Fantasy",
+  ];
+
+  return (
+    <div className="filter-bar">
+      <div className="filter-group">
+        <div className="filter-item">
+          <label>Sort</label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            onFocus={() => setActiveFilter("sort")}
+            onBlur={() => setActiveFilter(null)}
+          >
+            <option value="popularity">Popularity ↓</option>
+            <option value="rating">Rating ↓</option>
+          </select>
         </div>
-    );
+
+        <div className="filter-item search-field">
+          <label>Search</label>
+          <div className="search-input-wrapper">
+            <input
+              type="text"
+              placeholder="Search movies & shows..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="filter-group">
+        <div className="filter-item">
+          <label>Genre</label>
+          <select
+            value={genre}
+            onChange={(e) => setGenre(e.target.value)}
+            onFocus={() => setActiveFilter("genre")}
+            onBlur={() => setActiveFilter(null)}
+          >
+            {genres.map((g) => (
+              <option key={g} value={g === "All Genres" ? "" : g}>
+                {g}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="filter-item">
+          <label>Year</label>
+          <select
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            onFocus={() => setActiveFilter("year")}
+            onBlur={() => setActiveFilter(null)}
+          >
+            <option value="">All Years</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+          </select>
+        </div>
+
+        <div className="filter-item">
+          <label>Rating</label>
+          <select
+            value={rating}
+            onChange={(e) => setRating(e.target.value)}
+            onFocus={() => setActiveFilter("rating")}
+            onBlur={() => setActiveFilter(null)}
+          >
+            <option value="">All Ratings</option>
+            <option value="7.0">7.0+ ⭐</option>
+            <option value="8.0">8.0+ ⭐</option>
+            <option value="9.0">9.0+ ⭐</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ComponentNavbar;

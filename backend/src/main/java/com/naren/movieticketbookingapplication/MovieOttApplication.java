@@ -33,9 +33,13 @@ public class MovieOttApplication {
                                                ShowRepository showRepository,
                                                SubscriptionPlanRepository subscriptionPlanRepository) {
         return args -> {
-            createRandomCustomer(customerRepository, encoder);
-            createRandomMovie(movieRepository);
-            createRandomShow(showRepository);
+            int i = 6;
+            while(i != 0) {
+                createRandomCustomer(customerRepository, encoder);
+                createRandomMovie(movieRepository);
+                createRandomShow(showRepository);
+                i--;
+            }
             createDefaultPlans(subscriptionPlanRepository);
 //            createRole(roleRepository);
         };

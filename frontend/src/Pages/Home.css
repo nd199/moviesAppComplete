@@ -1,5 +1,11 @@
 .home {
-    background-color: var(--main-color);
-    position: relative;
-    overflow: hidden;
+  background-color: var(--main-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  margin-top: 60px;
 }

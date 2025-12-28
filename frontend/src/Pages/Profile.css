@@ -1,219 +1,273 @@
 .profileContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px;
-    background-color: #0d1117;
-    color: #c9d1d9;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #020617 0%, #0a0e1a 100%);
+  padding: 2rem;
+  color: #f9fafb;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .profileTitleContainer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 1000px;
-    margin-bottom: 20px;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  text-align: center;
 }
 
 .profileTitle {
-    font-size: 36px;
-    color: #f39c12;
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  background: linear-gradient(135deg, #f97316, #fb923c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
 }
 
 .profileContentContainer {
-    display: flex;
-    flex-direction: row;
-    gap: 20%;
-    align-items: center;
-    background-color: #161b22;
-    padding: 40px;
-    width: 100%;
-    max-width: 1200px;
-    margin: auto;
-    border-radius: 16px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
 }
 
 .profileInfo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    border: 2px solid white;
-    padding: 90px 20px;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .profileInfoContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
 }
 
 .profileInfoImg {
-    border-radius: 50%;
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border: 4px solid #444;
-    margin-bottom: 20px;
-    transition: border-color 0.3s ease, transform 0.3s ease;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(249, 115, 22, 0.4);
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.2);
+  transition: all 0.3s ease;
 }
 
 .profileInfoImg:hover {
-    border-color: #666;
-    transform: scale(1.1);
-}
-
-.profileInfoText {
-    text-align: center;
-    margin-bottom: 20px;
+  transform: scale(1.05);
+  border-color: #f97316;
 }
 
 .profileInfoName {
-    font-size: 24px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  color: #f9fafb;
 }
 
 .profileDetails {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  width: 100%;
 }
 
 .profileInfoTitle {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #f39c12;
-    text-align: center;
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #f97316;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
 .profileInfoItem {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(11, 18, 32, 0.6);
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
-.profileShowInfo {
-    margin-left: 10px;
-}
-
-.profileUpdate {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-top: 20px;
-    position: relative;
-}
-
-.profileUpdateForm {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-.profileUpdateLeft {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.profileUpdateItem {
-    margin-bottom: 20px;
-}
-
-.profileUpdateInput {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #444;
-    border-radius: 8px;
-    background-color: #0d1117;
-    color: #c9d1d9;
-    font-size: 18px;
-    transition: border-color 0.3s ease;
-}
-
-.profileUpdateInput:focus {
-    outline: none;
-    border-color: #f39c12;
-}
-
-.profileUpdateRight {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-.profileUpdateUpload {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.profileUpdateImg {
-    border-radius: 50%;
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border: 4px solid #444;
-    margin-bottom: 10px;
-}
-
-.profileUpdateIcon {
-    cursor: pointer;
-    color: #f39c12;
+.profileInfoItem svg {
+  color: #9ca3af;
+  font-size: 1.4rem;
 }
 
 .profileUpdateButton {
-    background-color: #f39c12;
-    color: #0d1117;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
+  width: 100%;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: #020617;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
 }
 
 .profileUpdateButton:hover {
-    background-color: #0d1117;
-    color: #f39c12;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(249, 115, 22, 0.4);
+}
+
+.profileUpdate {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(25px);
+  border-radius: 20px;
+  padding: 2.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  position: relative;
+  max-width: 500px;
 }
 
 .editProfileCloseButton {
-    width: 30px;
-    color: white;
-    background: none;
-    position: absolute;
-    right: 20px;
-    top: -60px;
-    cursor: pointer;
-    border: 0.8px solid #fff;
-    font-size: 20px;
-    font-weight: 800;
-    transition: all 4s ease;
+  position: absolute;
+  top: -1.5rem;
+  right: 1rem;
+  background: rgba(15, 23, 42, 0.9);
+  border: 2px solid #f9fafb;
+  color: #f9fafb;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
 }
 
 .editProfileCloseButton:hover {
-    transform: rotateY(320deg);
+  background: #ef4444;
+  border-color: #ef4444;
+  transform: rotate(90deg);
 }
 
-@media (max-width: 600px) {
-    .profileContentContainer {
-        padding: 20px;
-    }
+.profileUpdateForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: end;
+}
 
-    .profileInfoImg,
-    .profileUpdateImg {
-        width: 100px;
-        height: 100px;
-    }
+.profileUpdateRight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
 
-    .profileUpdateInput {
-        font-size: 16px;
-    }
+.profileUpdateUpload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profileUpdateImg {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(148, 163, 184, 0.3);
+}
+
+.profileUpdateLabel {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: #020617;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.profileUpdateLabel:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4);
+}
+
+.profileUpdateIcon {
+  font-size: 1.2rem;
+}
+
+.uploadProgress {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.profileUpdateLeft .profileUpdateItem {
+  margin-bottom: 0;
+}
+
+.profileUpdateItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.profileUpdateItem label {
+  font-size: 0.95rem;
+  color: #f9fafb;
+  font-weight: 500;
+}
+
+.profileUpdateInput {
+  background: rgba(11, 18, 32, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #f9fafb;
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.profileUpdateInput:focus {
+  outline: none;
+  border-color: #f97316;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+}
+
+.profileUpdateInput::placeholder {
+  color: #9ca3af;
+}
+
+.profileUpdateInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .profileContentContainer {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .profileUpdateForm {
+    grid-template-columns: 1fr;
+  }
+
+  .profileInfo {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profileContainer {
+    padding: 1rem;
+  }
 }

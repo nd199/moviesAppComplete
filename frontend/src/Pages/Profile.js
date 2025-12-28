@@ -17,11 +17,12 @@ import "./Profile.css";
 const Profile = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.user?.currentUser);
-  const [name, setName] = useState(user.name);
-  const [email, setEmail] = useState(user.email);
-  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
-  const [imageUrl, setImageUrl] = useState(user.imageUrl);
-  const [address, setAddress] = useState(user.address);
+
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || "");
+  const [imageUrl, setImageUrl] = useState(user?.imageUrl || "");
+  const [address, setAddress] = useState(user?.address || "");
   const [avatar, setAvatar] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -30,17 +31,9 @@ const Profile = () => {
     e.preventDefault();
     try {
       let updatedImageUrl = imageUrl;
-
       if (avatar) {
-        try {
-          const url = await uploadToImgBB(avatar, setUploadProgress);
-          updatedImageUrl = url;
-          setImageUrl(url);
-        } catch (err) {
-          console.error("Upload to ImgBB failed:", err);
-          toast.error("Image upload failed");
-          return;
-        }
+        const url = await uploadToImgBB(avatar, setUploadProgress);
+        updatedImageUrl = url;
       }
 
       const result = await updateProfile(
@@ -56,15 +49,11 @@ const Profile = () => {
       );
 
       if (result.success) {
-        toast.success("Profile updated successfully!");
-      } else {
-        toast.error(`Failed to update profile: ${result.error}`);
+        toast.success("Profile updated!");
+        fetchUsers(dispatch);
       }
-
-      fetchUsers(dispatch);
     } catch (err) {
-      console.log(err);
-      toast.error("An unexpected error occurred");
+      toast.error("Update failed");
     }
   };
 
@@ -73,9 +62,7 @@ const Profile = () => {
     if (file) {
       setAvatar(file);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageUrl(reader.result);
-      };
+      reader.onloadend = () => setImageUrl(reader.result);
       reader.readAsDataURL(file);
     }
   };
@@ -90,90 +77,75 @@ const Profile = () => {
         <div className="profileInfo">
           <div className="profileInfoContainer">
             <img
-              src={imageUrl || "https://example.com/default-image.jpg"}
-              alt=""
+              src={
+                imageUrl ||
+                "https://via.placeholder.com/150/1a1a1a/9ca3af?text=U"
+              }
+              alt="Profile"
               className="profileInfoImg"
+              onError={(e) =>
+                (e.target.src =
+                  "https://via.placeholder.com/150/1a1a1a/9ca3af?text=U")
+              }
             />
-            <div className="profileInfoText">
-              <h3 className="profileInfoName">{name || user.name}</h3>
-            </div>
+            <h3 className="profileInfoName">{name}</h3>
             <div className="profileDetails">
               <span className="profileInfoTitle">Account Details</span>
               <div className="profileInfoItem">
                 <Person2Outlined />
-                <span className="profileShowInfo">{name || user.name}</span>
+                <span>{name}</span>
               </div>
               <div className="profileInfoItem">
                 <MailOutlined />
-                <span className="profileShowInfo">{email || user.email}</span>
+                <span>{email}</span>
               </div>
               <div className="profileInfoItem">
                 <PhoneOutlined />
-                <span className="profileShowInfo">
-                  {phoneNumber || user.phoneNumber}
-                </span>
+                <span>{phoneNumber}</span>
               </div>
               <div className="profileInfoItem">
                 <LocationOnOutlined />
-                <span className="profileShowInfo">
-                  {address || user.address}
-                </span>
+                <span>{address}</span>
               </div>
             </div>
             <button
               onClick={() => setShowEditForm(true)}
               className="profileUpdateButton"
-              type="button"
             >
-              Edit
+              Edit Profile
             </button>
           </div>
         </div>
+
         {showEditForm && (
           <div className="profileUpdate">
             <button
-              onClick={() => setShowEditForm(!showEditForm)}
+              onClick={() => setShowEditForm(false)}
               className="editProfileCloseButton"
             >
-              X
+              ✕
             </button>
             <form className="profileUpdateForm" onSubmit={userUpdateHandler}>
               <div className="profileUpdateRight">
                 <div className="profileUpdateUpload">
-                  <img
-                    src={imageUrl || "https://example.com/default-image.jpg"}
-                    alt=""
-                    className="profileUpdateImg"
-                  />
-                  <label
-                    htmlFor="file"
-                    style={{
-                      padding: "5px",
-                      border: "1px solid orange",
-                      borderRadius: "10px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <PublishOutlined className="profileUpdateIcon" />
-                    <span>Upload</span>
+                  <img src={imageUrl} alt="" className="profileUpdateImg" />
+                  <label htmlFor="file" className="profileUpdateLabel">
+                    <PublishOutlined /> Upload
                   </label>
                   <input
-                    type="file"
                     id="file"
+                    type="file"
                     style={{ display: "none" }}
+                    accept="image/*"
                     onChange={handleFileChange}
                   />
-                  <LinearProgress
-                    variant="determinate"
-                    value={uploadProgress}
-                    style={{
-                      height: "10px",
-                      borderRadius: "5px",
-                      marginTop: "10px",
-                    }}
-                  />
+                  {uploadProgress > 0 && (
+                    <LinearProgress
+                      variant="determinate"
+                      value={uploadProgress}
+                      className="uploadProgress"
+                    />
+                  )}
                 </div>
               </div>
               <div className="profileUpdateLeft">
@@ -182,33 +154,30 @@ const Profile = () => {
                   <input
                     type="text"
                     className="profileUpdateInput"
-                    name="name"
-                    placeholder={user.name}
+                    placeholder={user?.name}
                     value={name}
-                    onChange={(e) => setName(e.target?.value)}
+                    onChange={(e) => setName(e.target.value)}
                   />
                 </div>
                 <div className="profileUpdateItem">
                   <label>Email</label>
                   <input
-                    type="text"
+                    type="email"
                     className="profileUpdateInput"
-                    name="email"
-                    placeholder={user.email}
+                    placeholder={user?.email}
                     value={email}
-                    onChange={(e) => setEmail(e.target?.value)}
+                    onChange={(e) => setEmail(e.target.value)}
                     disabled
                   />
                 </div>
                 <div className="profileUpdateItem">
                   <label>Phone</label>
                   <input
-                    type="text"
+                    type="tel"
                     className="profileUpdateInput"
-                    name="phoneNumber"
-                    placeholder={user.phoneNumber}
+                    placeholder={user?.phoneNumber}
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target?.value)}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                   />
                 </div>
                 <div className="profileUpdateItem">
@@ -216,14 +185,13 @@ const Profile = () => {
                   <input
                     type="text"
                     className="profileUpdateInput"
-                    name="address"
-                    placeholder={user.address}
+                    placeholder={user?.address}
                     value={address}
-                    onChange={(e) => setAddress(e.target?.value)}
+                    onChange={(e) => setAddress(e.target.value)}
                   />
                 </div>
               </div>
-              <button className="profileUpdateButton" type="submit">
+              <button type="submit" className="profileUpdateButton">
                 Update
               </button>
             </form>

@@ -1,25 +1,28 @@
-import React, { useEffect, useState } from "react";
-import "./NavBar.css";
-import Lottie from "react-lottie";
-import popcornAnimation from "../Utils/animations/popcorn.json";
 import { ArrowDropDown, Close, Menu, Notifications } from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import Lottie from "react-lottie";
 import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../redux/userSlice";
+import popcornAnimation from "../Utils/animations/popcorn.json";
+import "./NavBar.css";
 
 const NavBar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const nav = useNavigate();
+  const navigate = useNavigate();
   const user = useSelector((state) => state?.user);
   const dispatch = useDispatch();
-  let dropdownTimeout;
 
-  window.onscroll = () => {
-    setIsScrolled(window.scrollY !== 0);
-    return () => (window.onscroll = null);
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const defaultOptions = {
     loop: true,
@@ -30,91 +33,109 @@ const NavBar = () => {
     },
   };
 
-  useEffect(() => {
-    return () => {
-      clearTimeout(dropdownTimeout);
-    };
+  const toggleDropdown = useCallback(() => {
+    setDropdownOpen((prev) => !prev);
   }, []);
 
-  const toggleDropdown = () => {
-    clearTimeout(dropdownTimeout);
-    setDropdownOpen(!dropdownOpen);
-    dropdownTimeout = setTimeout(() => {
-      setDropdownOpen(false);
-    }, 1600);
-  };
+  const closeDropdown = useCallback(() => {
+    setDropdownOpen(false);
+  }, []);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+  const toggleMenu = useCallback(() => {
+    setMenuOpen((prev) => !prev);
+  }, []);
 
-  const userLogoutHandler = () => {
+  const userLogoutHandler = useCallback(() => {
     localStorage.removeItem("persist:root");
     dispatch(logout());
-    nav("/Login");
-    window.location.reload();
-  };
+    navigate("/Login");
+  }, [dispatch, navigate]);
 
-  const userProfileHandler = () => {
-    nav("/Profile");
-  }
+  const userProfileHandler = useCallback(() => {
+    navigate("/Profile");
+    closeDropdown();
+  }, [navigate, closeDropdown]);
+
+  const closeMobileMenu = useCallback(() => {
+    setMenuOpen(false);
+  }, []);
 
   return (
-    <div className={isScrolled ? "nav-bar scrolled" : "nav-bar"}>
-      <div className="nav-wrapper">
-        <div className="leftNavbar">
+    <header className={`navbar ${isScrolled ? "scrolled" : ""}`}>
+      <nav className="nav-container">
+        <Link to="/" className="logo-container" onClick={closeMobileMenu}>
           <div className="logo">
-            <Lottie options={defaultOptions} height={70} width={70} />
-            <span className="title">CN.io</span>
+            <Lottie
+              options={defaultOptions}
+              height={isScrolled ? 50 : 60}
+              width={isScrolled ? 50 : 60}
+            />
+            <span className="logo-title">CN.io</span>
           </div>
-          <div className={menuOpen ? "nav-links open" : "nav-links"}>
-            <Link to={"/"} onClick={() => setMenuOpen(false)}>
-              <span>Home</span>
+        </Link>
+        <ul className={`nav-links ${menuOpen ? "mobile-open" : ""}`}>
+          <li>
+            <Link to="/" onClick={closeMobileMenu}>
+              Home
             </Link>
-            <Link to={"/About"} onClick={() => setMenuOpen(false)}>
-              <span>About Us</span>
+          </li>
+          <li>
+            <Link to="/About" onClick={closeMobileMenu}>
+              About
             </Link>
-            <Link to={"/Movies"} onClick={() => setMenuOpen(false)}>
-              <span>Movies</span>
+          </li>
+          <li>
+            <Link to="/Movies" onClick={closeMobileMenu}>
+              Movies
             </Link>
-            <Link to={"/Shows"} onClick={() => setMenuOpen(false)}>
-              <span>Shows</span>
+          </li>
+          <li>
+            <Link to="/Shows" onClick={closeMobileMenu}>
+              Shows
             </Link>
-          </div>
-        </div>
-        <div className="rightNavbar">
-          <div className="profile">
-            <div className="p-image">
-              <img
-                src={user?.currentUser?.imageUrl || "images/naren.png"}
-                alt=""
-                style={{
-                  width: "35px",
-                  height: "35px",
-                  borderRadius: "10px",
-                  objectFit: "cover",
-                }}
-              />
-              <ArrowDropDown className="dropdown" onClick={toggleDropdown} />
-            </div>
-            <span>kids</span>
-            <Notifications className="notify" />
+          </li>
+        </ul>
+        <div className="nav-right">
+          <div className="profile-container">
+            <button className="profile-btn" onClick={toggleDropdown}>
+              <div className="profile-image">
+                <img
+                  src={
+                    user?.currentUser?.imageUrl || "/images/default-avatar.png"
+                  }
+                  alt="Profile"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "flex";
+                  }}
+                />
+              </div>
+              <ArrowDropDown />
+            </button>
+
             {dropdownOpen && (
-              <div className="profile-drop">
-                <div className="options">
-                  <span onClick={userProfileHandler}>Profile</span>
-                  <hr />
-                  <span onClick={userLogoutHandler}>Logout</span>
-                </div>
+              <div className="profile-dropdown">
+                <button className="dropdown-item" onClick={userProfileHandler}>
+                  Profile
+                </button>
+                <hr />
+                <button
+                  className="dropdown-item logout"
+                  onClick={userLogoutHandler}
+                >
+                  Logout
+                </button>
               </div>
             )}
           </div>
-          <div className="hamburger" onClick={toggleMenu}>
+
+          <Notifications className="notification-icon" />
+          <button className="mobile-menu-btn" onClick={toggleMenu}>
             {menuOpen ? <Close /> : <Menu />}
-          </div>
+          </button>
         </div>
-      </div>
-    </div>
+      </nav>
+    </header>
   );
 };
 
