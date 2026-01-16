@@ -14,7 +14,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchCurrentUserDetails(dispatch, currentUser?.email);
-  }, [dispatch, currentUser.email]);
+  }, [dispatch, currentUser?.email]);
   return (
     <div className="home">
       <NavBar />

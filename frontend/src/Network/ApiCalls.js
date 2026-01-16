@@ -1,5 +1,9 @@
-import axios from "axios";
-import { authRequest, passResetRequest, publicRequest } from "../AxiosMethods";
+import {
+  authRequest,
+  passResetRequest,
+  publicRequest,
+  userRequest,
+} from "../AxiosMethods";
 import {
   fetchMoviesFailure,
   fetchMoviesStart,
@@ -37,12 +41,6 @@ import {
   verifyEmailStart,
   verifyEmailSuccess,
 } from "../redux/userSlice";
-
-import {
-  pushToPaymentFailure,
-  pushToPaymentStart,
-  pushToPaymentSuccess,
-} from "../redux/PaymentRedux";
 
 /* ================= REGISTER ================= */
 export const register = async (dispatch, customerInfo) => {
@@ -172,10 +170,10 @@ export const fetchUsers = async (dispatch) => {
 };
 
 /* ================= FETCH CURRENT USER ================= */
-export const fetchCurrentUserDetails = async (dispatch, email) => {
+export const fetchCurrentUserDetails = async (dispatch) => {
   dispatch(fetchCurrentStart());
   try {
-    const res = await publicRequest.get(`/customers/currentUser/${email}`);
+    const res = await userRequest().get(`/customers/currentUser`);
     dispatch(fetchCurrentSuccess(res.data));
     return res.data;
   } catch (error) {

@@ -33,88 +33,76 @@ public class SecurityFilterChainConfig {
 
     @Bean
     public SecurityFilterChain customSecurityFilterChain(HttpSecurity http) throws Exception {
-        log.info("Configuring custom Security Filter Chain...");
+
         http.csrf(AbstractHttpConfigurer::disable)
+
+                .sessionManagement(sm ->
+                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers(HttpMethod.GET, "/ping").permitAll()
-                        .requestMatchers("/api/v1/verify/email", "/api/v1/validate/Otp", "/pingSpring",
-                                "/api/v1/customers/currentUser/{email}")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/customers", "/api/v1/auth/admins",
-                                "/api/v1/auth/login", "/api/v1/auth/loginAdmin", "/api/password-reset/request",
-                                "/api/password-reset/reset")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/customers/byEmail",
-                                "/api/v1/customers/byPhone", "/api/v1/customers/loggedIn/{isLoggedIn}",
-                                "api/v1/customers/stats")
-                        .permitAll()
 
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/profile/{id}").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/customers/userRequest").permitAll()
+                        /* ================= PUBLIC ================= */
 
-                        // Admin-only endpoints
-                        .requestMatchers(HttpMethod.POST, "/api/v1/customers/roles")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/customers/{id}", "/api/v1/customers/byEmail",
-                                "/api/v1/customers/byPhone", "/api/v1/customers",
-                                "/api/v1/products/AllProducts", "/api/v1/roles", "/api/v1/customers/currentAdmin/{email}")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/{id}", "/api/v1/roles/{id}")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/customers/add-movie/{customerId}/{movieId}",
-                                "/api/v1/customers/{id}", "/api/v1/customers/reset-pass/{id}",
-                                "/api/v1/customers/products/{id}/{type}")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/remove-movie/{customerId}/{movieId}",
-                                "/api/v1/customers/{customerId}/remove-all-movies")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/roles")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/roles/{id}", "/api/v1/products/{id}/{type}")
-                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,
+                                "/ping",
+                                "/api/v1/movies/**",
+                                "/api/v1/shows/**",
+                                "/api/v1/about"
+                        ).permitAll()
 
-                        // MovieController endpoints
-                        .requestMatchers(HttpMethod.POST, "/api/v1/movies")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/movies/{id}", "/api/v1/movies")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/movies/{id}")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/movies/{id}")
-                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/auth/**",
+                                "/api/v1/verify/email",
+                                "/api/v1/validate/Otp",
+                                "/api/password-reset/**"
+                        ).permitAll()
 
-                        // ShowController endpoints
-                        .requestMatchers(HttpMethod.POST, "/api/v1/shows")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/shows/{id}", "/api/v1/shows")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/shows/{id}")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/shows/{id}")
-                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/subscription/intent"
+                        ).permitAll()
 
-                        // AuthController endpoints
-                        .requestMatchers(HttpMethod.POST, "/auth/customers")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/admins")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/login")
-                        .permitAll()
+                        /* ================= AUTHENTICATED ================= */
 
-                        // RegVerifyController endpoints
-                        .requestMatchers(HttpMethod.POST, "/api/v1/verify/email")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/validate/Otp")
-                        .permitAll()
+                        .requestMatchers(
+                                "/api/v1/profile/**",
+                                "/api/v1/customers/currentUser",
+                                "/api/v1/subscription/confirm",
 
-                        .anyRequest().authenticated())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                "/api/v1/video/**"
+                        ).authenticated()
+
+                        /* ================= ADMIN ================= */
+
+                        .requestMatchers(
+                                "/api/v1/customers/**",
+                                "/api/v1/roles/**",
+                                "/api/v1/products/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/movies",
+                                "/api/v1/shows"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/v1/movies/**",
+                                "/api/v1/shows/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/v1/movies/**",
+                                "/api/v1/shows/**"
+                        ).hasRole("ADMIN")
+
+                        .anyRequest().authenticated()
+                )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(handler -> handler.authenticationEntryPoint(authenticationEntryPoint));
-        log.info("Custom Security Filter Chain configured successfully.");
+                .exceptionHandling(ex ->
+                        ex.authenticationEntryPoint(authenticationEntryPoint)
+                );
+
         return http.build();
     }
-
 }

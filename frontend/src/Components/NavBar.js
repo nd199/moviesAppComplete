@@ -11,15 +11,13 @@ const NavBar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
   const navigate = useNavigate();
-  const user = useSelector((state) => state?.user);
   const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.user?.currentUser);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -28,41 +26,35 @@ const NavBar = () => {
     loop: true,
     autoplay: true,
     animationData: popcornAnimation,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
+    rendererSettings: { preserveAspectRatio: "xMidYMid slice" },
   };
 
-  const toggleDropdown = useCallback(() => {
-    setDropdownOpen((prev) => !prev);
-  }, []);
+  const toggleDropdown = useCallback(
+    () => setDropdownOpen((prev) => !prev),
+    []
+  );
+  const closeDropdown = useCallback(() => setDropdownOpen(false), []);
+  const toggleMenu = useCallback(() => setMenuOpen((prev) => !prev), []);
+  const closeMobileMenu = useCallback(() => setMenuOpen(false), []);
 
-  const closeDropdown = useCallback(() => {
-    setDropdownOpen(false);
-  }, []);
-
-  const toggleMenu = useCallback(() => {
-    setMenuOpen((prev) => !prev);
-  }, []);
-
-  const userLogoutHandler = useCallback(() => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem("persist:root");
     dispatch(logout());
-    navigate("/Login");
-  }, [dispatch, navigate]);
-
-  const userProfileHandler = useCallback(() => {
-    navigate("/Profile");
+    navigate("/login");
     closeDropdown();
-  }, [navigate, closeDropdown]);
+    closeMobileMenu();
+  }, [dispatch, navigate, closeDropdown, closeMobileMenu]);
 
-  const closeMobileMenu = useCallback(() => {
-    setMenuOpen(false);
-  }, []);
+  const goToProfile = useCallback(() => {
+    navigate("/profile");
+    closeDropdown();
+    closeMobileMenu();
+  }, [navigate, closeDropdown, closeMobileMenu]);
 
   return (
     <header className={`navbar ${isScrolled ? "scrolled" : ""}`}>
       <nav className="nav-container">
+        {/* Logo */}
         <Link to="/" className="logo-container" onClick={closeMobileMenu}>
           <div className="logo">
             <Lottie
@@ -73,6 +65,8 @@ const NavBar = () => {
             <span className="logo-title">CN.io</span>
           </div>
         </Link>
+
+        {/* Navigation Links */}
         <ul className={`nav-links ${menuOpen ? "mobile-open" : ""}`}>
           <li>
             <Link to="/" onClick={closeMobileMenu}>
@@ -80,56 +74,61 @@ const NavBar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/About" onClick={closeMobileMenu}>
+            <Link to="/about" onClick={closeMobileMenu}>
               About
             </Link>
           </li>
           <li>
-            <Link to="/Movies" onClick={closeMobileMenu}>
+            <Link to="/movies" onClick={closeMobileMenu}>
               Movies
             </Link>
           </li>
           <li>
-            <Link to="/Shows" onClick={closeMobileMenu}>
+            <Link to="/shows" onClick={closeMobileMenu}>
               Shows
             </Link>
           </li>
         </ul>
+
+        {/* Right Side */}
         <div className="nav-right">
-          <div className="profile-container">
-            <button className="profile-btn" onClick={toggleDropdown}>
-              <div className="profile-image">
-                <img
-                  src={
-                    user?.currentUser?.imageUrl || "/images/default-avatar.png"
-                  }
-                  alt="Profile"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                    e.target.nextSibling.style.display = "flex";
-                  }}
-                />
-              </div>
-              <ArrowDropDown />
-            </button>
+          {/* Profile */}
+          {currentUser && (
+            <div className="profile-container">
+              <button className="profile-btn" onClick={toggleDropdown}>
+                <div className="profile-image">
+                  <img
+                    src={currentUser.imageUrl || "/images/defaultAvatar.png"}
+                    alt="Profile"
+                    onError={(e) => {
+                      e.target.src = "/images/default-avatar.png";
+                    }}
+                  />
+                </div>
+                <ArrowDropDown />
+              </button>
 
-            {dropdownOpen && (
-              <div className="profile-dropdown">
-                <button className="dropdown-item" onClick={userProfileHandler}>
-                  Profile
-                </button>
-                <hr />
-                <button
-                  className="dropdown-item logout"
-                  onClick={userLogoutHandler}
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
+              {dropdownOpen && (
+                <div className="profile-dropdown">
+                  <button className="dropdown-item" onClick={goToProfile}>
+                    Profile
+                  </button>
+                  <hr />
+                  <button
+                    className="dropdown-item logout"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
+          {/* Notifications */}
           <Notifications className="notification-icon" />
+
+          {/* Mobile menu toggle */}
           <button className="mobile-menu-btn" onClick={toggleMenu}>
             {menuOpen ? <Close /> : <Menu />}
           </button>

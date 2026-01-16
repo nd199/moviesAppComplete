@@ -389,7 +389,8 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerDTO getCustomerByEmail(String email) {
         return customerDao.getCustomerByUsername(email).map((customerDTOMapper))
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Could not find customer by email " + email)
+                        () -> new ResourceNotFoundException(
+                                "Could not find customer by email " + email)
                 );
     }
 

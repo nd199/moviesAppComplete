@@ -10,13 +10,12 @@ import com.naren.movieticketbookingapplication.Entity.Show;
 import com.naren.movieticketbookingapplication.Record.CustomerUpdateRequest;
 import com.naren.movieticketbookingapplication.Record.ProductCreateRequest;
 import com.naren.movieticketbookingapplication.Record.ProductUpdateRequest;
-import com.naren.movieticketbookingapplication.Service.CustomerService;
-import com.naren.movieticketbookingapplication.Service.MovieService;
-import com.naren.movieticketbookingapplication.Service.ProductService;
-import com.naren.movieticketbookingapplication.Service.ShowService;
+import com.naren.movieticketbookingapplication.Service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,10 +54,10 @@ public class CustomerController {
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/customers/currentUser/{email}")
-    public ResponseEntity<?> getCustomerByEmail(@PathVariable("email") String email) {
-        log.info("Fetching customer by email: {}", email);
-        CustomerDTO customerDTO = customerService.getCustomerByEmail(email);
+    @GetMapping("/customers/currentUser")
+    public ResponseEntity<?> getCustomerByEmail(@AuthenticationPrincipal UserDetails userDetails) {
+        log.info("Fetching customer by email: {}", userDetails.getUsername());
+        CustomerDTO customerDTO = customerService.getCustomerByEmail(userDetails.getUsername());
         log.info("Customer _found:{}", customerDTO);
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }

@@ -32,7 +32,9 @@ const userSlice = createSlice({
     },
     registerSuccess: (state, action) => {
       state.isFetching = false;
-      state.currentUser = action.payload;
+      state.currentUser = {
+        ...action.payload,
+      };
     },
     registerFailure: (state, action) => {
       state.isFetching = false;
@@ -47,7 +49,11 @@ const userSlice = createSlice({
     },
     loginSuccess: (state, action) => {
       state.isFetching = false;
-      state.currentUser = action.payload;
+      state.error = false;
+      state.currentUser = {
+        ...action.payload.customerDTO,
+        token: action.payload.token,
+      };
     },
     loginFailure: (state, action) => {
       state.isFetching = false;

@@ -1,4 +1,3 @@
-// RegistrationForm.jsx
 import { Box, LinearProgress } from "@mui/material";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useCallback, useEffect, useMemo, useState } from "react";

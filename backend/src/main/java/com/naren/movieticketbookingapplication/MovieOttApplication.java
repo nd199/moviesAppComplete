@@ -33,7 +33,7 @@ public class MovieOttApplication {
                                                ShowRepository showRepository,
                                                SubscriptionPlanRepository subscriptionPlanRepository) {
         return args -> {
-            int i = 6;
+            int i = 1;
             while(i != 0) {
                 createRandomCustomer(customerRepository, encoder);
                 createRandomMovie(movieRepository);

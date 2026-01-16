@@ -1,6 +1,6 @@
-import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { userRequest } from "../AxiosMethods";
 import EmailSubscriptionVerify from "../Components/EmailSubscriptionVerify";
 import "./EmailVerification.css";
 
@@ -9,8 +9,7 @@ const EmailVerification = () => {
   const [email, setEmail] = useState("");
   const [isVerified, setIsVerified] = useState(false);
   const [isVerifiedError, setIsVerifiedError] = useState("");
-  const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state?.user?.currentUser);
+  const req = userRequest();
 
   const handleEmailUpdate = useCallback((email) => {
     setEmail(email);
@@ -30,28 +29,18 @@ const EmailVerification = () => {
       if (!selectedPlan?.selectedPlan) return;
 
       try {
-        const res = await axios.post(
-          "https://movieticket-api.onrender.com/api/v1/subscription/intent",
-          {
-            planId: selectedPlan.selectedPlan.id,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${currentUser.token}`,
-            },
-          }
-        );
-
+        const res = await req.post("/subscription/intent", {
+          planId: selectedPlan?.selectedPlan?.id,
+        });
         const { paymentToken } = res.data;
-
-        window.location.href = `https://movies-app-complete-payment.vercel.app/checkout?token=${paymentToken}`;
+        window.location.href = `http://localhost:8080/checkout?token=${paymentToken}`;
       } catch (err) {
         console.error("Payment initiation failed", err);
       }
     };
 
     initiatePayment();
-  }, [isVerified, selectedPlan, currentUser]);
+  }, [isVerified, selectedPlan?.selectedPlan, req]);
 
   return (
     <div className="email-verification-page">

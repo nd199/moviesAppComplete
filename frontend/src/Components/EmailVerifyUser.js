@@ -63,7 +63,7 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
       if (res === "OTP verified successfully") {
         setIsEmailDisabled(true);
         setShowOtpInput(false);
-        onEmailVerified(email); // notify parent Formik
+        onEmailVerified(email);
       }
     } catch (err) {
       console.error(err);

@@ -39,7 +39,6 @@ const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* MEDIA */}
       <div className="card-media">
         {isHovered ? (
           <div className="card-video-wrapper">
@@ -68,7 +67,6 @@ const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre }) => {
         )}
       </div>
 
-      {/* CONTENT */}
       <div className="card-body">
         {isHovered ? (
           <>

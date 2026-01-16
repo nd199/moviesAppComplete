@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { resetErrorMessage } from "../redux/userSlice";
-import { validateOtp, verifyEmail } from "../Network/ApiCalls";
-import TickMark from "../Utils/animations/TickMark.json";
-import CrossMark from "../Utils/animations/CrossMark.json";
-import Lottie from "react-lottie";
 import { Send } from "@mui/icons-material";
+import { useEffect, useState } from "react";
+import Lottie from "react-lottie";
+import { useDispatch, useSelector } from "react-redux";
+import { validateOtp, verifyEmail } from "../Network/ApiCalls";
+import { resetErrorMessage } from "../redux/userSlice";
+import CrossMark from "../Utils/animations/CrossMark.json";
+import TickMark from "../Utils/animations/TickMark.json";
 import "./EmailSubscriptionVerify.css";
 
 const EmailSubscriptionVerify = ({

@@ -28,7 +28,6 @@ const LoginForm = () => {
       await login(dispatch, { username: email, password });
       navigate("/", { replace: true });
     } catch (err) {
-      // The error is already stored in Redux, no need to throw again
       console.error(err);
     } finally {
       setLoading(false);
@@ -95,7 +94,7 @@ const LoginForm = () => {
         <div className="login-links">
           <p>
             Don't have an account?{" "}
-            <Link to="/" className="login-register-link">
+            <Link to="/register" className="login-register-link">
               Register here
             </Link>
           </p>
