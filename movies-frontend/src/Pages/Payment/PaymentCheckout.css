@@ -1,0 +1,178 @@
+.paymentPage-container {
+    background-color: rgba(0, 0, 0, 0.28);
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: scroll;
+}
+
+.paymentPage-card {
+    width: 80%;
+    background-color: rgba(57, 56, 56, 0.9);
+    padding: 20px;
+    box-shadow: 2px 8px 12px rgba(0, 0, 0, 0.9);
+    border-radius: 20px;
+}
+
+.paymentPage-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.paymentPage-title {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.paymentPage-description {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: #fff;
+}
+
+.paymentPage-content {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.paymentPage-left,
+.paymentPage-right {
+    flex: 1;
+    background-color: rgba(17, 13, 18, 0.7);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.paymentPage-left-top,
+.paymentPage-left-bottom {
+    margin-bottom: 20px;
+}
+
+.paymentPage-left-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.paymentPage-left-heading h2 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #fff;
+}
+
+.paymentPage-profile-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    padding: 2px;
+    object-fit: cover;
+    background-color: white;
+}
+
+.paymentPage-left-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.paymentPage-input,
+.paymentPage-card-input {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+}
+
+.paymentPage-input label,
+.paymentPage-card-input label {
+    font-size: 1rem;
+    color: #fff;
+}
+
+.paymentPage-input input,
+.paymentPage-input select,
+.paymentPage-card-input input,
+.paymentPage-card-input select {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.paymentPage-card-input input:focus,
+.paymentPage-card-input select:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(63, 81, 181, 0.5);
+}
+
+.paymentPage-card-input .card-type-img {
+    width: 40px;
+    height: auto;
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+}
+
+.paymentPage-card-input .cvv-help {
+    font-size: 0.8rem;
+    color: #ccc;
+    margin-top: 5px;
+}
+
+.paymentPage-checkout-btn {
+    padding: 12px 24px;
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+.paymentPage-checkout-btn:hover {
+    background-color: #303f9f;
+}
+
+.paymentPage-checkout-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.paymentCardImage {
+    width: 200px;
+    height: 24px;
+}
+
+.cards {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.cards label {
+    color: white;
+    font-weight: 200;
+    font-size: 20px;
+}
+
+.paymentPage-card-input {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+}
