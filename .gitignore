@@ -26,12 +26,22 @@ backend/**/generated-test-sources/
 backend/**/surefire-reports/
 
 # ===============================
-# Movies Frontend (React)
+# Frontend (React)
 # ===============================
+frontend/node_modules/
+frontend/build/
 movies-frontend/node_modules/
 movies-frontend/build/
+frontendAdmin/node_modules/
+frontendAdmin/build/
+frontendpayment/node_modules/
+frontendpayment/build/
+payment/node_modules/
 
 # ===============================
 # Misc
 # ===============================
 previewConfig.json
+*.log
+*.tmp
+.DS_Store
