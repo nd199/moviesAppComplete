@@ -1,0 +1,142 @@
+package com.naren.moviesapp.Controller;
+
+import com.naren.moviesapp.Auth.AuthRequest;
+import com.naren.moviesapp.Auth.AuthResponse;
+import com.naren.moviesapp.Auth.AuthService;
+import com.naren.moviesapp.Entity.RefreshToken;
+import com.naren.moviesapp.Record.CustomerRegistration;
+import com.naren.moviesapp.Service.CustomerService;
+import com.naren.moviesapp.Service.RefreshTokenService;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
+import org.springframework.http.ResponseCookie;
+
+@RestController
+@RequestMapping("/api/v1/auth")
+public class AuthController {
+    private final AuthService authService;
+    private final CustomerService customerService;
+    private final RefreshTokenService refreshTokenService;
+
+    public AuthController(AuthService authService, CustomerService customerService, RefreshTokenService refreshTokenService) {
+        this.authService = authService;
+        this.customerService = customerService;
+        this.refreshTokenService = refreshTokenService;
+    }
+
+    @PostMapping("/customers")
+    public ResponseEntity<?> addCustomer(@Valid @RequestBody CustomerRegistration customerRegistration) {
+        ResponseEntity<?> response = customerService.registerUser(customerRegistration, Set.<String>of("ROLE_USER"));
+        return response;
+    }
+
+    @PostMapping("/admins")
+    public ResponseEntity<?> addAdmin(@Valid @RequestBody CustomerRegistration customerRegistration) {
+        ResponseEntity<?> response = customerService.registerUser(customerRegistration, Set.<String>of("ROLE_ADMIN"));
+        return response;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody AuthRequest authRequest, HttpServletResponse response) {
+        AuthResponse authResponse = authService.login(authRequest);
+
+        addAuthCookies(response, authResponse);
+        
+        return ResponseEntity.ok()
+                .body((java.lang.Object) authResponse.customerDTO());
+    }
+
+    @PostMapping("/loginAdmin")
+    public ResponseEntity<?> loginAdmin(@Valid @RequestBody AuthRequest authRequest, HttpServletResponse response) {
+        AuthResponse authResponse = authService.login(authRequest);
+
+        addAuthCookies(response, authResponse);
+        
+        return ResponseEntity.ok()
+                .body((java.lang.Object) authResponse);
+    }
+
+    private void addAuthCookies(HttpServletResponse response, AuthResponse authResponse) {
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(authResponse.customerDTO().user());
+
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", authResponse.token())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(30 * 60)
+                .sameSite("Strict")
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken.getToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader("Set-Cookie", jwtCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+    }
+    
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@CookieValue("refresh_token") String refreshToken, HttpServletResponse response) {
+        RefreshToken token = refreshTokenService.findByToken(refreshToken);
+        if (token == null || token.isExpired()) {
+            return ResponseEntity.badRequest().body("Invalid or expired refresh token");
+        }
+        
+        // Generate new JWT token
+        String newJwtToken = authService.generateTokenForUser(token.getUser());
+        
+        // Set new JWT cookie
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", newJwtToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(30 * 60) // 30 minutes
+                .sameSite("Strict")
+                .build();
+        
+        response.addHeader("Set-Cookie", jwtCookie.toString());
+        
+        return ResponseEntity.ok().body("Token refreshed successfully");
+    }
+    
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@CookieValue(value = "refresh_token", required = false) String refreshToken, HttpServletResponse response) {
+        if (refreshToken != null) {
+            RefreshToken token = refreshTokenService.findByToken(refreshToken);
+            if (token != null) {
+                refreshTokenService.deleteByUser(token.getUser());
+            }
+        }
+        
+        // Clear cookies
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+        
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+        
+        response.addHeader("Set-Cookie", jwtCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+        
+        return ResponseEntity.ok().body("Logged out successfully");
+    }
+
+}
