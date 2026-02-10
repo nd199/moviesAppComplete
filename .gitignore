@@ -1,29 +1,37 @@
-<<<<<<< HEAD
-.DS_Store
-=======
-# Ignore Mac system files
+# ===============================
+# OS
+# ===============================
 .DS_Store
 
-# Ignore Node.js dependencies
-frontend/node_modules/
-payment/node_modules/
-backend/src/main/resources/application.yaml
-
-# Ignore IDE specific files
+# ===============================
+# IDE
+# ===============================
 .idea/
 .vscode/
+*.iml
 
-# Ignore build artifacts
-frontend/build/
-backend/target/
-backend/movieticketbookingapplication.iml
-
->>>>>>> 4ee0c34 (backend and frontend ready just merging mut be done)
-# React Component Preview
-previewConfig.json
-
-# env files
+# ===============================
+# Environment files
+# ===============================
 .env
 .env.*
 
-/payment/.env
+# ===============================
+# Backend (Maven / Java)
+# ===============================
+backend/target/
+backend/**/*.class
+backend/**/generated-sources/
+backend/**/generated-test-sources/
+backend/**/surefire-reports/
+
+# ===============================
+# Movies Frontend (React)
+# ===============================
+movies-frontend/node_modules/
+movies-frontend/build/
+
+# ===============================
+# Misc
+# ===============================
+previewConfig.json
