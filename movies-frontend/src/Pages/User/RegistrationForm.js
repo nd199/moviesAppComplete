@@ -23,7 +23,7 @@ const phoneRegex = /^[+][0-9]{1,4}[0-9]{7,12}$/;
 const RegistrationForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const serverError = useSelector((state) => state.user.errorMessage?.message);
+  const serverError = useSelector((state) => state.user.errorMessage);
 
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);

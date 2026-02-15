@@ -5,6 +5,8 @@ import "./VideoFullScreen.css";
 const VideoFullScreen = () => {
   const { id } = useParams();
   
+  console.log('VideoFullScreen - Component loaded with ID:', id);
+  
   return (
     <div className="videoFS">
       <div className="back">

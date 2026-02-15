@@ -23,19 +23,42 @@ const LoginForm = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    
+    // Convert email to lowercase for consistency
+    const normalizedEmail = email.toLowerCase().trim();
+    
+    // Basic validation
+    if (!normalizedEmail || !password) {
+      setPopupMessage("Please enter both email and password");
+      setShowPopup(true);
+      return;
+    }
+    
     setLoading(true);
     try {
-      await login(dispatch, { username: email, password });
-      navigate("/", { replace: true });
+      const result = await login(dispatch, { username: normalizedEmail, password });
+      console.log('Login successful, user data:', result);
+      setPopupMessage("Login successful! Redirecting...");
+      setShowPopup(true);
+      setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 1000);
     } catch (err) {
-      console.error(err);
+      console.error('Login error:', err);
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          'Login failed. Please try again.';
+      setPopupMessage(errorMessage);
+      setShowPopup(true);
     } finally {
       setLoading(false);
     }
   };
 
   const handleForgotPassword = async () => {
-    if (!email) {
+    const normalizedEmail = email.toLowerCase().trim();
+    
+    if (!normalizedEmail) {
       setPopupMessage("Please enter your email first.");
       setShowPopup(true);
       return;
@@ -43,7 +66,7 @@ const LoginForm = () => {
 
     setLoading(true);
     try {
-      const res = await forgotPasswordRequest(dispatch, email);
+      const res = await forgotPasswordRequest(dispatch, normalizedEmail);
       const message = res?.message || "Password reset link sent to your email";
       setPopupMessage(message);
       setShowPopup(true);
@@ -65,6 +88,7 @@ const LoginForm = () => {
     <div className="login-container">
       <div className="login-card">
         <h1>Login</h1>
+        <p className="login-subtitle">Access your movie streaming account</p>
         <form onSubmit={handleLogin} className="login-form">
           <div className="inputs">
             <label>Email:</label>
@@ -88,7 +112,7 @@ const LoginForm = () => {
           </div>
           {error && <div className="error">{error}</div>}
           <button type="submit" className="login-button" disabled={loading}>
-            {loading ? "Loading..." : "Login"}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
         <div className="login-links">
@@ -106,6 +130,10 @@ const LoginForm = () => {
             >
               Click here
             </span>
+          </p>
+          <p className="demo-account">
+            Demo Account: demo@example.com / Demo123456
+            <br />
           </p>
         </div>
       </div>
