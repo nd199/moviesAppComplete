@@ -96,8 +96,9 @@ export const login = async (dispatch, userInfo) => {
 export const fetchMovies = async dispatch => {
   dispatch(fetchMoviesStart());
   try {
-    const res = await publicRequest.get('/movies');
-    dispatch(fetchMoviesSuccess(res.data));
+    const res = await publicRequest().get('/products/AllProducts');
+    const movies = res.data?.movies || [];
+    dispatch(fetchMoviesSuccess(movies));
   } catch (error) {
     const message = error.response?.data?.message || 'Failed to fetch movies';
     dispatch(fetchMoviesFailure({ message }));
@@ -108,8 +109,9 @@ export const fetchMovies = async dispatch => {
 export const fetchShows = async dispatch => {
   dispatch(fetchShowsStart());
   try {
-    const res = await publicRequest.get('/shows');
-    dispatch(fetchShowsSuccess(res.data));
+    const res = await publicRequest().get('/products/AllProducts');
+    const shows = res.data?.shows || [];
+    dispatch(fetchShowsSuccess(shows));
   } catch (error) {
     const message = error.response?.data?.message || 'Failed to fetch shows';
     dispatch(fetchShowsFailure({ message }));
@@ -120,7 +122,7 @@ export const fetchShows = async dispatch => {
 export const verifyEmail = async (dispatch, email) => {
   dispatch(verifyEmailStart());
   try {
-    const res = await publicRequest.post('/verify/email', email);
+    const res = await publicRequest().post('/verify/email', email);
     dispatch(verifyEmailSuccess(res.data.message));
     return res.data;
   } catch (error) {
@@ -135,7 +137,7 @@ export const verifyEmail = async (dispatch, email) => {
 export const validateOtp = async (dispatch, validateInfo) => {
   dispatch(validateOtpStart());
   try {
-    const res = await publicRequest.post('/validate/Otp', validateInfo);
+    const res = await publicRequest().post('/validate/Otp', validateInfo);
     dispatch(validateOtpSuccess(res.data));
     return res.data;
   } catch (error) {
@@ -149,7 +151,7 @@ export const validateOtp = async (dispatch, validateInfo) => {
 export const updateProfile = async (dispatch, userUpdateInfo, id) => {
   dispatch(updateUserStart());
   try {
-    const res = await publicRequest.put(`/profile/${id}`, userUpdateInfo);
+    const res = await publicRequest().put(`/profile/${id}`, userUpdateInfo);
     dispatch(updateUserSuccess(res.data));
     return { success: true, data: res.data };
   } catch (error) {
@@ -163,7 +165,7 @@ export const updateProfile = async (dispatch, userUpdateInfo, id) => {
 export const fetchUsers = async dispatch => {
   dispatch(fetchUsersStart());
   try {
-    const res = await publicRequest.get('/customers/userRequest');
+    const res = await publicRequest().get('/customers/userRequest');
     dispatch(fetchUsersSuccess(res.data));
   } catch (error) {
     const message = error.response?.data?.message || 'Failed to fetch users';

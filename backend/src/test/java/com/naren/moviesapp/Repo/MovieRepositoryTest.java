@@ -1,6 +1,5 @@
 package com.naren.moviesapp.Repo;
 
-import com.naren.moviesapp.AbstractTestContainers;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.TestConfig;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestConfig.class)
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class MovieRepositoryTest extends AbstractTestContainers {
+class MovieRepositoryTest {
 
     @Autowired
     private MovieRepository underTest;

@@ -1,22 +1,22 @@
-import AboutUsAnimation from "./animations/AboutUs.json";
-import vastAnimation from "./animations/vast.json";
-import offlineAnimation from "./animations/offline.json";
-import AffordAnimation from "./animations/Afford.json";
-import AccessAnimation from "./animations/Access.json";
-import personalizedAnimation from "./animations/personalized.json";
-import streamingAnimation from "./animations/Streaming.json";
-import AdBlock from "./animations/AdBlock.json";
-import parental from "./animations/Parental.json";
-import down from "./animations/download.json";
-import Check from "./animations/Check.json";
-import SLoad from "./animations/SLoad.json";
+import AboutUsAnimation from './animations/AboutUs.json';
+import vastAnimation from './animations/vast.json';
+import offlineAnimation from './animations/offline.json';
+import AffordAnimation from './animations/Afford.json';
+import AccessAnimation from './animations/Access.json';
+import personalizedAnimation from './animations/personalized.json';
+import streamingAnimation from './animations/Streaming.json';
+import AdBlock from './animations/AdBlock.json';
+import parental from './animations/Parental.json';
+import down from './animations/download.json';
+import Check from './animations/Check.json';
+import SLoad from './animations/SLoad.json';
 
 export const AboutUsOptions = {
   loop: true,
   autoplay: true,
   animationData: AboutUsAnimation,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };
 
@@ -25,7 +25,7 @@ export const vastOptions = {
   autoplay: true,
   animationData: vastAnimation,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };
 
@@ -34,7 +34,7 @@ export const offlineOptions = {
   autoplay: true,
   animationData: offlineAnimation,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };
 
@@ -43,7 +43,7 @@ export const affordOptions = {
   autoplay: true,
   animationData: AffordAnimation,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };
 
@@ -52,7 +52,7 @@ export const AccessOptions = {
   autoplay: true,
   animationData: AccessAnimation,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };
 
@@ -61,7 +61,7 @@ export const personalizedOptions = {
   autoplay: true,
   animationData: personalizedAnimation,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };
 
@@ -70,7 +70,7 @@ export const streamOptions = {
   autoplay: true,
   animationData: streamingAnimation,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };
 
@@ -79,7 +79,7 @@ export const adBlockOption = {
   autoplay: true,
   animationData: AdBlock,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };
 
@@ -88,7 +88,7 @@ export const parentalOption = {
   autoplay: true,
   animationData: parental,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };
 
@@ -97,7 +97,7 @@ export const downOption = {
   autoplay: true,
   animationData: down,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };
 
@@ -106,7 +106,7 @@ export const CheckOption = {
   autoplay: true,
   animationData: Check,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };
 
@@ -115,6 +115,6 @@ export const ServerConnectingOptions = {
   autoplay: true,
   animationData: SLoad,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
+    preserveAspectRatio: 'xMidYMid slice',
   },
 };

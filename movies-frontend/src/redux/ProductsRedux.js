@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   movies: [],
@@ -8,10 +8,10 @@ const initialState = {
 };
 
 const productSlice = createSlice({
-  name: "product",
+  name: 'product',
   initialState,
   reducers: {
-    fetchMoviesStart: (state) => {
+    fetchMoviesStart: state => {
       state.fetching = true;
       state.error = false;
     },
@@ -19,11 +19,11 @@ const productSlice = createSlice({
       state.fetching = false;
       state.movies = action.payload;
     },
-    fetchMoviesFailure: (state) => {
+    fetchMoviesFailure: state => {
       state.fetching = false;
       state.error = true;
     },
-    fetchShowsStart: (state) => {
+    fetchShowsStart: state => {
       state.fetching = true;
       state.error = false;
     },
@@ -31,7 +31,7 @@ const productSlice = createSlice({
       state.fetching = false;
       state.shows = action.payload;
     },
-    fetchShowsFailure: (state) => {
+    fetchShowsFailure: state => {
       state.fetching = false;
       state.error = true;
     },

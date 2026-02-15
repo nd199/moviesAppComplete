@@ -1,6 +1,6 @@
 package com.naren.moviesapp.Exception.ApiError;
 
-import com.naren.moviesapp.Exception.ResourceNotFoundException;
+import com.naren.moviesapp.Exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -18,6 +18,72 @@ import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
+    
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiError> handleAuthenticationException(AuthenticationException e,
+                                                              HttpServletRequest request) {
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                UNAUTHORIZED.value(),
+                LocalDateTime.now(),
+                e.getErrorCode()
+        );
+        return new ResponseEntity<>(apiError, UNAUTHORIZED);
+    }
+    
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiError> handleInvalidCredentials(InvalidCredentialsException e,
+                                                             HttpServletRequest request) {
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                UNAUTHORIZED.value(),
+                LocalDateTime.now(),
+                e.getErrorCode()
+        );
+        return new ResponseEntity<>(apiError, UNAUTHORIZED);
+    }
+    
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    public ResponseEntity<ApiError> handleEmailNotVerified(EmailNotVerifiedException e,
+                                                           HttpServletRequest request) {
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                FORBIDDEN.value(),
+                LocalDateTime.now(),
+                e.getErrorCode()
+        );
+        return new ResponseEntity<>(apiError, FORBIDDEN);
+    }
+    
+    @ExceptionHandler(AccountNotRegisteredException.class)
+    public ResponseEntity<ApiError> handleAccountNotRegistered(AccountNotRegisteredException e,
+                                                            HttpServletRequest request) {
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                FORBIDDEN.value(),
+                LocalDateTime.now(),
+                e.getErrorCode()
+        );
+        return new ResponseEntity<>(apiError, FORBIDDEN);
+    }
+    
+    @ExceptionHandler(AccountLockedException.class)
+    public ResponseEntity<ApiError> handleAccountLocked(AccountLockedException e,
+                                                        HttpServletRequest request) {
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                LOCKED.value(),
+                LocalDateTime.now(),
+                e.getErrorCode()
+        );
+        return new ResponseEntity<>(apiError, LOCKED);
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException e,
                                                            HttpServletRequest request) {
@@ -25,21 +91,10 @@ public class DefaultExceptionHandler {
                 request.getRequestURI(),
                 e.getMessage(),
                 NOT_FOUND.value(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                "RESOURCE_NOT_FOUND"
         );
         return new ResponseEntity<>(apiError, NOT_FOUND);
-    }
-
-    @ExceptionHandler(InsufficientAuthenticationException.class)
-    public ResponseEntity<ApiError> handleInsufficientAuth(InsufficientAuthenticationException e,
-                                                           HttpServletRequest request) {
-        ApiError apiError = new ApiError(
-                request.getRequestURI(),
-                "You are not authorized to access this resource.",
-                FORBIDDEN.value(),
-                LocalDateTime.now()
-        );
-        return new ResponseEntity<>(apiError, FORBIDDEN);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -49,7 +104,8 @@ public class DefaultExceptionHandler {
                 request.getRequestURI(),
                 "Invalid username or password. Please try again.",
                 UNAUTHORIZED.value(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                "BAD_CREDENTIALS"
         );
         return new ResponseEntity<>(apiError, UNAUTHORIZED);
     }
@@ -61,7 +117,8 @@ public class DefaultExceptionHandler {
                 request.getRequestURI(),
                 "The specified role does not exist.",
                 BAD_REQUEST.value(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                "ROLE_NOT_FOUND"
         );
         return new ResponseEntity<>(apiError, BAD_REQUEST);
     }
@@ -73,7 +130,8 @@ public class DefaultExceptionHandler {
                 request.getRequestURI(),
                 "A database error occurred. Please try again later.",
                 INTERNAL_SERVER_ERROR.value(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                "DATABASE_ERROR"
         );
         return new ResponseEntity<>(apiError, INTERNAL_SERVER_ERROR);
     }
@@ -85,7 +143,8 @@ public class DefaultExceptionHandler {
                 request.getRequestURI(),
                 "Something went wrong on our side. Please try again later.",
                 INTERNAL_SERVER_ERROR.value(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                "INTERNAL_ERROR"
         );
         return new ResponseEntity<>(apiError, INTERNAL_SERVER_ERROR);
     }

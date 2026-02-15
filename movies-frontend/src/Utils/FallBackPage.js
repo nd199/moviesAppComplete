@@ -1,7 +1,7 @@
-import React from "react";
-import "./FallbackCheck.css";
-import Lottie from "react-lottie";
-import { CheckOption } from "./AnimationData";
+import React from 'react';
+import './FallbackCheck.css';
+import Lottie from 'react-lottie';
+import { CheckOption } from './AnimationData';
 
 const Fallback = () => {
   return (
@@ -16,8 +16,7 @@ const Fallback = () => {
         </p>
         <button
           className="retry-button"
-          onClick={() => window.location.reload()}
-        >
+          onClick={() => window.location.reload()}>
           Retry
         </button>
       </div>

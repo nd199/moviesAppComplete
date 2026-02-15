@@ -1,6 +1,5 @@
 package com.naren.moviesapp.Repo;
 
-import com.naren.moviesapp.AbstractTestContainers;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Payment;
 import com.naren.moviesapp.Entity.SubscriptionPlan;
@@ -11,19 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@DataJpaTest(excludeAutoConfiguration = {
+    org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration.class,
+    org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration.class
+})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestConfig.class)
 @ActiveProfiles("test")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class PaymentRepositoryTest extends AbstractTestContainers {
+class PaymentRepositoryTest {
 
     @Autowired
     private PaymentRepository paymentRepository;

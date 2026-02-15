@@ -1,25 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "./NewProduct.css";
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
-import app from "../../firebase";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
-import { addProduct } from "../../Network/ApiCalls";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
 const NewProduct = () => {
   const [input, setInput] = useState({});
   const [file, setFile] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [categories] = useState([]);
+  const [uploadProgress] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const allInputsFilled = Object.values(input).every((value) => value);
@@ -50,42 +40,9 @@ const NewProduct = () => {
       return;
     }
 
-    const fileName = new Date().getTime() + file.name;
-    const storage = getStorage(app);
-    const storageRef = ref(storage, fileName);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        setUploadProgress(progress);
-      },
-      (error) => {
-        console.error("Upload failed: ", error);
-      },
-      async () => {
-        try {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          const product = {
-            ...input,
-            poster: downloadURL,
-            genre: categories.join(","),
-          };
-          addProduct(product, dispatch);
-        } catch (error) {
-          console.error("Error getting download URL: ", error);
-        }
-      }
-    );
-
-    try {
-      await uploadTask;
-    } catch (error) {
-      console.error("Upload failed: ", error);
-    }
+    // TODO: Replace with local file upload or alternative storage solution
+    console.log("File upload functionality disabled - Firebase removed");
+    alert("File upload functionality is currently disabled. Please configure an alternative storage solution.");
   };
 
   return (

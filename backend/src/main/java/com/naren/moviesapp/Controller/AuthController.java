@@ -7,11 +7,15 @@ import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Service.CustomerService;
 import com.naren.moviesapp.Service.RefreshTokenService;
+import com.naren.moviesapp.Service.TokenBlacklistService;
+import com.naren.moviesapp.jwt.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Set;
 import org.springframework.http.ResponseCookie;
 
@@ -21,11 +25,15 @@ public class AuthController {
     private final AuthService authService;
     private final CustomerService customerService;
     private final RefreshTokenService refreshTokenService;
+    private final TokenBlacklistService tokenBlacklistService;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(AuthService authService, CustomerService customerService, RefreshTokenService refreshTokenService) {
+    public AuthController(AuthService authService, CustomerService customerService, RefreshTokenService refreshTokenService, TokenBlacklistService tokenBlacklistService, JwtUtil jwtUtil) {
         this.authService = authService;
         this.customerService = customerService;
         this.refreshTokenService = refreshTokenService;
+        this.tokenBlacklistService = tokenBlacklistService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/customers")
@@ -108,12 +116,22 @@ public class AuthController {
     }
     
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(value = "refresh_token", required = false) String refreshToken, HttpServletResponse response) {
+    public ResponseEntity<?> logout(@CookieValue(value = "refresh_token", required = false) String refreshToken, 
+                                @RequestHeader(value = "Authorization", required = false) String authHeader,
+                                HttpServletResponse response) {
+        
+        // Handle refresh token logout (existing logic)
         if (refreshToken != null) {
             RefreshToken token = refreshTokenService.findByToken(refreshToken);
             if (token != null) {
                 refreshTokenService.deleteByUser(token.getUser());
             }
+        }
+        
+        // Handle JWT token blacklisting (new logic)
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String jwtToken = authHeader.substring(7);
+            tokenBlacklistService.blacklistToken(jwtToken, jwtUtil.getExpirationTime());
         }
         
         // Clear cookies
@@ -136,7 +154,10 @@ public class AuthController {
         response.addHeader("Set-Cookie", jwtCookie.toString());
         response.addHeader("Set-Cookie", refreshCookie.toString());
         
-        return ResponseEntity.ok().body("Logged out successfully");
+        return ResponseEntity.ok(Map.of(
+            "message", "Logged out successfully",
+            "status", "success"
+        ));
     }
 
 }

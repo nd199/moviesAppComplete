@@ -1,32 +1,42 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import SwiperCore from "swiper";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import { Navigation, Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { fetchMovies, fetchShows } from "../Network/ApiCalls";
-import "./List.css";
-import ListItem from "./ListItem";
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import SwiperCore from 'swiper';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Navigation, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { fetchMovies, fetchShows } from '../Network/ApiCalls';
+import './List.css';
+import ListItem from './ListItem';
 
 SwiperCore.use([Navigation, Pagination]);
 
 const List = ({ title }) => {
   const dispatch = useDispatch();
-  const movies = useSelector((state) => state?.product?.movies);
-  const shows = useSelector((state) => state?.product?.shows);
+  const movies = useSelector(state => state?.product?.movies);
+  const shows = useSelector(state => state?.product?.shows);
 
   useEffect(() => {
-    fetchMovies(dispatch);
-    fetchShows(dispatch);
+    const fetchData = async () => {
+      try {
+        await Promise.all([
+          fetchMovies(dispatch),
+          fetchShows(dispatch)
+        ]);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+
+    fetchData();
   }, [dispatch]);
 
-  const getViewAllLink = (title) =>
-    title === "Movies" ? "/movies" : title === "Shows" ? "/shows" : "#";
+  const getViewAllLink = title =>
+    title === 'Movies' ? '/movies' : title === 'Shows' ? '/shows' : '#';
 
-  const items = title === "Movies" ? movies : shows;
+  const items = title === 'Movies' ? movies : shows;
 
   if (!items || items.length === 0) return null;
 
@@ -60,11 +70,11 @@ const List = ({ title }) => {
             480: { slidesPerView: 2 },
             0: { slidesPerView: 1.2 },
           }}
-          className="row-swiper"
-        >
+          className="row-swiper">
           {items.map((item, idx) => (
             <SwiperSlide key={item.id || idx} className="row-slide">
               <ListItem
+                id={item.id || item.show_id}
                 name={item.name}
                 desc={item.description}
                 year={item.year}
@@ -72,6 +82,7 @@ const List = ({ title }) => {
                 rating={item.rating}
                 runtime={item.runtime}
                 genre={item.genre}
+                poster={item.poster}
               />
             </SwiperSlide>
           ))}

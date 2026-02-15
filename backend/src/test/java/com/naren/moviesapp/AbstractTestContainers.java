@@ -3,6 +3,7 @@ package com.naren.moviesapp;
 import com.github.javafaker.Faker;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -16,19 +17,25 @@ public class AbstractTestContainers {
 
     @Container
     protected static final PostgreSQLContainer<?> postgresContainer =
-            new PostgreSQLContainer<>("postgres:15")
-                    .withDatabaseName("postgres-movie")
+            new PostgreSQLContainer<>("postgres:15-alpine")
+                    .withDatabaseName("movieott")
                     .withUsername("codeNaren")
-                    .withPassword("password");
+                    .withPassword("password")
+                    .withReuse(true);
 
     @BeforeAll
     static void engageFlyway() {
+        // Wait for container to be ready
+        postgresContainer.start();
+        
         Flyway flyway = Flyway
                 .configure()
                 .dataSource(postgresContainer.getJdbcUrl(),
                         postgresContainer.getUsername(),
                         postgresContainer.getPassword()
                 )
+                .cleanDisabled(true)
+                .validateMigrationNaming(false)
                 .load();
         flyway.migrate();
     }
@@ -47,6 +54,30 @@ public class AbstractTestContainers {
         registry.add(
                 "spring.datasource.password",
                 postgresContainer::getPassword
+        );
+        registry.add(
+                "spring.datasource.driver-class-name",
+                postgresContainer::getDriverClassName
+        );
+        registry.add(
+                "spring.jpa.hibernate.ddl-auto",
+                () -> "none"
+        );
+        registry.add(
+                "spring.flyway.enabled",
+                () -> "false"
+        );
+        registry.add(
+                "spring.datasource.hikari.connection-timeout",
+                () -> "30000"
+        );
+        registry.add(
+                "spring.datasource.hikari.maximum-pool-size",
+                () -> "5"
+        );
+        registry.add(
+                "spring.datasource.hikari.minimum-idle",
+                () -> "1"
         );
     }
 

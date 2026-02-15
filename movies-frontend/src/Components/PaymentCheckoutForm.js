@@ -1,5 +1,5 @@
-import React from "react";
-import "./PaymentCheckoutForm.css";
+import React from 'react';
+import './PaymentCheckoutForm.css';
 
 const PaymentCheckoutForm = ({
   paymentDetails,
@@ -83,8 +83,7 @@ const PaymentCheckoutForm = ({
               name="paymentMethod"
               value={paymentDetails.paymentMethod}
               onChange={handlePaymentInputChange}
-              required
-            >
+              required>
               <option value="">Select Payment Method</option>
               <option value="creditCard">Credit Card</option>
               <option value="debitCard">Debit Card</option>

@@ -12,8 +12,8 @@ const UserList = () => {
     const users = useSelector((state) => state?.user?.users.filter(user => user.roles[0] !== 'ROLE_ADMIN'));
 
     const defaultUserPicture = [
-        "https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/christian-buehner-DItYlc26zVI-unsplash.jpg?alt=media&token=REMOVED_STORAGE_TOKEN",
-        "https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/michael-dam-mEZ3PoFGs_k-unsplash.jpg?alt=media&token=REMOVED_STORAGE_TOKEN",
+        "https://picsum.photos/seed/user1/100/100.jpg",
+        "https://picsum.photos/seed/user2/100/100.jpg",
     ];
     const defaultSelected =
         defaultUserPicture[Math.floor(Math.random() * defaultUserPicture.length)];
@@ -31,7 +31,7 @@ const UserList = () => {
             await deleteUser(id, dispatch);
             fetchUserList();
         } catch (err) {
-            setError("Failed to delete user. Please try again.");
+            console.error("Failed to delete user:", err);
         }
     };
 

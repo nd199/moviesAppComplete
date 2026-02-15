@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   currentUser: null,
@@ -10,23 +10,23 @@ const initialState = {
 };
 
 const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {
     /* ================= COMMON ================= */
-    resetErrorMessage: (state) => {
+    resetErrorMessage: state => {
       state.error = false;
       state.errorMessage = null;
       state.successMessage = null;
     },
 
-    logout: (state) => {
+    logout: state => {
       state.currentUser = null;
       state.users = [];
     },
 
     /* ================= REGISTER ================= */
-    registerStart: (state) => {
+    registerStart: state => {
       state.isFetching = true;
       state.error = false;
     },
@@ -43,7 +43,7 @@ const userSlice = createSlice({
     },
 
     /* ================= LOGIN ================= */
-    loginStart: (state) => {
+    loginStart: state => {
       state.isFetching = true;
       state.error = false;
     },
@@ -62,7 +62,7 @@ const userSlice = createSlice({
     },
 
     /* ================= FORGOT PASSWORD ================= */
-    forgotPasswordStart: (state) => {
+    forgotPasswordStart: state => {
       state.isFetching = true;
       state.error = false;
     },
@@ -77,7 +77,7 @@ const userSlice = createSlice({
     },
 
     /* ================= VERIFY EMAIL ================= */
-    verifyEmailStart: (state) => {
+    verifyEmailStart: state => {
       state.isFetching = true;
       state.error = false;
     },
@@ -92,7 +92,7 @@ const userSlice = createSlice({
     },
 
     /* ================= VALIDATE OTP ================= */
-    validateOtpStart: (state) => {
+    validateOtpStart: state => {
       state.isFetching = true;
       state.error = false;
     },
@@ -107,7 +107,7 @@ const userSlice = createSlice({
     },
 
     /* ================= UPDATE PASSWORD ================= */
-    updatePassPushStart: (state) => {
+    updatePassPushStart: state => {
       state.isFetching = true;
       state.error = false;
     },
@@ -122,7 +122,7 @@ const userSlice = createSlice({
     },
 
     /* ================= UPDATE PROFILE ================= */
-    updateUserStart: (state) => {
+    updateUserStart: state => {
       state.isFetching = true;
       state.error = false;
     },
@@ -137,7 +137,7 @@ const userSlice = createSlice({
     },
 
     /* ================= FETCH USERS ================= */
-    fetchUsersStart: (state) => {
+    fetchUsersStart: state => {
       state.isFetching = true;
       state.error = false;
     },
@@ -152,7 +152,7 @@ const userSlice = createSlice({
     },
 
     /* ================= FETCH CURRENT USER ================= */
-    fetchCurrentStart: (state) => {
+    fetchCurrentStart: state => {
       state.isFetching = true;
       state.error = false;
     },

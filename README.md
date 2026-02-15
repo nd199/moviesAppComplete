@@ -6,11 +6,7 @@
 
 
 # App Screenshots
-![alt text](https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/Screenshot%202024-07-16%20at%206.51.51%E2%80%AFPM.png?alt=media&token=cdccc77e-cf9a-4bb3-97ea-10e6226ffce7)
-
-![alt text](https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/Screenshot%202024-07-16%20at%207.06.08%E2%80%AFPM.png?alt=media&token=84318f15-de05-40d3-a8f2-fbbb41ca13d4)
-
-![alt text](https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/Screenshot%202024-07-16%20at%207.00.05%E2%80%AFPM.png?alt=media&token=b5dd6a42-83cb-4acb-96af-b8bbe2fc152f)
+(Screenshots removed - Firebase storage URLs deprecated)
 
 MoviesApp is an example of an Internet Streaming Service Platform (OTT application). The application features a user-friendly interface for both admins and users. It is built with a Java Spring backend and a React frontend. The application also utilizes a microservices architecture, with separate services for handling user/admin operations and payment processing, which communicate via APIs.
 
@@ -29,49 +25,75 @@ MoviesApp is an example of an Internet Streaming Service Platform (OTT applicati
 - User dashboard for browsing and booking movies
 - Responsive design with a Netflix-inspired theme
 - Smooth navigation with redirects upon registration, login, and logout
-- Payment processing module using Node.js and MongoDB
+- Payment processing module using Spring Boot and PostgreSQL
 - Microservices architecture with communication via APIs
 
 ## Tech Stack
-- **Backend:** Java Spring Boot
-- **Frontend:** React And Redux Toolkit
-- **Database:** PostgreSQL (user/admin data) Springboot Backend, MongoDB (payment data) Node backend
-- **Authentication:** JWT (JSON Web Tokens) for registration and login
-- **UUIDTOKEN:** Changing-Password Email Verification
-- **Payment Processing Backend:** Node.js
+- **Backend:** Java 17, Spring Boot 3.2.12, Spring Security, JWT Authentication
+- **Frontend:** React 19.2.4, Redux Toolkit, Material-UI, React Router
+- **Database:** PostgreSQL with Flyway migrations
+- **Cache:** Redis for session management
+- **Build Tools:** Maven for backend, npm for frontend
+- **Containerization:** Docker and Docker Compose
+- **Email:** Spring Mail with SendGrid integration
+- **Testing:** JUnit 5, TestContainers, React Testing Library
 
 ## Installation
 
 ### Prerequisites
-- Java 11 or higher (var keywords are used)
-- Node.js and npm
-- PostgreSQL (or your preferred database)
-- MongoDB (or your preferred database)
+- Java 17 or higher
+- Node.js 18+ and npm
+- Docker and Docker Compose
+- Maven 3.6+
 
-### Backend
+### Quick Start with Docker
 1. Clone the repository:
     ```bash
     git clone https://github.com/yourusername/MoviesApp.git
-    cd MoviesApp/backend
+    cd MoviesApp
     ```
 
-2. Update the `application.properties` file with your database credentials:
-    ```properties
-    spring.datasource.url=jdbc:postgresql://localhost:5332/moviesapp
-    spring.datasource.username=yourusername
-    spring.datasource.password=yourpassword
-    ```
-
-3. Build and run the backend:
+2. Start the database services:
     ```bash
-    ./mvnw clean install
-    ./mvnw spring-boot:run
+    docker-compose up -d
     ```
 
-### Frontend (User)
+3. Start the backend:
+    ```bash
+    cd backend
+    mvn spring-boot:run
+    ```
+
+4. Start the frontend (in a new terminal):
+    ```bash
+    cd movies-frontend
+    npm install
+    npm start
+    ```
+
+### Manual Setup
+
+#### Backend
+1. Update the `application-dev.yaml` file with your database credentials:
+    ```yaml
+    spring:
+      datasource:
+        url: jdbc:postgresql://localhost:5332/movieott
+        username: codeNaren
+        password: password
+    ```
+
+2. Build and run the backend:
+    ```bash
+    cd backend
+    mvn clean install
+    mvn spring-boot:run
+    ```
+
+### Frontend
 1. Navigate to the frontend directory:
     ```bash
-    cd frontend
+    cd movies-frontend
     ```
 
 2. Install the dependencies:
@@ -84,52 +106,38 @@ MoviesApp is an example of an Internet Streaming Service Platform (OTT applicati
     npm start
     ```
 
-### Frontend (Admin)
-1. Navigate to the admin directory:
-    ```bash
-     cd frontendAdmin
-    ```
-
-2. Install the dependencies:
-    ```bash
-    npm install
-    ```
-
-3. Start the development server:
-    ```bash
-    npm start
-    ```
-
-### Payment Module
-1. Navigate to the payment module directory:
-    ```bash
-    cd paymentModule
-    ```
-
-2. Update the `config.js` file with your MongoDB URI:
-    ```javascript
-    module.exports = {
-        mongoURI: 'mongodb://yourusername:yourpassword@localhost:27017/movie_payment?authSource=admin'
-    };
-    ```
-
-3. Install the dependencies:
-    ```bash
-    npm install
-    ```
-
-4. Start the payment server:
-    ```bash
-    npm start
-    ```
+#### Available Scripts
+- `npm start` - Start development server on port 3000
+- `npm run build` - Build for production
+- `npm test` - Run tests
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint issues
+- `npm run format` - Format code with Prettier
 
 ## Usage
 1. Open your browser and go to `http://localhost:3000` for the user interface.
-2. Open your browser and go to `http://localhost:3006` for the admin interface.
-3. Register a new account or log in with an existing account.
-4. As an admin, you can access the admin dashboard to manage movies, shows as products, users, and screenings.
-5. As a user, you can browse available movies and make bookings.
-6. Use the payment interface for processing payments.
+2. Register a new account or log in with an existing account.
+3. As an admin, you can access the admin dashboard to manage movies, shows as products, users, and screenings.
+4. As a user, you can browse available movies and make bookings.
+5. Use the payment interface for processing payments.
+
+### Environment Variables
+#### Backend (application-dev.yaml)
+- `DB_URL` - Database connection URL (default: jdbc:postgresql://localhost:5332/movieott)
+- `DB_USERNAME` - Database username (default: codeNaren)
+- `DB_PASSWORD` - Database password (default: password)
+- `JWT_SECRET` - JWT secret key for authentication
+- `MAIL_HOST` - SMTP server host (default: smtp.gmail.com)
+- `MAIL_USERNAME` - Email username for notifications
+- `MAIL_PASSWORD` - Email app password
+- `REDIS_HOST` - Redis server host (default: localhost)
+- `REDIS_PORT` - Redis server port (default: 6379)
+
+#### Frontend (.env)
+Create a `.env` file in the movies-frontend directory:
+```env
+REACT_APP_API_URL=http://localhost:8080
+```
 
 ## API Endpoints
 ### Authentication(Spring backend)
@@ -148,9 +156,9 @@ MoviesApp is an example of an Internet Streaming Service Platform (OTT applicati
 - `POST /api/v1/products` - Add a new product (Movie or Show)
 - `DELETE /api/v1/bookings/{id}` - Delete a product (Movie or Show)
 
-### Payments(Node backend)
-- `POST /api/v1/payments` - Process a payment
-- `GET /api/v1/payments/{id}` - Get payment details
+### Payments(Spring backend)
+- `POST /api/v1/payments/submitPayment` - Process a payment
+- `GET /api/v1/payments/paymentDetails` - Get payment details
 
 ## Contributing
 Contributions are welcome! Please follow these steps:

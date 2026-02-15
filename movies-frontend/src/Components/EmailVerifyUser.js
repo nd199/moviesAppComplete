@@ -1,38 +1,36 @@
-import { Send } from "@mui/icons-material";
-import { useEffect, useState } from "react";
-import Lottie from "react-lottie";
-import { useDispatch, useSelector } from "react-redux";
-import { validateOtp, verifyEmail } from "../Network/ApiCalls";
-import { resetErrorMessage } from "../redux/userSlice";
-import CrossMark from "../Utils/animations/CrossMark.json";
-import TickMark from "../Utils/animations/TickMark.json";
-import "./EmailVerifyUser.css";
+import { Send } from '@mui/icons-material';
+import { useEffect, useState } from 'react';
+import Lottie from 'react-lottie';
+import { useDispatch, useSelector } from 'react-redux';
+import { validateOtp, verifyEmail } from '../Network/ApiCalls';
+import { resetErrorMessage } from '../redux/userSlice';
+import CrossMark from '../Utils/animations/CrossMark.json';
+import TickMark from '../Utils/animations/TickMark.json';
+import './EmailVerifyUser.css';
 
 const EmailVerifyUser = ({ onEmailVerified }) => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [showVerifyBtn, setShowVerifyBtn] = useState(false);
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState('');
   const [showOtpInput, setShowOtpInput] = useState(false);
-  const [otpMessage, setOtpMessage] = useState("");
+  const [otpMessage, setOtpMessage] = useState('');
   const [otpTimer, setOtpTimer] = useState(0);
   const [isSending, setIsSending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isEmailDisabled, setIsEmailDisabled] = useState(false);
 
   const dispatch = useDispatch();
-  const serverError = useSelector(
-    (state) => state?.user?.errorMessage?.message
-  );
+  const serverError = useSelector(state => state?.user?.errorMessage?.message);
 
   useEffect(() => () => dispatch(resetErrorMessage()), [dispatch]);
   useEffect(() => {
     if (!showOtpInput || otpTimer <= 0) return;
-    const interval = setInterval(() => setOtpTimer((t) => t - 1), 1000);
+    const interval = setInterval(() => setOtpTimer(t => t - 1), 1000);
     return () => clearInterval(interval);
   }, [showOtpInput, otpTimer]);
 
-  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isValidOtp = (otp) => /^[0-9]{6}$/.test(otp);
+  const isValidEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isValidOtp = otp => /^[0-9]{6}$/.test(otp);
 
   const handleSendOtp = async () => {
     if (!isValidEmail(email)) return;
@@ -41,10 +39,10 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
       await verifyEmail(dispatch, { email });
       setShowOtpInput(true);
       setOtpTimer(60);
-      setOtpMessage("");
+      setOtpMessage('');
     } catch (err) {
       console.error(err);
-      setOtpMessage("Failed to send OTP");
+      setOtpMessage('Failed to send OTP');
     } finally {
       setIsSending(false);
       setShowVerifyBtn(false);
@@ -60,14 +58,14 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
         enteredOTP: otp,
       });
       setOtpMessage(res);
-      if (res === "OTP verified successfully") {
+      if (res === 'OTP verified successfully') {
         setIsEmailDisabled(true);
         setShowOtpInput(false);
         onEmailVerified(email);
       }
     } catch (err) {
       console.error(err);
-      setOtpMessage("Invalid OTP or OTP expired");
+      setOtpMessage('Invalid OTP or OTP expired');
       onEmailVerified(false);
     } finally {
       setIsVerifying(false);
@@ -78,13 +76,13 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
     loop: true,
     autoplay: true,
     animationData: TickMark,
-    rendererSettings: { preserveAspectRatio: "xMidYMid slice" },
+    rendererSettings: { preserveAspectRatio: 'xMidYMid slice' },
   };
   const CrossOptions = {
     loop: true,
     autoplay: true,
     animationData: CrossMark,
-    rendererSettings: { preserveAspectRatio: "xMidYMid slice" },
+    rendererSettings: { preserveAspectRatio: 'xMidYMid slice' },
   };
 
   return (
@@ -95,17 +93,17 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
           type="email"
           value={email}
           placeholder="your@email.com"
-          onChange={(e) => {
+          onChange={e => {
             setEmail(e.target.value.toLowerCase());
             setShowVerifyBtn(e.target.value.length > 1 && !isEmailDisabled);
-            setOtpMessage("");
+            setOtpMessage('');
             setShowOtpInput(false);
           }}
           disabled={isEmailDisabled}
         />
-        {otpMessage === "OTP verified successfully" ? (
+        {otpMessage === 'OTP verified successfully' ? (
           <Lottie options={TickOptions} style={{ width: 40, height: 40 }} />
-        ) : otpMessage === "Invalid OTP or OTP expired" ? (
+        ) : otpMessage === 'Invalid OTP or OTP expired' ? (
           <Lottie options={CrossOptions} style={{ width: 40, height: 40 }} />
         ) : null}
       </div>
@@ -113,9 +111,8 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
       {showVerifyBtn && (
         <button
           onClick={handleSendOtp}
-          disabled={!isValidEmail(email) || isSending}
-        >
-          {isSending ? "Sending..." : "Verify Email"}
+          disabled={!isValidEmail(email) || isSending}>
+          {isSending ? 'Sending...' : 'Verify Email'}
         </button>
       )}
 
@@ -126,12 +123,11 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
             value={otp}
             maxLength={6}
             placeholder="Enter OTP"
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+            onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
           />
           <button
             onClick={handleVerifyOtp}
-            disabled={!isValidOtp(otp) || isVerifying}
-          >
+            disabled={!isValidOtp(otp) || isVerifying}>
             <Send />
           </button>
           <p>{otpTimer}s</p>
@@ -141,11 +137,10 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
       {otpMessage && (
         <p
           className={
-            otpMessage === "OTP verified successfully"
-              ? "otp-message"
-              : "otp-message-error"
-          }
-        >
+            otpMessage === 'OTP verified successfully'
+              ? 'otp-message'
+              : 'otp-message-error'
+          }>
           {otpMessage}
         </p>
       )}

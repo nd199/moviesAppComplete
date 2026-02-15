@@ -6,10 +6,10 @@ import {
   PlaceOutlined,
   Twitter,
   WhatsApp,
-} from "@mui/icons-material";
-import { HiOutlinePhone } from "react-icons/hi";
-import { Link } from "react-router-dom";
-import "./Footer.css";
+} from '@mui/icons-material';
+import { HiOutlinePhone } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
+import './Footer.css';
 
 const Footer = () => {
   return (
@@ -26,18 +26,18 @@ const Footer = () => {
             streaming, offline downloads, and personalized recommendations.
           </p>
           <div className="social-links">
-            <a href="#" className="social-link facebook">
+            <button className="social-link facebook" aria-label="Facebook">
               <Facebook />
-            </a>
-            <a href="#" className="social-link twitter">
+            </button>
+            <button className="social-link twitter" aria-label="Twitter">
               <Twitter />
-            </a>
-            <a href="#" className="social-link instagram">
+            </button>
+            <button className="social-link instagram" aria-label="Instagram">
               <Instagram />
-            </a>
-            <a href="#" className="social-link whatsapp">
+            </button>
+            <button className="social-link whatsapp" aria-label="WhatsApp">
               <WhatsApp />
-            </a>
+            </button>
           </div>
         </div>
 

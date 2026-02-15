@@ -1,5 +1,5 @@
 :root {
-  ---secondary-color: "#fbfbfbd";
+  ---secondary-color: '#fbfbfbd';
 }
 
 .otp-container {
@@ -27,7 +27,9 @@
   color: var(--secondary-color);
   cursor: pointer;
   font-size: 24px;
-  transition: color 0.3s, transform 0.3s;
+  transition:
+    color 0.3s,
+    transform 0.3s;
 }
 
 .otp-container .send-icon:hover {

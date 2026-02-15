@@ -5,10 +5,10 @@ import {
   ThumbUpAltOutlined,
   VolumeOff,
   VolumeUp,
-} from "@mui/icons-material";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import "./Col-ListItem.css";
+} from '@mui/icons-material';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import './Col-ListItem.css';
 
 const ColListItem = ({
   name,
@@ -19,18 +19,18 @@ const ColListItem = ({
   rating,
   runtime,
   genre,
-  className = "",
+  className = '',
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
 
-  const toggleAudio = (e) => {
+  const toggleAudio = e => {
     e.stopPropagation();
     setIsMuted(!isMuted);
   };
 
-  const formatRuntime = (minutes) => {
-    if (!minutes) return "";
+  const formatRuntime = minutes => {
+    if (!minutes) return '';
     const mins = parseInt(minutes);
     const hours = Math.floor(mins / 60);
     const remMins = mins % 60;
@@ -39,18 +39,17 @@ const ColListItem = ({
 
   const genres = genre
     ? genre
-        .split(",")
-        .map((g) => g.trim())
+        .split(',')
+        .map(g => g.trim())
         .slice(0, 2)
     : [];
 
   return (
     <Link
       to="/play"
-      className={`card ${className} ${isHovered ? "card-hovered" : ""}`}
+      className={`card ${className} ${isHovered ? 'card-hovered' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+      onMouseLeave={() => setIsHovered(false)}>
       <div className="card-media">
         {isHovered ? (
           <div className="card-video-wrapper">
@@ -60,8 +59,7 @@ const ColListItem = ({
               loop
               muted={isMuted}
               playsInline
-              preload="metadata"
-            >
+              preload="metadata">
               <source
                 src="https://www.w3schools.com/html/mov_bbb.mp4"
                 type="video/mp4"
@@ -76,7 +74,7 @@ const ColListItem = ({
           <img
             src={
               img ||
-              "https://via.placeholder.com/320x180/1a1a1a/9ca3af?text=No+Image"
+              'https://via.placeholder.com/320x180/1a1a1a/9ca3af?text=No+Image'
             }
             alt={name}
             className="card-poster"

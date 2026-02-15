@@ -1,6 +1,5 @@
 package com.naren.moviesapp.Repo;
 
-import com.naren.moviesapp.AbstractTestContainers;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.TestConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestConfig.class)
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class CustomerRepositoryTest extends AbstractTestContainers {
+class CustomerRepositoryTest {
 
     @Autowired
     private CustomerRepository underTest;
@@ -27,11 +26,17 @@ class CustomerRepositoryTest extends AbstractTestContainers {
 
     @BeforeEach
     void setUp() {
-        var customerName = FAKER.name().name();
-        var customerEmail = customerName + "@codeNaren.com";
-        var password = FAKER.internet().password(8, 12);
-        Long phoneNumber = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
-        customer = new Customer(customerName, customerEmail, password, phoneNumber, false, false, false, "Chennai, India", false);
+        customer = new Customer();
+        customer.setName("Test User");
+        customer.setEmail("test@example.com");
+        customer.setPassword("password123");
+        customer.setPhoneNumber(9999999999L);
+        customer.setImageUrl("");
+        customer.setIsEmailVerified(true);
+        customer.setAddress("Chennai, India");
+        customer.setIsLogged(false);
+        customer.setIsRegistered(true);
+        customer.setIsSubscribed(false);
     }
 
     @Test

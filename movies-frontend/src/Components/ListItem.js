@@ -5,22 +5,22 @@ import {
   ThumbUpAltOutlined,
   VolumeOff,
   VolumeUp,
-} from "@mui/icons-material";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import "./ListItem.css";
+} from '@mui/icons-material';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import './ListItem.css';
 
-const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre }) => {
+const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre, poster, id }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
 
-  const toggleAudio = (e) => {
+  const toggleAudio = e => {
     e.stopPropagation();
-    setIsMuted((prev) => !prev);
+    setIsMuted(prev => !prev);
   };
 
-  const formatRuntime = (minutes) => {
-    if (!minutes) return "";
+  const formatRuntime = minutes => {
+    if (!minutes) return '';
     const min = parseInt(minutes.toString().slice(0, 3), 10);
     const h = Math.floor(min / 60);
     const m = min % 60;
@@ -29,16 +29,15 @@ const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre }) => {
   };
 
   const genres = genre
-    ?.split(",")
-    .map((g) => g.trim())
+    ?.split(',')
+    .map(g => g.trim())
     .filter(Boolean);
 
   return (
     <article
-      className={`card ${isHovered ? "card-hovered" : ""}`}
+      className={`card ${isHovered ? 'card-hovered' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+      onMouseLeave={() => setIsHovered(false)}>
       <div className="card-media">
         {isHovered ? (
           <div className="card-video-wrapper">
@@ -60,7 +59,7 @@ const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre }) => {
           </div>
         ) : (
           <img
-            src="https://c4.wallpaperflare.com/wallpaper/123/991/646/avatar-blue-skin-james-cameron-s-movie-avatar-movie-poster-wallpaper-preview.jpg"
+            src={poster || "https://c4.wallpaperflare.com/wallpaper/123/991/646/avatar-blue-skin-james-cameron-s-movie-avatar-movie-poster-wallpaper-preview.jpg"}
             alt={name}
             className="card-poster"
           />
@@ -73,7 +72,7 @@ const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre }) => {
             <div className="card-header">
               <h3 className="card-title">{name}</h3>
               <div className="card-actions">
-                <Link to="/vfs" className="card-action">
+                <Link to={`/video/${id}`} className="card-action">
                   <PlayArrow fontSize="small" />
                 </Link>
                 <button className="card-action">

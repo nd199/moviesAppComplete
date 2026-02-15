@@ -1,72 +1,71 @@
-import { AddToQueueOutlined, PlayArrowOutlined } from "@mui/icons-material";
-import { useState } from "react";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "./Featured.css";
-import VideoPlayer from "./VideoPlayer";
+import { AddToQueueOutlined, PlayArrowOutlined } from '@mui/icons-material';
+import { useState } from 'react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import './Featured.css';
+import VideoPlayer from './VideoPlayer';
 
 const Featured = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
   const [expandedItems, setExpandedItems] = useState({});
 
   const featuredData = [
     {
-      title: "John Wick 4",
-      year: "2023",
-      rating: "R",
-      genre: "Action • Thriller",
-      desc: "An action-packed thriller that follows legendary hitman John Wick (Keanu Reeves) as he continues his relentless quest for freedom. With the bounty on his head ever increasing, Wick faces his most formidable foes yet across New York, Paris, Osaka, and Berlin.",
+      title: 'John Wick 4',
+      year: '2023',
+      rating: 'R',
+      genre: 'Action • Thriller',
+      desc: 'An action-packed thriller that follows legendary hitman John Wick (Keanu Reeves) as he continues his relentless quest for freedom. With the bounty on his head ever increasing, Wick faces his most formidable foes yet across New York, Paris, Osaka, and Berlin.',
       descMore:
-        "John Wick uncovers a path to defeating the High Table once and for all, but a powerful new enemy, the Marquis de Gramont, forces old allies to turn against him. Each city brings stylized, brutal combat, stunning choreography, and a deeper emotional core as his past catches up. One final fight for peace, freedom, and redemption.",
-      videoId: "X27pvZBu1ykSt5rHtmZA",
+        'John Wick uncovers a path to defeating the High Table once and for all, but a powerful new enemy, the Marquis de Gramont, forces old allies to turn against him. Each city brings stylized, brutal combat, stunning choreography, and a deeper emotional core as his past catches up. One final fight for peace, freedom, and redemption.',
+      videoId: 'X27pvZBu1ykSt5rHtmZA',
     },
     {
-      title: "Coolie",
-      year: "2025",
-      rating: "U/A",
-      genre: "Action • Thriller",
-      desc: "A man from a humble background rises against a powerful criminal system in a high-octane action drama.",
+      title: 'Coolie',
+      year: '2025',
+      rating: 'U/A',
+      genre: 'Action • Thriller',
+      desc: 'A man from a humble background rises against a powerful criminal system in a high-octane action drama.',
       descMore:
-        "Coolie (2025) is an action-thriller centered around a protagonist from the working class who challenges a deeply rooted criminal network, blending mass action sequences with social themes.",
-      videoId: "sIwcMUy8Y3xypseKBH7E",
+        'Coolie (2025) is an action-thriller centered around a protagonist from the working class who challenges a deeply rooted criminal network, blending mass action sequences with social themes.',
+      videoId: 'sIwcMUy8Y3xypseKBH7E',
     },
     {
-      title: "Athadu",
-      year: "2005",
-      rating: "U/A",
-      genre: "Action • Thriller",
-      desc: "A professional assassin takes on a new identity after being framed for a political murder.",
+      title: 'Athadu',
+      year: '2005',
+      rating: 'U/A',
+      genre: 'Action • Thriller',
+      desc: 'A professional assassin takes on a new identity after being framed for a political murder.',
       descMore:
-        "Athadu follows a highly skilled hitman who, after being falsely accused of assassinating a politician, assumes the identity of a deceased stranger and finds redemption while evading law enforcement and powerful enemies.",
-      videoId: "ER3zitX5AEe45hn9KGq5",
+        'Athadu follows a highly skilled hitman who, after being falsely accused of assassinating a politician, assumes the identity of a deceased stranger and finds redemption while evading law enforcement and powerful enemies.',
+      videoId: 'ER3zitX5AEe45hn9KGq5',
     },
     {
-      title: "Vedhalam",
-      year: "2015",
-      rating: "U/A",
-      genre: "Action • Drama",
-      desc: "A taxi driver with a mysterious past seeks justice while protecting his sister.",
+      title: 'Vedhalam',
+      year: '2015',
+      rating: 'U/A',
+      genre: 'Action • Drama',
+      desc: 'A taxi driver with a mysterious past seeks justice while protecting his sister.',
       descMore:
-        "Vedhalam tells the story of a seemingly simple taxi driver whose violent past resurfaces when his sister becomes the target of criminals, leading to a gripping tale of revenge, sacrifice, and redemption.",
-      videoId: "BoneWfjXFHFzsbWY22lJ",
+        'Vedhalam tells the story of a seemingly simple taxi driver whose violent past resurfaces when his sister becomes the target of criminals, leading to a gripping tale of revenge, sacrifice, and redemption.',
+      videoId: 'BoneWfjXFHFzsbWY22lJ',
     },
     {
-      title: "Jailer 2",
-      year: "2025",
-      rating: "U/A",
-      genre: "Action • Thriller",
-      desc: "A retired jailer is forced back into action when a powerful criminal network threatens his family.",
+      title: 'Jailer 2',
+      year: '2025',
+      rating: 'U/A',
+      genre: 'Action • Thriller',
+      desc: 'A retired jailer is forced back into action when a powerful criminal network threatens his family.',
       descMore:
-        "Jailer 2 continues the story of a fearless former jailer who confronts an even deadlier criminal syndicate, delivering intense action and emotional moments.",
-      videoId: "ExGx22jAdDWUZ9jYAODc",
+        'Jailer 2 continues the story of a fearless former jailer who confronts an even deadlier criminal syndicate, delivering intense action and emotional moments.',
+      videoId: 'ExGx22jAdDWUZ9jYAODc',
     },
   ];
 
-  const toggleMore = (index) => {
-    setExpandedItems((prev) => ({
+  const toggleMore = index => {
+    setExpandedItems(prev => ({
       ...prev,
       [index]: !prev[index],
     }));
@@ -93,9 +92,7 @@ const Featured = () => {
           pauseOnMouseEnter: true,
         }}
         loop={true}
-        onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-        className="featured-swiper"
-      >
+        className="featured-swiper">
         {featuredData.map((item, index) => (
           <SwiperSlide key={index}>
             <div className="featured-slide">
@@ -132,9 +129,8 @@ const Featured = () => {
 
                     <button
                       className="featured-more-btn"
-                      onClick={() => toggleMore(index)}
-                    >
-                      {expandedItems[index] ? "Show less" : "More..."}
+                      onClick={() => toggleMore(index)}>
+                      {expandedItems[index] ? 'Show less' : 'More...'}
                     </button>
                   </div>
 

@@ -1,3 +1,4 @@
+-- Create subscription_plans table first
 CREATE TABLE subscription_plans (
     id BIGSERIAL PRIMARY KEY NOT NULL,
     plan_name VARCHAR(50) NOT NULL,
@@ -6,6 +7,7 @@ CREATE TABLE subscription_plans (
     description TEXT NOT NULL
 );
 
+-- Then create subscription_intents with foreign key reference
 CREATE TABLE subscription_intents (
     id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,

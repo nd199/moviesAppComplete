@@ -1,40 +1,40 @@
-import { Send } from "@mui/icons-material";
-import { useEffect, useState } from "react";
-import Lottie from "react-lottie";
-import { useDispatch, useSelector } from "react-redux";
-import { validateOtp, verifyEmail } from "../Network/ApiCalls";
-import { resetErrorMessage } from "../redux/userSlice";
-import CrossMark from "../Utils/animations/CrossMark.json";
-import TickMark from "../Utils/animations/TickMark.json";
-import "./EmailSubscriptionVerify.css";
+import { Send } from '@mui/icons-material';
+import { useEffect, useState } from 'react';
+import Lottie from 'react-lottie';
+import { useDispatch, useSelector } from 'react-redux';
+import { validateOtp, verifyEmail } from '../Network/ApiCalls';
+import { resetErrorMessage } from '../redux/userSlice';
+import CrossMark from '../Utils/animations/CrossMark.json';
+import TickMark from '../Utils/animations/TickMark.json';
+import './EmailSubscriptionVerify.css';
 
 const EmailSubscriptionVerify = ({
   onEmailUpdate,
   onEmailVerified,
   onEmailError,
 }) => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [emVerify, setEmShowVerify] = useState(false);
-  const [mailOtp, setMailOTP] = useState("");
+  const [mailOtp, setMailOTP] = useState('');
   const [EmailOtp, setShowEmailOtp] = useState(false);
-  const [otpMessage, setOtpMessage] = useState("");
+  const [otpMessage, setOtpMessage] = useState('');
   const [otpTimer, setOtpTimer] = useState();
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
-  const [placeholder, setPlaceHolder] = useState("Cena@gmail.com");
+  const [placeholder, setPlaceHolder] = useState('Cena@gmail.com');
   const [showSuccessErrorMessage, setShowSuccessErrorMessage] = useState(false);
   const [isEmailDisabled, setIsEmailDisabled] = useState(false);
 
   const dispatch = useDispatch();
-  let lError = useSelector((state) => state?.user.errorMessage?.message);
-  const currUserEmail = useSelector((state) => state?.user?.currentUser?.email);
+  let lError = useSelector(state => state?.user.errorMessage?.message);
+  const currUserEmail = useSelector(state => state?.user?.currentUser?.email);
 
   useEffect(() => {
     return () => {
       dispatch(resetErrorMessage());
-      setOtpMessage("");
-      setShowSuccessErrorMessage("");
-      setShowEmailOtp("");
+      setOtpMessage('');
+      setShowSuccessErrorMessage('');
+      setShowEmailOtp('');
     };
   }, [dispatch]);
 
@@ -46,18 +46,18 @@ const EmailSubscriptionVerify = ({
     let timer;
     if (otpTimer > 0) {
       timer = setInterval(() => {
-        setOtpTimer((prev) => prev - 1);
+        setOtpTimer(prev => prev - 1);
       }, 1000);
     }
     return () => clearInterval(timer);
   }, [otpTimer]);
 
-  const isValidEmail = (email) => {
+  const isValidEmail = email => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const isValidOtp = (mailOtp) => {
+  const isValidOtp = mailOtp => {
     const otpRegex = /^[0-9]{6}$/;
     return otpRegex.test(mailOtp);
   };
@@ -71,7 +71,7 @@ const EmailSubscriptionVerify = ({
       setOtpMessage(res);
       setOtpTimer(60);
     } catch (error) {
-      console.error("Error verifying email:", error);
+      console.error('Error verifying email:', error);
     } finally {
       setIsSendingEmail(false);
     }
@@ -80,14 +80,14 @@ const EmailSubscriptionVerify = ({
   const otpValidationHandler = async () => {
     if (otpTimer <= 0 && mailOtp.length !== 0) {
       setShowSuccessErrorMessage(
-        "Otp has expired Please re enter your email to try again"
+        'Otp has expired Please re enter your email to try again',
       );
       setEmShowVerify(true);
       setShowEmailOtp(false);
-      setOtpMessage("");
-      setMailOTP("");
-      setEmail("");
-      setPlaceHolder("Cena@gmail.com");
+      setOtpMessage('');
+      setMailOTP('');
+      setEmail('');
+      setPlaceHolder('Cena@gmail.com');
       return;
     }
 
@@ -97,8 +97,8 @@ const EmailSubscriptionVerify = ({
       const res = await validateOtp(dispatch, validateInfo);
       setOtpMessage(res);
       setShowEmailOtp(false);
-      setShowSuccessErrorMessage("");
-      if (res === "OTP verified successfully") {
+      setShowSuccessErrorMessage('');
+      if (res === 'OTP verified successfully') {
         setIsEmailDisabled(true);
         onEmailVerified(true);
       }
@@ -106,12 +106,12 @@ const EmailSubscriptionVerify = ({
       setShowEmailOtp(false);
       setOtpMessage(error?.response?.data);
       setShowSuccessErrorMessage(
-        error?.response?.data + " Please enter you email again to re-verify"
+        error?.response?.data + ' Please enter you email again to re-verify',
       );
-      setPlaceHolder("Cena@gmail.com");
-      setEmail("");
-      setMailOTP("");
-      setShowEmailOtp("");
+      setPlaceHolder('Cena@gmail.com');
+      setEmail('');
+      setMailOTP('');
+      setShowEmailOtp('');
       onEmailVerified(false);
     } finally {
       setIsVerifyingOtp(false);
@@ -123,7 +123,7 @@ const EmailSubscriptionVerify = ({
     autoplay: true,
     animationData: TickMark,
     rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
+      preserveAspectRatio: 'xMidYMid slice',
     },
   };
 
@@ -132,7 +132,7 @@ const EmailSubscriptionVerify = ({
     autoplay: true,
     animationData: CrossMark,
     rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
+      preserveAspectRatio: 'xMidYMid slice',
     },
   };
 
@@ -145,39 +145,39 @@ const EmailSubscriptionVerify = ({
             type="email"
             placeholder={placeholder}
             value={email}
-            onChange={(e) => {
+            onChange={e => {
               const inputEmail = e.target.value.toLowerCase();
               setEmail(inputEmail);
               if (isValidEmail(inputEmail)) {
                 if (inputEmail === currUserEmail) {
                   setEmShowVerify(true);
-                  onEmailError("");
+                  onEmailError('');
                 } else {
                   onEmailError(
-                    "Your email is incorrect, check and provide correct Email to proceed with verification"
+                    'Your email is incorrect, check and provide correct Email to proceed with verification',
                   );
                   setEmShowVerify(false);
                 }
               } else {
                 setEmShowVerify(false);
-                onEmailError("");
+                onEmailError('');
               }
-              setOtpMessage("");
+              setOtpMessage('');
             }}
             required
             disabled={isEmailDisabled}
-            style={{ cursor: !isEmailDisabled ? "pointer" : "not-allowed" }}
+            style={{ cursor: !isEmailDisabled ? 'pointer' : 'not-allowed' }}
           />
-          {otpMessage === "OTP verified successfully" ? (
+          {otpMessage === 'OTP verified successfully' ? (
             <Lottie
               options={TickMarkOptions}
-              style={{ width: "40px", height: "40px" }}
+              style={{ width: '40px', height: '40px' }}
               title="OTP verified successfully"
             />
-          ) : otpMessage === "Invalid OTP or OTP expired" ? (
+          ) : otpMessage === 'Invalid OTP or OTP expired' ? (
             <Lottie
               options={CrossMarkOptions}
-              style={{ width: "40px", height: "40px" }}
+              style={{ width: '40px', height: '40px' }}
               title="Invalid OTP or OTP expired"
             />
           ) : null}
@@ -189,14 +189,13 @@ const EmailSubscriptionVerify = ({
             className="verify-button"
             disabled={!isValidEmail(email)}
             style={{
-              cursor: !isValidEmail(email) ? "not-allowed" : "pointer",
+              cursor: !isValidEmail(email) ? 'not-allowed' : 'pointer',
             }}
             title={
               !isValidEmail(email)
-                ? "Please enter a valid email"
-                : "Click to verify your email"
-            }
-          >
+                ? 'Please enter a valid email'
+                : 'Click to verify your email'
+            }>
             Verify Email
           </button>
         ) : EmailOtp ? (
@@ -209,7 +208,7 @@ const EmailSubscriptionVerify = ({
                   type="text"
                   placeholder="OTP"
                   value={mailOtp}
-                  onChange={(e) => setMailOTP(e.target.value)}
+                  onChange={e => setMailOTP(e.target.value)}
                 />
                 <div>
                   {isSendingEmail ? (
@@ -221,19 +220,18 @@ const EmailSubscriptionVerify = ({
                         onClick={otpValidationHandler}
                         style={{
                           cursor: !isValidOtp(mailOtp)
-                            ? "not-allowed"
-                            : "pointer",
+                            ? 'not-allowed'
+                            : 'pointer',
                         }}
                         title={
                           !isValidOtp(mailOtp)
-                            ? "Please enter a valid OTP"
-                            : "Click to verify your OTP"
-                        }
-                      >
+                            ? 'Please enter a valid OTP'
+                            : 'Click to verify your OTP'
+                        }>
                         <Send className="send-icon" />
                       </button>
                       <span>
-                        OTP Expires in <span className="timer">{otpTimer}</span>{" "}
+                        OTP Expires in <span className="timer">{otpTimer}</span>{' '}
                         seconds
                       </span>
                     </div>
@@ -244,7 +242,7 @@ const EmailSubscriptionVerify = ({
           </div>
         ) : null}
       </div>
-      <p style={{ marginBottom: "10px", color: "white" }}>
+      <p style={{ marginBottom: '10px', color: 'white' }}>
         {showSuccessErrorMessage}
       </p>
     </>

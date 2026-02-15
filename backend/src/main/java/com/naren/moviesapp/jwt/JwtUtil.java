@@ -2,14 +2,16 @@ package com.naren.moviesapp.jwt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Exception.AlgorithmNotSupportedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.stereotype.Service;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.io.Decoders;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -18,23 +20,28 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class JwtUtil {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
-    private static final SecretKey SECRET_KEY;
+    
+    @Value("${jwt.secret:default-secret-key-that-should-be-changed-in-production-use-at-least-256-bits}")
+    private String jwtSecret;
+    
+    @Value("${jwt.issuer:codeNaren.com}")
+    private String jwtIssuer;
+    
+    @Value("${jwt.expiration-minutes:30}")
+    private long jwtExpirationMinutes;
 
-    static {
-        try {
-            SECRET_KEY = generateSecretKey();
-        } catch (NoSuchAlgorithmException e) {
-            throw new AlgorithmNotSupportedException("Algorithm not supported");
-        }
-    }
-
-    private static SecretKey generateSecretKey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
-        return keyGenerator.generateKey();
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(
+            jwtSecret.length() < 44 ? 
+            java.util.Base64.getEncoder().encodeToString(jwtSecret.getBytes()) : 
+            jwtSecret
+        );
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
 //
@@ -43,51 +50,60 @@ public class JwtUtil {
 //    }
 
     public String issueToken(String subject, Map<String, Object> claims) {
-        return Jwts.builder().claims(claims)
+        Map<String, Object> enhancedClaims = new HashMap<>(claims);
+        enhancedClaims.put("jti", UUID.randomUUID().toString());
+        enhancedClaims.put("iat", System.currentTimeMillis() / 1000);
+        
+        return Jwts.builder()
+                .claims(enhancedClaims)
                 .subject(subject)
-                .issuer("codeNaren.com")
+                .issuer(jwtIssuer)
                 .issuedAt(Date.from(Instant.now()))
-                .expiration(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))
-                .signWith(SECRET_KEY)
+                .expiration(Date.from(Instant.now().plus(jwtExpirationMinutes, ChronoUnit.MINUTES)))
+                .signWith(getSigningKey())
                 .compact();
     }
 
     public String issueToken(String subject, Set<Role> roles) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", roles);
-
-        return Jwts
-                .builder()
-                .claims(claims)
-                .subject(subject)
-                .issuedAt(Date.from(Instant.now()))
-                .expiration(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))
-                .signWith(SECRET_KEY)
-                .compact();
+        claims.put("type", "access");
+        
+        return issueToken(subject, claims);
     }
     private Claims getClaims(String token) {
-        return Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     public String getSubject(String token) {
         return getClaims(token).getSubject();
     }
-
-//    public Set<String> getRoles(String token) {
-//        //noinspection unchecked
-//        return (Set<String>) getClaims(token).get("roles");
-//    }
+    
+    public String getJti(String token) {
+        return getClaims(token).getId();
+    }
 
     public boolean isTokenValid(String token, String userName) {
         try {
             Claims claims = getClaims(token);
-            boolean isValid = claims.getSubject().equals(userName) && !isTokenExpired(claims);
+            
+            // Enhanced validation with multiple checks
+            boolean isValid = claims.getSubject().equals(userName) 
+                && !isTokenExpired(claims)
+                && claims.getIssuer().equals(jwtIssuer)
+                && claims.getIssuedAt().before(Date.from(Instant.now()))
+                && claims.get("type", String.class).equals("access");
+                
             if (!isValid) {
-                logger.warn("Invalid JWT token for user: {}", userName);
+                logger.warn("Invalid JWT token for user: {} - Reason validation failed", userName);
             }
             return isValid;
         } catch (Exception e) {
-            logger.error("JWT token validation failed: {}", e.getMessage());
+            logger.error("JWT token validation failed for user {}: {}", userName, e.getMessage());
             return false;
         }
     }
@@ -96,8 +112,12 @@ public class JwtUtil {
         Date expiration = claims.getExpiration();
         boolean isExpired = expiration != null && expiration.before(Date.from(Instant.now()));
         if (isExpired) {
-                logger.warn("JWT token expired for user");
+            logger.warn("JWT token expired for user");
         }
         return isExpired;
+    }
+    
+    public long getExpirationTime() {
+        return System.currentTimeMillis() + (jwtExpirationMinutes * 60 * 1000);
     }
 }

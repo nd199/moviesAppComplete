@@ -12,6 +12,9 @@ import LoginForm from "./Pages/User/LoginForm";
 import RegistrationForm from "./Pages/User/RegistrationForm";
 import Subscription from "./Pages/User/Subscription";
 import VideoFullScreen from "./Pages/User/VideoFullScreen";
+import AboutUs from "./Pages/User/AboutUs";
+import Movies from "./Pages/User/Movies";
+import Shows from "./Pages/User/Shows";
 
 // Admin pages
 import AdminHome from "./Pages/Admin/Home";
@@ -37,7 +40,6 @@ function AppWithHealthCheck() {
 
 function AppWithNavigation() {
   const currentUser = useSelector((state) => state.user?.currentUser);
-  const isRegistered = currentUser && currentUser?.isRegistered;
   const isSubscribed = currentUser && currentUser?.isSubscribed;
   const isAdmin = currentUser?.roles?.includes("ROLE_ADMIN");
   const dispatch = useDispatch();
@@ -80,6 +82,9 @@ function AppWithNavigation() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegistrationForm />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/movies" element={<Movies />} />
+        <Route path="/shows" element={<Shows />} />
 
         {/* Protected user routes */}
         <Route

@@ -5,11 +5,10 @@ import Chart from "../../Components/Chart";
 import WidgetsSmall from "../../Components/WidgetsSmall";
 import WidgetsLarge from "../../Components/WidgetsLarge";
 import {publicRequest} from "../../AxiosMethods";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { fetchCurrentAdminDetails } from "../../Network/ApiCalls";
 
 const Home = () => {
-    const dispatch = useDispatch();
     // const user = useSelector((state) => state?.user);
     // const currentUser = user?.currentUser;
     // // useEffect(() => {

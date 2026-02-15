@@ -6,7 +6,10 @@ public record ApiError(
         String path,
         String message,
         int statusCode,
-        LocalDateTime localDateTime
-
+        LocalDateTime localDateTime,
+        String errorCode
 ) {
+    public ApiError(String path, String message, int statusCode, LocalDateTime localDateTime) {
+        this(path, message, statusCode, localDateTime, null);
+    }
 }

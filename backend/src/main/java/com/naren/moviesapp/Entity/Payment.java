@@ -40,7 +40,7 @@ public class Payment {
     @Column(name = "transaction_id", nullable = false, unique = true)
     private String transactionId;
 
-    @Column(name = "amount", nullable = false)
+    @Column(name = "amount", nullable = false, columnDefinition = "NUMERIC(10,2)")
     private Double amount;
 
     @Column(name = "status", nullable = false)

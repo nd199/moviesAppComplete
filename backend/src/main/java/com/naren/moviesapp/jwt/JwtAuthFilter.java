@@ -1,6 +1,7 @@
 package com.naren.moviesapp.jwt;
 
 import com.naren.moviesapp.Service.CustomerUserDetailsService;
+import com.naren.moviesapp.Service.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,10 +21,12 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
 
-    public JwtAuthFilter(JwtUtil jwtUtil, CustomerUserDetailsService userDetailsService) {
+    public JwtAuthFilter(JwtUtil jwtUtil, CustomerUserDetailsService userDetailsService, TokenBlacklistService tokenBlacklistService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -52,6 +55,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
         
         if (token == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Check if token is blacklisted
+        if (tokenBlacklistService.isTokenBlacklisted(token)) {
             filterChain.doFilter(request, response);
             return;
         }

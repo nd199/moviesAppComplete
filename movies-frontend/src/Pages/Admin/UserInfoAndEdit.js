@@ -15,8 +15,8 @@ import { format } from "date-fns";
 
 const UserInfoAndEdit = () => {
   const defaultUserPicture = [
-    "https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/christian-buehner-DItYlc26zVI-unsplash.jpg?alt=media&token=REMOVED_STORAGE_TOKEN",
-    "https://firebasestorage.googleapis.com/v0/b/moviesite-5ed22.appspot.com/o/michael-dam-mEZ3PoFGs_k-unsplash.jpg?alt=media&token=REMOVED_STORAGE_TOKEN",
+    "https://picsum.photos/seed/user1/100/100.jpg",
+    "https://picsum.photos/seed/user2/100/100.jpg",
   ];
   const defaultSelected =
       defaultUserPicture[Math.floor(Math.random() * defaultUserPicture.length)];
@@ -58,7 +58,7 @@ const UserInfoAndEdit = () => {
       });
       fetchUsers(dispatch);
     } catch (err) {
-      setError("Failed to update user. Please try again.");
+      console.error("Failed to update user:", err);
     }
   };
 

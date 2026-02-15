@@ -8,6 +8,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,10 +50,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
+            .cors(AbstractHttpConfigurer::disable)
+            .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/auth/**", "/api/v1/auth/**", "/api/public/**", "/error", "/actuator/**", "/ping").permitAll()
+                .requestMatchers("/api/auth/**", "/api/v1/auth/**", "/api/public/**", "/api/v1/customers/**", "/api/v1/products/**", "/customers/**", "/error", "/actuator/**", "/ping").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
@@ -68,6 +70,7 @@ public class SecurityConfig {
                 .httpStrictTransportSecurity(hsts -> hsts
                     .maxAgeInSeconds(31536000)
                     .preload(true)
+                    .includeSubDomains(false)
                 )
                 .addHeaderWriter(new StaticHeadersWriter("X-Content-Type-Options", "nosniff"))
                 .addHeaderWriter(new StaticHeadersWriter("X-Frame-Options", "DENY"))

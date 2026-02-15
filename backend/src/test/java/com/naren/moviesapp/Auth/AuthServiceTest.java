@@ -4,7 +4,7 @@ import com.naren.moviesapp.Dao.CustomerDao;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Customer;
-import com.naren.moviesapp.Exception.ResourceNotFoundException;
+import com.naren.moviesapp.Exception.*;
 import com.naren.moviesapp.Record.CustomerUpdateRequest;
 import com.naren.moviesapp.Service.CustomerService;
 import com.naren.moviesapp.jwt.JwtUtil;
@@ -201,7 +201,7 @@ class AuthServiceTest {
                 .thenThrow(new BadCredentialsException("bad credentials"));
 
         assertThatThrownBy(() -> underTest.login(request))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Incorrect email or password");
+                .isInstanceOf(InvalidCredentialsException.class)
+                .hasMessageContaining("Invalid email or password");
     }
 }

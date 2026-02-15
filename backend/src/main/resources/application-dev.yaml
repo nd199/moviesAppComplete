@@ -8,9 +8,9 @@ spring:
     static-path-pattern: /**
 
   datasource:
-    url: jdbc:postgresql://localhost:5332/movieott
-    username: codeNaren
-    password: password
+    url: ${DB_URL:jdbc:postgresql://localhost:5332/movieott}
+    username: ${DB_USERNAME:codeNaren}
+    password: ${DB_PASSWORD:password}
 
   flyway:
     enabled: true
@@ -25,18 +25,16 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-    show-sql: true
+    show-sql: false
 
   main:
     web-application-type: servlet
 
-
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: codenaren@gmail.com #Please provide your Google app acc email
-    password: gpezdhriviifkuon
-    #This will not Work Please provide your app Pass from your google account
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:your-email@gmail.com}
+    password: ${MAIL_PASSWORD:your-app-password}
     properties:
       mail:
         smtp:
@@ -46,10 +44,24 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+          
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:bXlTdXBlclNlY3JldEtleUZvckpXVFRva2VuR2VuZXJhdGlvblRoYXQaXNMZWFzdDI1NkJpdHNMb25n}
+  issuer: ${JWT_ISSUER:codeNaren.com}
+  expiration-minutes: ${JWT_EXPIRATION_MINUTES:30}
+  refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:7}
+
+# Application Configuration
+app:
+  data-initialization:
+    enabled: ${APP_DATA_INITIALIZATION_ENABLED:true}
 
 logging:
   level:
@@ -58,3 +70,6 @@ logging:
     org:
       springframework:
         security: debug
+    com:
+      naren:
+        moviesapp: debug
