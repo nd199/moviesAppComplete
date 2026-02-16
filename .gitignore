@@ -24,14 +24,25 @@ backend/**/*.class
 backend/**/generated-sources/
 backend/**/generated-test-sources/
 backend/**/surefire-reports/
+backend/**/maven-archiver/
+backend/**/dependency-cache/
+backend/**/build/
+backend/out/
+backend/.mvn/wrapper/maven-wrapper.jar
 
 # ===============================
 # Frontend (React)
 # ===============================
 frontend/node_modules/
 frontend/build/
+frontend/.cache/
+frontend/.next/
+frontend/out/
 movies-frontend/node_modules/
 movies-frontend/build/
+movies-frontend/.cache/
+movies-frontend/.next/
+movies-frontend/out/
 frontendAdmin/node_modules/
 frontendAdmin/build/
 frontendpayment/node_modules/
