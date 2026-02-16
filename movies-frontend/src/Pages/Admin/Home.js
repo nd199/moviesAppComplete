@@ -5,8 +5,6 @@ import Chart from "../../Components/Chart";
 import WidgetsSmall from "../../Components/WidgetsSmall";
 import WidgetsLarge from "../../Components/WidgetsLarge";
 import {publicRequest} from "../../AxiosMethods";
-import { useDispatch } from "react-redux";
-import { fetchCurrentAdminDetails } from "../../Network/ApiCalls";
 
 const Home = () => {
     // const user = useSelector((state) => state?.user);

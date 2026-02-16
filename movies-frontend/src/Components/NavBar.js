@@ -4,7 +4,7 @@ import Lottie from "react-lottie";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../redux/userSlice";
-import { Cookies } from 'react-cookie';
+import api from "../AxiosMethods";
 import popcornAnimation from "../Utils/animations/popcorn.json";
 import "./NavBar.css";
 
@@ -16,7 +16,6 @@ const NavBar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user?.currentUser);
-  const cookies = new Cookies();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -39,17 +38,20 @@ const NavBar = () => {
   const toggleMenu = useCallback(() => setMenuOpen((prev) => !prev), []);
   const closeMobileMenu = useCallback(() => setMenuOpen(false), []);
 
-  const handleLogout = useCallback(() => {
-    // Clear secure cookies
-    cookies.remove('jwt_token', { path: '/' });
-    cookies.remove('refresh_token', { path: '/' });
+  const handleLogout = useCallback(async () => {
+    try {
+      // Call backend logout to clear HttpOnly cookies
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     
     // Clear redux state
     dispatch(logout());
     navigate("/login");
     closeDropdown();
     closeMobileMenu();
-  }, [dispatch, navigate, closeDropdown, closeMobileMenu, cookies]);
+  }, [dispatch, navigate, closeDropdown, closeMobileMenu]);
 
   const goToProfile = useCallback(() => {
     navigate("/profile");

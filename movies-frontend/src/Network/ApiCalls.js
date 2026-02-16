@@ -6,6 +6,7 @@ import {
   paymentRequest,
   springRequest,
 } from '../AxiosMethods';
+import Cookies from "js-cookie";
 import {
   fetchMoviesFailure,
   fetchMoviesStart,
@@ -30,6 +31,7 @@ import {
   registerFailure,
   registerStart,
   registerSuccess,
+  setAuthStatus,
   updatePassPushFailure,
   updatePassPushStart,
   updatePassPushSuccess,
@@ -49,7 +51,20 @@ export const register = async (dispatch, customerInfo) => {
   dispatch(registerStart());
   try {
     const res = await authRequest().post('/auth/customers', customerInfo);
+    
+    // Save JWT token to cookies
+    if (res.data.accessToken) {
+      Cookies.set("jwt_token", res.data.accessToken, {
+        path: "/",
+        secure: false, // Set to true for HTTPS in production
+        sameSite: "strict",
+        expires: 7, // 7 days in js-cookie format
+      });
+      console.log('Register: JWT token saved to cookies');
+    }
+    
     dispatch(registerSuccess(res.data));
+    dispatch(setAuthStatus("authenticated"));
   } catch (error) {
     const message =
       error.response?.data?.message ||
@@ -81,7 +96,20 @@ export const login = async (dispatch, userInfo) => {
   dispatch(loginStart());
   try {
     const res = await authRequest().post('/auth/login', userInfo);
+    
+    // Save JWT token to cookies
+    if (res.data.accessToken) {
+      Cookies.set("jwt_token", res.data.accessToken, {
+        path: "/",
+        secure: false, // Set to true for HTTPS in production
+        sameSite: "strict",
+        expires: 7, // 7 days in js-cookie format
+      });
+      console.log('Login: JWT token saved to cookies');
+    }
+    
     dispatch(loginSuccess(res.data));
+    dispatch(setAuthStatus("authenticated"));
   } catch (error) {
     const message =
       error.response?.data?.message ||
@@ -177,11 +205,22 @@ export const fetchUsers = async dispatch => {
 export const fetchCurrentUserDetails = async dispatch => {
   dispatch(fetchCurrentStart());
   try {
-    const res = await userRequest().get(`/customers/currentUser`);
+    const res = await userRequest().get(`/customers/currentUser`, {
+      withCredentials: true
+    });
     dispatch(fetchCurrentSuccess(res.data));
     return res.data;
   } catch (error) {
     const message = error.response?.data?.message || 'Failed to fetch user';
+    
+    // If it's a 401 or 403 auth error, set as unauthenticated
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.warn('Auth error - setting user as unauthenticated');
+      dispatch(fetchCurrentFailure({ message }));
+      return;
+    }
+    
+    // For other errors, proceed normally
     dispatch(fetchCurrentFailure({ message }));
   }
 };
@@ -208,6 +247,18 @@ export const getPaymentDetailsApi = email =>
 export const updateFinalUserApi = finalUser =>
   paymentRequest.post('/payments/updateFinalUser', { finalUser });
 
+export const markUserSubscribedApi = async (email) => {
+  try {
+    const res = await paymentRequest.post('/payments/subscribe-success', null, {
+      params: { email }
+    });
+    return res.data;
+  } catch (error) {
+    console.error('Failed to mark user as subscribed:', error);
+    throw error;
+  }
+};
+
 export const pingSpringApi = email => springRequest.post('/', { email });
 
 /* ================= ADMIN APIS ================= */
@@ -218,7 +269,9 @@ export const fetchProducts = async dispatch => {
     return products;
   } catch (error) {
     console.error('Failed to fetch products:', error);
-    throw error;
+    // Don't throw error to prevent app crash, return empty array instead
+    console.warn('Returning empty products array due to auth error');
+    return [];
   }
 };
 

@@ -1,7 +1,13 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Entity.*;
-import com.naren.moviesapp.Repo.*;
+import com.naren.moviesapp.Entity.Customer;
+import com.naren.moviesapp.Entity.Payment;
+import com.naren.moviesapp.Entity.SubscriptionPlan;
+import com.naren.moviesapp.Entity.UserPlanInfo;
+import com.naren.moviesapp.Repo.CustomerRepository;
+import com.naren.moviesapp.Repo.PaymentRepository;
+import com.naren.moviesapp.Repo.SubscriptionPlanRepository;
+import com.naren.moviesapp.Repo.UserPlanInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,12 +116,21 @@ public class PaymentService {
 
         customer.setIsSubscribed(isSubscribed);
 
-        if (!isSubscribed) {
-            Optional<UserPlanInfo> planInfo = userPlanInfoRepository.findByCustomerId(customer.getId());
-            if (planInfo.isPresent()) {
-                planInfo.get().setIsActive(false);
-                userPlanInfoRepository.save(planInfo.get());
+        Optional<UserPlanInfo> planInfo = userPlanInfoRepository.findByCustomerId(customer.getId());
+        if (planInfo.isPresent()) {
+            UserPlanInfo userPlan = planInfo.get();
+            if (isSubscribed) {
+                // Activate the user's plan when subscription is set to true
+                userPlan.setIsActive(true);
+                // If there's no subscription end date or it's in the past, set a default
+                if (userPlan.getSubscriptionEndDate() == null || userPlan.getSubscriptionEndDate().isBefore(LocalDateTime.now())) {
+                    userPlan.setSubscriptionEndDate(LocalDateTime.now().plusMonths(1)); // Default to 1 month
+                }
+            } else {
+                // Deactivate the user's plan when subscription is set to false
+                userPlan.setIsActive(false);
             }
+            userPlanInfoRepository.save(userPlan);
         }
 
         return customerRepository.save(customer);

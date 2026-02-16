@@ -7,14 +7,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    
+
     @Value("${app.allowed.origins:}")
     private String allowedOrigins;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         String[] origins;
-        
+
         // If allowedOrigins is not set or empty, use localhost for development
         if (allowedOrigins == null || allowedOrigins.trim().isEmpty()) {
             origins = new String[]{"http://localhost:3000"};

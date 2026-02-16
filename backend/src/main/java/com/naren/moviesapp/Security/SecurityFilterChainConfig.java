@@ -4,32 +4,58 @@ import com.naren.moviesapp.jwt.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @EnableWebSecurity
 @Configuration
 public class SecurityFilterChainConfig {
 
-    private final AuthenticationProvider authenticationProvider;
-    private final JwtAuthFilter authFilter;
-    private final AuthenticationEntryPoint authenticationEntryPoint;
-    public SecurityFilterChainConfig(AuthenticationProvider authenticationProvider, JwtAuthFilter authFilter,
-                                     AuthenticationEntryPoint authenticationEntryPoint) {
-        this.authenticationProvider = authenticationProvider;
-        this.authFilter = authFilter;
-        this.authenticationEntryPoint = authenticationEntryPoint;
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain customSecurityFilterChain(HttpSecurity http) throws Exception {
+    public PasswordEncoder passwordEncoder() {
+        return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder encoder) {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+        daoAuthenticationProvider.setPasswordEncoder(encoder);
+        return daoAuthenticationProvider;
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new HttpStatusEntryPoint(HttpStatus.FORBIDDEN);
+    }
+
+    @Bean
+    public SecurityFilterChain customSecurityFilterChain(HttpSecurity http,
+                                                         AuthenticationProvider authenticationProvider,
+                                                         JwtAuthFilter authFilter,
+                                                         AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable)
+
+                .cors(cors -> cors.configure(http))
 
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -43,6 +69,7 @@ public class SecurityFilterChainConfig {
                                 "/ping",
                                 "/api/v1/movies/**",
                                 "/api/v1/shows/**",
+                                "/api/v1/products/**",
                                 "/api/v1/about"
                         ).permitAll()
 
@@ -55,6 +82,13 @@ public class SecurityFilterChainConfig {
 
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/subscription/intent"
+                        ).permitAll()
+
+                        // Swagger UI endpoints
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html"
                         ).permitAll()
 
                         /* ================= AUTHENTICATED ================= */
@@ -71,8 +105,7 @@ public class SecurityFilterChainConfig {
 
                         .requestMatchers(
                                 "/api/v1/customers/**",
-                                "/api/v1/roles/**",
-                                "/api/v1/products/**"
+                                "/api/v1/roles/**"
                         ).hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.POST,

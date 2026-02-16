@@ -5,6 +5,7 @@ import com.naren.moviesapp.Record.MovieRegistration;
 import com.naren.moviesapp.Record.MovieUpdation;
 
 import java.util.List;
+
 public interface MovieServiceInterface {
 
     Movie addMovie(MovieRegistration registration);

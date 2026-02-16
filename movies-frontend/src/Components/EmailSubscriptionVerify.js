@@ -16,7 +16,7 @@ const EmailSubscriptionVerify = ({
   const [email, setEmail] = useState('');
   const [emVerify, setEmShowVerify] = useState(false);
   const [mailOtp, setMailOTP] = useState('');
-  const [EmailOtp, setShowEmailOtp] = useState(false);
+  const [showEmailOtp, setShowEmailOtp] = useState(false);
   const [otpMessage, setOtpMessage] = useState('');
   const [otpTimer, setOtpTimer] = useState();
   const [isSendingEmail, setIsSendingEmail] = useState(false);
@@ -26,7 +26,6 @@ const EmailSubscriptionVerify = ({
   const [isEmailDisabled, setIsEmailDisabled] = useState(false);
 
   const dispatch = useDispatch();
-  let lError = useSelector(state => state?.user.errorMessage?.message);
   const currUserEmail = useSelector(state => state?.user?.currentUser?.email);
 
   useEffect(() => {
@@ -138,7 +137,8 @@ const EmailSubscriptionVerify = ({
 
   return (
     <>
-      <div className="inputs">
+      <form onSubmit={(e) => e.preventDefault()}>
+        <div className="inputs">
         <label>EMAIL :</label>
         <div className="envVerify-message">
           <input
@@ -198,7 +198,7 @@ const EmailSubscriptionVerify = ({
             }>
             Verify Email
           </button>
-        ) : EmailOtp ? (
+        ) : showEmailOtp ? (
           <div className="otp-container">
             {isVerifyingOtp ? (
               <p>Verifying OTP...</p>
@@ -242,6 +242,7 @@ const EmailSubscriptionVerify = ({
           </div>
         ) : null}
       </div>
+      </form>
       <p style={{ marginBottom: '10px', color: 'white' }}>
         {showSuccessErrorMessage}
       </p>

@@ -83,12 +83,13 @@ public class CustomerService implements CustomerServiceInterface {
         }
         roleService.deleteRole(id);
     }
+
     @Override
     @Transactional
     public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration, Set<String> roleNames) {
 
         logger.info("Attempting to register new user with email: {}", customerRegistration.email());
-        
+
         try {
             Customer registeredCustomer = registerCustomer(customerRegistration);
             Set<Role> roles = new HashSet<>();
@@ -112,18 +113,18 @@ public class CustomerService implements CustomerServiceInterface {
             String token = jwtUtil.issueToken(registeredCustomer.getUsername(), roles);
             CustomerDTO customerDTO = customerDTOMapper.apply(registeredCustomer);
 
-            logger.info("Successfully registered user with email: {}, roles: {}", 
+            logger.info("Successfully registered user with email: {}, roles: {}",
                     customerRegistration.email(), roleNames);
-            
+
             return ResponseEntity.status(HttpStatus.CREATED)
                     .header(HttpHeaders.AUTHORIZATION, token)
                     .body(customerDTO);
         } catch (InvalidRegistration e) {
-            logger.warn("Invalid registration attempt for email {}: {}", 
+            logger.warn("Invalid registration attempt for email {}: {}",
                     customerRegistration.email(), e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (RoleNotFoundException e) {
-            logger.error("Role assignment failed for email {}: {}", 
+            logger.error("Role assignment failed for email {}: {}",
                     customerRegistration.email(), e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -148,18 +149,18 @@ public class CustomerService implements CustomerServiceInterface {
                 false, false, false, customerRegistration.address(), false);
     }
 
-    private boolean validatePassword(String password, String name, String email, Long phoneNumber) {
+    private boolean validatePassword(String password, String name, String email, String phoneNumber) {
         if (password == null || password.length() < REQ_PASSWORD_LENGTH) {
             throw new PasswordInvalidException("Password must be at least %s characters long".formatted(REQ_PASSWORD_LENGTH));
         }
         return !containsPersonalInfo(password, name, email, phoneNumber);
     }
 
-    private boolean containsPersonalInfo(String password, String name, String email, Long phoneNumber) {
+    private boolean containsPersonalInfo(String password, String name, String email, String phoneNumber) {
 
         if (password.contains(name) ||
                 password.contains(email) ||
-                password.contains(String.valueOf(phoneNumber))) {
+                password.contains(phoneNumber)) {
             throw new PasswordInvalidException("Password must " +
                     "not contain personal info [Name,Email,Phone] ");
         }
@@ -235,21 +236,21 @@ public class CustomerService implements CustomerServiceInterface {
     @Transactional
     public void updatePassword(String email, String newPassword) {
         logger.info("Password update request for email: {}", email);
-        
+
         Customer customer = customerDao.getCustomerByUsername(email)
                 .orElseThrow(() -> {
                     logger.warn("Password update failed - user not found: {}", email);
                     return new ResourceNotFoundException("Customer with email "
                             + email + " not found");
                 });
-        
+
         // Check if new password is same as current password by encoding the new password and comparing
         String encodedNewPassword = passwordEncoder.encode(newPassword);
         if (passwordEncoder.matches(newPassword, customer.getPassword())) {
             logger.warn("Password update failed - new password same as current for email: {}", email);
             throw new PasswordInvalidException("New password cannot be the same as your current password");
         }
-        
+
         var passwordIsValid = validatePassword(newPassword, customer.getName(), customer.getEmail(), customer.getPhoneNumber());
         if (!passwordIsValid) {
             logger.warn("Password update failed - validation error for email: {}", email);
@@ -257,7 +258,7 @@ public class CustomerService implements CustomerServiceInterface {
         }
         customer.setPassword(encodedNewPassword);
         customerDao.updateCustomer(customer);
-        
+
         logger.info("Password successfully updated for email: {}", email);
     }
 
@@ -365,7 +366,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    public CustomerDTO getCustomerByPhoneNumber(Long phoneNumber) {
+    public CustomerDTO getCustomerByPhoneNumber(String phoneNumber) {
         return customerDao.getCustomerByPhoneNumber(phoneNumber)
                 .map(customerDTOMapper).orElseThrow(
                         () -> new ResourceNotFoundException("Could not find customer by phone number " + phoneNumber)

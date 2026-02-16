@@ -10,14 +10,14 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class TokenBlacklistService {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(TokenBlacklistService.class);
     private static final String BLACKLIST_PREFIX = "blacklist:";
     private static final long DEFAULT_BLACKLIST_DURATION = 30; // minutes
-    
+
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
-    
+
     public void blacklistToken(String token, long expirationTime) {
         try {
             String jti = extractJtiFromToken(token);
@@ -30,11 +30,11 @@ public class TokenBlacklistService {
             logger.error("Failed to blacklist token: {}", e.getMessage());
         }
     }
-    
+
     public void blacklistToken(String token) {
         blacklistToken(token, DEFAULT_BLACKLIST_DURATION);
     }
-    
+
     public boolean isTokenBlacklisted(String token) {
         try {
             String jti = extractJtiFromToken(token);
@@ -46,7 +46,7 @@ public class TokenBlacklistService {
         }
         return false;
     }
-    
+
     private String extractJtiFromToken(String token) {
         try {
             // This is a simplified extraction - in production, you might want to parse the JWT properly
@@ -66,13 +66,13 @@ public class TokenBlacklistService {
         }
         return null;
     }
-    
+
     private long calculateTTL(long expirationTime) {
         long currentTime = System.currentTimeMillis();
         long ttl = (expirationTime - currentTime) / (60 * 1000); // Convert to minutes
         return Math.max(ttl, 1); // At least 1 minute
     }
-    
+
     public void removeExpiredTokens() {
         // Redis automatically handles TTL, but this method can be used for manual cleanup
         logger.debug("Token cleanup initiated");

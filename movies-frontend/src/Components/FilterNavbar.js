@@ -13,7 +13,6 @@ const FilterNavbar = ({
   rating,
   setRating,
 }) => {
-  const [activeFilter, setActiveFilter] = useState(null);
 
   const genres = [
     'All',
@@ -36,9 +35,7 @@ const FilterNavbar = ({
           <label>Sort</label>
           <select
             value={sortBy}
-            onChange={e => setSortBy(e.target.value)}
-            onFocus={() => setActiveFilter('sort')}
-            onBlur={() => setActiveFilter(null)}>
+            onChange={e => setSortBy(e.target.value)}>
             <option value="popularity">Popularity ↓</option>
             <option value="rating">Rating ↓</option>
           </select>
@@ -62,9 +59,7 @@ const FilterNavbar = ({
           <label>Genre</label>
           <select
             value={genre}
-            onChange={e => setGenre(e.target.value)}
-            onFocus={() => setActiveFilter('genre')}
-            onBlur={() => setActiveFilter(null)}>
+            onChange={e => setGenre(e.target.value)}>
             {genres.map(g => (
               <option key={g} value={g === 'All Genres' ? '' : g}>
                 {g}
@@ -77,9 +72,7 @@ const FilterNavbar = ({
           <label>Year</label>
           <select
             value={year}
-            onChange={e => setYear(e.target.value)}
-            onFocus={() => setActiveFilter('year')}
-            onBlur={() => setActiveFilter(null)}>
+            onChange={e => setYear(e.target.value)}>
             <option value="">All Years</option>
             <option value="2025">2025</option>
             <option value="2024">2024</option>
@@ -93,9 +86,7 @@ const FilterNavbar = ({
           <label>Rating</label>
           <select
             value={rating}
-            onChange={e => setRating(e.target.value)}
-            onFocus={() => setActiveFilter('rating')}
-            onBlur={() => setActiveFilter(null)}>
+            onChange={e => setRating(e.target.value)}>
             <option value="">All Ratings</option>
             <option value="7.0">7.0+ ⭐</option>
             <option value="8.0">8.0+ ⭐</option>

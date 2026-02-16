@@ -1,7 +1,7 @@
 package com.naren.moviesapp.IT.CustomerIntegrationTest;
 
 import com.github.javafaker.Faker;
-import com.naren.moviesapp.AbstractTestContainers;
+import com.naren.moviesapp.AbstractIntegrationTest;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Role;
@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
@@ -26,7 +27,8 @@ import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CustomerIT extends AbstractTestContainers {
+@ActiveProfiles("test")
+public class CustomerIT extends AbstractIntegrationTest {
 
     private static final Faker FAKER = new Faker();
     private static final String API_PATH = "/api/v1/customers";
@@ -49,7 +51,7 @@ public class CustomerIT extends AbstractTestContainers {
         String customerName = "IM CUSTOMER" + FAKER.name().fullName();
         String customerEmail = customerName.replace(" ", ".") + "@codeNaren.com".toLowerCase();
         String password = FAKER.internet().password(8, 12);
-        Long customerPhone = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
+        String customerPhone = FAKER.phoneNumber().subscriberNumber(9);
         boolean isEmailVerified = true;
         String address = "Chennai, India";
 
@@ -153,11 +155,11 @@ public class CustomerIT extends AbstractTestContainers {
         Faker faker = new Faker();
         String customerName1 = faker.name().fullName();
         String email1 = customerName1.replace(" ", ".") + "@codeNaren.com";
-        Long phone1 = Long.valueOf(faker.phoneNumber().subscriberNumber(9));
+        String phone1 = faker.phoneNumber().subscriberNumber(9);
 
         String customerName2 = faker.name().fullName();
         String email2 = customerName2.replace(" ", ".") + "@codeNaren.com";
-        Long phone2 = Long.valueOf(faker.phoneNumber().subscriberNumber(9));
+        String phone2 = faker.phoneNumber().subscriberNumber(9);
 
         String password = faker.internet().password(8, 12);
         boolean isEmailVerified = false;
@@ -209,12 +211,12 @@ public class CustomerIT extends AbstractTestContainers {
         // Generate data for the admin and customer
         String adminName = faker.name().fullName();
         String adminEmail = adminName.replace(" ", ".") + "@codeNaren.com";
-        Long adminPhone = Long.valueOf(faker.phoneNumber().subscriberNumber(9));
+        String adminPhone = faker.phoneNumber().subscriberNumber(9);
         String password = faker.internet().password(8, 12);
 
         String customerName = faker.name().fullName();
         String customerEmail = customerName.replace(" ", ".") + "@codeNaren.com";
-        Long customerPhone = Long.valueOf(faker.phoneNumber().subscriberNumber(9));
+        String customerPhone = faker.phoneNumber().subscriberNumber(9);
 
         boolean isEmailVerified = false;
         String address = "Chennai, India";
@@ -296,7 +298,7 @@ public class CustomerIT extends AbstractTestContainers {
     void addMovie() {
         String adminName = FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".") + "@codeNaren.com";
-        Long adminPhone = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
+        String adminPhone = FAKER.phoneNumber().subscriberNumber(9);
         String password = FAKER.internet().password(8, 12);
         boolean isEmailVerified = false;
         String address = "Chennai, India";

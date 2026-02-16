@@ -32,7 +32,7 @@ public class MoviesApplication {
                                                ShowRepository showRepository,
                                                SubscriptionPlanRepository subscriptionPlanRepository) {
         return args -> {
-            int i = 1;
+            int i = 4;
             while (i != 0) {
                 createRandomCustomer(customerRepository, encoder);
                 createRandomMovie(movieRepository);
@@ -49,7 +49,7 @@ public class MoviesApplication {
         String domain = System.getenv().getOrDefault("EMAIL_DOMAIN", "codeNaren.com");
         String customerEmail = customerName.toLowerCase().replace(" ", "") + "@" + domain;
         String password = encoder.encode(FAKER.internet().password(8, 12));
-        Long phoneNumber = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
+        String phoneNumber = FAKER.phoneNumber().subscriberNumber(9);
         Boolean isLoggedIn = FAKER.options().<Boolean>option(true, false);
         Boolean isRegistered = FAKER.options().<Boolean>option(true, false);
         Customer customer = new Customer(customerName, customerEmail, password,
@@ -131,8 +131,9 @@ public class MoviesApplication {
         }
         if (!planRepository.existsByPlanName("Yearly")) {
             planRepository.save(premiumPlan());
+        }
     }
-    }
+
     private void createRole(RoleRepository roleRepository) {
 
         if (!roleRepository.existsRoleByName("ROLE_USER")) {

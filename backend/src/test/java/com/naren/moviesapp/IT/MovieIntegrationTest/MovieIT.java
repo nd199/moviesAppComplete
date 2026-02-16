@@ -1,7 +1,7 @@
 package com.naren.moviesapp.IT.MovieIntegrationTest;
 
 import com.github.javafaker.Faker;
-import com.naren.moviesapp.AbstractTestContainers;
+import com.naren.moviesapp.AbstractIntegrationTest;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Record.CustomerRegistration;
@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
@@ -26,7 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class MovieIT extends AbstractTestContainers {
+@ActiveProfiles("test")
+public class MovieIT extends AbstractIntegrationTest {
 
     private static final String API_PATH = "/api/v1/movies";
 
@@ -51,7 +53,7 @@ public class MovieIT extends AbstractTestContainers {
         String customerName = "IM CUSTOMER " + FAKER.name().fullName();
         String customerEmail = customerName.replace(" ", ".") + "@codeNaren.com";
         String password = FAKER.internet().password(8, 12);
-        Long customerPhone = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
+        String customerPhone = FAKER.phoneNumber().subscriberNumber(9);
         boolean isEmailVerified = false;
         String address = "Chennai, India";
 

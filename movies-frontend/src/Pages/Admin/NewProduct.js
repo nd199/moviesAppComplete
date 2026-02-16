@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./NewProduct.css";
-import Box from "@mui/material/Box";
-import LinearProgress from "@mui/material/LinearProgress";
-import { useDispatch } from "react-redux";
 
 const NewProduct = () => {
   const [input, setInput] = useState({});
   const [file, setFile] = useState(null);
-  const [categories] = useState([]);
-  const [uploadProgress] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   useEffect(() => {
@@ -27,10 +22,6 @@ const NewProduct = () => {
       ...prev,
       [name]: type === "checkbox" ? e.target.checked : value,
     }));
-  };
-
-  const changeCategoryHandler = (e) => {
-    setCategories(e.target.value.split(","));
   };
 
   const clickHandler = async (e) => {
@@ -58,17 +49,6 @@ const NewProduct = () => {
               onChange={(e) => setFile(e.target.files[0])}
             />
           </div>
-          <Box sx={{ width: "100%" }}>
-            <LinearProgress
-              variant="determinate"
-              value={uploadProgress}
-              style={{
-                height: "10px",
-                borderRadius: "5px",
-                marginBottom: "10px",
-              }}
-            />
-          </Box>
           <div className="pItem">
             <label>Name</label>
             <input
@@ -101,7 +81,8 @@ const NewProduct = () => {
             <input
               type="text"
               placeholder="',' i.e: Mystery, Horror"
-              onChange={changeCategoryHandler}
+              name="genre"
+              onChange={changeHandler}
             />
           </div>
           <div className="pItem">

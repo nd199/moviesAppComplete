@@ -15,23 +15,42 @@ import java.util.Set;
 
 public interface CustomerServiceInterface {
     void addRole(Role role);
+
     List<Role> getRoles();
+
     Role getRoleById(Long id);
+
     void removeRole(Long id);
+
     ResponseEntity<?> registerUser(CustomerRegistration customerRegistration, Set<String> roleNames);
+
     CustomerDTO getCustomerById(Long customerId);
+
     CustomerDTO updateCustomer(CustomerUpdateRequest request, Long id);
+
     void updatePassword(String email, String newPassword);
+
     List<CustomerDTO> getAllCustomers();
+
     void deleteCustomer(Long customerId);
+
     void addMovieToCustomer(Long customerId, Long movieId);
+
     void removeMovieFromCustomer(Long customerId, Long movieId);
+
     void removeAllMovies(Long customerId);
+
     List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn);
+
     CustomerDTO getCustomerByEmail(String email);
-    CustomerDTO getCustomerByPhoneNumber(Long phoneNumber);
+
+    CustomerDTO getCustomerByPhoneNumber(String phoneNumber);
+
     void generateAndSendMailOtp(EmailVerificationRequest emailVerificationRequest);
+
     List<CustomerDTO> getLatestCustomerList();
+
     List<CustomerStatsDTO> getCustomerStats();
+
     ResponseEntity<?> pingSubscription(CustomerSubscription customerSubscription);
 }

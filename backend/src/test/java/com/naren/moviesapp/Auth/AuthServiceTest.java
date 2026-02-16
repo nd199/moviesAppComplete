@@ -4,7 +4,8 @@ import com.naren.moviesapp.Dao.CustomerDao;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Customer;
-import com.naren.moviesapp.Exception.*;
+import com.naren.moviesapp.Exception.InvalidCredentialsException;
+import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.CustomerUpdateRequest;
 import com.naren.moviesapp.Service.CustomerService;
 import com.naren.moviesapp.jwt.JwtUtil;
@@ -22,7 +23,6 @@ import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -75,7 +75,7 @@ class AuthServiceTest {
         principal.setId(10L);
         principal.setName("User");
         principal.setEmail("user@codeNaren.com");
-        principal.setPhoneNumber(9999999999L);
+        principal.setPhoneNumber("9999999999");
         principal.setImageUrl("");
         principal.setIsEmailVerified(true);
         principal.setAddress("Chennai, India");
@@ -129,7 +129,7 @@ class AuthServiceTest {
         principal.setId(10L);
         principal.setName("User");
         principal.setEmail("user@codeNaren.com");
-        principal.setPhoneNumber(9999999999L);
+        principal.setPhoneNumber("9999999999");
         principal.setImageUrl("");
         principal.setIsEmailVerified(true);
         principal.setAddress("Chennai, India");
@@ -186,7 +186,7 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> underTest.login(request))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Profile not found");
+                .hasMessageContaining("Account not found");
 
         verify(customerService, never()).updateCustomer(any(), any());
         verify(customerDTOMapper, never()).apply(any());

@@ -3,7 +3,6 @@ package com.naren.moviesapp;
 import com.github.javafaker.Faker;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -21,13 +20,13 @@ public class AbstractTestContainers {
                     .withDatabaseName("movieott")
                     .withUsername("codeNaren")
                     .withPassword("password")
-                    .withReuse(true);
+                    .withReuse(false);
 
     @BeforeAll
     static void engageFlyway() {
         // Wait for container to be ready
         postgresContainer.start();
-        
+
         Flyway flyway = Flyway
                 .configure()
                 .dataSource(postgresContainer.getJdbcUrl(),
@@ -73,11 +72,32 @@ public class AbstractTestContainers {
         );
         registry.add(
                 "spring.datasource.hikari.maximum-pool-size",
-                () -> "5"
+                () -> "10"
         );
         registry.add(
                 "spring.datasource.hikari.minimum-idle",
-                () -> "1"
+                () -> "2"
+        );
+        registry.add(
+                "spring.datasource.hikari.idle-timeout",
+                () -> "180000"
+        );
+        registry.add(
+                "spring.datasource.hikari.max-lifetime",
+                () -> "600000"
+        );
+        registry.add(
+                "spring.datasource.hikari.leak-detection-threshold",
+                () -> "30000"
+        );
+        // Connection validation settings
+        registry.add(
+                "spring.datasource.hikari.connection-test-query",
+                () -> "SELECT 1"
+        );
+        registry.add(
+                "spring.datasource.hikari.validation-timeout",
+                () -> "5000"
         );
     }
 

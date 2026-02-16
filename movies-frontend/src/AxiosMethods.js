@@ -1,15 +1,5 @@
 import axios from "axios";
-import { Cookies } from 'react-cookie';
-
-const cookies = new Cookies();
-
-// Enhanced cookie configuration
-const cookieOptions = {
-  path: '/',
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.REACT_APP_COOKIE_SAME_SITE || 'lax',
-  httpOnly: false // Set to true if backend handles httpOnly cookies
-};
+import Cookies from "js-cookie";
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1",
@@ -17,14 +7,18 @@ const api = axios.create({
   timeout: 10000, // Add timeout for better error handling
 });
 
-// Request interceptor - add token from cookies
+// Request interceptor - add security headers
 api.interceptors.request.use(
   (config) => {
-    const token = cookies.get('jwt_token');
-    if (token && token !== 'undefined' && token !== 'null') {
+    // Get JWT token from cookies
+    const token = Cookies.get("jwt_token");
+    
+    // Add Authorization header if token exists
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    // Add security headers
+    
+    // Add other security headers
     config.headers['X-Requested-With'] = 'XMLHttpRequest';
     return config;
   },
@@ -41,11 +35,6 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Clear all auth-related cookies
-      cookies.remove('jwt_token', { ...cookieOptions });
-      cookies.remove('refresh_token', { ...cookieOptions });
-      cookies.remove('user_session', { ...cookieOptions });
-      
       // Only redirect if not already on login page
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
@@ -57,7 +46,11 @@ api.interceptors.response.use(
 
 export default api;
 export const userRequest = () => api;
-export const authRequest = () => api;
+export const authRequest = () => axios.create({
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1",
+  withCredentials: true,
+  timeout: 10000,
+});
 export const passResetRequest = axios.create({
   baseURL: process.env.REACT_APP_API_URL || "http://localhost:8080/api/password-reset",
   withCredentials: true,

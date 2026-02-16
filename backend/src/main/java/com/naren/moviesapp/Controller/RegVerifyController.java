@@ -29,6 +29,7 @@ public class RegVerifyController {
         customerService.generateAndSendMailOtp(emailVerificationRequest);
         return ResponseEntity.ok("OTP sent to email: " + emailVerificationRequest.email());
     }
+
     @PostMapping("/validate/Otp")
     public ResponseEntity<String> verifyEmailOtp(@RequestBody VerifyOtpRequest request) {
         String email = request.customerEmail();

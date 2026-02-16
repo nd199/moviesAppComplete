@@ -15,6 +15,7 @@
     "axios": "1.13.5",
     "date-fns": "4.1.0",
     "formik": "2.4.9",
+    "js-cookie": "^3.0.5",
     "lottie-react": "2.4.1",
     "react": "19.2.4",
     "react-cookie": "8.0.1",
@@ -76,9 +77,9 @@
     ]
   },
   "devDependencies": {
-    "webpack-bundle-analyzer": "^4.10.1",
     "eslint": "^8.57.0",
     "prettier": "^3.3.3",
-    "source-map-loader": "^4.0.1"
+    "source-map-loader": "^4.0.1",
+    "webpack-bundle-analyzer": "^4.10.1"
   }
 }

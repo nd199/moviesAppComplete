@@ -6,14 +6,15 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     boolean existsByEmail(String email);
 
-    boolean existsByPhoneNumber(Long phoneNumber);
+    boolean existsByPhoneNumber(String phoneNumber);
 
     Optional<Customer> findCustomerByEmail(String email);
 
-    Optional<Customer> getCustomerByPhoneNumber(Long phoneNumber);
+    Optional<Customer> getCustomerByPhoneNumber(String phoneNumber);
 
     List<Customer> getCustomersByIsLogged(Boolean isLoggedIn);
 

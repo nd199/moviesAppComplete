@@ -34,7 +34,7 @@ const Shows = () => {
             show.name?.toLowerCase().includes(searchQuery.toLowerCase())
         )
         .filter((show) => !genre || show.genre?.includes(genre))
-        .filter((show) => !year || show.year == parseInt(year))
+        .filter((show) => !year || show.year === parseInt(year))
         .filter((show) => !rating || show.rating >= parseFloat(rating))
         .sort((a, b) => {
           if (sortBy === "popularity") {

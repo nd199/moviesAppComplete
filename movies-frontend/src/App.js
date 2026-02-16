@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import { fetchCurrentUserDetails } from "./Network/ApiCalls";
 import { persistor } from "./redux/store";
+import axios from "axios";
 import "./App.css";
 
 // Import components for all roles
@@ -11,6 +12,7 @@ import Home from "./Pages/User/Home";
 import LoginForm from "./Pages/User/LoginForm";
 import RegistrationForm from "./Pages/User/RegistrationForm";
 import Subscription from "./Pages/User/Subscription";
+import EmailVerification from "./Pages/User/EmailVerification";
 import VideoFullScreen from "./Pages/User/VideoFullScreen";
 import AboutUs from "./Pages/User/AboutUs";
 import Movies from "./Pages/User/Movies";
@@ -34,75 +36,122 @@ import Success from "./Pages/Payment/Success";
 import Fallback from "./Utils/FallBackPage";
 import ServerConnection from "./Utils/ServerConnection";
 
+// Backend Health Check Component
 function AppWithHealthCheck() {
+  const [serverStatus, setServerStatus] = useState('checking'); // 'checking', 'up', 'down'
+  const [retryCount, setRetryCount] = useState(0);
+
+  useEffect(() => {
+    const checkServerHealth = async () => {
+      try {
+        // Ping backend with timeout
+        await axios.get(`${process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1"}/ping`, {
+          timeout: 5000, // 5 second timeout for health check
+        });
+        setServerStatus('up');
+      } catch (error) {
+        console.warn('Backend health check failed:', error.message);
+        setServerStatus('down');
+      }
+    };
+
+    // Initial health check
+    checkServerHealth();
+
+    // Set up retry mechanism if server is down
+    let retryInterval;
+    if (serverStatus === 'down' && retryCount < 5) {
+      retryInterval = setInterval(() => {
+        setRetryCount(prev => prev + 1);
+        checkServerHealth();
+      }, 10000); // Retry every 10 seconds
+    }
+
+    return () => {
+      if (retryInterval) clearInterval(retryInterval);
+    };
+  }, [serverStatus, retryCount]);
+
+  // Show server connection screen while checking
+  if (serverStatus === 'checking') {
+    return <ServerConnection />;
+  }
+
+  // Show fallback page if server is down
+  if (serverStatus === 'down') {
+    return <Fallback retryCount={retryCount} onRetry={() => setServerStatus('checking')} />;
+  }
+
+  // Only render app if server is up
   return <AppWithNavigation />;
 }
 
 function AppWithNavigation() {
-  const currentUser = useSelector((state) => state.user?.currentUser);
-  const isSubscribed = currentUser && currentUser?.isSubscribed;
-  const isAdmin = currentUser?.roles?.includes("ROLE_ADMIN");
-  const isFetching = useSelector((state) => state.user?.isFetching);
   const dispatch = useDispatch();
-
-  console.log('AppWithNavigation - Current user:', currentUser);
-  console.log('AppWithNavigation - Is subscribed:', isSubscribed);
-  console.log('AppWithNavigation - Is admin:', isAdmin);
-  console.log('AppWithNavigation - Is fetching:', isFetching);
+  const [skipUserFetch, setSkipUserFetch] = useState(false);
 
   useEffect(() => {
-    if (currentUser?.token) {
+    // Skip user fetch if we just completed payment (to preserve subscription status)
+    if (!skipUserFetch) {
       fetchCurrentUserDetails(dispatch);
     }
-  }, [currentUser?.token, dispatch]);
+  }, [dispatch, skipUserFetch]);
+
+  // Listen for payment success to skip next fetch
+  useEffect(() => {
+    const handlePaymentSuccess = () => {
+      setSkipUserFetch(true);
+      // Reset flag after 10 seconds to allow normal fetching again
+      setTimeout(() => setSkipUserFetch(false), 10000);
+    };
+
+    // This will be called from PaymentCheckout
+    window.paymentSuccess = handlePaymentSuccess;
+    
+    return () => {
+      window.paymentSuccess = null;
+    };
+  }, []);
 
   // Role-based routing component
-  const ProtectedRoute = ({ children, requiredRole, allowVideoPreview }) => {
-    console.log('ProtectedRoute - Checking access:', { 
-      currentUser: currentUser?.email, 
-      requiredRole, 
-      isSubscribed, 
-      isAdmin, 
-      allowVideoPreview,
-      userHasToken: !!currentUser?.token,
-      isFetching 
+  const ProtectedRoute = ({ children, requiredRole }) => {
+    const authStatus = useSelector(state => state.user.authStatus);
+    const currentUser = useSelector(state => state.user.currentUser);
+    const isAdmin = currentUser?.roles?.includes("ROLE_ADMIN");
+    const isSubscribed = currentUser?.isSubscribed;
+
+    console.log('ProtectedRoute - Debug:', {
+      authStatus,
+      currentUser,
+      isAdmin,
+      isSubscribed,
+      requiredRole
     });
-    
-    if (isFetching) {
-      return <div style={{padding: '20px', textAlign: 'center', color: 'white'}}>Loading user data...</div>;
+
+    if (authStatus === "loading") {
+      return (
+        <div style={{ padding: "20px", textAlign: "center", color: "white" }}>
+          Checking authentication...
+        </div>
+      );
     }
-    
-    // Wait a moment for user data to be available
-    if (!currentUser?.token) {
-      console.log('ProtectedRoute - No token yet, showing loading...');
-      return <div style={{padding: '20px', textAlign: 'center', color: 'white'}}>Loading user data...</div>;
+
+    if (authStatus === "unauthenticated") {
+      console.log('ProtectedRoute - Redirecting to login (unauthenticated)');
+      return <Navigate to="/login" replace />;
     }
-    
-    // Additional delay to ensure Redux persistence is fully loaded
-    setTimeout(() => {
-      if (!currentUser?.token) {
-        console.log('ProtectedRoute - Still no token after delay, redirecting to login');
-        return <Navigate to="/login" replace />;
-      }
-    }, 500);
 
     if (requiredRole === "admin" && !isAdmin) {
-      console.log('ProtectedRoute - Admin required but not admin');
+      console.log('ProtectedRoute - Redirecting to home (not admin)');
       return <Navigate to="/" replace />;
     }
 
-    if (requiredRole === "user" && isAdmin) {
-      console.log('ProtectedRoute - User required but is admin');
-      return <Navigate to="/admin" replace />;
-    }
-
-    // Special handling for video preview - allow access even without subscription
-    if (requiredRole === "subscribed" && !isSubscribed && !allowVideoPreview) {
-      console.log('ProtectedRoute - Subscription required but not subscribed, redirecting to subscription');
+    if (requiredRole === "subscribed" && !isSubscribed) {
+      console.log('ProtectedRoute - Redirecting to subscription (not subscribed)');
       return <Navigate to="/subscription" replace />;
     }
 
-    console.log('ProtectedRoute - Access granted for video, allowVideoPreview:', allowVideoPreview);
+    console.log('ProtectedRoute - Access granted');
     return children;
   };
 
@@ -131,9 +180,17 @@ function AppWithNavigation() {
           }
         />
         <Route
+          path="/email-verification"
+          element={
+            <ProtectedRoute>
+              <EmailVerification />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/video/:id"
           element={
-            <ProtectedRoute requiredRole="subscribed" allowVideoPreview={true}>
+            <ProtectedRoute requiredRole="subscribed">
               <VideoFullScreen />
             </ProtectedRoute>
           }

@@ -3,25 +3,26 @@ package com.naren.moviesapp.Exception.ApiError;
 import com.naren.moviesapp.Exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.management.relation.RoleNotFoundException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
-    
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiError> handleAuthenticationException(AuthenticationException e,
-                                                              HttpServletRequest request) {
+                                                                  HttpServletRequest request) {
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -31,7 +32,7 @@ public class DefaultExceptionHandler {
         );
         return new ResponseEntity<>(apiError, UNAUTHORIZED);
     }
-    
+
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ApiError> handleInvalidCredentials(InvalidCredentialsException e,
                                                              HttpServletRequest request) {
@@ -44,7 +45,7 @@ public class DefaultExceptionHandler {
         );
         return new ResponseEntity<>(apiError, UNAUTHORIZED);
     }
-    
+
     @ExceptionHandler(EmailNotVerifiedException.class)
     public ResponseEntity<ApiError> handleEmailNotVerified(EmailNotVerifiedException e,
                                                            HttpServletRequest request) {
@@ -57,10 +58,10 @@ public class DefaultExceptionHandler {
         );
         return new ResponseEntity<>(apiError, FORBIDDEN);
     }
-    
+
     @ExceptionHandler(AccountNotRegisteredException.class)
     public ResponseEntity<ApiError> handleAccountNotRegistered(AccountNotRegisteredException e,
-                                                            HttpServletRequest request) {
+                                                               HttpServletRequest request) {
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -70,7 +71,7 @@ public class DefaultExceptionHandler {
         );
         return new ResponseEntity<>(apiError, FORBIDDEN);
     }
-    
+
     @ExceptionHandler(AccountLockedException.class)
     public ResponseEntity<ApiError> handleAccountLocked(AccountLockedException e,
                                                         HttpServletRequest request) {
@@ -119,6 +120,26 @@ public class DefaultExceptionHandler {
                 BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 "ROLE_NOT_FOUND"
+        );
+        return new ResponseEntity<>(apiError, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleValidationExceptions(MethodArgumentNotValidException e,
+                                                               HttpServletRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+
+        String errorMessage = errors.values().stream().findFirst().orElse("Validation failed");
+
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                errorMessage,
+                BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                "VALIDATION_ERROR"
         );
         return new ResponseEntity<>(apiError, BAD_REQUEST);
     }

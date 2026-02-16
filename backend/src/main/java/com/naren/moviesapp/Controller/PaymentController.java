@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.HashMap;
-import java.lang.Object;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -37,13 +34,13 @@ public class PaymentController {
             Payment payment = paymentService.processPayment(email, planId, paymentMethod);
 
             return ResponseEntity.ok(Map.<String, Object>of(
-                "message", "Payment processed successfully",
-                "data", payment
+                    "message", "Payment processed successfully",
+                    "data", payment
             ));
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.<String, Object>of(
-                "message", "Failed to save payment: " + e.getMessage()
+                    "message", "Failed to save payment: " + e.getMessage()
             ));
         }
     }
@@ -64,13 +61,13 @@ public class PaymentController {
             Optional<UserPlanInfo> userPlanInfo = paymentService.getUserPlanInfo(email);
 
             return ResponseEntity.ok(Map.<String, Object>of(
-                "message", "Payment processed",
-                "data", userPlanInfo.orElse(null)
+                    "message", "Payment processed",
+                    "data", userPlanInfo.orElse(null)
             ));
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.<String, Object>of(
-                "message", "Payment failed: " + e.getMessage()
+                    "message", "Payment failed: " + e.getMessage()
             ));
         }
     }
@@ -85,13 +82,13 @@ public class PaymentController {
             }
 
             return ResponseEntity.ok(Map.<String, Object>of(
-                "message", "Payment details",
-                "data", userPlanInfo.get()
+                    "message", "Payment details",
+                    "data", userPlanInfo.get()
             ));
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.<String, Object>of(
-                "message", "Failed to fetch details: " + e.getMessage()
+                    "message", "Failed to fetch details: " + e.getMessage()
             ));
         }
     }
@@ -108,13 +105,13 @@ public class PaymentController {
             Optional<Payment> payment = paymentService.getLatestPaymentByEmail(email);
 
             return ResponseEntity.ok(Map.<String, Object>of(
-                "message", "User subscription updated",
-                "data", payment.orElse(null)
+                    "message", "User subscription updated",
+                    "data", payment.orElse(null)
             ));
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.<String, Object>of(
-                "message", "Internal server error: " + e.getMessage()
+                    "message", "Internal server error: " + e.getMessage()
             ));
         }
     }
@@ -123,12 +120,12 @@ public class PaymentController {
     public ResponseEntity<?> getPaymentIntent(@RequestParam String token) {
         try {
             return ResponseEntity.ok(Map.<String, Object>of(
-                "message", "Payment intent retrieved",
-                "token", token
+                    "message", "Payment intent retrieved",
+                    "token", token
             ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.<String, Object>of(
-                "message", "Invalid or expired token"
+                    "message", "Invalid or expired token"
             ));
         }
     }
@@ -138,12 +135,35 @@ public class PaymentController {
         try {
             List<Payment> payments = paymentService.getPaymentsByEmail(email);
             return ResponseEntity.ok(Map.<String, Object>of(
-                "message", "Payment history",
-                "data", payments
+                    "message", "Payment history",
+                    "data", payments
             ));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.<String, Object>of(
-                "message", "Failed to fetch payment history: " + e.getMessage()
+                    "message", "Failed to fetch payment history: " + e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/subscribe-success")
+    public ResponseEntity<?> markUserSubscribed(@RequestParam String email) {
+        try {
+            var updatedCustomer = paymentService.updateSubscriptionStatus(email, true);
+            return ResponseEntity.ok(Map.<String, Object>of(
+                    "message", "User subscription updated successfully",
+                    "data", Map.<String, Object>of(
+                            "id", updatedCustomer.getId(),
+                            "email", updatedCustomer.getEmail(),
+                            "name", updatedCustomer.getName(),
+                            "isSubscribed", updatedCustomer.getIsSubscribed(),
+                            "phoneNumber", updatedCustomer.getPhoneNumber(),
+                            "address", updatedCustomer.getAddress(),
+                            "isEmailVerified", updatedCustomer.getIsEmailVerified()
+                    )
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.<String, Object>of(
+                    "message", "Failed to update subscription: " + e.getMessage()
             ));
         }
     }

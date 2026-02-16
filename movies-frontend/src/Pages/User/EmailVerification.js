@@ -1,15 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { userRequest } from "../AxiosMethods";
+import { useNavigate, useLocation } from "react-router-dom";
 import EmailSubscriptionVerify from "../../Components/EmailSubscriptionVerify";
 import "./EmailVerification.css";
 
 const EmailVerification = () => {
   const selectedPlan = useSelector((state) => state?.payment.paymentPlan);
+  const currentUser = useSelector((state) => state?.user?.currentUser);
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [isVerified, setIsVerified] = useState(false);
   const [isVerifiedError, setIsVerifiedError] = useState("");
-  const req = userRequest();
+  const navigate = useNavigate();
+
+  // Get plan from route state (preferred) or fallback to Redux
+  const plan = location.state?.plan || selectedPlan?.selectedPlan;
 
   const handleEmailUpdate = useCallback((email) => {
     setEmail(email);
@@ -24,23 +29,34 @@ const EmailVerification = () => {
   }, []);
 
   useEffect(() => {
-    const initiatePayment = async () => {
-      if (!isVerified) return;
-      if (!selectedPlan?.selectedPlan) return;
+    console.log("Selected Plan Redux:", selectedPlan);
+    console.log("Plan from route state:", location.state?.plan);
+    console.log("Final plan being used:", plan);
+    
+    if (!isVerified) return;
 
+    if (!plan) {
+      console.warn("No selected plan found. Redirecting to subscription.");
+      navigate("/subscription");
+      return;
+    }
+
+    const userId = currentUser?.id || currentUser?.email || email;
+    
+    console.log('EmailVerification - Attempting redirect to:', `/payment/${userId}`);
+    
+    setTimeout(() => {
       try {
-        const res = await req.post("/subscription/intent", {
-          planId: selectedPlan?.selectedPlan?.id,
+        navigate(`/payment/${userId}`, {
+          state: { plan: plan }
         });
-        const { paymentToken } = res.data;
-        window.location.href = `http://localhost:8080/checkout?token=${paymentToken}`;
-      } catch (err) {
-        console.error("Payment initiation failed", err);
+      } catch (error) {
+        console.error('Navigation failed:', error);
+        window.location.href = `/payment/${userId}`;
       }
-    };
+    }, 1500);
 
-    initiatePayment();
-  }, [isVerified, selectedPlan?.selectedPlan, req]);
+}, [isVerified, plan, navigate, currentUser?.id, currentUser?.email, email, location.state?.plan, selectedPlan?.selectedPlan]);
 
   return (
     <div className="email-verification-page">
@@ -59,7 +75,7 @@ const EmailVerification = () => {
       )}
       {isVerified && selectedPlan && (
         <div className="success-message">
-          <p>Email has been verified!</p>
+          <p>Email verified! Redirecting to payment...</p>
         </div>
       )}
     </div>

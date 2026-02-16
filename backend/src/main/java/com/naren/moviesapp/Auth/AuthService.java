@@ -10,17 +10,12 @@ import com.naren.moviesapp.Record.CustomerUpdateRequest;
 import com.naren.moviesapp.Service.CustomerService;
 import com.naren.moviesapp.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +32,7 @@ public class AuthService {
         if (authRequest.username() == null || authRequest.username().trim().isEmpty()) {
             throw new AuthenticationException("Email address is required", "MISSING_EMAIL");
         }
-        
+
         if (authRequest.password() == null || authRequest.password().trim().isEmpty()) {
             throw new AuthenticationException("Password is required", "MISSING_PASSWORD");
         }
@@ -53,7 +48,7 @@ public class AuthService {
             if (!(principal instanceof Customer)) {
                 throw new AuthenticationException("Invalid authentication result", "INVALID_PRINCIPAL");
             }
-            
+
             Customer customerPrincipal = (Customer) principal;
 
             // Check if customer exists in database
@@ -64,13 +59,13 @@ public class AuthService {
             // Check if email is verified
             if (!Boolean.TRUE.equals(customerPrincipal.getIsEmailVerified())) {
                 throw new EmailNotVerifiedException(
-                    "Email address not verified. Please check your inbox and verify your email before logging in.");
+                        "Email address not verified. Please check your inbox and verify your email before logging in.");
             }
 
             // Check if account is registered
             if (!Boolean.TRUE.equals(customerPrincipal.getIsRegistered())) {
                 throw new AccountNotRegisteredException(
-                    "Account registration incomplete. Please complete the registration process.");
+                        "Account registration incomplete. Please complete the registration process.");
             }
 
             // Update login status
@@ -129,15 +124,15 @@ public class AuthService {
             throw new AuthenticationException("Login failed due to an unexpected error. Please try again later.", "LOGIN_ERROR", e);
         }
     }
-    
+
     public String generateTokenForUser(Customer user) {
         CustomerDTO customerDTO = customerDTOMapper.apply(user);
-        
+
         Set<Role> roles = new HashSet<Role>();
         for (String roleName : customerDTO.roles()) {
             roles.add(new Role(roleName));
         }
-        
+
         return jwtUtil.issueToken(customerDTO.email(), roles);
     }
 }

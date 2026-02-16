@@ -17,7 +17,7 @@ const ServerConnection = () => {
             <a
               href="https://render.com"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noreferrer"
               style={{
                 fontWeight: 'bold',
                 fontStyle: 'underlined',

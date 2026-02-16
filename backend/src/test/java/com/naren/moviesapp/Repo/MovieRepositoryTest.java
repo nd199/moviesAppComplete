@@ -1,5 +1,6 @@
 package com.naren.moviesapp.Repo;
 
+import com.naren.moviesapp.AbstractTestContainers;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.TestConfig;
 import org.junit.jupiter.api.Test;
@@ -7,22 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * @DataJpaTest
- * @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
- * @Import(TestConfig.class)
- */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestConfig.class)
-@ActiveProfiles("test")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class MovieRepositoryTest {
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+public class MovieRepositoryTest extends AbstractTestContainers {
 
     @Autowired
     private MovieRepository underTest;

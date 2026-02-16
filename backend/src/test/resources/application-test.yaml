@@ -1,0 +1,75 @@
+server:
+  error:
+    include-message: always
+  port: 8080
+
+spring:
+  mvc:
+    static-path-pattern: /**
+
+  datasource:
+    url: jdbc:tc:postgresql:16.0:///movieott_test
+    username: test
+    password: test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+  flyway:
+    enabled: true
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    locations: classpath:db/migration
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+  main:
+    web-application-type: servlet
+
+  mail:
+    host: localhost
+    port: 3025
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6370
+      password:
+
+# JWT Configuration
+jwt:
+  secret: testSecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLongForTesting
+  issuer: test.com
+  expiration-minutes: 30
+  refresh-expiration-days: 7
+
+# Application Configuration
+app:
+  data-initialization:
+    enabled: false
+
+logging:
+  level:
+    web: debug
+    sql: debug
+    org:
+      springframework:
+        security: debug
+      testcontainers: debug
+    com:
+      naren:
+        moviesapp: debug

@@ -10,7 +10,10 @@ import com.naren.moviesapp.Entity.Show;
 import com.naren.moviesapp.Record.CustomerUpdateRequest;
 import com.naren.moviesapp.Record.ProductCreateRequest;
 import com.naren.moviesapp.Record.ProductUpdateRequest;
-import com.naren.moviesapp.Service.*;
+import com.naren.moviesapp.Service.CustomerService;
+import com.naren.moviesapp.Service.MovieService;
+import com.naren.moviesapp.Service.ProductService;
+import com.naren.moviesapp.Service.ShowService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,6 +42,7 @@ public class CustomerController {
         customerService.addRole(role);
         return ResponseEntity.ok().body("Role added successfully");
     }
+
     @GetMapping("/customers/{id}")
     public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable("id") Long customerId) {
         CustomerDTO customerDTO = customerService.getCustomerById(customerId);
@@ -59,7 +63,7 @@ public class CustomerController {
 
     @GetMapping("/customers/byPhone")
     public ResponseEntity<CustomerDTO> getCustomerByPhoneNumber(@RequestParam String phoneNumber) {
-        CustomerDTO customerDTO = customerService.getCustomerByPhoneNumber(Long.parseLong(phoneNumber.substring(1)));
+        CustomerDTO customerDTO = customerService.getCustomerByPhoneNumber(phoneNumber.substring(1));
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
 
@@ -140,6 +144,7 @@ public class CustomerController {
     public ResponseEntity<?> addProduct(@RequestBody ProductCreateRequest productCreateRequest) {
         return productService.addProduct(productCreateRequest);
     }
+
     @PutMapping("/products/{id}/{type}")
     public ResponseEntity<?> updateProduct(@RequestBody ProductUpdateRequest productUpdateRequest,
                                            @PathVariable("id") Long id,

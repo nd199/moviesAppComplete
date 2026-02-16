@@ -10,7 +10,7 @@ public record CustomerDTO(
         Long id,
         String name,
         String email,
-        Long phoneNumber,
+        String phoneNumber,
         String imageUrl,
         Boolean isEmailVerified,
         String address,

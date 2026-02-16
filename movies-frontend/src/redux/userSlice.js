@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   currentUser: null,
   users: [],
+  authStatus: "loading", // loading | authenticated | unauthenticated
   isFetching: false,
   error: false,
   errorMessage: null,
@@ -23,6 +24,17 @@ const userSlice = createSlice({
     logout: state => {
       state.currentUser = null;
       state.users = [];
+      state.authStatus = "unauthenticated";
+    },
+
+    setAuthStatus: (state, action) => {
+      state.authStatus = action.payload;
+    },
+
+    setSubscriptionStatus: (state, action) => {
+      if (state.currentUser) {
+        state.currentUser.isSubscribed = action.payload;
+      }
     },
 
     /* ================= REGISTER ================= */
@@ -34,6 +46,7 @@ const userSlice = createSlice({
       state.isFetching = false;
       state.currentUser = {
         ...action.payload,
+        token: 'cookie-auth', // Placeholder for cookie-based auth
       };
     },
     registerFailure: (state, action) => {
@@ -51,8 +64,8 @@ const userSlice = createSlice({
       state.isFetching = false;
       state.error = false;
       state.currentUser = {
-        ...action.payload.customerDTO,
-        token: action.payload.token,
+        ...action.payload,
+        token: 'cookie-auth', // Placeholder for cookie-based auth
       };
     },
     loginFailure: (state, action) => {
@@ -159,11 +172,18 @@ const userSlice = createSlice({
     fetchCurrentSuccess: (state, action) => {
       state.isFetching = false;
       state.currentUser = action.payload;
+      state.authStatus = "authenticated";
     },
     fetchCurrentFailure: (state, action) => {
       state.isFetching = false;
       state.error = true;
       state.errorMessage = action.payload?.message;
+      
+      // Only set unauthenticated if it's not an auth preservation error
+      if (!action.payload?.preserveUser) {
+        state.currentUser = null;
+        state.authStatus = "unauthenticated";
+      }
     },
   },
 });
@@ -207,6 +227,9 @@ export const {
   fetchCurrentStart,
   fetchCurrentSuccess,
   fetchCurrentFailure,
+
+  setAuthStatus,
+  setSubscriptionStatus,
 } = userSlice.actions;
 
 export default userSlice.reducer;

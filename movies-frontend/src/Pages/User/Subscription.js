@@ -23,20 +23,16 @@ const Subscription = () => {
 
     const plans = [
         {id: 1, name: 'Monthly Plan', price: 300, interval: 'month', description: 'Access to all content for a month.'},
-        {
-            id: 2,
-            name: '6-Month Plan',
-            price: 50,
-            interval: '6 months',
-            description: 'Access to all content for 6 months.'
-        },
-        {id: 3, name: 'Yearly Plan', price: 1200, interval: 'year', description: 'Save 20% with annual billing.'},
+        {id: 3, name: '6-Month Plan', price: 50, interval: '6 months', description: 'Access to all content for 6 months.'},
+        {id: 12, name: 'Yearly Plan', price: 1200, interval: 'year', description: 'Save 20% with annual billing.'},
     ];
 
     const handleSubscribe = () => {
         if (selectedPlan) {
             dispatch(setPaymentPlan({selectedPlan: selectedPlan, allPlans: plans}));
-            nav("/email-verification");
+            nav("/email-verification", {
+                state: { plan: selectedPlan }
+            });
         }
     };
 

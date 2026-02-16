@@ -1,45 +1,38 @@
 package com.naren.moviesapp.jwt;
 
+import com.naren.moviesapp.Entity.Role;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.naren.moviesapp.Entity.Role;
-import com.naren.moviesapp.Exception.AlgorithmNotSupportedException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.io.Decoders;
-
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class JwtUtil {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
-    
+
     @Value("${jwt.secret:default-secret-key-that-should-be-changed-in-production-use-at-least-256-bits}")
     private String jwtSecret;
-    
+
     @Value("${jwt.issuer:codeNaren.com}")
     private String jwtIssuer;
-    
+
     @Value("${jwt.expiration-minutes:30}")
     private long jwtExpirationMinutes;
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(
-            jwtSecret.length() < 44 ? 
-            java.util.Base64.getEncoder().encodeToString(jwtSecret.getBytes()) : 
-            jwtSecret
+                jwtSecret.length() < 44 ?
+                        java.util.Base64.getEncoder().encodeToString(jwtSecret.getBytes()) :
+                        jwtSecret
         );
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -53,7 +46,7 @@ public class JwtUtil {
         Map<String, Object> enhancedClaims = new HashMap<>(claims);
         enhancedClaims.put("jti", UUID.randomUUID().toString());
         enhancedClaims.put("iat", System.currentTimeMillis() / 1000);
-        
+
         return Jwts.builder()
                 .claims(enhancedClaims)
                 .subject(subject)
@@ -68,9 +61,10 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", roles);
         claims.put("type", "access");
-        
+
         return issueToken(subject, claims);
     }
+
     private Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
@@ -82,7 +76,7 @@ public class JwtUtil {
     public String getSubject(String token) {
         return getClaims(token).getSubject();
     }
-    
+
     public String getJti(String token) {
         return getClaims(token).getId();
     }
@@ -90,14 +84,14 @@ public class JwtUtil {
     public boolean isTokenValid(String token, String userName) {
         try {
             Claims claims = getClaims(token);
-            
+
             // Enhanced validation with multiple checks
-            boolean isValid = claims.getSubject().equals(userName) 
-                && !isTokenExpired(claims)
-                && claims.getIssuer().equals(jwtIssuer)
-                && claims.getIssuedAt().before(Date.from(Instant.now()))
-                && claims.get("type", String.class).equals("access");
-                
+            boolean isValid = claims.getSubject().equals(userName)
+                    && !isTokenExpired(claims)
+                    && claims.getIssuer().equals(jwtIssuer)
+                    && claims.getIssuedAt().before(Date.from(Instant.now()))
+                    && claims.get("type", String.class).equals("access");
+
             if (!isValid) {
                 logger.warn("Invalid JWT token for user: {} - Reason validation failed", userName);
             }
@@ -116,7 +110,7 @@ public class JwtUtil {
         }
         return isExpired;
     }
-    
+
     public long getExpirationTime() {
         return System.currentTimeMillis() + (jwtExpirationMinutes * 60 * 1000);
     }

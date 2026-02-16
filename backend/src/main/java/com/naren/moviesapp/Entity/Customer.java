@@ -46,8 +46,8 @@ public class Customer implements UserDetails {
     @Column(name = "password", columnDefinition = "TEXT", nullable = false)
     private String password;
 
-    @Column(name = "phone_number", nullable = false)
-    private Long phoneNumber;
+    @Column(name = "phone_number", nullable = false, columnDefinition = "TEXT")
+    private String phoneNumber;
 
     @Column(name = "image_url")
     private String imageUrl;
@@ -92,7 +92,7 @@ public class Customer implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, List<Movie> movies, Set<Role> roles, Boolean isSubscribed) {
+    public Customer(Long id, String name, String email, String password, String phoneNumber, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, List<Movie> movies, Set<Role> roles, Boolean isSubscribed) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -107,7 +107,7 @@ public class Customer implements UserDetails {
         this.isSubscribed = isSubscribed;
     }
 
-    public Customer(Long id, String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address, Boolean isSubscribed) {
+    public Customer(Long id, String name, String email, String password, String phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address, Boolean isSubscribed) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -121,7 +121,7 @@ public class Customer implements UserDetails {
 
     }
 
-    public Customer(Long id, String name, String email, String password, Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, Boolean isSubscribed) {
+    public Customer(Long id, String name, String email, String password, String phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, Boolean isSubscribed) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -136,7 +136,7 @@ public class Customer implements UserDetails {
 
     }
 
-    public Customer(String name, String email, String password, Long phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address, Boolean isSubscribed) {
+    public Customer(String name, String email, String password, String phoneNumber, Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, String address, Boolean isSubscribed) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -149,7 +149,7 @@ public class Customer implements UserDetails {
     }
 
     public Customer(String name, String email, String password,
-                    Long phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, Boolean isSubscribed) {
+                    String phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, Boolean isSubscribed) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -161,6 +161,7 @@ public class Customer implements UserDetails {
         this.isRegistered = isRegistered;
         this.isSubscribed = isSubscribed;
     }
+
     @Override
     public String toString() {
         return "Customer{" +

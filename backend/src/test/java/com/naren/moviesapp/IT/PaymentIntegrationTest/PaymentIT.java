@@ -1,7 +1,7 @@
 package com.naren.moviesapp.IT.PaymentIntegrationTest;
 
 import com.github.javafaker.Faker;
-import com.naren.moviesapp.AbstractTestContainers;
+import com.naren.moviesapp.AbstractIntegrationTest;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.SubscriptionPlan;
 import com.naren.moviesapp.Record.CustomerRegistration;
@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
@@ -25,7 +26,8 @@ import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PaymentIT extends AbstractTestContainers {
+@ActiveProfiles("test")
+public class PaymentIT extends AbstractIntegrationTest {
 
     private static final Faker FAKER = new Faker();
     private static final Random RANDOM = new Random();
@@ -49,7 +51,7 @@ public class PaymentIT extends AbstractTestContainers {
         createRoleIfNotExists();
 
         String password = FAKER.internet().password(8, 12);
-        Long phone = Long.valueOf(FAKER.phoneNumber().subscriberNumber(9));
+        String phone = FAKER.phoneNumber().subscriberNumber(9);
         boolean isEmailVerified = true;
         String address = "Chennai, India";
 
@@ -123,7 +125,8 @@ public class PaymentIT extends AbstractTestContainers {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .expectBody(new ParameterizedTypeReference<Map<String, Object>>() {
+                })
                 .value(body -> {
                     assertThat(body).containsKey("data");
                 });

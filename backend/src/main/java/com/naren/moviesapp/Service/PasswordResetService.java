@@ -1,8 +1,6 @@
 package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Dao.CustomerDao;
-import com.naren.moviesapp.Dto.CustomerDTO;
-import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.PasswordResetToken;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.PasswordResetRequest;

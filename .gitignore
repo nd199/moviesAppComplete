@@ -45,3 +45,29 @@ previewConfig.json
 *.log
 *.tmp
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.cache
+*.pid
+*.pid.lock
+*.seed
+*.tgz
+*.tar.gz
+*.zip
+*.rar
+
+# ===============================
+# Test Coverage & Reports
+# ===============================
+coverage/
+.nyc_output/
+test-results/
+junit.xml
+*.lcov
+
+# ===============================
+# Lock Files (additional projects)
+# ===============================
+yarn.lock
+pnpm-lock.yaml
