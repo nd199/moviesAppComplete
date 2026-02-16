@@ -21,6 +21,7 @@ import Shows from "./Pages/User/Shows";
 // Admin pages
 import AdminHome from "./Pages/Admin/Home";
 import AdminLogin from "./Pages/Admin/Login";
+import AdminRegister from "./Pages/Admin/Register";
 import UserList from "./Pages/Admin/UserList";
 import UserInfoAndEdit from "./Pages/Admin/UserInfoAndEdit";
 import NewUser from "./Pages/Admin/NewUser";
@@ -44,9 +45,9 @@ function AppWithHealthCheck() {
   useEffect(() => {
     const checkServerHealth = async () => {
       try {
-        // Ping backend with timeout
+
         await axios.get(`${process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1"}/ping`, {
-          timeout: 5000, // 5 second timeout for health check
+          timeout: 5000,
         });
         setServerStatus('up');
       } catch (error) {
@@ -198,6 +199,7 @@ function AppWithNavigation() {
 
         {/* Admin routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/registerAdmin" element={<AdminRegister />} />
         <Route
           path="/admin"
           element={

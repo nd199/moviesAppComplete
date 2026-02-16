@@ -114,7 +114,7 @@ const UserList = () => {
             renderCell: (params) => {
                 return (
                     <div className="ulActions">
-                        <Link to={"/User/" + params.row.id}>
+                        <Link to={"/admin/users/" + params.row.id}>
                             <EditOutlined className="ulEdit"/>
                         </Link>
                         <DeleteOutlineOutlined

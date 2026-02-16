@@ -77,7 +77,7 @@ const ProductList = () => {
       renderCell: (params) => {
         return (
           <div className="plActions">
-            <Link to={`/Product/${params.row.entityId}`}>
+            <Link to={`/admin/products/${params.row.entityId}`}>
               <EditOutlined className="plEdit" />
             </Link>
             <DeleteOutlineOutlined
@@ -118,7 +118,7 @@ const ProductList = () => {
   return (
     <div className="productListPage">
       <div className="create">
-        <Link to="/NewProduct">
+        <Link to="/admin/products/new">
           <button className="productAdd">Create</button>
         </Link>
       </div>

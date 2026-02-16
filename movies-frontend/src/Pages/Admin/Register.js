@@ -75,7 +75,7 @@ const Register = () => {
     if (password === confirmPassword) {
       try {
         await register(dispatch, { name, email, password, phoneNumber });
-        nav("/Home");
+        nav("/admin/login");
       } catch (err) {
         console.error(err);
       }
@@ -184,7 +184,7 @@ const Register = () => {
               R E G I S T E R
             </button>
             <div className="reg-form-links">
-              <Link to={"/"}>
+              <Link to={"/admin/login"}>
                 <p>
                   Have an account? Login{" "}
                   <span className="reg-login-link">here</span>

@@ -66,7 +66,7 @@ public class SecurityFilterChainConfig {
                         /* ================= PUBLIC ================= */
 
                         .requestMatchers(HttpMethod.GET,
-                                "/ping",
+                                "/api/v1/ping",
                                 "/api/v1/movies/**",
                                 "/api/v1/shows/**",
                                 "/api/v1/products/**",

@@ -17,7 +17,6 @@ public class SubsPingController {
 
     @PostMapping("/pingSpring")
     public ResponseEntity<?> pingSubscription(@RequestBody CustomerSubscription customerSubscription) {
-        // Check if the received object is correctly mapped
         if (customerSubscription.email() == null) {
             return ResponseEntity.<String>badRequest().body("Invalid request body");
         }

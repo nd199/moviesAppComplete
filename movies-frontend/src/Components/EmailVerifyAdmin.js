@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Lottie from 'react-lottie';
-import { validateOtp, verifyEmail } from '../redux/ApiCalls';
+import { validateOtp, verifyEmail } from '../Network/ApiCalls';
 import './EmailVerifyAdmin.css';
 import CrossMark from '../Utils/animations/CrossMark.json';
 import TickMark from '../Utils/animations/TickMark.json';
