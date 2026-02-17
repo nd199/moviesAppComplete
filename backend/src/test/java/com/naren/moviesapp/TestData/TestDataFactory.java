@@ -3,11 +3,7 @@ package com.naren.moviesapp.TestData;
 import com.github.javafaker.Faker;
 import com.naren.moviesapp.Entity.*;
 import com.naren.moviesapp.Enum.RoleName;
-import com.naren.moviesapp.Record.CustomerRegistration;
-import com.naren.moviesapp.Record.MovieRegistration;
-import com.naren.moviesapp.Record.MovieUpdation;
-import com.naren.moviesapp.Record.ShowRegistration;
-import com.naren.moviesapp.Record.ShowUpdation;
+import com.naren.moviesapp.Record.*;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -15,14 +11,14 @@ import java.util.List;
 import java.util.UUID;
 
 public class TestDataFactory {
-    
+
     private static final Faker FAKER = new Faker();
-    
+
     // Customer Test Data
     public static Customer createTestCustomer() {
         return createTestCustomer(null);
     }
-    
+
     public static Customer createTestCustomer(Long id) {
         Customer customer = new Customer();
         if (id != null) {
@@ -42,43 +38,43 @@ public class TestDataFactory {
         customer.setUpdatedAt(LocalDateTime.now());
         return customer;
     }
-    
+
     public static CustomerRegistration createTestCustomerRegistration() {
         return new CustomerRegistration(
-            FAKER.name().fullName(),
-            FAKER.internet().emailAddress(),
-            FAKER.internet().password(),
-            FAKER.phoneNumber().subscriberNumber(9),
-            FAKER.internet().url(),
-            FAKER.bool().bool(),
-            FAKER.address().fullAddress(),
-            FAKER.bool().bool(),
-            FAKER.bool().bool()
+                FAKER.name().fullName(),
+                FAKER.internet().emailAddress(),
+                FAKER.internet().password(),
+                FAKER.phoneNumber().subscriberNumber(9),
+                FAKER.internet().url(),
+                FAKER.bool().bool(),
+                FAKER.address().fullAddress(),
+                FAKER.bool().bool(),
+                FAKER.bool().bool()
         );
     }
-    
+
     // Role Test Data
     public static Role createTestRole(RoleName roleName) {
         Role role = new Role();
         role.setName(roleName);
         return role;
     }
-    
+
     public static List<Role> createAllRoles() {
         return List.of(
-            createTestRole(RoleName.ROLE_USER),
-            createTestRole(RoleName.ROLE_ADMIN),
-            createTestRole(RoleName.ROLE_SUPER_ADMIN),
-            createTestRole(RoleName.ROLE_CONTENT_MANAGER),
-            createTestRole(RoleName.ROLE_SUPPORT)
+                createTestRole(RoleName.ROLE_USER),
+                createTestRole(RoleName.ROLE_ADMIN),
+                createTestRole(RoleName.ROLE_SUPER_ADMIN),
+                createTestRole(RoleName.ROLE_CONTENT_MANAGER),
+                createTestRole(RoleName.ROLE_SUPPORT)
         );
     }
-    
+
     // Movie Test Data
     public static Movie createTestMovie() {
         return createTestMovie(null);
     }
-    
+
     public static Movie createTestMovie(Long id) {
         Movie movie = new Movie();
         if (id != null) {
@@ -98,40 +94,40 @@ public class TestDataFactory {
         movie.setUpdatedAt(LocalDateTime.now());
         return movie;
     }
-    
+
     public static MovieRegistration createTestMovieRegistration() {
         return new MovieRegistration(
-            FAKER.book().title(),
-            FAKER.number().randomDouble(2, 50, 500),
-            FAKER.number().randomDouble(1, 1, 5),
-            FAKER.lorem().sentence(20),
-            FAKER.internet().url(),
-            FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
-            FAKER.number().numberBetween(1980, 2023),
-            FAKER.number().numberBetween(80, 180) + " mins",
-            FAKER.book().genre()
+                FAKER.book().title(),
+                FAKER.number().randomDouble(2, 50, 500),
+                FAKER.number().randomDouble(1, 1, 5),
+                FAKER.lorem().sentence(20),
+                FAKER.internet().url(),
+                FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
+                FAKER.number().numberBetween(1980, 2023),
+                FAKER.number().numberBetween(80, 180) + " mins",
+                FAKER.book().genre()
         );
     }
-    
+
     public static MovieUpdation createTestMovieUpdation() {
         return new MovieUpdation(
-            FAKER.book().title(),
-            FAKER.number().randomDouble(2, 50, 500),
-            FAKER.number().randomDouble(1, 1, 5),
-            FAKER.lorem().sentence(20),
-            FAKER.internet().url(),
-            FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
-            FAKER.number().numberBetween(1980, 2023),
-            FAKER.number().numberBetween(80, 180) + " mins",
-            FAKER.book().genre()
+                FAKER.book().title(),
+                FAKER.number().randomDouble(2, 50, 500),
+                FAKER.number().randomDouble(1, 1, 5),
+                FAKER.lorem().sentence(20),
+                FAKER.internet().url(),
+                FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
+                FAKER.number().numberBetween(1980, 2023),
+                FAKER.number().numberBetween(80, 180) + " mins",
+                FAKER.book().genre()
         );
     }
-    
+
     // Show Test Data
     public static Show createTestShow() {
         return createTestShow(null);
     }
-    
+
     public static Show createTestShow(Long id) {
         Show show = new Show();
         if (id != null) {
@@ -151,40 +147,40 @@ public class TestDataFactory {
         show.setUpdatedAt(LocalDateTime.now());
         return show;
     }
-    
+
     public static ShowRegistration createTestShowRegistration() {
         return new ShowRegistration(
-            FAKER.book().title(),
-            FAKER.number().randomDouble(2, 50, 500),
-            FAKER.number().randomDouble(1, 1, 5),
-            FAKER.lorem().sentence(20),
-            FAKER.internet().url(),
-            FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
-            FAKER.number().numberBetween(1980, 2023),
-            FAKER.number().numberBetween(20, 60) + " mins",
-            FAKER.book().genre()
+                FAKER.book().title(),
+                FAKER.number().randomDouble(2, 50, 500),
+                FAKER.number().randomDouble(1, 1, 5),
+                FAKER.lorem().sentence(20),
+                FAKER.internet().url(),
+                FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
+                FAKER.number().numberBetween(1980, 2023),
+                FAKER.number().numberBetween(20, 60) + " mins",
+                FAKER.book().genre()
         );
     }
-    
+
     public static ShowUpdation createTestShowUpdation() {
         return new ShowUpdation(
-            FAKER.book().title(),
-            FAKER.number().randomDouble(2, 50, 500),
-            FAKER.number().randomDouble(1, 1, 5),
-            FAKER.lorem().sentence(20),
-            FAKER.internet().url(),
-            FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
-            FAKER.number().numberBetween(1980, 2023),
-            FAKER.number().numberBetween(20, 60) + " mins",
-            FAKER.book().genre()
+                FAKER.book().title(),
+                FAKER.number().randomDouble(2, 50, 500),
+                FAKER.number().randomDouble(1, 1, 5),
+                FAKER.lorem().sentence(20),
+                FAKER.internet().url(),
+                FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
+                FAKER.number().numberBetween(1980, 2023),
+                FAKER.number().numberBetween(20, 60) + " mins",
+                FAKER.book().genre()
         );
     }
-    
+
     // Payment Test Data
     public static Payment createTestPayment() {
         return createTestPayment(null, null, null);
     }
-    
+
     public static Payment createTestPayment(Long id, Customer customer, SubscriptionPlan plan) {
         Payment payment = new Payment();
         if (id != null) {
@@ -199,12 +195,12 @@ public class TestDataFactory {
         payment.setUpdatedAt(LocalDateTime.now());
         return payment;
     }
-    
+
     // Subscription Plan Test Data
     public static SubscriptionPlan createTestSubscriptionPlan() {
         return createTestSubscriptionPlan(null);
     }
-    
+
     public static SubscriptionPlan createTestSubscriptionPlan(Long id) {
         SubscriptionPlan plan = new SubscriptionPlan();
         if (id != null) {
@@ -216,12 +212,12 @@ public class TestDataFactory {
         plan.setInterval(FAKER.options().option("Month", "6 Months", "Year"));
         return plan;
     }
-    
+
     // User Plan Info Test Data
     public static UserPlanInfo createTestUserPlanInfo() {
         return createTestUserPlanInfo(null, null, null);
     }
-    
+
     public static UserPlanInfo createTestUserPlanInfo(Long id, Customer customer, SubscriptionPlan plan) {
         UserPlanInfo userPlanInfo = new UserPlanInfo();
         if (id != null) {
@@ -236,12 +232,12 @@ public class TestDataFactory {
         userPlanInfo.setUpdatedAt(LocalDateTime.now());
         return userPlanInfo;
     }
-    
+
     // Refresh Token Test Data
     public static RefreshToken createTestRefreshToken() {
         return createTestRefreshToken(null, null);
     }
-    
+
     public static RefreshToken createTestRefreshToken(String id, Customer user) {
         RefreshToken refreshToken = new RefreshToken();
         if (id != null) {
@@ -252,12 +248,12 @@ public class TestDataFactory {
         refreshToken.setExpiryDate(Instant.now().plusSeconds(FAKER.number().numberBetween(604800, 2592000))); // 7 days to 30 days
         return refreshToken;
     }
-    
+
     // Password Reset Token Test Data
     public static PasswordResetToken createTestPasswordResetToken() {
         return createTestPasswordResetToken(null, null);
     }
-    
+
     public static PasswordResetToken createTestPasswordResetToken(Long id, Customer customer) {
         PasswordResetToken token = new PasswordResetToken();
         if (id != null) {
@@ -268,32 +264,32 @@ public class TestDataFactory {
         token.setExpiry(Instant.now().plusSeconds(3600)); // 1 hour
         return token;
     }
-    
+
     // Utility methods for creating lists of test data
     public static List<Customer> createTestCustomerList(int count) {
         return java.util.stream.IntStream.range(0, count)
                 .mapToObj(i -> createTestCustomer())
                 .collect(java.util.stream.Collectors.toList());
     }
-    
+
     public static List<Movie> createTestMovieList(int count) {
         return java.util.stream.IntStream.range(0, count)
                 .mapToObj(i -> createTestMovie())
                 .collect(java.util.stream.Collectors.toList());
     }
-    
+
     public static List<Show> createTestShowList(int count) {
         return java.util.stream.IntStream.range(0, count)
                 .mapToObj(i -> createTestShow())
                 .collect(java.util.stream.Collectors.toList());
     }
-    
+
     public static List<Payment> createTestPaymentList(int count) {
         return java.util.stream.IntStream.range(0, count)
                 .mapToObj(i -> createTestPayment())
                 .collect(java.util.stream.Collectors.toList());
     }
-    
+
     // Constants for common test values
     public static class TestConstants {
         public static final String TEST_EMAIL = "test@example.com";
@@ -305,7 +301,7 @@ public class TestDataFactory {
         public static final String TEST_TRANSACTION_ID = "txn_test123";
         public static final Double TEST_AMOUNT = 100.00;
         public static final String TEST_TOKEN = "test-token-123";
-        
+
         private TestConstants() {
             // Utility class - prevent instantiation
         }

@@ -1,11 +1,11 @@
 package com.naren.moviesapp.IT.CustomerIntegrationTest;
-import com.naren.moviesapp.Enum.RoleName;
 
 import com.github.javafaker.Faker;
 import com.naren.moviesapp.AbstractIntegrationTest;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Role;
+import com.naren.moviesapp.Enum.RoleName;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Record.CustomerUpdateRequest;
 import com.naren.moviesapp.Record.MovieRegistration;

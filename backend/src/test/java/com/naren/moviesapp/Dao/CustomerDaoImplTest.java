@@ -21,12 +21,12 @@ import static org.mockito.Mockito.*;
 
 class CustomerDaoImplTest extends AbstractTestContainers {
 
+    private static final Faker FAKER = new Faker();
     private CustomerDao underTest;
     private AutoCloseable autoCloseable;
     @Mock
     private CustomerRepository customerRepository;
     private Customer customer;
-    private static final Faker FAKER = new Faker();
 
     @BeforeEach
     void setUp() {

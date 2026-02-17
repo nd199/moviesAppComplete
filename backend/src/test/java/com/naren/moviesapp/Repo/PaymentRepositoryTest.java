@@ -4,7 +4,6 @@ import com.naren.moviesapp.AbstractTestContainers;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Payment;
 import com.naren.moviesapp.Entity.SubscriptionPlan;
-import com.naren.moviesapp.TestData.TestDataFactory;
 import com.naren.moviesapp.TestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
