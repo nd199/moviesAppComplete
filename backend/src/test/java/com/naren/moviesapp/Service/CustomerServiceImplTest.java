@@ -74,7 +74,7 @@ class CustomerServiceImplTest {
         when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
         when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
 
-        Role role = new Role("ROLE_USER");
+        Role role = new Role(RoleName.valueOf("ROLE_USER"));
         when(roleService.findRoleByName(RoleName.ROLE_USER)).thenReturn(role);
         ResponseEntity<?> response = underTest.registerUser(registration, Set.of("ROLE_USER"));
 
@@ -91,6 +91,72 @@ class CustomerServiceImplTest {
         assertThat(capturedCustomer.getIsEmailVerified()).isEqualTo(true);
         assertThat(capturedCustomer.getAddress()).isEqualTo("Chennai, India");
         verify(roleService).findRoleByName(RoleName.ROLE_USER);
+        assertThat(capturedCustomer.getRoles()).contains(role);
+        assertThat(response.getBody()).isEqualTo(customerDTOMapper.apply(capturedCustomer));
+    }
+
+    @Test
+    void registerCustomerSuccess_withAdminRole() {
+        String email = "admin@example.com";
+        String password = "password";
+        String encodedPassword = passwordEncoder.encode(password);
+        CustomerRegistration registration = new CustomerRegistration("admin",
+                email, password, "22222222222", "", false, "Chennai, India", false, false);
+
+        when(customerDao.existsByEmail(email)).thenReturn(false);
+        when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
+        when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
+
+        Role role = new Role(RoleName.valueOf("ROLE_ADMIN"));
+        when(roleService.findRoleByName(RoleName.ROLE_ADMIN)).thenReturn(role);
+        ResponseEntity<?> response = underTest.registerUser(registration, Set.of("ROLE_ADMIN"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
+        verify(customerDao).addCustomer(customerArgumentCaptor.capture());
+
+        Customer capturedCustomer = customerArgumentCaptor.getValue();
+        assertThat(capturedCustomer.getEmail()).isEqualTo(email);
+        assertThat(capturedCustomer.getName()).isEqualTo("admin");
+        assertThat(capturedCustomer.getPassword()).isEqualTo(encodedPassword);
+        assertThat(capturedCustomer.getPhoneNumber()).isEqualTo("22222222222");
+        assertThat(capturedCustomer.getIsEmailVerified()).isEqualTo(true);
+        assertThat(capturedCustomer.getAddress()).isEqualTo("Chennai, India");
+        verify(roleService).findRoleByName(RoleName.ROLE_ADMIN);
+        assertThat(capturedCustomer.getRoles()).contains(role);
+        assertThat(response.getBody()).isEqualTo(customerDTOMapper.apply(capturedCustomer));
+    }
+
+    @Test
+    void registerCustomerSuccess_withSuperAdminRole() {
+        String email = "superadmin@example.com";
+        String password = "password";
+        String encodedPassword = passwordEncoder.encode(password);
+        CustomerRegistration registration = new CustomerRegistration("superadmin",
+                email, password, "22222222222", "", false, "Chennai, India", false, false);
+
+        when(customerDao.existsByEmail(email)).thenReturn(false);
+        when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
+        when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
+
+        Role role = new Role(RoleName.valueOf("ROLE_SUPER_ADMIN"));
+        when(roleService.findRoleByName(RoleName.ROLE_SUPER_ADMIN)).thenReturn(role);
+        ResponseEntity<?> response = underTest.registerUser(registration, Set.of("ROLE_SUPER_ADMIN"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
+        verify(customerDao).addCustomer(customerArgumentCaptor.capture());
+
+        Customer capturedCustomer = customerArgumentCaptor.getValue();
+        assertThat(capturedCustomer.getEmail()).isEqualTo(email);
+        assertThat(capturedCustomer.getName()).isEqualTo("superadmin");
+        assertThat(capturedCustomer.getPassword()).isEqualTo(encodedPassword);
+        assertThat(capturedCustomer.getPhoneNumber()).isEqualTo("22222222222");
+        assertThat(capturedCustomer.getIsEmailVerified()).isEqualTo(true);
+        assertThat(capturedCustomer.getAddress()).isEqualTo("Chennai, India");
+        verify(roleService).findRoleByName(RoleName.ROLE_SUPER_ADMIN);
         assertThat(capturedCustomer.getRoles()).contains(role);
         assertThat(response.getBody()).isEqualTo(customerDTOMapper.apply(capturedCustomer));
     }
@@ -284,7 +350,31 @@ class CustomerServiceImplTest {
 
     @Test
     void addRole() {
-        Role role = new Role("ROLE_USER");
+        Role role = new Role(RoleName.valueOf("ROLE_USER"));
+        when(roleService.existsByName(role)).thenReturn(false);
+        underTest.addRole(role);
+        verify(roleService).saveRole(role);
+    }
+
+    @Test
+    void addRole_superAdmin() {
+        Role role = new Role(RoleName.valueOf("ROLE_SUPER_ADMIN"));
+        when(roleService.existsByName(role)).thenReturn(false);
+        underTest.addRole(role);
+        verify(roleService).saveRole(role);
+    }
+
+    @Test
+    void addRole_contentManager() {
+        Role role = new Role(RoleName.valueOf("ROLE_CONTENT_MANAGER"));
+        when(roleService.existsByName(role)).thenReturn(false);
+        underTest.addRole(role);
+        verify(roleService).saveRole(role);
+    }
+
+    @Test
+    void addRole_support() {
+        Role role = new Role(RoleName.valueOf("ROLE_SUPPORT"));
         when(roleService.existsByName(role)).thenReturn(false);
         underTest.addRole(role);
         verify(roleService).saveRole(role);
@@ -293,7 +383,7 @@ class CustomerServiceImplTest {
 
     @Test
     void addRoleThrowsIfRoleAlreadyExists() {
-        Role role = new Role("ROLE_USER");
+        Role role = new Role(RoleName.valueOf("ROLE_USER"));
         when(roleService.existsByName(role)).thenReturn(true);
         assertThatThrownBy(() -> underTest.addRole(role)).isInstanceOf(ResourceAlreadyExists.class)
                 .hasMessage("Role already exists");
@@ -311,7 +401,7 @@ class CustomerServiceImplTest {
 
     @Test
     void testRemoveRole() {
-        Role role = new Role("ROLE_USER");
+        Role role = new Role(RoleName.valueOf("ROLE_USER"));
         when(roleService.findRoleById(role.getId())).thenReturn(role);
         underTest.removeRole(role.getId());
         verify(roleService).deleteRole(role.getId());

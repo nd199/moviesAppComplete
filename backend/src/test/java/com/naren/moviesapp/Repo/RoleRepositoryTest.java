@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,24 +24,24 @@ class RoleRepositoryTest {
         RoleName roleName = RoleName.ROLE_USER;
         Role expectedRole = new Role(roleName);
 
-        when(roleRepository.findRoleByName(roleName)).thenReturn(expectedRole);
+        when(roleRepository.findByName(roleName)).thenReturn(Optional.of(expectedRole));
 
-        Role result = roleRepository.findRoleByName(roleName);
+        Role result = roleRepository.findByName(roleName).orElse(null);
 
         assertThat(result).isEqualTo(expectedRole);
-        verify(roleRepository).findRoleByName(roleName);
+        verify(roleRepository).findByName(roleName);
     }
 
     @Test
     void findRoleByName_ReturnsNull_WhenRoleDoesNotExist() {
         RoleName roleName = RoleName.ROLE_USER;
 
-        when(roleRepository.findRoleByName(roleName)).thenReturn(null);
+        when(roleRepository.findByName(roleName)).thenReturn(Optional.empty());
 
-        Role result = roleRepository.findRoleByName(roleName);
+        Role result = roleRepository.findByName(roleName).orElse(null);
 
         assertThat(result).isNull();
-        verify(roleRepository).findRoleByName(roleName);
+        verify(roleRepository).findByName(roleName);
     }
 
     @Test
@@ -47,24 +49,24 @@ class RoleRepositoryTest {
         RoleName roleName = RoleName.ROLE_USER;
         Role role = new Role(roleName);
 
-        when(roleRepository.existsRoleByName(roleName)).thenReturn(true);
+        when(roleRepository.existsByName(roleName)).thenReturn(true);
 
-        boolean result = roleRepository.existsRoleByName(roleName);
+        boolean result = roleRepository.existsByName(roleName);
 
         assertThat(result).isTrue();
-        verify(roleRepository).existsRoleByName(roleName);
+        verify(roleRepository).existsByName(roleName);
     }
 
     @Test
     void existsRoleByName_ReturnsFalse_WhenRoleDoesNotExist() {
         RoleName roleName = RoleName.ROLE_USER;
 
-        when(roleRepository.existsRoleByName(roleName)).thenReturn(false);
+        when(roleRepository.existsByName(roleName)).thenReturn(false);
 
-        boolean result = roleRepository.existsRoleByName(roleName);
+        boolean result = roleRepository.existsByName(roleName);
 
         assertThat(result).isFalse();
-        verify(roleRepository).existsRoleByName(roleName);
+        verify(roleRepository).existsByName(roleName);
     }
 
     @Test
@@ -72,23 +74,23 @@ class RoleRepositoryTest {
         String roleName = "ROLE_USER";
         Role role = new Role(RoleName.valueOf(roleName));
 
-        when(roleRepository.existsRoleByName(roleName)).thenReturn(true);
+        when(roleRepository.existsByName(RoleName.valueOf(roleName))).thenReturn(true);
 
-        boolean result = roleRepository.existsRoleByName(roleName);
+        boolean result = roleRepository.existsByName(RoleName.valueOf(roleName));
 
         assertThat(result).isTrue();
-        verify(roleRepository).existsRoleByName(roleName);
+        verify(roleRepository).existsByName(RoleName.valueOf(roleName));
     }
 
     @Test
     void existsRoleByName_WithDefaultMethod_ReturnsFalse_WhenRoleDoesNotExist() {
         String roleName = "ROLE_NONEXISTENT";
 
-        when(roleRepository.existsRoleByName(roleName)).thenReturn(false);
+        when(roleRepository.existsByName(RoleName.ROLE_USER)).thenReturn(false);
 
-        boolean result = roleRepository.existsRoleByName(roleName);
+        boolean result = roleRepository.existsByName(RoleName.ROLE_USER);
 
         assertThat(result).isFalse();
-        verify(roleRepository).existsRoleByName(roleName);
+        verify(roleRepository).existsByName(RoleName.ROLE_USER);
     }
 }

@@ -5,8 +5,8 @@ import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Role;
+import com.naren.moviesapp.Enum.RoleName;
 import com.naren.moviesapp.Exception.*;
-import com.naren.moviesapp.Service.CustomerService;
 import com.naren.moviesapp.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.*;
@@ -23,7 +23,6 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final CustomerDTOMapper customerDTOMapper;
     private final JwtUtil jwtUtil;
-    private final CustomerService customerService;
     private final CustomerDao customerDao;
 
     public AuthResponse login(AuthRequest authRequest) {
@@ -41,10 +40,9 @@ public class AuthService {
 
             validateAccountState(customer);
 
-            // Optional: update login flag
             if (!Boolean.TRUE.equals(customer.getIsLogged())) {
                 customer.setIsLogged(true);
-                customerDao.save(customer);
+                customerDao.updateCustomer(customer);
             }
 
             String token = generateTokenForUser(customer);
@@ -97,7 +95,7 @@ public class AuthService {
         }
 
         boolean isSuperAdmin = customer.getRoles().stream()
-                .anyMatch(role -> role.getName().equals("ROLE_SUPER_ADMIN"));
+                .anyMatch(role -> role.getName() == RoleName.ROLE_SUPER_ADMIN);
 
         if (!isSuperAdmin && !Boolean.TRUE.equals(customer.getIsEmailVerified())) {
             throw new EmailNotVerifiedException(
@@ -118,7 +116,7 @@ public class AuthService {
 
         Set<Role> roles = new HashSet<Role>();
         for (String roleName : customerDTO.roles()) {
-            roles.add(new Role(roleName));
+            roles.add(new Role(RoleName.valueOf(roleName)));
         }
 
         return jwtUtil.issueToken(customerDTO.email(), roles);

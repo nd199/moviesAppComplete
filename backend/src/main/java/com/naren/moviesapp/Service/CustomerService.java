@@ -2,7 +2,6 @@ package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Dao.CustomerDao;
 import com.naren.moviesapp.Dao.MovieDao;
-import com.naren.moviesapp.Dto.AdminCreateRequest;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Dto.CustomerStatsDTO;
@@ -423,50 +422,6 @@ public class CustomerService implements CustomerServiceInterface {
         customer.setIsLogged(true);
         customerDao.updateCustomer(customer);
         return ResponseEntity.ok("Customer Subscribed");
-    }
-
-    @Transactional
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public CustomerDTO createAdmin(AdminCreateRequest adminRequest) {
-        logger.info("Creating new admin user: {}", adminRequest.email());
-
-        Customer existingCustomer = customerDao.getCustomerByUsername(adminRequest.email()).orElse(null);
-        if (existingCustomer != null) {
-            throw new ResourceAlreadyExists("Admin with email " + adminRequest.email() + " already exists");
-        }
-
-        Customer admin = new Customer();
-        admin.setName(adminRequest.name());
-        admin.setEmail(adminRequest.email());
-        admin.setPassword(passwordEncoder.encode(adminRequest.password() != null ? adminRequest.password() : "TempPassword123!"));
-        admin.setPhoneNumber(adminRequest.phoneNumber());
-        admin.setImageUrl(adminRequest.imageUrl());
-        admin.setIsEmailVerified(true);
-        admin.setAddress(adminRequest.address());
-        admin.setIsLogged(false);
-        admin.setIsRegistered(true);
-        admin.setIsSubscribed(true);
-
-        Set<Role> adminRoles = new HashSet<>();
-        if (adminRequest.roles() != null && !adminRequest.roles().isEmpty()) {
-            for (String roleName : adminRequest.roles()) {
-                Role role = roleService.findRoleByName(RoleName.valueOf(roleName));
-                if (role != null) {
-                    adminRoles.add(role);
-                }
-            }
-        } else {
-            Role adminRole = roleService.findRoleByName(RoleName.ROLE_ADMIN);
-            if (adminRole != null) {
-                adminRoles.add(adminRole);
-            }
-        }
-
-        adminRoles.forEach(admin::addRole);
-        Customer savedAdmin = customerDao.save(admin);
-
-        logger.info("Successfully created admin user: {}", savedAdmin.getEmail());
-        return customerDTOMapper.apply(savedAdmin);
     }
 
     public boolean isOwner(Long customerId, String username) {

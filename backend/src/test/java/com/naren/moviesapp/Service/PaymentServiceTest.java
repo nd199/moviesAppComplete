@@ -8,6 +8,7 @@ import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.PaymentRepository;
 import com.naren.moviesapp.Repo.SubscriptionPlanRepository;
 import com.naren.moviesapp.Repo.UserPlanInfoRepository;
+import com.naren.moviesapp.TestData.TestDataFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,18 +59,15 @@ class PaymentServiceTest {
         Long planId = 1L;
         String paymentMethod = "credit_card";
 
-        Customer customer = new Customer();
-        customer.setId(10L);
+        Customer customer = TestDataFactory.createTestCustomer(10L);
         customer.setEmail(email);
         customer.setIsSubscribed(false);
 
-        SubscriptionPlan plan = new SubscriptionPlan();
-        plan.setId(planId);
+        SubscriptionPlan plan = TestDataFactory.createTestSubscriptionPlan(planId);
         plan.setPrice(99.99);
         plan.setInterval("monthly");
 
-        Payment savedPayment = new Payment();
-        savedPayment.setId(100L);
+        Payment savedPayment = TestDataFactory.createTestPayment(100L, customer, plan);
 
         when(customerRepository.findCustomerByEmail(email)).thenReturn(Optional.of(customer));
         when(subscriptionPlanRepository.findById(planId)).thenReturn(Optional.of(plan));
@@ -116,8 +114,7 @@ class PaymentServiceTest {
     void processPayment_throws_when_plan_not_found() {
         String email = "user@example.com";
 
-        Customer customer = new Customer();
-        customer.setId(10L);
+        Customer customer = TestDataFactory.createTestCustomer(10L);
         customer.setEmail(email);
 
         when(customerRepository.findCustomerByEmail(email)).thenReturn(Optional.of(customer));

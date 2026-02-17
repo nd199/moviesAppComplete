@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import com.naren.moviesapp.AbstractIntegrationTest;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Role;
+import com.naren.moviesapp.Enum.RoleName;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Record.MovieRegistration;
 import com.naren.moviesapp.Record.MovieUpdation;
@@ -81,11 +82,14 @@ public class MovieIT extends AbstractIntegrationTest {
     }
 
     private void createRoleIfNotExists() {
-        if (!roleRepository.existsRoleByName("ROLE_USER")) {
-            addRole(new Role("ROLE_USER"));
+        if (!roleRepository.existsByName(RoleName.valueOf("ROLE_USER"))) {
+            addRole(new Role(RoleName.valueOf("ROLE_USER")));
         }
-        if (!roleRepository.existsRoleByName("ROLE_ADMIN")) {
-            addRole(new Role("ROLE_ADMIN"));
+        if (!roleRepository.existsByName(RoleName.valueOf("ROLE_ADMIN"))) {
+            addRole(new Role(RoleName.valueOf("ROLE_ADMIN")));
+        }
+        if (!roleRepository.existsByName(RoleName.valueOf("ROLE_SUPER_ADMIN"))) {
+            addRole(new Role(RoleName.valueOf("ROLE_SUPER_ADMIN")));
         }
     }
 
@@ -96,6 +100,19 @@ public class MovieIT extends AbstractIntegrationTest {
     private String registerAdminAndGetToken(CustomerRegistration registration) {
         return Objects.requireNonNull(webTestClient.post()
                 .uri("/api/v1/auth/admins")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(registration), CustomerRegistration.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .returnResult(Void.class)
+                .getResponseHeaders()
+                .getFirst(HttpHeaders.AUTHORIZATION));
+    }
+
+    private String registerSuperAdminAndGetToken(CustomerRegistration registration) {
+        return Objects.requireNonNull(webTestClient.post()
+                .uri("/api/v1/auth/super-admins")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(registration), CustomerRegistration.class)
@@ -274,7 +291,53 @@ public class MovieIT extends AbstractIntegrationTest {
         assertThat(updatedMovie.getName()).isEqualTo(newName);
         assertThat(updatedMovie.getCost()).isEqualTo(registration.cost());
         assertThat(updatedMovie.getRating()).isEqualTo(registration.rating());
-        // Add more assertions as needed
+    }
+
+    @Test
+    void createMovie_withSuperAdmin() {
+        String superAdminName = "SUPER ADMIN " + FAKER.name().fullName();
+        String superAdminEmail = superAdminName.replace(" ", ".") + "@codeNaren.com";
+        CustomerRegistration superAdminRegistration = new CustomerRegistration(
+                superAdminName, superAdminEmail, FAKER.internet().password(8, 12),
+                FAKER.phoneNumber().subscriberNumber(9), "", false, "Chennai, India", false, false);
+
+        String superAdminToken = registerSuperAdminAndGetToken(superAdminRegistration);
+
+        webTestClient.post()
+                .uri(API_PATH)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(AUTHORIZATION, "Bearer " + superAdminToken)
+                .body(Mono.just(registration), MovieRegistration.class)
+                .exchange()
+                .expectStatus()
+                .isCreated();
+
+        List<Movie> movieList = webTestClient.get()
+                .uri(API_PATH)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectBodyList(new ParameterizedTypeReference<Movie>() {
+                }).returnResult()
+                .getResponseBody();
+
+        assert movieList != null;
+        Long id = movieList.stream()
+                .filter(m -> m.getName().equals(registration.name()))
+                .map(Movie::getId)
+                .findFirst()
+                .orElseThrow();
+
+        Movie expected = webTestClient.get()
+                .uri(API_PATH + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(AUTHORIZATION, "Bearer " + superAdminToken)
+                .exchange()
+                .expectBody(new ParameterizedTypeReference<Movie>() {
+                }).returnResult()
+                .getResponseBody();
+
+        assertThat(movieList).contains(expected);
     }
 
 }

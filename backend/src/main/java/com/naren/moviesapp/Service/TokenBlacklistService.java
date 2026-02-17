@@ -74,7 +74,6 @@ public class TokenBlacklistService {
     }
 
     public void removeExpiredTokens() {
-        // Redis automatically handles TTL, but this method can be used for manual cleanup
         logger.debug("Token cleanup initiated");
     }
 }

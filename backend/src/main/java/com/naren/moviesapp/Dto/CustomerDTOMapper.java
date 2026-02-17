@@ -1,7 +1,6 @@
 package com.naren.moviesapp.Dto;
 
 import com.naren.moviesapp.Entity.Customer;
-import com.naren.moviesapp.Entity.Role;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
@@ -23,7 +22,7 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                 customer.getIsRegistered(),
                 customer.getIsSubscribed(),
                 customer.getMovies(),
-                customer.getRoles().stream().map(Role::getName).toList(),
+                customer.getRoles().stream().map(role -> role.getName().name()).toList(),
                 customer.getCreatedAt(),
                 customer.getUpdatedAt(),
                 customer

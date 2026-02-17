@@ -1,8 +1,10 @@
 package com.naren.moviesapp.Dao;
 
+import com.github.javafaker.Faker;
 import com.naren.moviesapp.AbstractTestContainers;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Repo.CustomerRepository;
+import com.naren.moviesapp.TestData.TestDataFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,15 +26,14 @@ class CustomerDaoImplTest extends AbstractTestContainers {
     @Mock
     private CustomerRepository customerRepository;
     private Customer customer;
+    private static final Faker FAKER = new Faker();
 
     @BeforeEach
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         underTest = new CustomerDao(customerRepository);
 
-        customer = new Customer(1L, FAKER.name().name(),
-                FAKER.internet().emailAddress(), FAKER.internet().password(),
-                FAKER.phoneNumber().subscriberNumber(9), false, false, false, "Chennai, India", false);
+        customer = TestDataFactory.createTestCustomer(1L);
     }
 
     @AfterEach
@@ -83,7 +84,7 @@ class CustomerDaoImplTest extends AbstractTestContainers {
     @Test
     void getCustomerList() {
         Page<Customer> page = mock(Page.class);
-        List<Customer> customers = List.of(new Customer());
+        List<Customer> customers = List.of(TestDataFactory.createTestCustomer());
 
         when(page.getContent()).thenReturn(customers);
         when(customerRepository.findAll(any(Pageable.class))).thenReturn(page);

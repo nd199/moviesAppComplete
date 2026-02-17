@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @Configuration
+@EnableMethodSecurity
 public class SecurityFilterChainConfig {
 
     @Bean
@@ -106,22 +108,28 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(
                                 "/api/v1/customers/**",
                                 "/api/v1/roles/**"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("ADMIN", "SUPER_ADMIN")
 
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/movies",
                                 "/api/v1/shows"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("ADMIN", "SUPER_ADMIN")
 
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/v1/movies/**",
                                 "/api/v1/shows/**"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("ADMIN", "SUPER_ADMIN")
 
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/v1/movies/**",
                                 "/api/v1/shows/**"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("ADMIN", "SUPER_ADMIN")
+
+                        /* ================= SUPER ADMIN ================= */
+
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/admin/create"
+                        ).hasRole("SUPER_ADMIN")
 
                         .anyRequest().authenticated()
                 )

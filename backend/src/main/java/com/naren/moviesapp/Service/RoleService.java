@@ -1,6 +1,7 @@
 package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Entity.Role;
+import com.naren.moviesapp.Enum.RoleName;
 import com.naren.moviesapp.Repo.RoleRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ public class RoleService {
     }
 
     void saveRole(Role role) {
-        if (!roleRepository.existsRoleByName(role.getName())) {
+        if (!roleRepository.existsByName(role.getName())) {
             roleRepository.save(role);
         }
     }
@@ -38,10 +39,14 @@ public class RoleService {
     }
 
     Role findRoleByName(String roleName) {
-        return roleRepository.findRoleByName(roleName);
+        return roleRepository.findByName(RoleName.valueOf(roleName)).orElse(null);
+    }
+
+    Role findRoleByName(RoleName roleName) {
+        return roleRepository.findByName(roleName).orElse(null);
     }
 
     public boolean existsByName(Role role) {
-        return roleRepository.existsRoleByName(role.getName());
+        return roleRepository.existsByName(role.getName());
     }
 }

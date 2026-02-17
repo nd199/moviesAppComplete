@@ -4,14 +4,14 @@ import com.naren.moviesapp.AbstractTestContainers;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Payment;
 import com.naren.moviesapp.Entity.SubscriptionPlan;
+import com.naren.moviesapp.TestData.TestDataFactory;
 import com.naren.moviesapp.TestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,8 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestConfig.class)
-@Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 public class PaymentRepositoryTest extends AbstractTestContainers {
 
     @Autowired

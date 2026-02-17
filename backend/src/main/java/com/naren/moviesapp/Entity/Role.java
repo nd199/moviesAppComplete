@@ -1,7 +1,9 @@
 package com.naren.moviesapp.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.naren.moviesapp.Enum.RoleName;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,31 +20,22 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Role {
 
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
-    Set<Customer> customers = new HashSet<Customer>();
+    Set<Customer> customers = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(unique = true, nullable = false)
+    private RoleName name;
 
-    public Role(Long id, String name, Set<Customer> customers) {
-        this.id = id;
-        this.name = name;
-        this.customers = customers;
-    }
-
-    public Role(String name, Set<Customer> customers) {
-        this.name = name;
-        this.customers = customers;
-    }
-
-    public Role(String name) {
+    public Role(RoleName name) {
         this.name = name;
     }
 

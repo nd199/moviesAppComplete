@@ -2,6 +2,7 @@ package com.naren.moviesapp.Dao;
 
 import com.naren.moviesapp.Entity.Show;
 import com.naren.moviesapp.Repo.ShowRepository;
+import com.naren.moviesapp.TestData.TestDataFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,10 +32,7 @@ class ShowDaoImplTest {
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         underTest = new ShowDao(showRepository);
-        sh = new Show(1L,
-                "Harry Potter",
-                200D,
-                5D, "none", "none", "none", 2000, "none", "none", "shows");
+        sh = TestDataFactory.createTestShow(1L);
     }
 
     @AfterEach
@@ -78,7 +76,7 @@ class ShowDaoImplTest {
     @Test
     void getShowList() {
         Page<Show> page = mock(Page.class);
-        List<Show> shs = List.of(new Show());
+        List<Show> shs = List.of(TestDataFactory.createTestShow());
 
         when(page.getContent()).thenReturn(shs);
         when(showRepository.findAll(any(Pageable.class))).thenReturn(page);

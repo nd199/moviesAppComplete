@@ -1,4 +1,5 @@
 package com.naren.moviesapp.IT.CustomerIntegrationTest;
+import com.naren.moviesapp.Enum.RoleName;
 
 import com.github.javafaker.Faker;
 import com.naren.moviesapp.AbstractIntegrationTest;
@@ -63,11 +64,14 @@ public class CustomerIT extends AbstractIntegrationTest {
     }
 
     private void createRoleIfNotExists() {
-        if (!roleRepository.existsRoleByName("ROLE_USER")) {
-            addRole(new Role("ROLE_USER"));
+        if (!roleRepository.existsByName(RoleName.valueOf("ROLE_USER"))) {
+            addRole(new Role(RoleName.valueOf("ROLE_USER")));
         }
-        if (!roleRepository.existsRoleByName("ROLE_ADMIN")) {
-            addRole(new Role("ROLE_ADMIN"));
+        if (!roleRepository.existsByName(RoleName.valueOf("ROLE_ADMIN"))) {
+            addRole(new Role(RoleName.valueOf("ROLE_ADMIN")));
+        }
+        if (!roleRepository.existsByName(RoleName.valueOf("ROLE_SUPER_ADMIN"))) {
+            addRole(new Role(RoleName.valueOf("ROLE_SUPER_ADMIN")));
         }
     }
 
@@ -94,6 +98,19 @@ public class CustomerIT extends AbstractIntegrationTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(adminRegistration), CustomerRegistration.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .returnResult(Void.class)
+                .getResponseHeaders()
+                .getFirst(HttpHeaders.AUTHORIZATION);
+    }
+
+    private String registerSuperAdminAndGetToken(CustomerRegistration registration) {
+        return webTestClient.post()
+                .uri("/api/v1/auth/super-admins")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(registration), CustomerRegistration.class)
                 .exchange()
                 .expectStatus().isCreated()
                 .returnResult(Void.class)
@@ -355,6 +372,39 @@ public class CustomerIT extends AbstractIntegrationTest {
         assertThat(addedMovie.getDescription()).isEqualTo(movie.description());
         assertThat(addedMovie.getPoster()).isEqualTo(movie.poster());
         assertThat(addedMovie.getYear()).isEqualTo(movie.year());
+    }
+
+    @Test
+    void createCustomer_withSuperAdmin() {
+        String superAdminName = "SUPER ADMIN " + FAKER.name().fullName();
+        String superAdminEmail = superAdminName.replace(" ", ".") + "@codeNaren.com";
+        CustomerRegistration superAdminRegistration = new CustomerRegistration(
+                superAdminName, superAdminEmail, FAKER.internet().password(8, 12),
+                FAKER.phoneNumber().subscriberNumber(9), "", false, "Chennai, India", false, false);
+
+        String superAdminToken = registerSuperAdminAndGetToken(superAdminRegistration);
+
+        List<CustomerDTO> customerDTOList = webTestClient.get()
+                .uri(API_PATH)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", superAdminToken))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(new ParameterizedTypeReference<CustomerDTO>() {
+                })
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(customerDTOList).isNotNull();
+        assertThat(customerDTOList).isNotEmpty();
+
+        Optional<CustomerDTO> optionalSuperAdmin = customerDTOList.stream()
+                .filter(c -> c.email().equalsIgnoreCase(superAdminRegistration.email()))
+                .findFirst();
+
+        assertThat(optionalSuperAdmin).isPresent();
+        CustomerDTO superAdminDTO = optionalSuperAdmin.orElseThrow();
+        assertThat(superAdminDTO.roles()).contains("ROLE_SUPER_ADMIN");
     }
 
 

@@ -37,11 +37,6 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-//
-//    public String issueToken(String subject, String... scopes) {
-//        return issueToken(subject, Map.of("scopes", scopes));
-//    }
-
     public String issueToken(String subject, Map<String, Object> claims) {
         Map<String, Object> enhancedClaims = new HashMap<>(claims);
         enhancedClaims.put("jti", UUID.randomUUID().toString());
@@ -58,8 +53,12 @@ public class JwtUtil {
     }
 
     public String issueToken(String subject, Set<Role> roles) {
+        List<String> roleNames = roles.stream()
+                .map(role -> role.getName().name())
+                .toList();
+
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", roles);
+        claims.put("roles", roleNames);
         claims.put("type", "access");
 
         return issueToken(subject, claims);

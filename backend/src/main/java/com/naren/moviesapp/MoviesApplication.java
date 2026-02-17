@@ -1,13 +1,16 @@
 package com.naren.moviesapp;
 
 import com.github.javafaker.Faker;
+import com.naren.moviesapp.Config.SuperAdminSeeder;
 import com.naren.moviesapp.Entity.*;
+import com.naren.moviesapp.Enum.RoleName;
 import com.naren.moviesapp.Repo.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -26,11 +29,13 @@ public class MoviesApplication {
 
     @Bean
     @ConditionalOnProperty(name = "app.data-initialization.enabled", havingValue = "true", matchIfMissing = false)
+    @Profile("!test")
     public CommandLineRunner commandLineRunner(CustomerRepository customerRepository,
                                                MovieRepository movieRepository, PasswordEncoder encoder,
                                                RoleRepository roleRepository,
                                                ShowRepository showRepository,
-                                               SubscriptionPlanRepository subscriptionPlanRepository) {
+                                               SubscriptionPlanRepository subscriptionPlanRepository,
+                                               SuperAdminSeeder superAdminSeeder) {
         return args -> {
             int i = 4;
             while (i != 0) {
@@ -41,6 +46,9 @@ public class MoviesApplication {
             }
             createDefaultPlans(subscriptionPlanRepository);
             createRole(roleRepository);
+
+            // Call SuperAdminSeeder to create super admin user
+            superAdminSeeder.seedSuperAdmin().run(args);
         };
     }
 
@@ -136,13 +144,25 @@ public class MoviesApplication {
 
     private void createRole(RoleRepository roleRepository) {
 
-        if (!roleRepository.existsRoleByName("ROLE_USER")) {
-            Role user = new Role("ROLE_USER");
+        if (!roleRepository.existsByName(RoleName.ROLE_USER)) {
+            Role user = new Role(RoleName.ROLE_USER);
             roleRepository.save(user);
         }
-        if (!roleRepository.existsRoleByName("ROLE_ADMIN")) {
-            Role admin = new Role("ROLE_ADMIN");
+        if (!roleRepository.existsByName(RoleName.ROLE_ADMIN)) {
+            Role admin = new Role(RoleName.ROLE_ADMIN);
             roleRepository.save(admin);
+        }
+        if (!roleRepository.existsByName(RoleName.ROLE_SUPER_ADMIN)) {
+            Role superAdmin = new Role(RoleName.ROLE_SUPER_ADMIN);
+            roleRepository.save(superAdmin);
+        }
+        if (!roleRepository.existsByName(RoleName.ROLE_CONTENT_MANAGER)) {
+            Role contentManager = new Role(RoleName.ROLE_CONTENT_MANAGER);
+            roleRepository.save(contentManager);
+        }
+        if (!roleRepository.existsByName(RoleName.ROLE_SUPPORT)) {
+            Role support = new Role(RoleName.ROLE_SUPPORT);
+            roleRepository.save(support);
         }
     }
 }

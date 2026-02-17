@@ -7,6 +7,7 @@ import com.naren.moviesapp.Exception.ResourceAlreadyExists;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.MovieRegistration;
 import com.naren.moviesapp.Record.MovieUpdation;
+import com.naren.moviesapp.TestData.TestDataFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,12 +41,9 @@ class MovieServiceImplTest {
 
     @Test
     void addMovie() {
-        MovieRegistration registration = new MovieRegistration(
-                "testName", 300.23, 5.00, "A great movie",
-                "http://poster.url", "PG-13", 2022,
-                "120 mins", "Action");
+        MovieRegistration registration = TestDataFactory.createTestMovieRegistration();
 
-        when(movieDao.existsByName("testName")).thenReturn(false);
+        when(movieDao.existsByName(registration.name())).thenReturn(false);
 
         underTest.addMovie(registration);
 
@@ -69,12 +67,9 @@ class MovieServiceImplTest {
 
     @Test
     void throwsMovieNameExists() {
-        MovieRegistration registration = new MovieRegistration(
-                "testName", 300.23, 5.00, "A great movie",
-                "http://poster.url", "PG-13", 2022,
-                "120 mins", "Action");
+        MovieRegistration registration = TestDataFactory.createTestMovieRegistration();
 
-        when(movieDao.existsByName("testName")).thenReturn(true);
+        when(movieDao.existsByName(registration.name())).thenReturn(true);
 
         assertThatThrownBy(
                 () -> underTest.addMovie(registration))

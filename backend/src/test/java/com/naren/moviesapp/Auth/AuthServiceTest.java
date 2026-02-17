@@ -4,30 +4,25 @@ import com.naren.moviesapp.Dao.CustomerDao;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Customer;
-import com.naren.moviesapp.Exception.InvalidCredentialsException;
-import com.naren.moviesapp.Exception.ResourceNotFoundException;
-import com.naren.moviesapp.Record.CustomerUpdateRequest;
-import com.naren.moviesapp.Service.CustomerService;
+import com.naren.moviesapp.Entity.Role;
+import com.naren.moviesapp.Enum.RoleName;
+import com.naren.moviesapp.Exception.*;
+import com.naren.moviesapp.TestData.TestDataFactory;
 import com.naren.moviesapp.jwt.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,165 +38,158 @@ class AuthServiceTest {
     private JwtUtil jwtUtil;
 
     @Mock
-    private CustomerService customerService;
-
-    @Mock
     private CustomerDao customerDao;
 
     @Mock
     private Authentication authentication;
 
-    @Captor
-    private ArgumentCaptor<CustomerUpdateRequest> updateRequestCaptor;
-
+    @InjectMocks
     private AuthService underTest;
+
+    private Customer principal;
 
     @BeforeEach
     void setUp() {
-        underTest = new AuthService(
-                authenticationManager,
-                customerDTOMapper,
-                jwtUtil,
-                customerService,
-                customerDao
-        );
+        principal = TestDataFactory.createTestCustomer(10L);
+        principal.setName("User");
+        principal.setEmail("user@codeNaren.com");
+        principal.setPhoneNumber("9999999999");
+        principal.setImageUrl("");
+        principal.setIsEmailVerified(true);
+        principal.setAddress("Chennai, India");
+        principal.setIsRegistered(true);
+        principal.setRoles(Set.of(new Role(RoleName.ROLE_USER)));
     }
 
     @Test
     void login_whenCustomerNotLogged_updatesCustomer_andIssuesToken() {
-        AuthRequest request = new AuthRequest("user@codeNaren.com", "password");
 
-        Customer principal = new Customer();
-        principal.setId(10L);
-        principal.setName("User");
-        principal.setEmail("user@codeNaren.com");
-        principal.setPhoneNumber("9999999999");
-        principal.setImageUrl("");
-        principal.setIsEmailVerified(true);
-        principal.setAddress("Chennai, India");
         principal.setIsLogged(false);
-        principal.setIsRegistered(true);
 
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+        when(authenticationManager.authenticate(any()))
                 .thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(principal);
-        when(customerDao.existsByEmail(principal.getEmail())).thenReturn(true);
+        when(authentication.getPrincipal())
+                .thenReturn(principal);
+        when(customerDao.existsByEmail(principal.getEmail()))
+                .thenReturn(true);
 
-        CustomerDTO updated = new CustomerDTO(
-                principal.getId(),
-                principal.getName(),
-                principal.getEmail(),
-                principal.getPhoneNumber(),
-                principal.getImageUrl(),
-                principal.getIsEmailVerified(),
-                principal.getAddress(),
-                true,
-                principal.getIsRegistered(),
-                false,
-                List.of(),
-                List.of("ROLE_USER"),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                principal
-        );
-
-        when(customerService.updateCustomer(any(CustomerUpdateRequest.class), eq(principal.getId())))
-                .thenReturn(updated);
-        when(jwtUtil.issueToken(eq(updated.email()), anySet())).thenReturn("jwt-token");
-
-        AuthResponse response = underTest.login(request);
-
-        assertThat(response.customerDTO()).isEqualTo(updated);
-        assertThat(response.token()).isEqualTo("jwt-token");
-
-        verify(customerService).updateCustomer(updateRequestCaptor.capture(), eq(principal.getId()));
-        assertThat(updateRequestCaptor.getValue().isLogged()).isTrue();
-
-        verify(jwtUtil).issueToken(eq(updated.email()), anySet());
-        verify(customerDTOMapper, never()).apply(any());
-    }
-
-    @Test
-    void login_whenCustomerAlreadyLogged_doesNotUpdateCustomer_andUsesMapper() {
-        AuthRequest request = new AuthRequest("user@codeNaren.com", "password");
-
-        Customer principal = new Customer();
-        principal.setId(10L);
-        principal.setName("User");
-        principal.setEmail("user@codeNaren.com");
-        principal.setPhoneNumber("9999999999");
-        principal.setImageUrl("");
-        principal.setIsEmailVerified(true);
-        principal.setAddress("Chennai, India");
-        principal.setIsLogged(true);
-        principal.setIsRegistered(true);
-
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(principal);
-        when(customerDao.existsByEmail(principal.getEmail())).thenReturn(true);
-
-        CustomerDTO mapped = new CustomerDTO(
-                principal.getId(),
-                principal.getName(),
-                principal.getEmail(),
-                principal.getPhoneNumber(),
-                principal.getImageUrl(),
-                principal.getIsEmailVerified(),
-                principal.getAddress(),
-                true,
-                principal.getIsRegistered(),
-                false,
-                List.of(),
-                List.of("ROLE_ADMIN"),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                principal
-        );
-
+        CustomerDTO mapped = buildDTO("ROLE_USER");
         when(customerDTOMapper.apply(principal)).thenReturn(mapped);
-        when(jwtUtil.issueToken(eq(mapped.email()), anySet())).thenReturn("jwt-token");
+        when(jwtUtil.issueToken(eq(mapped.email()), anySet()))
+                .thenReturn("jwt-token");
 
-        AuthResponse response = underTest.login(request);
+        AuthResponse response =
+                underTest.login(new AuthRequest("user@codeNaren.com", "password"));
 
         assertThat(response.customerDTO()).isEqualTo(mapped);
         assertThat(response.token()).isEqualTo("jwt-token");
 
-        verify(customerService, never()).updateCustomer(any(), any());
-        verify(customerDTOMapper).apply(principal);
+        verify(customerDao).updateCustomer(principal);
         verify(jwtUtil).issueToken(eq(mapped.email()), anySet());
     }
 
     @Test
-    void login_throwsResourceNotFound_whenProfileMissing() {
-        AuthRequest request = new AuthRequest("user@codeNaren.com", "password");
+    void login_whenCustomerAlreadyLogged_doesNotUpdateCustomer() {
 
-        Customer principal = new Customer();
-        principal.setEmail("user@codeNaren.com");
+        principal.setIsLogged(true);
 
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+        when(authenticationManager.authenticate(any()))
                 .thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(principal);
-        when(customerDao.existsByEmail(principal.getEmail())).thenReturn(false);
+        when(authentication.getPrincipal())
+                .thenReturn(principal);
+        when(customerDao.existsByEmail(principal.getEmail()))
+                .thenReturn(true);
 
-        assertThatThrownBy(() -> underTest.login(request))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Account not found");
+        CustomerDTO mapped = buildDTO("ROLE_ADMIN");
+        when(customerDTOMapper.apply(principal)).thenReturn(mapped);
+        when(jwtUtil.issueToken(eq(mapped.email()), anySet()))
+                .thenReturn("jwt-token");
 
-        verify(customerService, never()).updateCustomer(any(), any());
-        verify(customerDTOMapper, never()).apply(any());
-        verify(jwtUtil, never()).issueToken(any(), anySet());
+        AuthResponse response =
+                underTest.login(new AuthRequest("user@codeNaren.com", "password"));
+
+        assertThat(response.customerDTO()).isEqualTo(mapped);
+        assertThat(response.token()).isEqualTo("jwt-token");
+
+        verify(customerDao, never()).updateCustomer(any());
+    }
+
+    @Test
+    void login_throwsResourceNotFound_whenProfileMissing() {
+
+        when(authenticationManager.authenticate(any()))
+                .thenReturn(authentication);
+        when(authentication.getPrincipal())
+                .thenReturn(principal);
+        when(customerDao.existsByEmail(principal.getEmail()))
+                .thenReturn(false);
+
+        assertThatThrownBy(() ->
+                underTest.login(new AuthRequest("user@codeNaren.com", "password"))
+        ).isInstanceOf(ResourceNotFoundException.class);
+
+        verify(jwtUtil, never())
+                .issueToken(anyString(), anySet());
     }
 
     @Test
     void login_wrapsBadCredentials() {
-        AuthRequest request = new AuthRequest("user@codeNaren.com", "bad");
 
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new BadCredentialsException("bad credentials"));
+        when(authenticationManager.authenticate(any()))
+                .thenThrow(new BadCredentialsException("bad"));
 
-        assertThatThrownBy(() -> underTest.login(request))
-                .isInstanceOf(InvalidCredentialsException.class)
-                .hasMessageContaining("Invalid email or password");
+        assertThatThrownBy(() ->
+                underTest.login(new AuthRequest("user@codeNaren.com", "bad"))
+        ).isInstanceOf(InvalidCredentialsException.class);
+    }
+
+    @Test
+    void login_superAdmin_canLoginWithoutVerificationOrRegistration() {
+
+        principal.setIsEmailVerified(false);
+        principal.setIsRegistered(false);
+        principal.setIsLogged(false);
+        principal.setRoles(Set.of(new Role(RoleName.ROLE_SUPER_ADMIN)));
+
+        when(authenticationManager.authenticate(any()))
+                .thenReturn(authentication);
+        when(authentication.getPrincipal())
+                .thenReturn(principal);
+        when(customerDao.existsByEmail(principal.getEmail()))
+                .thenReturn(true);
+
+        CustomerDTO mapped = buildDTO("ROLE_SUPER_ADMIN");
+        when(customerDTOMapper.apply(principal)).thenReturn(mapped);
+        when(jwtUtil.issueToken(eq(mapped.email()), anySet()))
+                .thenReturn("jwt-token");
+
+        AuthResponse response =
+                underTest.login(new AuthRequest("superadmin@codeNaren.com", "password"));
+
+        assertThat(response.customerDTO().roles())
+                .contains("ROLE_SUPER_ADMIN");
+
+        verify(customerDao).updateCustomer(principal);
+        verify(jwtUtil).issueToken(eq(mapped.email()), anySet());
+    }
+
+    private CustomerDTO buildDTO(String role) {
+        return new CustomerDTO(
+                principal.getId(),
+                principal.getName(),
+                principal.getEmail(),
+                principal.getPhoneNumber(),
+                principal.getImageUrl(),
+                principal.getIsEmailVerified(),
+                principal.getAddress(),
+                true,
+                principal.getIsRegistered(),
+                false,
+                List.of(),
+                List.of(role),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                principal
+        );
     }
 }

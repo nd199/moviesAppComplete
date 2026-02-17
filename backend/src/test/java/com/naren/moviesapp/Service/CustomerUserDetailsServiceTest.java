@@ -55,7 +55,7 @@ class CustomerUserDetailsServiceTest {
 
         assertThatThrownBy(() -> underTest.loadUserByUsername(username))
                 .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("Username " + username + " not found");
+                .hasMessage("User not found: " + username);
 
         verify(customerRepository).findByEmail(username);
     }
@@ -68,7 +68,7 @@ class CustomerUserDetailsServiceTest {
 
         assertThatThrownBy(() -> underTest.loadUserByUsername(username))
                 .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("Username null not found");
+                .hasMessage("User not found: null");
 
         verify(customerRepository).findByEmail(username);
     }
@@ -81,7 +81,7 @@ class CustomerUserDetailsServiceTest {
 
         assertThatThrownBy(() -> underTest.loadUserByUsername(username))
                 .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("Username  not found");
+                .hasMessage("User not found: ");
 
         verify(customerRepository).findByEmail(username);
     }

@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import com.naren.moviesapp.AbstractIntegrationTest;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.SubscriptionPlan;
+import com.naren.moviesapp.Enum.RoleName;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Repo.RoleRepository;
 import com.naren.moviesapp.Repo.SubscriptionPlanRepository;
@@ -61,11 +62,11 @@ public class PaymentIT extends AbstractIntegrationTest {
     }
 
     private void createRoleIfNotExists() {
-        if (!roleRepository.existsRoleByName("ROLE_USER")) {
-            roleRepository.save(new Role("ROLE_USER"));
+        if (!roleRepository.existsByName(RoleName.valueOf("ROLE_USER"))) {
+            roleRepository.save(new Role(RoleName.valueOf("ROLE_USER")));
         }
-        if (!roleRepository.existsRoleByName("ROLE_ADMIN")) {
-            roleRepository.save(new Role("ROLE_ADMIN"));
+        if (!roleRepository.existsByName(RoleName.valueOf("ROLE_ADMIN"))) {
+            roleRepository.save(new Role(RoleName.valueOf("ROLE_ADMIN")));
         }
     }
 
