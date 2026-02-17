@@ -2,12 +2,14 @@ package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Dao.CustomerDao;
 import com.naren.moviesapp.Dao.MovieDao;
+import com.naren.moviesapp.Dto.AdminCreateRequest;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Dto.CustomerStatsDTO;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Role;
+import com.naren.moviesapp.Enum.RoleName;
 import com.naren.moviesapp.Exception.*;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Record.CustomerSubscription;
@@ -20,11 +22,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.management.relation.RoleNotFoundException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -55,6 +57,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public void addRole(Role role) {
         if (role == null) {
             throw new ResourceNotFoundException("Role cannot be null");
@@ -66,16 +69,19 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public List<Role> getRoles() {
         return roleService.getAllRoles();
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Role getRoleById(Long id) {
         return roleService.findRoleById(id);
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public void removeRole(Long id) {
         Role role = getRoleById(id);
         if (role == null) {
@@ -85,6 +91,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @Transactional
     public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration, Set<String> roleNames) {
 
@@ -95,7 +102,7 @@ public class CustomerService implements CustomerServiceInterface {
             Set<Role> roles = new HashSet<>();
 
             for (String roleName : roleNames) {
-                Role role = roleService.findRoleByName(roleName);
+                Role role = roleService.findRoleByName(RoleName.valueOf(roleName));
                 if (role == null) {
                     logger.warn("Role not found during registration: {}", roleName);
                     throw new RoleNotFoundException("Role " + roleName + " not found");
@@ -174,6 +181,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public CustomerDTO getCustomerById(Long customerId) {
         return customerDao.getCustomer(customerId)
                 .map(customerDTOMapper)
@@ -183,6 +191,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @Transactional
     public CustomerDTO updateCustomer(CustomerUpdateRequest request, Long id) {
 
@@ -233,6 +242,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN') or #email == authentication.principal.username")
     @Transactional
     public void updatePassword(String email, String newPassword) {
         logger.info("Password update request for email: {}", email);
@@ -263,6 +273,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public List<CustomerDTO> getAllCustomers() {
         List<CustomerDTO> customers = customerDao.getCustomerList()
                 .stream()
@@ -272,6 +283,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @Transactional
     public void deleteCustomer(Long customerId) {
 
@@ -347,6 +359,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn) {
         List<Customer> customers = customerDao.getCustomersByIsLoggedIn(isLoggedIn);
         if (customers.isEmpty()) {
@@ -357,6 +370,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN') or #email == authentication.principal.username")
     public CustomerDTO getCustomerByEmail(String email) {
         return customerDao.getCustomerByUsername(email).map((customerDTOMapper))
                 .orElseThrow(
@@ -379,6 +393,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public List<CustomerDTO> getLatestCustomerList() {
         return customerDao.getTop5Customers()
                 .stream().map(customerDTOMapper)
@@ -386,6 +401,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public List<CustomerStatsDTO> getCustomerStats() {
         return customerDao.getCustomerStats()
                 .stream()
@@ -407,5 +423,54 @@ public class CustomerService implements CustomerServiceInterface {
         customer.setIsLogged(true);
         customerDao.updateCustomer(customer);
         return ResponseEntity.ok("Customer Subscribed");
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public CustomerDTO createAdmin(AdminCreateRequest adminRequest) {
+        logger.info("Creating new admin user: {}", adminRequest.email());
+
+        Customer existingCustomer = customerDao.getCustomerByUsername(adminRequest.email()).orElse(null);
+        if (existingCustomer != null) {
+            throw new ResourceAlreadyExists("Admin with email " + adminRequest.email() + " already exists");
+        }
+
+        Customer admin = new Customer();
+        admin.setName(adminRequest.name());
+        admin.setEmail(adminRequest.email());
+        admin.setPassword(passwordEncoder.encode(adminRequest.password() != null ? adminRequest.password() : "TempPassword123!"));
+        admin.setPhoneNumber(adminRequest.phoneNumber());
+        admin.setImageUrl(adminRequest.imageUrl());
+        admin.setIsEmailVerified(true);
+        admin.setAddress(adminRequest.address());
+        admin.setIsLogged(false);
+        admin.setIsRegistered(true);
+        admin.setIsSubscribed(true);
+
+        Set<Role> adminRoles = new HashSet<>();
+        if (adminRequest.roles() != null && !adminRequest.roles().isEmpty()) {
+            for (String roleName : adminRequest.roles()) {
+                Role role = roleService.findRoleByName(RoleName.valueOf(roleName));
+                if (role != null) {
+                    adminRoles.add(role);
+                }
+            }
+        } else {
+            Role adminRole = roleService.findRoleByName(RoleName.ROLE_ADMIN);
+            if (adminRole != null) {
+                adminRoles.add(adminRole);
+            }
+        }
+
+        adminRoles.forEach(admin::addRole);
+        Customer savedAdmin = customerDao.save(admin);
+
+        logger.info("Successfully created admin user: {}", savedAdmin.getEmail());
+        return customerDTOMapper.apply(savedAdmin);
+    }
+
+    public boolean isOwner(Long customerId, String username) {
+        Customer customer = customerDao.getCustomer(customerId).orElse(null);
+        return customer != null && customer.getEmail().equals(username);
     }
 }

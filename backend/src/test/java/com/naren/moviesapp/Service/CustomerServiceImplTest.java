@@ -7,6 +7,7 @@ import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Role;
+import com.naren.moviesapp.Enum.RoleName;
 import com.naren.moviesapp.Exception.PasswordInvalidException;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
@@ -74,12 +75,10 @@ class CustomerServiceImplTest {
         when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
 
         Role role = new Role("ROLE_USER");
-        when(roleService.findRoleByName(role.getName())).thenReturn(role);
+        when(roleService.findRoleByName(RoleName.ROLE_USER)).thenReturn(role);
         ResponseEntity<?> response = underTest.registerUser(registration, Set.of("ROLE_USER"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        underTest.registerUser(registration, Set.of(String.valueOf(role)));
 
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
         verify(customerDao).addCustomer(customerArgumentCaptor.capture());
@@ -91,7 +90,7 @@ class CustomerServiceImplTest {
         assertThat(capturedCustomer.getPhoneNumber()).isEqualTo("22222222222");
         assertThat(capturedCustomer.getIsEmailVerified()).isEqualTo(true);
         assertThat(capturedCustomer.getAddress()).isEqualTo("Chennai, India");
-        verify(roleService).findRoleByName("ROLE_USER");
+        verify(roleService).findRoleByName(RoleName.ROLE_USER);
         assertThat(capturedCustomer.getRoles()).contains(role);
         assertThat(response.getBody()).isEqualTo(customerDTOMapper.apply(capturedCustomer));
     }
@@ -101,16 +100,11 @@ class CustomerServiceImplTest {
 
         CustomerRegistration registration = new CustomerRegistration("John Doe", "johndoe@example.com", "password", "1234567890", "", false, "Chennai, India", false, false);
         Set<String> roleNames = new HashSet<>();
-        roleNames.add("INVALID_ROLE");
+        roleNames.add("NON_EXISTENT_ROLE");
 
-        when(roleService.findRoleByName("INVALID_ROLE")).thenReturn(null);
-
-        ResponseEntity<?> response = underTest.registerUser(registration, roleNames);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isEqualTo("Role INVALID_ROLE not found");
-
-        verify(roleService).findRoleByName("INVALID_ROLE");
+        assertThatThrownBy(() -> underTest.registerUser(registration, roleNames))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("No enum constant com.naren.moviesapp.Enum.RoleName.NON_EXISTENT_ROLE");
     }
 
     @Test
@@ -290,7 +284,7 @@ class CustomerServiceImplTest {
 
     @Test
     void addRole() {
-        Role role = new Role("USER_ROLE");
+        Role role = new Role("ROLE_USER");
         when(roleService.existsByName(role)).thenReturn(false);
         underTest.addRole(role);
         verify(roleService).saveRole(role);
@@ -299,7 +293,7 @@ class CustomerServiceImplTest {
 
     @Test
     void addRoleThrowsIfRoleAlreadyExists() {
-        Role role = new Role("USER_ROLE");
+        Role role = new Role("ROLE_USER");
         when(roleService.existsByName(role)).thenReturn(true);
         assertThatThrownBy(() -> underTest.addRole(role)).isInstanceOf(ResourceAlreadyExists.class)
                 .hasMessage("Role already exists");
@@ -317,7 +311,7 @@ class CustomerServiceImplTest {
 
     @Test
     void testRemoveRole() {
-        Role role = new Role("USER_ROLE");
+        Role role = new Role("ROLE_USER");
         when(roleService.findRoleById(role.getId())).thenReturn(role);
         underTest.removeRole(role.getId());
         verify(roleService).deleteRole(role.getId());

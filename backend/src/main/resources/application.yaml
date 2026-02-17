@@ -8,3 +8,15 @@ spring:
     static-path-pattern: /**
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+
+logging:
+  level:
+    org.springframework.security: TRACE
+    com.naren.moviesapp: DEBUG
+
+app:
+  superadmin:
+    email: ${SUPER_ADMIN_EMAIL:superadmin@movies.com}
+    password: ${SUPER_ADMIN_PASSWORD:ChangeMe123!}
+  data-initialization:
+    enabled: ${DATA_INITIALIZATION_ENABLED:true}
