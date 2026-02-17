@@ -1,7 +1,7 @@
 package com.naren.moviesapp.Repo;
 
 import com.naren.moviesapp.Entity.Role;
-import com.naren.moviesapp.Enum.RoleName;
+import com.naren.moviesapp.Entity.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

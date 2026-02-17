@@ -1,7 +1,7 @@
 package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Entity.Role;
-import com.naren.moviesapp.Enum.RoleName;
+import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Repo.RoleRepository;
 import org.springframework.stereotype.Service;
 

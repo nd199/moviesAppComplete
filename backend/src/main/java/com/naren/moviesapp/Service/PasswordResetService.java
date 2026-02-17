@@ -1,6 +1,6 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Dao.CustomerDao;
+import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Entity.PasswordResetToken;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.PasswordResetRequest;
@@ -21,17 +21,17 @@ public class PasswordResetService {
     private final PasswordRTRepository tokenRepository;
     private final EmailService emailService;
     private final CustomerService customerService;
-    private final CustomerDao customerDao;
+    private final CustomerRepository customerRepository;
 
-    public PasswordResetService(PasswordRTRepository tokenRepository, EmailService emailService, CustomerService customerService, CustomerDao customerDao) {
+    public PasswordResetService(PasswordRTRepository tokenRepository, EmailService emailService, CustomerService customerService, CustomerRepository customerRepository) {
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
         this.customerService = customerService;
-        this.customerDao = customerDao;
+        this.customerRepository = customerRepository;
     }
 
     public void createPasswordResetToken(String email) {
-        if (!customerDao.existsByEmail(email)) {
+        if (!customerRepository.existsByEmail(email)) {
             throw new ResourceNotFoundException("Your account " +
                     "is not present please check your email else register first");
         }

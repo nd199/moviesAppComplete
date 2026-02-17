@@ -1,6 +1,6 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Dao.CustomerDao;
+import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Entity.PasswordResetToken;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.PasswordResetRequest;
@@ -32,20 +32,20 @@ class PasswordResetServiceTest {
     @Mock
     private CustomerService customerService;
     @Mock
-    private CustomerDao customerDao;
+    private CustomerRepository customerRepository;
 
     private PasswordResetService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new PasswordResetService(tokenRepository, emailService, customerService, customerDao);
+        underTest = new PasswordResetService(tokenRepository, emailService, customerService, customerRepository);
     }
 
     @Test
     void createPasswordResetToken_Success() {
         String email = "test@example.com";
 
-        when(customerDao.existsByEmail(email)).thenReturn(false);
+        when(customerRepository.existsByEmail(email)).thenReturn(false);
 
         assertThatThrownBy(() -> underTest.createPasswordResetToken(email))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -59,7 +59,7 @@ class PasswordResetServiceTest {
     void createPasswordResetToken_EmailExists() {
         String email = "test@example.com";
 
-        when(customerDao.existsByEmail(email)).thenReturn(true);
+        when(customerRepository.existsByEmail(email)).thenReturn(true);
         doNothing().when(emailService).sendPasswordResetMail(any(), any());
 
         underTest.createPasswordResetToken(email);
@@ -80,7 +80,7 @@ class PasswordResetServiceTest {
     void createPasswordResetToken_EmailServiceFails() {
         String email = "test@example.com";
 
-        when(customerDao.existsByEmail(email)).thenReturn(true);
+        when(customerRepository.existsByEmail(email)).thenReturn(true);
         doThrow(new RuntimeException("Email failed")).when(emailService).sendPasswordResetMail(any(), any());
 
         assertThatThrownBy(() -> underTest.createPasswordResetToken(email))

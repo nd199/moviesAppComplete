@@ -2,6 +2,7 @@ package com.naren.moviesapp.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.naren.moviesapp.Config.RolePermissionMapper;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -198,9 +199,15 @@ public class Customer implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        for (Role role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getName().name()));
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        for (Role role : this.getRoles()) {
+            RoleName roleName = role.getName();
+            RolePermissionMapper.getPermissions(roleName)
+                    .forEach(permission ->
+                            authorities.add(
+                                    new SimpleGrantedAuthority(permission.name())
+                            )
+                    );
         }
         return authorities;
     }

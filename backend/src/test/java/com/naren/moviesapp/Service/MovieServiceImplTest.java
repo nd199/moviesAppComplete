@@ -1,6 +1,6 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Dao.MovieDao;
+import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
@@ -31,25 +31,25 @@ import static org.mockito.Mockito.*;
 class MovieServiceImplTest {
 
     @Mock
-    private MovieDao movieDao;
+    private MovieRepository movieRepository;
     private MovieService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new MovieService(movieDao);
+        underTest = new MovieService(movieRepository);
     }
 
     @Test
     void addMovie() {
         MovieRegistration registration = TestDataFactory.createTestMovieRegistration();
 
-        when(movieDao.existsByName(registration.name())).thenReturn(false);
+        when(movieRepository.existsByName(registration.name())).thenReturn(false);
 
         underTest.addMovie(registration);
 
         ArgumentCaptor<Movie> movieArgumentCaptor = ArgumentCaptor.forClass(Movie.class);
 
-        verify(movieDao).addMovie(movieArgumentCaptor.capture());
+        verify(movieRepository).save(movieArgumentCaptor.capture());
 
         Movie captured = movieArgumentCaptor.getValue();
 
@@ -69,14 +69,14 @@ class MovieServiceImplTest {
     void throwsMovieNameExists() {
         MovieRegistration registration = TestDataFactory.createTestMovieRegistration();
 
-        when(movieDao.existsByName(registration.name())).thenReturn(true);
+        when(movieRepository.existsByName(registration.name())).thenReturn(true);
 
         assertThatThrownBy(
                 () -> underTest.addMovie(registration))
                 .isInstanceOf(ResourceAlreadyExists.class)
                 .hasMessageContaining("Movie name %s already exists".formatted(registration.name()));
 
-        verify(movieDao, never()).addMovie(any());
+        verify(movieRepository, never()).save(any());
     }
 
     @Test
@@ -95,24 +95,24 @@ class MovieServiceImplTest {
                 "movies");
         movie.setId(id);
 
-        when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
 
         underTest.removeMovie(id);
 
-        verify(movieDao).removeMovie(movie);
+        verify(movieRepository).delete(movie);
     }
 
     @Test
     void throwsWhenMovieRemovalIfNotExist() {
         long id = 1;
 
-        when(movieDao.getMovieById(id)).thenReturn(Optional.empty());
+        when(movieRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.removeMovie(id))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Movie with ID %s not found".formatted(id));
 
-        verify(movieDao, never()).removeMovie(any());
+        verify(movieRepository, never()).delete(any());
     }
 
     @Test
@@ -131,7 +131,7 @@ class MovieServiceImplTest {
                 "movies");
         movie.setId(id);
 
-        when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
 
         Movie actual = underTest.getMovieById(id);
 
@@ -142,7 +142,7 @@ class MovieServiceImplTest {
     void getMovieByIdThrowsIfNotExists() {
         long id = 1;
 
-        when(movieDao.getMovieById(id)).thenReturn(Optional.empty());
+        when(movieRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.getMovieById(id))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -153,7 +153,7 @@ class MovieServiceImplTest {
     void getMovieList() {
         underTest.getMovieList();
 
-        verify(movieDao).getMovieList();
+        verify(movieRepository).findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
     }
 
     @Test
@@ -173,7 +173,7 @@ class MovieServiceImplTest {
                 "movies");
         movie.setId(id);
 
-        when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
 
         MovieUpdation movieUpdation = new MovieUpdation(
                 "testName2", 300.00, 5.0, "An awesome movie",
@@ -184,7 +184,7 @@ class MovieServiceImplTest {
 
         ArgumentCaptor<Movie> movieArgumentCaptor = ArgumentCaptor.forClass(Movie.class);
 
-        verify(movieDao).updateMovie(movieArgumentCaptor.capture());
+        verify(movieRepository).save(movieArgumentCaptor.capture());
 
         Movie updatedMovie = movieArgumentCaptor.getValue();
 
@@ -206,20 +206,20 @@ class MovieServiceImplTest {
         MovieUpdation update = new MovieUpdation(null, null, null, null, null, null, null, null, null);
         Long movieId = 1L;
 
-        when(movieDao.getMovieById(movieId)).thenReturn(java.util.Optional.ofNullable(movie));
+        when(movieRepository.findById(movieId)).thenReturn(java.util.Optional.ofNullable(movie));
 
         assertThatThrownBy
                 (() -> underTest.updateMovie(update, movieId))
                 .hasMessage("No data changes found");
 
-        verify(movieDao, never()).updateMovie(movie);
+        verify(movieRepository, never()).save(movie);
     }
 
     @Test
     void testUpdateMovieMovieNotFound() {
         Long movieId = 1L;
 
-        when(movieDao.getMovieById(movieId)).thenReturn(java.util.Optional.empty());
+        when(movieRepository.findById(movieId)).thenReturn(java.util.Optional.empty());
 
         assertThatThrownBy(() -> underTest.updateMovie(
                 new MovieUpdation("Hello", 100.0, 4.5, "New Description", "New Poster",
@@ -227,7 +227,7 @@ class MovieServiceImplTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Movie with ID '%s' not found".formatted(movieId));
 
-        verify(movieDao, never()).updateMovie(any());
+        verify(movieRepository, never()).save(any());
     }
 
 
@@ -248,7 +248,7 @@ class MovieServiceImplTest {
                 "movies");
         movie.setId(id);
 
-        when(movieDao.getMovieById(id)).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
 
         MovieUpdation movieUpdation = new MovieUpdation(
                 "testName", 200.0, 2.0, "A movie",
@@ -264,7 +264,7 @@ class MovieServiceImplTest {
     void updateMovieByIdThrowsIfNotExists() {
         long id = 1;
 
-        when(movieDao.getMovieById(id)).thenReturn(Optional.empty());
+        when(movieRepository.findById(id)).thenReturn(Optional.empty());
 
         MovieUpdation updation = new MovieUpdation(
                 "Name", 220.0, 3.30, "A good movie",
@@ -275,7 +275,7 @@ class MovieServiceImplTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Movie with ID '%s' not found".formatted(id));
 
-        verify(movieDao, never()).updateMovie(any());
+        verify(movieRepository, never()).save(any());
     }
 
     @Test
@@ -286,7 +286,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieDao.getMoviesByYear(year)).thenReturn(expectedMovies);
+        when(movieRepository.getMoviesByYear(year)).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.getMoviesByYear(year);
 
@@ -302,7 +302,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieDao.getMoviesByAgeRating(ageRating)).thenReturn(expectedMovies);
+        when(movieRepository.getMoviesByAgeRating(ageRating)).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.getMoviesByAgeRating(ageRating);
 
@@ -318,7 +318,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 10.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieDao.findByRatingGreaterThanEqual(rating)).thenReturn(expectedMovies);
+        when(movieRepository.findByRatingGreaterThanEqual(rating)).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findByRatingGreaterThanEqual(rating);
 
@@ -334,7 +334,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieDao.findByRatingLessThanEqual(rating)).thenReturn(expectedMovies);
+        when(movieRepository.findByRatingLessThanEqual(rating)).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findByRatingLessThanEqual(rating);
 
@@ -351,7 +351,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieDao.findByCostBetween(minCost, maxCost)).thenReturn(expectedMovies);
+        when(movieRepository.findByCostBetween(minCost, maxCost)).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findByCostBetween(minCost, maxCost);
 
@@ -366,7 +366,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieDao.findAllByOrderByNameAsc()).thenReturn(expectedMovies);
+        when(movieRepository.findAllByOrderByNameAsc()).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findAllByOrderByNameAsc();
 
@@ -381,7 +381,7 @@ class MovieServiceImplTest {
                 new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
-        when(movieDao.findAllByOrderByNameDesc()).thenReturn(expectedMovies);
+        when(movieRepository.findAllByOrderByNameDesc()).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findAllByOrderByNameDesc();
 
@@ -396,7 +396,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieDao.findAllByOrderByCostAsc()).thenReturn(expectedMovies);
+        when(movieRepository.findAllByOrderByCostAsc()).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findAllByOrderByCostAsc();
 
@@ -411,7 +411,7 @@ class MovieServiceImplTest {
                 new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
-        when(movieDao.findAllByOrderByCostDesc()).thenReturn(expectedMovies);
+        when(movieRepository.findAllByOrderByCostDesc()).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findAllByOrderByCostDesc();
 
@@ -426,7 +426,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieDao.findAllByOrderByRatingAsc()).thenReturn(expectedMovies);
+        when(movieRepository.findAllByOrderByRatingAsc()).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findAllByOrderByRatingAsc();
 
@@ -441,7 +441,7 @@ class MovieServiceImplTest {
                 new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
-        when(movieDao.findAllByOrderByRatingDesc()).thenReturn(expectedMovies);
+        when(movieRepository.findAllByOrderByRatingDesc()).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findAllByOrderByRatingDesc();
 
@@ -456,7 +456,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieDao.findAllByOrderByYearAsc()).thenReturn(expectedMovies);
+        when(movieRepository.findAllByOrderByYearAsc()).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findAllByOrderByYearAsc();
 
@@ -471,7 +471,7 @@ class MovieServiceImplTest {
                 new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
-        when(movieDao.findAllByOrderByYearDesc()).thenReturn(expectedMovies);
+        when(movieRepository.findAllByOrderByYearDesc()).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findAllByOrderByYearDesc();
 
@@ -486,7 +486,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieDao.findAllByOrderByGenreAsc()).thenReturn(expectedMovies);
+        when(movieRepository.findAllByOrderByGenreAsc()).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findAllByOrderByGenreAsc();
 
@@ -501,7 +501,7 @@ class MovieServiceImplTest {
                 new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
-        when(movieDao.findAllByOrderByGenreDesc()).thenReturn(expectedMovies);
+        when(movieRepository.findAllByOrderByGenreDesc()).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.findAllByOrderByGenreDesc();
 

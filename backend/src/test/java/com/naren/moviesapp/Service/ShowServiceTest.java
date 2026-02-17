@@ -1,6 +1,6 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Dao.ShowDao;
+import com.naren.moviesapp.Repo.ShowRepository;
 import com.naren.moviesapp.Entity.Show;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
@@ -30,12 +30,12 @@ import static org.mockito.Mockito.*;
 class ShowServiceTest {
 
     @Mock
-    private ShowDao showDao;
+    private ShowRepository showRepository;
     private ShowService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new ShowService(showDao);
+        underTest = new ShowService(showRepository);
     }
 
     @Test
@@ -45,13 +45,13 @@ class ShowServiceTest {
                 "http://poster.url", "PG-13", 2022,
                 "120 mins", "Drama");
 
-        when(showDao.existsByName("testName")).thenReturn(false);
+        when(showRepository.existsByName("testName")).thenReturn(false);
 
         underTest.addShow(registration);
 
         ArgumentCaptor<Show> showArgumentCaptor = ArgumentCaptor.forClass(Show.class);
 
-        verify(showDao).addShow(showArgumentCaptor.capture());
+        verify(showRepository).save(showArgumentCaptor.capture());
 
         Show captured = showArgumentCaptor.getValue();
 
@@ -75,14 +75,14 @@ class ShowServiceTest {
                 "http://poster.url", "PG-13", 2022,
                 "120 mins", "Drama");
 
-        when(showDao.existsByName("testName")).thenReturn(true);
+        when(showRepository.existsByName("testName")).thenReturn(true);
 
         assertThatThrownBy(
                 () -> underTest.addShow(registration))
                 .isInstanceOf(ResourceAlreadyExists.class)
                 .hasMessageContaining("Show name %s already exists".formatted(registration.name()));
 
-        verify(showDao, never()).addShow(any());
+        verify(showRepository, never()).save(any());
     }
 
     @Test
@@ -101,24 +101,24 @@ class ShowServiceTest {
                 "shows");
         show.setShow_id(id);
 
-        when(showDao.getShowById(id)).thenReturn(Optional.of(show));
+        when(showRepository.findById(id)).thenReturn(Optional.of(show));
 
         underTest.removeShow(id);
 
-        verify(showDao).removeShow(show);
+        verify(showRepository).delete(show);
     }
 
     @Test
     void throwsWhenShowRemovalIfNotExist() {
         long id = 1;
 
-        when(showDao.getShowById(id)).thenReturn(Optional.empty());
+        when(showRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.removeShow(id))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Show with ID %s not found".formatted(id));
 
-        verify(showDao, never()).removeShow(any());
+        verify(showRepository, never()).delete(any());
     }
 
     @Test
@@ -137,7 +137,7 @@ class ShowServiceTest {
                 "shows");
         show.setShow_id(id);
 
-        when(showDao.getShowById(id)).thenReturn(Optional.of(show));
+        when(showRepository.findById(id)).thenReturn(Optional.of(show));
 
         Show actual = underTest.getShowById(id);
 
@@ -148,7 +148,7 @@ class ShowServiceTest {
     void getShowByIdThrowsIfNotExists() {
         long id = 1;
 
-        when(showDao.getShowById(id)).thenReturn(Optional.empty());
+        when(showRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.getShowById(id))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -159,7 +159,7 @@ class ShowServiceTest {
     void getShowList() {
         underTest.getShowList();
 
-        verify(showDao).getShowList();
+        verify(showRepository).findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
     }
 
     @Test
@@ -179,7 +179,7 @@ class ShowServiceTest {
                 "shows");
         show.setShow_id(id);
 
-        when(showDao.getShowById(id)).thenReturn(Optional.of(show));
+        when(showRepository.findById(id)).thenReturn(Optional.of(show));
 
         ShowUpdation showUpdation = new ShowUpdation(
                 "testName2", 300.00, 5.0, "An awesome show",
@@ -190,7 +190,7 @@ class ShowServiceTest {
 
         ArgumentCaptor<Show> showArgumentCaptor = ArgumentCaptor.forClass(Show.class);
 
-        verify(showDao).updateShow(showArgumentCaptor.capture());
+        verify(showRepository).save(showArgumentCaptor.capture());
 
         Show updatedShow = showArgumentCaptor.getValue();
 
@@ -211,20 +211,20 @@ class ShowServiceTest {
         ShowUpdation update = new ShowUpdation(null, null, null, null, null, null, null, null, null);
         Long showId = 1L;
 
-        when(showDao.getShowById(showId)).thenReturn(java.util.Optional.ofNullable(show));
+        when(showRepository.findById(showId)).thenReturn(java.util.Optional.ofNullable(show));
 
         assertThatThrownBy
                 (() -> underTest.updateShow(update, showId))
                 .hasMessage("No data changes found");
 
-        verify(showDao, never()).updateShow(show);
+        verify(showRepository, never()).save(show);
     }
 
     @Test
     void testUpdateShowShowNotFound() {
         Long showId = 1L;
 
-        when(showDao.getShowById(showId)).thenReturn(java.util.Optional.empty());
+        when(showRepository.findById(showId)).thenReturn(java.util.Optional.empty());
 
         assertThatThrownBy(() -> underTest.updateShow(
                 new ShowUpdation("Hello", 100.0, 4.5, "New Description", "New Poster",
@@ -232,7 +232,7 @@ class ShowServiceTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Show not found");
 
-        verify(showDao, never()).updateShow(any());
+        verify(showRepository, never()).save(any());
     }
 
     @Test
@@ -252,7 +252,7 @@ class ShowServiceTest {
                 "shows");
         show.setShow_id(id);
 
-        when(showDao.getShowById(id)).thenReturn(Optional.of(show));
+        when(showRepository.findById(id)).thenReturn(Optional.of(show));
 
         ShowUpdation showUpdation = new ShowUpdation(
                 "testName", 200.0, 2.0, "A show",
@@ -268,7 +268,7 @@ class ShowServiceTest {
     void updateShowByIdThrowsIfNotExists() {
         long id = 1;
 
-        when(showDao.getShowById(id)).thenReturn(Optional.empty());
+        when(showRepository.findById(id)).thenReturn(Optional.empty());
 
         ShowUpdation updation = new ShowUpdation(
                 "Name", 220.0, 3.30, "A good show",
@@ -279,7 +279,7 @@ class ShowServiceTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Show not found");
 
-        verify(showDao, never()).updateShow(any());
+        verify(showRepository, never()).save(any());
     }
 
     @Test
@@ -290,7 +290,7 @@ class ShowServiceTest {
                 new Show("Show2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showDao.getShowsByYear(year)).thenReturn(expectedShows);
+        when(showRepository.getShowsByYear(year)).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.getShowsByYear(year);
 
@@ -306,7 +306,7 @@ class ShowServiceTest {
                 new Show("Show2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showDao.getShowsByAgeRating(ageRating)).thenReturn(expectedShows);
+        when(showRepository.getShowsByAgeRating(ageRating)).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.getShowsByAgeRating(ageRating);
 
@@ -322,7 +322,7 @@ class ShowServiceTest {
                 new Show("Show2", 10.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showDao.findByRatingGreaterThanEqual(rating)).thenReturn(expectedShows);
+        when(showRepository.findByRatingGreaterThanEqual(rating)).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findByRatingGreaterThanEqual(rating);
 
@@ -338,7 +338,7 @@ class ShowServiceTest {
                 new Show("Show2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showDao.findByRatingLessThanEqual(rating)).thenReturn(expectedShows);
+        when(showRepository.findByRatingLessThanEqual(rating)).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findByRatingLessThanEqual(rating);
 
@@ -355,7 +355,7 @@ class ShowServiceTest {
                 new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showDao.findByCostBetween(minCost, maxCost)).thenReturn(expectedShows);
+        when(showRepository.findByCostBetween(minCost, maxCost)).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findByCostBetween(minCost, maxCost);
 
@@ -370,7 +370,7 @@ class ShowServiceTest {
                 new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showDao.findAllByOrderByNameAsc()).thenReturn(expectedShows);
+        when(showRepository.findAllByOrderByNameAsc()).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findAllByOrderByNameAsc();
 
@@ -385,7 +385,7 @@ class ShowServiceTest {
                 new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
         );
 
-        when(showDao.findAllByOrderByNameDesc()).thenReturn(expectedShows);
+        when(showRepository.findAllByOrderByNameDesc()).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findAllByOrderByNameDesc();
 
@@ -400,7 +400,7 @@ class ShowServiceTest {
                 new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showDao.findAllByOrderByCostAsc()).thenReturn(expectedShows);
+        when(showRepository.findAllByOrderByCostAsc()).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findAllByOrderByCostAsc();
 
@@ -415,7 +415,7 @@ class ShowServiceTest {
                 new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
         );
 
-        when(showDao.findAllByOrderByCostDesc()).thenReturn(expectedShows);
+        when(showRepository.findAllByOrderByCostDesc()).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findAllByOrderByCostDesc();
 
@@ -430,7 +430,7 @@ class ShowServiceTest {
                 new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showDao.findAllByOrderByRatingAsc()).thenReturn(expectedShows);
+        when(showRepository.findAllByOrderByRatingAsc()).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findAllByOrderByRatingAsc();
 
@@ -445,7 +445,7 @@ class ShowServiceTest {
                 new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
         );
 
-        when(showDao.findAllByOrderByRatingDesc()).thenReturn(expectedShows);
+        when(showRepository.findAllByOrderByRatingDesc()).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findAllByOrderByRatingDesc();
 
@@ -460,7 +460,7 @@ class ShowServiceTest {
                 new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showDao.findAllByOrderByYearAsc()).thenReturn(expectedShows);
+        when(showRepository.findAllByOrderByYearAsc()).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findAllByOrderByYearAsc();
 
@@ -475,7 +475,7 @@ class ShowServiceTest {
                 new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
         );
 
-        when(showDao.findAllByOrderByYearDesc()).thenReturn(expectedShows);
+        when(showRepository.findAllByOrderByYearDesc()).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findAllByOrderByYearDesc();
 
@@ -490,7 +490,7 @@ class ShowServiceTest {
                 new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showDao.findAllByOrderByGenreAsc()).thenReturn(expectedShows);
+        when(showRepository.findAllByOrderByGenreAsc()).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findAllByOrderByGenreAsc();
 
@@ -505,7 +505,7 @@ class ShowServiceTest {
                 new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
         );
 
-        when(showDao.findAllByOrderByGenreDesc()).thenReturn(expectedShows);
+        when(showRepository.findAllByOrderByGenreDesc()).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.findAllByOrderByGenreDesc();
 

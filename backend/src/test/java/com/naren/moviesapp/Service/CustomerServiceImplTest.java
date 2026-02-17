@@ -1,13 +1,13 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Dao.CustomerDao;
-import com.naren.moviesapp.Dao.MovieDao;
+import com.naren.moviesapp.Repo.CustomerRepository;
+import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Role;
-import com.naren.moviesapp.Enum.RoleName;
+import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Exception.PasswordInvalidException;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
@@ -39,7 +39,7 @@ class CustomerServiceImplTest {
     private final CustomerDTOMapper customerDTOMapper = new CustomerDTOMapper();
 
     @Mock
-    private CustomerDao customerDao;
+    private CustomerRepository customerRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -47,7 +47,7 @@ class CustomerServiceImplTest {
     @Mock
     private JwtUtil jwtUtil;
     @Mock
-    private MovieDao movieDao;
+    private MovieRepository movieRepository;
 
     private CustomerService underTest;
 
@@ -57,8 +57,8 @@ class CustomerServiceImplTest {
     @BeforeEach
     void setUp() {
         underTest = new CustomerService(
-                customerDao, passwordEncoder, customerDTOMapper, roleService,
-                movieDao, jwtUtil, otpService);
+                customerRepository, passwordEncoder, customerDTOMapper, roleService,
+                movieRepository, jwtUtil, otpService);
 
     }
 
@@ -70,8 +70,8 @@ class CustomerServiceImplTest {
         CustomerRegistration registration = new CustomerRegistration("test",
                 email, password, "22222222222", "", false, "Chennai, India", false, false);
 
-        when(customerDao.existsByEmail(email)).thenReturn(false);
-        when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
+        when(customerRepository.existsByEmail(email)).thenReturn(false);
+        when(customerRepository.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
         when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
 
         Role role = new Role(RoleName.valueOf("ROLE_USER"));
@@ -81,7 +81,7 @@ class CustomerServiceImplTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
-        verify(customerDao).addCustomer(customerArgumentCaptor.capture());
+        verify(customerRepository).save(customerArgumentCaptor.capture());
 
         Customer capturedCustomer = customerArgumentCaptor.getValue();
         assertThat(capturedCustomer.getEmail()).isEqualTo(email);
@@ -103,8 +103,8 @@ class CustomerServiceImplTest {
         CustomerRegistration registration = new CustomerRegistration("admin",
                 email, password, "22222222222", "", false, "Chennai, India", false, false);
 
-        when(customerDao.existsByEmail(email)).thenReturn(false);
-        when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
+        when(customerRepository.existsByEmail(email)).thenReturn(false);
+        when(customerRepository.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
         when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
 
         Role role = new Role(RoleName.valueOf("ROLE_ADMIN"));
@@ -114,7 +114,7 @@ class CustomerServiceImplTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
-        verify(customerDao).addCustomer(customerArgumentCaptor.capture());
+        verify(customerRepository).save(customerArgumentCaptor.capture());
 
         Customer capturedCustomer = customerArgumentCaptor.getValue();
         assertThat(capturedCustomer.getEmail()).isEqualTo(email);
@@ -136,8 +136,8 @@ class CustomerServiceImplTest {
         CustomerRegistration registration = new CustomerRegistration("superadmin",
                 email, password, "22222222222", "", false, "Chennai, India", false, false);
 
-        when(customerDao.existsByEmail(email)).thenReturn(false);
-        when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
+        when(customerRepository.existsByEmail(email)).thenReturn(false);
+        when(customerRepository.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
         when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
 
         Role role = new Role(RoleName.valueOf("ROLE_SUPER_ADMIN"));
@@ -147,7 +147,7 @@ class CustomerServiceImplTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
-        verify(customerDao).addCustomer(customerArgumentCaptor.capture());
+        verify(customerRepository).save(customerArgumentCaptor.capture());
 
         Customer capturedCustomer = customerArgumentCaptor.getValue();
         assertThat(capturedCustomer.getEmail()).isEqualTo(email);
@@ -170,7 +170,7 @@ class CustomerServiceImplTest {
 
         assertThatThrownBy(() -> underTest.registerUser(registration, roleNames))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("No enum constant com.naren.moviesapp.Enum.RoleName.NON_EXISTENT_ROLE");
+                .hasMessageContaining("No enum constant com.naren.moviesapp.Entity.RoleName.NON_EXISTENT_ROLE");
     }
 
     @Test
@@ -181,7 +181,7 @@ class CustomerServiceImplTest {
                 .isInstanceOf(PasswordInvalidException.class)
                 .hasMessage("Password must not contain personal info [Name,Email,Phone] ");
 
-        verify(customerDao, never()).addCustomer(any());
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
@@ -192,13 +192,13 @@ class CustomerServiceImplTest {
                 .isInstanceOf(PasswordInvalidException.class)
                 .hasMessage("Password must be at least 8 characters long");
 
-        verify(customerDao, never()).addCustomer(any());
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
     void registerCustomerEmailAlreadyExistsThrowsException() {
         String email = "test@example.com";
-        when(customerDao.existsByEmail(email)).thenReturn(true);
+        when(customerRepository.existsByEmail(email)).thenReturn(true);
 
         CustomerRegistration registration = new CustomerRegistration("testName", email, "testpassword", "20220292232", "", false, "Chennai, India", false, false);
 
@@ -206,7 +206,7 @@ class CustomerServiceImplTest {
                 .isInstanceOf(ResourceAlreadyExists.class)
                 .hasMessage("Email already taken");
 
-        verify(customerDao, never()).addCustomer(any());
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
@@ -215,13 +215,13 @@ class CustomerServiceImplTest {
         CustomerRegistration registration =
                 new CustomerRegistration("testName", "test@example.com",
                         "testPassword", "1234567890", "", false, "Chennai, India", false, false);
-        when(customerDao.existsByPhoneNumber(registration.phoneNumber())).thenReturn(true);
+        when(customerRepository.existsByPhoneNumber(registration.phoneNumber())).thenReturn(true);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(ResourceAlreadyExists.class)
                 .hasMessage("Phone number already taken");
 
-        verify(customerDao, never()).addCustomer(any());
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
@@ -229,7 +229,7 @@ class CustomerServiceImplTest {
         long customerId = 1;
         Customer customer = new Customer(customerId, "Alex", "alex@example.com",
                 "password", "1234567890", false, false, false, "Chennai, India", false);
-        when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
         CustomerDTO result = underTest.getCustomerById(customerId);
 
@@ -242,13 +242,13 @@ class CustomerServiceImplTest {
     @Test
     void getCustomerByIdNonExistingCustomerIdThrowsException() {
         long nonExistingCustomerId = 100;
-        when(customerDao.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
+        when(customerRepository.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.getCustomerById(nonExistingCustomerId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Customer with ID 100 not found");
 
-        verify(customerDao).getCustomer(nonExistingCustomerId);
+        verify(customerRepository).findById(nonExistingCustomerId);
     }
 
     @Test
@@ -257,13 +257,13 @@ class CustomerServiceImplTest {
         Customer customer = new Customer(customerId, "testName", "test@example.com", "oldPassword", "20220292232", false, false, false, "Chennai, India", false);
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", "9999999999", "", false, "Chennai, India", false, false);
 
-        when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
-        when(customerDao.existsByEmail(updateRequest.email())).thenReturn(false);
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(customerRepository.existsByEmail(updateRequest.email())).thenReturn(false);
 
         underTest.updateCustomer(updateRequest, customerId);
 
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
-        verify(customerDao).updateCustomer(customerArgumentCaptor.capture());
+        verify(customerRepository).save(customerArgumentCaptor.capture());
 
         Customer updatedCustomer = customerArgumentCaptor.getValue();
         assertThat(updatedCustomer.getName()).isEqualTo("newName");
@@ -276,14 +276,14 @@ class CustomerServiceImplTest {
         long nonExistingCustomerId = 100;
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", "9999999999", "", false, "Chennai, India", false, false);
 
-        when(customerDao.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
+        when(customerRepository.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.updateCustomer(updateRequest, nonExistingCustomerId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Customer with ID 100 not found");
 
-        verify(customerDao).getCustomer(nonExistingCustomerId);
-        verify(customerDao, never()).updateCustomer(any());
+        verify(customerRepository).findById(nonExistingCustomerId);
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
@@ -292,8 +292,8 @@ class CustomerServiceImplTest {
         String existingEmail = "existing@example.com";
         Customer existingCustomer = new Customer(customerId, "John Doe", existingEmail, "password", "1234567890", false, false, false, "Chennai, India", false);
 
-        when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
-        when(customerDao.existsByEmail("new@example.com")).thenReturn(true);
+        when(customerRepository.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
+        when(customerRepository.existsByEmail("new@example.com")).thenReturn(true);
 
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", "new@example.com", "1234567890", "", false, "Chennai, India", false, false);
 
@@ -301,7 +301,7 @@ class CustomerServiceImplTest {
                 .isInstanceOf(ResourceAlreadyExists.class)
                 .hasMessage("Email already taken");
 
-        verify(customerDao, never()).updateCustomer(any());
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
@@ -311,7 +311,7 @@ class CustomerServiceImplTest {
         Customer existingCustomer = new Customer(customerId, "John Doe", existingEmail, "password", "1234567890",
                 "", false, "Chennai, India", false, false, false);
 
-        when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
+        when(customerRepository.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
 
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", existingEmail, "1234567890", "",
                 false, "Chennai, India", false, false);
@@ -320,7 +320,7 @@ class CustomerServiceImplTest {
                 .isInstanceOf(RequestValidationException.class)
                 .hasMessage("No data changes found");
 
-        verify(customerDao, never()).updateCustomer(any());
+        verify(customerRepository, never()).save(any());
     }
 
 
@@ -328,24 +328,24 @@ class CustomerServiceImplTest {
     void deleteCustomerSuccessfullyDeletesCustomer() {
         long customerId = 1;
         Customer customer = new Customer(customerId, "testName", "test@example.com", "password", "20220292232", false, false, false, "Chennai, India", false);
-        when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
         underTest.deleteCustomer(customerId);
 
-        verify(customerDao).deleteCustomer(customer);
+        verify(customerRepository).delete(customer);
     }
 
     @Test
     void deleteCustomerNonExistingCustomerIdThrowsException() {
         long nonExistingCustomerId = 100;
-        when(customerDao.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
+        when(customerRepository.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.deleteCustomer(nonExistingCustomerId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Customer with ID 100 not found");
 
-        verify(customerDao).getCustomer(nonExistingCustomerId);
-        verify(customerDao, never()).deleteCustomer(any());
+        verify(customerRepository).findById(nonExistingCustomerId);
+        verify(customerRepository, never()).delete(any());
     }
 
     @Test
@@ -437,14 +437,14 @@ class CustomerServiceImplTest {
                 "movies");
         movie.setId(1L);
 
-        when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
-        when(movieDao.getMovieById(1L)).thenReturn(Optional.of(movie));
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
 
         underTest.addMovieToCustomer(customer.getId(), movie.getId());
 
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
 
-        verify(customerDao).updateCustomer(customerArgumentCaptor.capture());
+        verify(customerRepository).save(customerArgumentCaptor.capture());
 
         Customer updated = customerArgumentCaptor.getValue();
 
@@ -468,8 +468,8 @@ class CustomerServiceImplTest {
                 "movies");
         movie.setId(1L);
 
-        when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
-        when(movieDao.getMovieById(1L)).thenReturn(Optional.of(movie));
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
 
         customer.setMovies(List.of(movie));
 
@@ -477,7 +477,7 @@ class CustomerServiceImplTest {
                 .isInstanceOf(ResourceAlreadyExists.class)
                 .hasMessage("Customer " + customer.getId() + " already subscribed to movie " + movie.getId());
 
-        verify(customerDao, never()).updateCustomer(any());
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
@@ -496,8 +496,8 @@ class CustomerServiceImplTest {
                 "movies");
         movie.setId(1L);
 
-        when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
-        when(movieDao.getMovieById(1L)).thenReturn(Optional.of(movie));
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
 
         customer.addMovie(movie);
 
@@ -506,7 +506,7 @@ class CustomerServiceImplTest {
         underTest.removeMovieFromCustomer(1L, 1L);
 
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
-        verify(customerDao).updateCustomer(customerArgumentCaptor.capture());
+        verify(customerRepository).save(customerArgumentCaptor.capture());
 
         Customer updatedCustomer = customerArgumentCaptor.getValue();
 
@@ -529,8 +529,8 @@ class CustomerServiceImplTest {
                 "movies");
         movie.setId(1L);
 
-        when(customerDao.getCustomer(1L)).thenReturn(Optional.of(customer));
-        when(movieDao.getMovieById(1L)).thenReturn(Optional.of(movie));
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
 
         assertThat(customer.getMovies()).doesNotContain(movie);
 
@@ -538,24 +538,24 @@ class CustomerServiceImplTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("not subscribed to");
 
-        verify(customerDao, never()).updateCustomer(customer);
+        verify(customerRepository, never()).updateCustomer(customer);
     }
 
     @Test
     void removeMovieFromCustomerCustomerNotFoundThrowsResourceNotFoundException() {
-        when(customerDao.getCustomer(1L)).thenReturn(Optional.empty());
+        when(customerRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.removeMovieFromCustomer(1L, 1L))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Customer with ID 1 not found");
 
-        verify(movieDao, never()).getMovieById(1L);
+        verify(movieRepository, never()).findById(1L);
     }
 
     @Test
     void getAllCustomers() {
         underTest.getAllCustomers();
-        verify(customerDao).getCustomerList();
+        verify(customerRepository).findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
     }
 
 
@@ -572,14 +572,14 @@ class CustomerServiceImplTest {
         movies.add(movie1);
         customer.setMovies(movies);
 
-        when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
         // Call the service method
         underTest.removeAllMovies(customerId);
 
         // Verify
-        verify(customerDao, times(1)).getCustomer(customerId);
-        verify(customerDao, times(1)).updateCustomer(customer);
+        verify(customerRepository, times(1)).findById(customerId);
+        verify(customerRepository, times(1)).save(customer);
         assertEquals(0, customer.getMovies().size());
     }
 
@@ -587,14 +587,14 @@ class CustomerServiceImplTest {
     @Test
     public void testRemoveAllMovies_customerNotFound() {
         Long customerId = 1L;
-        when(customerDao.getCustomer(customerId)).thenReturn(Optional.empty());
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.removeAllMovies(customerId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Customer with ID " + customerId + " not found");
 
-        verify(customerDao, times(1)).getCustomer(customerId);
-        verify(customerDao, never()).updateCustomer(any());
+        verify(customerRepository, times(1)).findById(customerId);
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
@@ -604,13 +604,13 @@ class CustomerServiceImplTest {
         customer.setId(customerId);
         customer.setMovies(new ArrayList<Movie>());
 
-        when(customerDao.getCustomer(customerId)).thenReturn(Optional.of(customer));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
         assertThatThrownBy(() -> underTest.removeAllMovies(customerId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Customer " + customerId + " not subscribed to any movie");
 
-        verify(customerDao, times(1)).getCustomer(customerId);
-        verify(customerDao, never()).updateCustomer(any());
+        verify(customerRepository, times(1)).findById(customerId);
+        verify(customerRepository, never()).save(any());
     }
 }

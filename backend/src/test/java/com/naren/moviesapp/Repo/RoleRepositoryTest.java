@@ -1,7 +1,7 @@
 package com.naren.moviesapp.Repo;
 
 import com.naren.moviesapp.Entity.Role;
-import com.naren.moviesapp.Enum.RoleName;
+import com.naren.moviesapp.Entity.RoleName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

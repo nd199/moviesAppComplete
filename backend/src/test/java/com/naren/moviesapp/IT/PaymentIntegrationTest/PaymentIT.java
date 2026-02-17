@@ -4,7 +4,7 @@ import com.github.javafaker.Faker;
 import com.naren.moviesapp.AbstractIntegrationTest;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.SubscriptionPlan;
-import com.naren.moviesapp.Enum.RoleName;
+import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Repo.RoleRepository;
 import com.naren.moviesapp.Repo.SubscriptionPlanRepository;

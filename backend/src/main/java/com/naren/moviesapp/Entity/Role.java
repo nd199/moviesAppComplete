@@ -1,7 +1,6 @@
 package com.naren.moviesapp.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.naren.moviesapp.Enum.RoleName;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

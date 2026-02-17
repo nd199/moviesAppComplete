@@ -1,11 +1,11 @@
 package com.naren.moviesapp.Auth;
 
-import com.naren.moviesapp.Dao.CustomerDao;
+import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Role;
-import com.naren.moviesapp.Enum.RoleName;
+import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Exception.*;
 import com.naren.moviesapp.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final CustomerDTOMapper customerDTOMapper;
     private final JwtUtil jwtUtil;
-    private final CustomerDao customerDao;
+    private final CustomerRepository customerRepository;
 
     public AuthResponse login(AuthRequest authRequest) {
 
@@ -42,7 +42,7 @@ public class AuthService {
 
             if (!Boolean.TRUE.equals(customer.getIsLogged())) {
                 customer.setIsLogged(true);
-                customerDao.updateCustomer(customer);
+                customerRepository.save(customer);
             }
 
             String token = generateTokenForUser(customer);
@@ -88,7 +88,7 @@ public class AuthService {
 
     private void validateAccountState(Customer customer) {
 
-        if (!customerDao.existsByEmail(customer.getEmail())) {
+        if (!customerRepository.existsByEmail(customer.getEmail())) {
             throw new ResourceNotFoundException(
                     "Account not found. Please check your email or register for a new account."
             );

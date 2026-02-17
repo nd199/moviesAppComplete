@@ -1,6 +1,6 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Dao.MovieDao;
+import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
@@ -15,20 +15,20 @@ import java.util.List;
 @Transactional
 @Service
 public class MovieService implements MovieServiceInterface {
-    private final MovieDao movieDao;
+    private final MovieRepository movieRepository;
 
-    public MovieService(MovieDao movieDao) {
-        this.movieDao = movieDao;
+    public MovieService(MovieRepository movieRepository) {
+        this.movieRepository = movieRepository;
     }
 
     @Override
     public Movie addMovie(MovieRegistration registration) {
         Movie movie = createMovie(registration);
-        if (movieDao.existsByName(registration.name())) {
+        if (movieRepository.existsByName(registration.name())) {
             String errorMessage = "Movie name %s already exists".formatted(registration.name());
             throw new ResourceAlreadyExists(errorMessage);
         }
-        Movie savedMovie = movieDao.addMovie(movie);
+        Movie savedMovie = movieRepository.save(movie);
         return savedMovie;
     }
 
@@ -48,23 +48,23 @@ public class MovieService implements MovieServiceInterface {
 
     @Override
     public void removeMovie(Long id) {
-        Movie movie = movieDao.getMovieById(id)
+        Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> {
                     String errorMessage = "Movie with ID %s not found".formatted(id);
                     return new ResourceNotFoundException(errorMessage);
                 });
-        movieDao.removeMovie(movie);
+        movieRepository.delete(movie);
     }
 
     @Override
     public List<Movie> getMovieList() {
-        List<Movie> movies = movieDao.getMovieList();
+        List<Movie> movies = movieRepository.findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
         return movies;
     }
 
     @Override
     public Movie getMovieById(Long id) {
-        return movieDao.getMovieById(id)
+        return movieRepository.findById(id)
                 .orElseThrow(() -> {
                     String errorMessage = "Movie with ID '%s' not found".formatted(id);
                     return new ResourceNotFoundException(errorMessage);
@@ -117,82 +117,82 @@ public class MovieService implements MovieServiceInterface {
         if (!changes) {
             throw new RequestValidationException("No data changes found");
         }
-        movieDao.updateMovie(movie);
+        movieRepository.save(movie);
         return movie;
     }
 
     @Override
     public List<Movie> getMoviesByYear(Integer year) {
-        return movieDao.getMoviesByYear(year);
+        return movieRepository.getMoviesByYear(year);
     }
 
     @Override
     public List<Movie> getMoviesByAgeRating(String ageRating) {
-        return movieDao.getMoviesByAgeRating(ageRating);
+        return movieRepository.getMoviesByAgeRating(ageRating);
     }
 
     @Override
     public List<Movie> findByRatingGreaterThanEqual(Double rating) {
-        return movieDao.findByRatingGreaterThanEqual(rating);
+        return movieRepository.findByRatingGreaterThanEqual(rating);
     }
 
     @Override
     public List<Movie> findByRatingLessThanEqual(Double rating) {
-        return movieDao.findByRatingLessThanEqual(rating);
+        return movieRepository.findByRatingLessThanEqual(rating);
     }
 
     @Override
     public List<Movie> findByCostBetween(Double minCost, Double maxCost) {
-        return movieDao.findByCostBetween(minCost, maxCost);
+        return movieRepository.findByCostBetween(minCost, maxCost);
     }
 
     @Override
     public List<Movie> findAllByOrderByNameAsc() {
-        return movieDao.findAllByOrderByNameAsc();
+        return movieRepository.findAllByOrderByNameAsc();
     }
 
     @Override
     public List<Movie> findAllByOrderByNameDesc() {
-        return movieDao.findAllByOrderByNameDesc();
+        return movieRepository.findAllByOrderByNameDesc();
     }
 
     @Override
     public List<Movie> findAllByOrderByCostAsc() {
-        return movieDao.findAllByOrderByCostAsc();
+        return movieRepository.findAllByOrderByCostAsc();
     }
 
     @Override
     public List<Movie> findAllByOrderByCostDesc() {
-        return movieDao.findAllByOrderByCostDesc();
+        return movieRepository.findAllByOrderByCostDesc();
     }
 
     @Override
     public List<Movie> findAllByOrderByRatingAsc() {
-        return movieDao.findAllByOrderByRatingAsc();
+        return movieRepository.findAllByOrderByRatingAsc();
     }
 
     @Override
     public List<Movie> findAllByOrderByRatingDesc() {
-        return movieDao.findAllByOrderByRatingDesc();
+        return movieRepository.findAllByOrderByRatingDesc();
     }
 
     @Override
     public List<Movie> findAllByOrderByYearAsc() {
-        return movieDao.findAllByOrderByYearAsc();
+        return movieRepository.findAllByOrderByYearAsc();
     }
 
     @Override
     public List<Movie> findAllByOrderByYearDesc() {
-        return movieDao.findAllByOrderByYearDesc();
+        return movieRepository.findAllByOrderByYearDesc();
     }
 
     @Override
     public List<Movie> findAllByOrderByGenreAsc() {
-        return movieDao.findAllByOrderByGenreAsc();
+        return movieRepository.findAllByOrderByGenreAsc();
     }
 
     @Override
     public List<Movie> findAllByOrderByGenreDesc() {
-        return movieDao.findAllByOrderByGenreDesc();
+        return movieRepository.findAllByOrderByGenreDesc();
     }
 }

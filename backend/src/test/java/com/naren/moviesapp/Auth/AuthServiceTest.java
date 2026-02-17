@@ -1,11 +1,11 @@
 package com.naren.moviesapp.Auth;
 
-import com.naren.moviesapp.Dao.CustomerDao;
+import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Role;
-import com.naren.moviesapp.Enum.RoleName;
+import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Exception.InvalidCredentialsException;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.TestData.TestDataFactory;
@@ -42,7 +42,7 @@ class AuthServiceTest {
     private JwtUtil jwtUtil;
 
     @Mock
-    private CustomerDao customerDao;
+    private CustomerRepository customerRepository;
 
     @Mock
     private Authentication authentication;
@@ -74,7 +74,7 @@ class AuthServiceTest {
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
                 .thenReturn(principal);
-        when(customerDao.existsByEmail(principal.getEmail()))
+        when(customerRepository.existsByEmail(principal.getEmail()))
                 .thenReturn(true);
 
         CustomerDTO mapped = buildDTO("ROLE_USER");
@@ -88,7 +88,7 @@ class AuthServiceTest {
         assertThat(response.customerDTO()).isEqualTo(mapped);
         assertThat(response.token()).isEqualTo("jwt-token");
 
-        verify(customerDao).updateCustomer(principal);
+        verify(customerRepository).save(principal);
         verify(jwtUtil).issueToken(eq(mapped.email()), anySet());
     }
 
@@ -101,7 +101,7 @@ class AuthServiceTest {
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
                 .thenReturn(principal);
-        when(customerDao.existsByEmail(principal.getEmail()))
+        when(customerRepository.existsByEmail(principal.getEmail()))
                 .thenReturn(true);
 
         CustomerDTO mapped = buildDTO("ROLE_ADMIN");
@@ -115,7 +115,7 @@ class AuthServiceTest {
         assertThat(response.customerDTO()).isEqualTo(mapped);
         assertThat(response.token()).isEqualTo("jwt-token");
 
-        verify(customerDao, never()).updateCustomer(any());
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
@@ -125,7 +125,7 @@ class AuthServiceTest {
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
                 .thenReturn(principal);
-        when(customerDao.existsByEmail(principal.getEmail()))
+        when(customerRepository.existsByEmail(principal.getEmail()))
                 .thenReturn(false);
 
         assertThatThrownBy(() ->
@@ -159,7 +159,7 @@ class AuthServiceTest {
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
                 .thenReturn(principal);
-        when(customerDao.existsByEmail(principal.getEmail()))
+        when(customerRepository.existsByEmail(principal.getEmail()))
                 .thenReturn(true);
 
         CustomerDTO mapped = buildDTO("ROLE_SUPER_ADMIN");
@@ -173,7 +173,7 @@ class AuthServiceTest {
         assertThat(response.customerDTO().roles())
                 .contains("ROLE_SUPER_ADMIN");
 
-        verify(customerDao).updateCustomer(principal);
+        verify(customerRepository).save(principal);
         verify(jwtUtil).issueToken(eq(mapped.email()), anySet());
     }
 

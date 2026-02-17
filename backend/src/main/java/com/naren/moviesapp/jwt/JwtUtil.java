@@ -1,5 +1,6 @@
 package com.naren.moviesapp.jwt;
 
+import com.naren.moviesapp.Config.RolePermissionMapper;
 import com.naren.moviesapp.Entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -8,6 +9,8 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -53,15 +56,30 @@ public class JwtUtil {
     }
 
     public String issueToken(String subject, Set<Role> roles) {
-        List<String> roleNames = roles.stream()
-                .map(role -> role.getName().name())
-                .toList();
+        Set<String> authorities = new HashSet<>();
 
+        roles.forEach(role -> {
+            authorities.add(role.getName().name());
+            RolePermissionMapper.getPermissions(role.getName())
+                    .forEach(permission -> authorities
+                            .add(permission.name()));
+        });
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", roleNames);
+        claims.put("authorities", authorities);
         claims.put("type", "access");
 
         return issueToken(subject, claims);
+    }
+
+    public Collection<? extends GrantedAuthority> getAuthorities(String token) {
+        Claims claims = getClaims(token);
+        List<String> authorities = claims.get("authorities", List.class);
+        if (authorities == null) {
+            return Collections.emptyList();
+        }
+        return authorities.stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
     private Claims getClaims(String token) {
