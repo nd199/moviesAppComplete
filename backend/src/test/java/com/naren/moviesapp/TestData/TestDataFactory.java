@@ -2,7 +2,6 @@ package com.naren.moviesapp.TestData;
 
 import com.github.javafaker.Faker;
 import com.naren.moviesapp.Entity.*;
-import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Record.*;
 
 import java.time.Instant;

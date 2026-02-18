@@ -1,12 +1,13 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Repo.ShowRepository;
 import com.naren.moviesapp.Entity.Show;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.ShowRegistration;
 import com.naren.moviesapp.Record.ShowUpdation;
+import com.naren.moviesapp.Repo.ShowRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ public class ShowService implements ShowServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('MOVIE_WRITE')")
     public Show addShow(ShowRegistration registration) {
         Show show = createShow(registration);
         if (showRepository.existsByName(registration.name())) {
@@ -47,6 +49,7 @@ public class ShowService implements ShowServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('MOVIE_DELETE')")
     public void removeShow(Long id) {
         Show show = showRepository.findById(id)
                 .orElseThrow(() -> {
@@ -57,6 +60,7 @@ public class ShowService implements ShowServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('MOVIE_READ')")
     public Show getShowById(Long id) {
         return showRepository.findById(id)
                 .orElseThrow(() -> {
@@ -66,12 +70,14 @@ public class ShowService implements ShowServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('MOVIE_READ')")
     public List<Show> getShowList() {
         List<Show> shows = showRepository.findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
         return shows;
     }
 
     @Override
+    @PreAuthorize("hasPermission('MOVIE_WRITE')")
     public Show updateShow(ShowUpdation update, Long showId) {
         Show show = showRepository.findById(showId)
                 .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
@@ -125,12 +131,12 @@ public class ShowService implements ShowServiceInterface {
 
     @Override
     public List<Show> getShowsByYear(Integer year) {
-        return showRepository.getShowsByYear(year);
+        return showRepository.findByYear(year);
     }
 
     @Override
     public List<Show> getShowsByAgeRating(String ageRating) {
-        return showRepository.getShowsByAgeRating(ageRating);
+        return showRepository.findByAgeRating(ageRating);
     }
 
     @Override

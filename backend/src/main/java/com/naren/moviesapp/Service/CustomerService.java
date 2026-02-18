@@ -1,7 +1,5 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Repo.CustomerRepository;
-import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Dto.CustomerStatsDTO;
@@ -14,6 +12,8 @@ import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Record.CustomerSubscription;
 import com.naren.moviesapp.Record.CustomerUpdateRequest;
 import com.naren.moviesapp.Record.EmailVerificationRequest;
+import com.naren.moviesapp.Repo.CustomerRepository;
+import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Utils.OtpService;
 import com.naren.moviesapp.jwt.JwtUtil;
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('USER_MANAGE')")
     public void addRole(Role role) {
         if (role == null) {
             throw new ResourceNotFoundException("Role cannot be null");
@@ -68,19 +68,19 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('USER_READ')")
     public List<Role> getRoles() {
         return roleService.getAllRoles();
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('USER_READ')")
     public Role getRoleById(Long id) {
         return roleService.findRoleById(id);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('USER_MANAGE')")
     public void removeRole(Long id) {
         Role role = getRoleById(id);
         if (role == null) {
@@ -90,7 +90,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('USER_MANAGE')")
     @Transactional
     public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration, Set<String> roleNames) {
 
@@ -180,7 +180,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('USER_READ')")
     public CustomerDTO getCustomerById(Long customerId) {
         return customerRepository.findById(customerId)
                 .map(customerDTOMapper)
@@ -190,7 +190,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('USER_MANAGE')")
     @Transactional
     public CustomerDTO updateCustomer(CustomerUpdateRequest request, Long id) {
 
@@ -241,7 +241,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN') or #email == authentication.principal.username")
+    @PreAuthorize("hasPermission('USER_MANAGE') or #email == authentication.principal.username")
     @Transactional
     public void updatePassword(String email, String newPassword) {
         logger.info("Password update request for email: {}", email);
@@ -272,7 +272,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('USER_READ')")
     public List<CustomerDTO> getAllCustomers() {
         List<CustomerDTO> customers = customerRepository.findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent()
                 .stream()
@@ -282,7 +282,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('USER_MANAGE')")
     @Transactional
     public void deleteCustomer(Long customerId) {
 
@@ -298,6 +298,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('USER_MANAGE') or #customerId == authentication.principal.id")
     public void addMovieToCustomer(Long customerId, Long movieId) {
 
         Customer customer = customerRepository.findById(customerId)
@@ -319,6 +320,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('USER_MANAGE') or #customerId == authentication.principal.id")
     public void removeMovieFromCustomer(Long customerId, Long movieId) {
 
         Customer customer = customerRepository.findById(customerId)
@@ -339,6 +341,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('USER_MANAGE') or #customerId == authentication.principal.id")
     public void removeAllMovies(Long customerId) {
 
         Customer customer = customerRepository.findById(customerId)
@@ -358,7 +361,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('USER_READ')")
     public List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn) {
         List<Customer> customers = customerRepository.getCustomersByIsLogged(isLoggedIn);
         if (customers.isEmpty()) {
@@ -369,7 +372,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN') or #email == authentication.principal.username")
+    @PreAuthorize("hasPermission('USER_READ') or #email == authentication.principal.username")
     public CustomerDTO getCustomerByEmail(String email) {
         return customerRepository.findCustomerByEmail(email).map((customerDTOMapper))
                 .orElseThrow(
@@ -379,6 +382,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('USER_READ')")
     public CustomerDTO getCustomerByPhoneNumber(String phoneNumber) {
         return customerRepository.getCustomerByPhoneNumber(phoneNumber)
                 .map(customerDTOMapper).orElseThrow(
@@ -387,12 +391,13 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('USER_READ')")
     public void generateAndSendMailOtp(EmailVerificationRequest emailVerificationRequest) {
         otpService.generateAndSendMailOtp(emailVerificationRequest.email());
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('USER_READ')")
     public List<CustomerDTO> getLatestCustomerList() {
         return customerRepository.getCustomersByTop5()
                 .stream().map(customerDTOMapper)
@@ -400,7 +405,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasPermission('VIEW_REPORTS')")
     public List<CustomerStatsDTO> getCustomerStats() {
         return customerRepository.getCustomerCountByEachMonthInYear()
                 .stream()

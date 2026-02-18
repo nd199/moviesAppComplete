@@ -108,28 +108,28 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(
                                 "/api/v1/customers/**",
                                 "/api/v1/roles/**"
-                        ).hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        ).hasAuthority("USER_MANAGE")
 
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/movies",
                                 "/api/v1/shows"
-                        ).hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        ).hasAuthority("MOVIE_WRITE")
 
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/v1/movies/**",
                                 "/api/v1/shows/**"
-                        ).hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        ).hasAuthority("MOVIE_WRITE")
 
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/v1/movies/**",
                                 "/api/v1/shows/**"
-                        ).hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        ).hasAuthority("MOVIE_DELETE")
 
                         /* ================= SUPER ADMIN ================= */
 
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/admin/create"
-                        ).hasRole("SUPER_ADMIN")
+                        ).hasAuthority("SYSTEM_CONFIG")
 
                         .anyRequest().authenticated()
                 )

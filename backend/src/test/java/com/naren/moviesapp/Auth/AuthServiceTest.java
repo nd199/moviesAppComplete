@@ -1,6 +1,5 @@
 package com.naren.moviesapp.Auth;
 
-import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Customer;
@@ -8,6 +7,7 @@ import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Exception.InvalidCredentialsException;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
+import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.TestData.TestDataFactory;
 import com.naren.moviesapp.jwt.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;

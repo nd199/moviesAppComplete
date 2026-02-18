@@ -1,9 +1,9 @@
 package com.naren.moviesapp.Config;
 
-import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;
+import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +30,6 @@ public class SuperAdminSeeder {
     public CommandLineRunner seedSuperAdmin() {
         return args -> {
 
-            // Get the ROLE_SUPER_ADMIN that should already be created by MoviesApplication
             Role superRole = roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN)
                     .orElseThrow(() -> new RuntimeException("ROLE_SUPER_ADMIN not found. Make sure MoviesApplication.createRole() runs first."));
 
@@ -41,12 +40,14 @@ public class SuperAdminSeeder {
                 superAdmin.setName("Super Admin");
                 superAdmin.setEmail(superAdminEmail);
                 superAdmin.setPassword(passwordEncoder.encode(superAdminPassword));
+                superAdmin.setPhoneNumber("0000000000");
+                superAdmin.setAddress("System Default");
                 superAdmin.setIsEmailVerified(true);
                 superAdmin.setIsRegistered(true);
                 superAdmin.setIsLogged(false);
+                superAdmin.setIsSubscribed(false);
                 superAdmin.getRoles().add(superRole);
                 customerRepository.save(superAdmin);
-                System.out.println("✅ Super Admin Created Successfully: " + superAdminEmail);
             } else {
                 boolean hasSuperRole = existingSuperAdmin.getRoles().stream()
                         .anyMatch(role -> role.getName() == RoleName.ROLE_SUPER_ADMIN);
@@ -54,9 +55,6 @@ public class SuperAdminSeeder {
                 if (!hasSuperRole) {
                     existingSuperAdmin.getRoles().add(superRole);
                     customerRepository.save(existingSuperAdmin);
-                    System.out.println("✅ Super Admin Role Added Successfully: " + superAdminEmail);
-                } else {
-                    System.out.println("✅ Super Admin already exists with proper role: " + superAdminEmail);
                 }
             }
         };

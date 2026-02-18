@@ -1,12 +1,13 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.MovieRegistration;
 import com.naren.moviesapp.Record.MovieUpdation;
+import com.naren.moviesapp.Repo.MovieRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ public class MovieService implements MovieServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('MOVIE_WRITE')")
     public Movie addMovie(MovieRegistration registration) {
         Movie movie = createMovie(registration);
         if (movieRepository.existsByName(registration.name())) {
@@ -47,6 +49,7 @@ public class MovieService implements MovieServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('MOVIE_DELETE')")
     public void removeMovie(Long id) {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> {
@@ -57,12 +60,14 @@ public class MovieService implements MovieServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('MOVIE_READ')")
     public List<Movie> getMovieList() {
         List<Movie> movies = movieRepository.findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
         return movies;
     }
 
     @Override
+    @PreAuthorize("hasPermission('MOVIE_READ')")
     public Movie getMovieById(Long id) {
         return movieRepository.findById(id)
                 .orElseThrow(() -> {
@@ -72,6 +77,7 @@ public class MovieService implements MovieServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasPermission('MOVIE_WRITE')")
     public Movie updateMovie(MovieUpdation update, Long movieId) {
         Movie movie = getMovieById(movieId);
 
@@ -123,12 +129,12 @@ public class MovieService implements MovieServiceInterface {
 
     @Override
     public List<Movie> getMoviesByYear(Integer year) {
-        return movieRepository.getMoviesByYear(year);
+        return movieRepository.findByYear(year);
     }
 
     @Override
     public List<Movie> getMoviesByAgeRating(String ageRating) {
-        return movieRepository.getMoviesByAgeRating(ageRating);
+        return movieRepository.findByAgeRating(ageRating);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.naren.moviesapp;
 
 import com.github.javafaker.Faker;
 import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.BeforeAll;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -22,9 +21,7 @@ public abstract class AbstractIntegrationTest {
                     .withPassword("test_password")
                     .withReuse(true); // Enable reuse for integration tests
 
-    @BeforeAll
-    static void setupDatabase() {
-        // Wait for container to be ready
+    static {
         postgresContainer.start();
 
         Flyway flyway = Flyway

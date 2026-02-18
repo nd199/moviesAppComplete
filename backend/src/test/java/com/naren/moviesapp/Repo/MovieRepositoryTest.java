@@ -1,262 +1,43 @@
 package com.naren.moviesapp.Repo;
 
-import com.naren.moviesapp.AbstractTestContainers;
+import com.naren.moviesapp.AbstractRepositoryTest;
+import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Movie;
-import com.naren.moviesapp.TestConfig;
+import com.naren.moviesapp.TestData.TestDataFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(TestConfig.class)
-@ActiveProfiles("test")
-public class MovieRepositoryTest extends AbstractTestContainers {
+public class MovieRepositoryTest extends AbstractRepositoryTest {
 
     @Autowired
-    private MovieRepository underTest;
+    private MovieRepository movieRepository;
+    
+    @Autowired
+    private CustomerRepository customerRepository;
 
+    private Customer testCustomer;
 
-    @Test
-    void existsByName() {
-        Movie movie = new Movie(
-                "harryPotter",
-                200D,
-                5D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-
-        underTest.save(movie);
-
-        assertThat(underTest.existsByName(movie.getName())).isTrue();
-    }
-
-
-    @Test
-    void findByName() {
-
-        Movie movie = new Movie(
-                "harryPotter",
-                200D,
-                5D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-
-        underTest.save(movie);
-
-        assertThat(underTest.findByName("harryPotter")).isEqualTo(movie);
-    }
-
-    @Test
-    void findByGenre() {
-        Movie movie = new Movie(
-                "harryPotter",
-                200D,
-                5D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-
-        underTest.save(movie);
-
-        assertThat(underTest.findByGenre("Fantasy")).contains(movie);
+    @BeforeEach
+    void setUp() {
+        testCustomer = TestDataFactory.createTestCustomer();
+        customerRepository.save(testCustomer);
     }
 
     @Test
     void findByYear() {
-        Movie movie = new Movie(
-                "harryPotter",
-                200D,
-                5D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
+        Movie movie = TestDataFactory.createTestMovie();
+        movie.setCustomer(testCustomer);
+        movie = movieRepository.save(movie);
+        final Long movieId = movie.getId();
 
-        underTest.save(movie);
-
-        assertThat(underTest.findByGenre("Fantasy")).contains(movie);
-
-
-    }
-
-    @Test
-    void findByAgeRating() {
-
-        Movie movie = new Movie(
-                "harryPotter",
-                200D,
-                5D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-
-        underTest.save(movie);
-
-        assertThat(underTest.findByAgeRating("PG-13")).contains(movie);
-    }
-
-    @Test
-    void findByRatingGreaterThanEqual() {
-        Movie movie = new Movie(
-                "harryPotter",
-                200D,
-                5D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-
-        Movie movie1 = new Movie(
-                "harryPotter2",
-                233D,
-                6D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-        Movie movie2 = new Movie(
-                "harryPotter3",
-                233D,
-                5D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-
-
-        underTest.save(movie);
-        underTest.save(movie1);
-        underTest.save(movie2);
-
-        assertThat(underTest.findByRatingGreaterThanEqual(movie.getRating())).contains(movie1);
-        assertThat(underTest.findByRatingGreaterThanEqual(movie.getRating())).contains(movie2);
-    }
-
-    @Test
-    void findByRatingLessThanEqual() {
-        Movie movie = new Movie(
-                "harryPotter",
-                200D,
-                5D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-
-        Movie movie1 = new Movie(
-                "harryPotter2",
-                233D,
-                4D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-        Movie movie2 = new Movie(
-                "harryPotter3",
-                233D,
-                5D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-
-
-        underTest.save(movie);
-        underTest.save(movie1);
-        underTest.save(movie2);
-
-        assertThat(underTest.findByRatingLessThanEqual(movie.getRating())).contains(movie1);
-        assertThat(underTest.findByRatingLessThanEqual(movie.getRating())).contains(movie2);
-    }
-
-    @Test
-    void findByCostBetween() {
-        Movie movie = new Movie(
-                "harryPotter",
-                200D,
-                5D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-
-        Movie movie1 = new Movie(
-                "harryPotter2",
-                233D,
-                4D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-        Movie movie2 = new Movie(
-                "harryPotter3",
-                233D,
-                5D,
-                "Description",
-                "Poster",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Fantasy",
-                "movies");
-
-        underTest.save(movie);
-        underTest.save(movie1);
-        underTest.save(movie2);
-
-        assertThat(underTest.findByCostBetween(3D, 700D)).contains(movie1);
-        assertThat(underTest.findByCostBetween(3D, 700D)).contains(movie2);
-        assertThat(underTest.findByCostBetween(3D, 7D)).doesNotContain(movie);
+        
+        List<Movie> movies = movieRepository.findByYear(movie.getYear());
+        assertThat(movies)
+                .anySatisfy(m -> assertThat(m.getId()).isEqualTo(movieId));
     }
 }

@@ -18,11 +18,22 @@ public class RolePermissionMapper {
             case ROLE_ADMIN -> Set.of(
                     Permission.MOVIE_READ,
                     Permission.MOVIE_WRITE,
+                    Permission.MOVIE_DELETE,
                     Permission.USER_READ,
+                    Permission.USER_MANAGE,
                     Permission.VIEW_REPORTS
             );
             case ROLE_SUPER_ADMIN -> Arrays.stream(Permission.values())
                     .collect(Collectors.toSet());
+            case ROLE_CONTENT_MANAGER -> Set.of(
+                    Permission.MOVIE_READ,
+                    Permission.MOVIE_WRITE
+            );
+            case ROLE_SUPPORT -> Set.of(
+                    Permission.MOVIE_READ,
+                    Permission.USER_READ,
+                    Permission.VIEW_REPORTS
+            );
         };
     }
 }

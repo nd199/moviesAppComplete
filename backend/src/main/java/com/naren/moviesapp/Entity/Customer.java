@@ -72,7 +72,7 @@ public class Customer implements UserDetails {
     private List<Movie> movies = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "customer_roles",
+    @JoinTable(name = "customers_roles",
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"),
             foreignKey = @ForeignKey(name = "fk_customer_role_id"),

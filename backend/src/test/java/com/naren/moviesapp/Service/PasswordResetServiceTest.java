@@ -1,9 +1,9 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Entity.PasswordResetToken;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.PasswordResetRequest;
+import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.PasswordRTRepository;
 import com.naren.moviesapp.Utils.EmailService;
 import org.junit.jupiter.api.BeforeEach;

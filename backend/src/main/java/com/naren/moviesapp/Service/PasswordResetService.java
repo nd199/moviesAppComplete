@@ -1,12 +1,13 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Entity.PasswordResetToken;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.PasswordResetRequest;
+import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.PasswordRTRepository;
 import com.naren.moviesapp.Utils.EmailService;
 import jakarta.transaction.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -30,6 +31,7 @@ public class PasswordResetService {
         this.customerRepository = customerRepository;
     }
 
+    @PreAuthorize("permitAll()")
     public void createPasswordResetToken(String email) {
         if (!customerRepository.existsByEmail(email)) {
             throw new ResourceNotFoundException("Your account " +
@@ -50,11 +52,13 @@ public class PasswordResetService {
         }
     }
 
+    @PreAuthorize("permitAll()")
     public boolean isTokenValid(String token) {
         Optional<PasswordResetToken> resetToken = tokenRepository.findByToken(token);
         return resetToken.isPresent() && resetToken.get().getExpiry().isAfter(Instant.now());
     }
 
+    @PreAuthorize("permitAll()")
     public void resetPassword(PasswordResetRequest passwordResetRequest) {
         var token = passwordResetRequest.token();
         var newPassword = passwordResetRequest.newPassword();

@@ -1,7 +1,5 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Repo.CustomerRepository;
-import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Customer;
@@ -14,6 +12,8 @@ import com.naren.moviesapp.Exception.ResourceAlreadyExists;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Record.CustomerUpdateRequest;
+import com.naren.moviesapp.Repo.CustomerRepository;
+import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Utils.OtpService;
 import com.naren.moviesapp.jwt.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -242,7 +242,7 @@ class CustomerServiceImplTest {
     @Test
     void getCustomerByIdNonExistingCustomerIdThrowsException() {
         long nonExistingCustomerId = 100;
-        when(customerRepository.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
+        when(customerRepository.findById(nonExistingCustomerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.getCustomerById(nonExistingCustomerId))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -276,7 +276,7 @@ class CustomerServiceImplTest {
         long nonExistingCustomerId = 100;
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("newName", "new@example.com", "9999999999", "", false, "Chennai, India", false, false);
 
-        when(customerRepository.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
+        when(customerRepository.findById(nonExistingCustomerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.updateCustomer(updateRequest, nonExistingCustomerId))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -292,7 +292,7 @@ class CustomerServiceImplTest {
         String existingEmail = "existing@example.com";
         Customer existingCustomer = new Customer(customerId, "John Doe", existingEmail, "password", "1234567890", false, false, false, "Chennai, India", false);
 
-        when(customerRepository.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(existingCustomer));
         when(customerRepository.existsByEmail("new@example.com")).thenReturn(true);
 
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", "new@example.com", "1234567890", "", false, "Chennai, India", false, false);
@@ -311,7 +311,7 @@ class CustomerServiceImplTest {
         Customer existingCustomer = new Customer(customerId, "John Doe", existingEmail, "password", "1234567890",
                 "", false, "Chennai, India", false, false, false);
 
-        when(customerRepository.getCustomer(customerId)).thenReturn(Optional.of(existingCustomer));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(existingCustomer));
 
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest("John Doe", existingEmail, "1234567890", "",
                 false, "Chennai, India", false, false);
@@ -338,7 +338,7 @@ class CustomerServiceImplTest {
     @Test
     void deleteCustomerNonExistingCustomerIdThrowsException() {
         long nonExistingCustomerId = 100;
-        when(customerRepository.getCustomer(nonExistingCustomerId)).thenReturn(Optional.empty());
+        when(customerRepository.findById(nonExistingCustomerId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.deleteCustomer(nonExistingCustomerId))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -538,7 +538,7 @@ class CustomerServiceImplTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("not subscribed to");
 
-        verify(customerRepository, never()).updateCustomer(customer);
+        verify(customerRepository, never()).save(customer);
     }
 
     @Test
@@ -554,8 +554,11 @@ class CustomerServiceImplTest {
 
     @Test
     void getAllCustomers() {
+        when(customerRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of()));
+
         underTest.getAllCustomers();
-        verify(customerRepository).findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
+        verify(customerRepository).findAll(org.springframework.data.domain.PageRequest.of(0, 20));
     }
 
 

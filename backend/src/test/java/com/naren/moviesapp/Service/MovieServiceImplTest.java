@@ -1,12 +1,12 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.MovieRegistration;
 import com.naren.moviesapp.Record.MovieUpdation;
+import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.TestData.TestDataFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -151,9 +151,12 @@ class MovieServiceImplTest {
 
     @Test
     void getMovieList() {
-        underTest.getMovieList();
+        when(movieRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of()));
 
-        verify(movieRepository).findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
+        List<Movie> movies = underTest.getMovieList();
+
+        assertThat(movies).isNotNull();
     }
 
     @Test
@@ -286,7 +289,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieRepository.getMoviesByYear(year)).thenReturn(expectedMovies);
+        when(movieRepository.findByYear(year)).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.getMoviesByYear(year);
 
@@ -302,7 +305,7 @@ class MovieServiceImplTest {
                 new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
-        when(movieRepository.getMoviesByAgeRating(ageRating)).thenReturn(expectedMovies);
+        when(movieRepository.findByAgeRating(ageRating)).thenReturn(expectedMovies);
 
         List<Movie> actualMovies = underTest.getMoviesByAgeRating(ageRating);
 

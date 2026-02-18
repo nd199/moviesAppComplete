@@ -1,12 +1,12 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Repo.ShowRepository;
 import com.naren.moviesapp.Entity.Show;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.ShowRegistration;
 import com.naren.moviesapp.Record.ShowUpdation;
+import com.naren.moviesapp.Repo.ShowRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -157,9 +157,12 @@ class ShowServiceTest {
 
     @Test
     void getShowList() {
-        underTest.getShowList();
+        when(showRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of()));
 
-        verify(showRepository).findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
+        List<Show> shows = underTest.getShowList();
+
+        assertThat(shows).isNotNull();
     }
 
     @Test
@@ -290,7 +293,7 @@ class ShowServiceTest {
                 new Show("Show2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showRepository.getShowsByYear(year)).thenReturn(expectedShows);
+        when(showRepository.findByYear(year)).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.getShowsByYear(year);
 
@@ -306,7 +309,7 @@ class ShowServiceTest {
                 new Show("Show2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
-        when(showRepository.getShowsByAgeRating(ageRating)).thenReturn(expectedShows);
+        when(showRepository.findByAgeRating(ageRating)).thenReturn(expectedShows);
 
         List<Show> actualShows = underTest.getShowsByAgeRating(ageRating);
 

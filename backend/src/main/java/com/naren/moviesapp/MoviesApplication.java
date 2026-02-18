@@ -3,7 +3,6 @@ package com.naren.moviesapp;
 import com.github.javafaker.Faker;
 import com.naren.moviesapp.Config.SuperAdminSeeder;
 import com.naren.moviesapp.Entity.*;
-import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Repo.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

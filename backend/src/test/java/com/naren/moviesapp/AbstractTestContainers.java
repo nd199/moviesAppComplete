@@ -4,11 +4,15 @@ import com.github.javafaker.Faker;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Testcontainers(disabledWithoutDocker = true)
 public class AbstractTestContainers {
 
     protected static final Faker FAKER = new Faker();
 
+    @Container
     protected static final PostgreSQLContainer<?> postgresContainer =
             new PostgreSQLContainer<>("postgres:15-alpine")
                     .withDatabaseName("movieott")
@@ -16,16 +20,12 @@ public class AbstractTestContainers {
                     .withPassword("password")
                     .withReuse(false);
 
-    private static synchronized void ensureContainerStarted() {
-        if (!postgresContainer.isRunning()) {
-            postgresContainer.start();
-        }
-    }
-
     @DynamicPropertySource
     private static void registerDynamicPropertySource(
             DynamicPropertyRegistry registry) {
-        ensureContainerStarted();
+        if (!postgresContainer.isRunning()) {
+            postgresContainer.start();
+        }
 
         registry.add(
                 "spring.datasource.url",

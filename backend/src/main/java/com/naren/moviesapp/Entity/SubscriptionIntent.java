@@ -18,12 +18,14 @@ import java.util.Objects;
 @Table(name = "subscription_intents")
 public class SubscriptionIntent {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long userId;
     private Long planId;
     @Enumerated(EnumType.STRING)
     private IntentStatus status;
+
+    @Column(name = "intent_token", nullable = false)
     private String intentToken;
 
     @CreatedDate
