@@ -1,6 +1,6 @@
 package com.naren.moviesapp.Security;
 
-import com.naren.moviesapp.Service.CustomerUserDetailsService;
+import com.naren.moviesapp.Service.CustomUserDetailsService;
 import com.naren.moviesapp.Service.TokenBlacklistService;
 import com.naren.moviesapp.jwt.JwtAuthFilter;
 import com.naren.moviesapp.jwt.JwtUtil;
@@ -59,7 +59,7 @@ public class SecurityFilterChainConfig {
     }
 
     @Bean
-    public JwtAuthFilter jwtAuthFilter(JwtUtil jwtUtil, CustomerUserDetailsService userDetailsService, TokenBlacklistService tokenBlacklistService) {
+    public JwtAuthFilter jwtAuthFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService, TokenBlacklistService tokenBlacklistService) {
         return new JwtAuthFilter(jwtUtil, userDetailsService, tokenBlacklistService);
     }
 

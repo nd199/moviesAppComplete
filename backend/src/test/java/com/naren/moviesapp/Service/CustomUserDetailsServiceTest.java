@@ -1,6 +1,7 @@
 package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Entity.Customer;
+import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,11 +24,14 @@ class CustomerUserDetailsServiceTest {
     @Mock
     private CustomerRepository customerRepository;
 
+    @Mock
+    private AdminRepository adminRepository;
+
     private CustomerUserDetailsService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new CustomerUserDetailsService(customerRepository);
+        underTest = new CustomerUserDetailsService(customerRepository, adminRepository);
     }
 
     @Test

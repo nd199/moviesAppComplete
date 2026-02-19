@@ -26,6 +26,10 @@ public class Role {
     @JsonIgnore
     Set<Customer> customers = new HashSet<>();
 
+    @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
+    Set<Admin> admins = new HashSet<>();
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
