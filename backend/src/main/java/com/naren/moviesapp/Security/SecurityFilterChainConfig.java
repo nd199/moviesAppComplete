@@ -1,6 +1,10 @@
 package com.naren.moviesapp.Security;
 
+import com.naren.moviesapp.Service.CustomerUserDetailsService;
+import com.naren.moviesapp.Service.TokenBlacklistService;
 import com.naren.moviesapp.jwt.JwtAuthFilter;
+import com.naren.moviesapp.jwt.JwtUtil;
+import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,6 +30,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityFilterChainConfig {
 
+    @PostConstruct
+    public void init() {
+        System.out.println("SECURITY CONFIG LOADED");
+    }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
@@ -46,7 +55,12 @@ public class SecurityFilterChainConfig {
 
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
-        return new HttpStatusEntryPoint(HttpStatus.FORBIDDEN);
+        return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Bean
+    public JwtAuthFilter jwtAuthFilter(JwtUtil jwtUtil, CustomerUserDetailsService userDetailsService, TokenBlacklistService tokenBlacklistService) {
+        return new JwtAuthFilter(jwtUtil, userDetailsService, tokenBlacklistService);
     }
 
     @Bean
@@ -54,6 +68,8 @@ public class SecurityFilterChainConfig {
                                                          AuthenticationProvider authenticationProvider,
                                                          JwtAuthFilter authFilter,
                                                          AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
+
+        System.out.println("SECURITY FILTER CHAIN CREATED");
 
         http.csrf(AbstractHttpConfigurer::disable)
 
@@ -76,7 +92,8 @@ public class SecurityFilterChainConfig {
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.POST,
-                                "/api/v1/auth/**",
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/refresh-token",
                                 "/api/v1/verify/email",
                                 "/api/v1/validate/Otp",
                                 "/api/password-reset/**"
@@ -107,7 +124,8 @@ public class SecurityFilterChainConfig {
 
                         .requestMatchers(
                                 "/api/v1/customers/**",
-                                "/api/v1/roles/**"
+                                "/api/v1/roles/**",
+                                "/api/v1/auth/admins"
                         ).hasAuthority("USER_MANAGE")
 
                         .requestMatchers(HttpMethod.POST,

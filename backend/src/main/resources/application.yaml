@@ -20,3 +20,4 @@ app:
     password: ${SUPER_ADMIN_PASSWORD:ChangeMe123!}
   data-initialization:
     enabled: ${DATA_INITIALIZATION_ENABLED:true}
+

@@ -28,7 +28,7 @@ public class PaymentService {
     @Transactional
     public Payment processPayment(String email, Long planId, String paymentMethod) {
         try {
-            Customer customer = customerRepository.findCustomerByEmail(email)
+            Customer customer = customerRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Customer not found with email: " + email));
 
             SubscriptionPlan plan = subscriptionPlanRepository.findById(planId)
@@ -111,7 +111,7 @@ public class PaymentService {
 
     @Transactional
     public Customer updateSubscriptionStatus(String email, boolean isSubscribed) {
-        Customer customer = customerRepository.findCustomerByEmail(email)
+        Customer customer = customerRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found with email: " + email));
 
         customer.setIsSubscribed(isSubscribed);

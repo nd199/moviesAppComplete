@@ -200,8 +200,14 @@ public class Customer implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
+
         for (Role role : this.getRoles()) {
             RoleName roleName = role.getName();
+
+            // Add role itself as authority
+            authorities.add(new SimpleGrantedAuthority(roleName.name()));
+
+            // Add mapped permissions
             RolePermissionMapper.getPermissions(roleName)
                     .forEach(permission ->
                             authorities.add(
@@ -209,6 +215,7 @@ public class Customer implements UserDetails {
                             )
                     );
         }
+
         return authorities;
     }
 

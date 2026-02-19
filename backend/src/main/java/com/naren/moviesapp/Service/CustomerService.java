@@ -56,7 +56,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_MANAGE')")
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     public void addRole(Role role) {
         if (role == null) {
             throw new ResourceNotFoundException("Role cannot be null");
@@ -68,19 +68,19 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public List<Role> getRoles() {
         return roleService.getAllRoles();
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public Role getRoleById(Long id) {
         return roleService.findRoleById(id);
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_MANAGE')")
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     public void removeRole(Long id) {
         Role role = getRoleById(id);
         if (role == null) {
@@ -90,7 +90,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_MANAGE')")
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     @Transactional
     public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration, Set<String> roleNames) {
 
@@ -180,7 +180,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public CustomerDTO getCustomerById(Long customerId) {
         return customerRepository.findById(customerId)
                 .map(customerDTOMapper)
@@ -190,7 +190,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_MANAGE')")
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     @Transactional
     public CustomerDTO updateCustomer(CustomerUpdateRequest request, Long id) {
 
@@ -246,7 +246,7 @@ public class CustomerService implements CustomerServiceInterface {
     public void updatePassword(String email, String newPassword) {
         logger.info("Password update request for email: {}", email);
 
-        Customer customer = customerRepository.findCustomerByEmail(email)
+        Customer customer = customerRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     logger.warn("Password update failed - user not found: {}", email);
                     return new ResourceNotFoundException("Customer with email "
@@ -272,7 +272,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public List<CustomerDTO> getAllCustomers() {
         List<CustomerDTO> customers = customerRepository.findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent()
                 .stream()
@@ -282,7 +282,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_MANAGE')")
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     @Transactional
     public void deleteCustomer(Long customerId) {
 
@@ -361,7 +361,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn) {
         List<Customer> customers = customerRepository.getCustomersByIsLogged(isLoggedIn);
         if (customers.isEmpty()) {
@@ -374,7 +374,7 @@ public class CustomerService implements CustomerServiceInterface {
     @Override
     @PreAuthorize("hasPermission('USER_READ') or #email == authentication.principal.username")
     public CustomerDTO getCustomerByEmail(String email) {
-        return customerRepository.findCustomerByEmail(email).map((customerDTOMapper))
+        return customerRepository.findByEmail(email).map((customerDTOMapper))
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
                                 "Could not find customer by email " + email)
@@ -382,7 +382,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public CustomerDTO getCustomerByPhoneNumber(String phoneNumber) {
         return customerRepository.getCustomerByPhoneNumber(phoneNumber)
                 .map(customerDTOMapper).orElseThrow(
@@ -391,13 +391,13 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public void generateAndSendMailOtp(EmailVerificationRequest emailVerificationRequest) {
         otpService.generateAndSendMailOtp(emailVerificationRequest.email());
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public List<CustomerDTO> getLatestCustomerList() {
         return customerRepository.getCustomersByTop5()
                 .stream().map(customerDTOMapper)
@@ -405,7 +405,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('VIEW_REPORTS')")
+    @PreAuthorize("hasAuthority('VIEW_REPORTS')")
     public List<CustomerStatsDTO> getCustomerStats() {
         return customerRepository.getCustomerCountByEachMonthInYear()
                 .stream()
@@ -417,7 +417,7 @@ public class CustomerService implements CustomerServiceInterface {
     @Override
     public ResponseEntity<?> pingSubscription(CustomerSubscription customerSubscription) {
 
-        Customer customer = customerRepository.findCustomerByEmail(customerSubscription.email())
+        Customer customer = customerRepository.findByEmail(customerSubscription.email())
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Could not find customer by email "
                                 + customerSubscription.email())

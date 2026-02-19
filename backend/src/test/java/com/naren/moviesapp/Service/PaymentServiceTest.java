@@ -69,7 +69,7 @@ class PaymentServiceTest {
 
         Payment savedPayment = TestDataFactory.createTestPayment(100L, customer, plan);
 
-        when(customerRepository.findCustomerByEmail(email)).thenReturn(Optional.of(customer));
+        when(customerRepository.findByEmail(email)).thenReturn(Optional.of(customer));
         when(subscriptionPlanRepository.findById(planId)).thenReturn(Optional.of(plan));
         when(paymentRepository.save(any(Payment.class))).thenReturn(savedPayment);
         when(userPlanInfoRepository.findByCustomerId(customer.getId())).thenReturn(Optional.empty());
@@ -99,7 +99,7 @@ class PaymentServiceTest {
     void processPayment_throws_when_customer_not_found() {
         String email = "missing@example.com";
 
-        when(customerRepository.findCustomerByEmail(email)).thenReturn(Optional.empty());
+        when(customerRepository.findByEmail(email)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.processPayment(email, 1L, "credit_card"))
                 .isInstanceOf(RuntimeException.class)
@@ -117,7 +117,7 @@ class PaymentServiceTest {
         Customer customer = TestDataFactory.createTestCustomer(10L);
         customer.setEmail(email);
 
-        when(customerRepository.findCustomerByEmail(email)).thenReturn(Optional.of(customer));
+        when(customerRepository.findByEmail(email)).thenReturn(Optional.of(customer));
         when(subscriptionPlanRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.processPayment(email, 99L, "credit_card"))

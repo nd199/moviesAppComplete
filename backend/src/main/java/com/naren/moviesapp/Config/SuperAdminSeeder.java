@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
@@ -27,13 +28,14 @@ public class SuperAdminSeeder {
     @Value("${app.superadmin.password}")
     private String superAdminPassword;
 
+    @Bean
     public CommandLineRunner seedSuperAdmin() {
         return args -> {
 
             Role superRole = roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN)
                     .orElseThrow(() -> new RuntimeException("ROLE_SUPER_ADMIN not found. Make sure MoviesApplication.createRole() runs first."));
 
-            Customer existingSuperAdmin = customerRepository.findCustomerByEmail(superAdminEmail).orElse(null);
+            Customer existingSuperAdmin = customerRepository.findByEmail(superAdminEmail).orElse(null);
 
             if (existingSuperAdmin == null) {
                 Customer superAdmin = new Customer();

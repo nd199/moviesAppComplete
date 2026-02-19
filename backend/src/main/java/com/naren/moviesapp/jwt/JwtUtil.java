@@ -13,6 +13,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -32,11 +34,14 @@ public class JwtUtil {
     private long jwtExpirationMinutes;
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(
-                jwtSecret.length() < 44 ?
-                        java.util.Base64.getEncoder().encodeToString(jwtSecret.getBytes()) :
-                        jwtSecret
-        );
+        // Use raw string bytes for signing key
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        
+        // Ensure key is at least 256 bits (32 bytes) for HS256
+        if (keyBytes.length < 32) {
+            keyBytes = java.util.Arrays.copyOf(keyBytes, 32);
+        }
+        
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -73,11 +78,14 @@ public class JwtUtil {
 
     public Collection<? extends GrantedAuthority> getAuthorities(String token) {
         Claims claims = getClaims(token);
-        List<String> authorities = claims.get("authorities", List.class);
-        if (authorities == null) {
+        Object authoritiesObject = claims.get("authorities");
+
+        if (!(authoritiesObject instanceof Collection<?> collection)) {
             return Collections.emptyList();
         }
-        return authorities.stream()
+
+        return collection.stream()
+                .map(Object::toString)
                 .map(SimpleGrantedAuthority::new)
                 .toList();
     }
@@ -102,19 +110,14 @@ public class JwtUtil {
         try {
             Claims claims = getClaims(token);
 
-            // Enhanced validation with multiple checks
-            boolean isValid = claims.getSubject().equals(userName)
-                    && !isTokenExpired(claims)
-                    && claims.getIssuer().equals(jwtIssuer)
-                    && claims.getIssuedAt().before(Date.from(Instant.now()))
-                    && claims.get("type", String.class).equals("access");
+            String type = claims.get("type", String.class);
 
-            if (!isValid) {
-                logger.warn("Invalid JWT token for user: {} - Reason validation failed", userName);
-            }
-            return isValid;
+            return claims.getSubject().equals(userName)
+                    && !isTokenExpired(claims)
+                    && jwtIssuer.equals(claims.getIssuer())
+                    && "access".equals(type);
         } catch (Exception e) {
-            logger.error("JWT token validation failed for user {}: {}", userName, e.getMessage());
+            logger.error("JWT validation failed: {}", e.getMessage());
             return false;
         }
     }
@@ -128,7 +131,7 @@ public class JwtUtil {
         return isExpired;
     }
 
-    public long getExpirationTime() {
-        return System.currentTimeMillis() + (jwtExpirationMinutes * 60 * 1000);
+    public Date extractExpiration(String token) {
+        return getClaims(token).getExpiration();
     }
 }

@@ -16,7 +16,7 @@ public class MovieRepositoryTest extends AbstractRepositoryTest {
 
     @Autowired
     private MovieRepository movieRepository;
-    
+
     @Autowired
     private CustomerRepository customerRepository;
 
@@ -35,7 +35,7 @@ public class MovieRepositoryTest extends AbstractRepositoryTest {
         movie = movieRepository.save(movie);
         final Long movieId = movie.getId();
 
-        
+
         List<Movie> movies = movieRepository.findByYear(movie.getYear());
         assertThat(movies)
                 .anySatisfy(m -> assertThat(m.getId()).isEqualTo(movieId));

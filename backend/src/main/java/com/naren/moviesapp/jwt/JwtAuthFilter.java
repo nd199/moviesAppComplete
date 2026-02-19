@@ -7,6 +7,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +19,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
@@ -29,11 +30,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.tokenBlacklistService = tokenBlacklistService;
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
+
+        logger.debug("JWT FILTER EXECUTING: {}", request.getRequestURI());
+
+        // First try to get token from Authorization header (for backward compatibility)
 
         // First try to get token from Authorization header (for backward compatibility)
         String token = null;
@@ -61,6 +68,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // Check if token is blacklisted
         if (tokenBlacklistService.isTokenBlacklisted(token)) {
+            logger.debug("Token is blacklisted");
             filterChain.doFilter(request, response);
             return;
         }
@@ -70,7 +78,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
 
-            if (jwtUtil.isTokenValid(token, userDetails.getUsername())) {
+            boolean valid = jwtUtil.isTokenValid(token, userDetails.getUsername());
+            logger.debug("Token validation result: {}", valid);
+
+            if (valid) {
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails, null, jwtUtil.getAuthorities(token)
