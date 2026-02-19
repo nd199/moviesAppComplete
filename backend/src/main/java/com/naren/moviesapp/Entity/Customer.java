@@ -2,18 +2,11 @@ package com.naren.moviesapp.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.naren.moviesapp.Config.RolePermissionMapper;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -27,34 +20,17 @@ import static jakarta.persistence.CascadeType.*;
 })
 @Getter
 @Setter
-@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
-
 @AllArgsConstructor
-public class Customer implements UserDetails {
+public class Customer extends BaseUser {
 
     @Id
     @SequenceGenerator(name = "customer_id", sequenceName = "customer_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_id")
     private Long id;
 
-    @Column(name = "name", columnDefinition = "TEXT")
-    private String name;
-
-    @Column(name = "email", columnDefinition = "TEXT", nullable = false)
-    private String email;
-
-    @Column(name = "password", columnDefinition = "TEXT", nullable = false)
-    private String password;
-
-    @Column(name = "phone_number", nullable = false, columnDefinition = "TEXT")
-    private String phoneNumber;
-
     @Column(name = "image_url")
     private String imageUrl;
-
-    @Column(nullable = false)
-    private Boolean isEmailVerified;
 
     @Column(nullable = false)
     private String address;
@@ -62,16 +38,13 @@ public class Customer implements UserDetails {
     @Column(nullable = false)
     private Boolean isLogged;
 
-    @Column(nullable = false)
-    private Boolean isRegistered;
-
     private Boolean isSubscribed;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = {DETACH, REFRESH, PERSIST, MERGE})
     @JsonIgnore
     private List<Movie> movies = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "customers_roles",
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"),
@@ -84,14 +57,6 @@ public class Customer implements UserDetails {
     @OneToOne(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private UserPlanInfo userPlanInfo;
-
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
     public Customer(Long id, String name, String email, String password, String phoneNumber, Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, List<Movie> movies, Set<Role> roles, Boolean isSubscribed) {
         this.id = id;
@@ -187,61 +152,14 @@ public class Customer implements UserDetails {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Customer customer = (Customer) o;
-        return Objects.equals(id, customer.id) && Objects.equals(name, customer.name) && Objects.equals(email, customer.email) && Objects.equals(password, customer.password) && Objects.equals(phoneNumber, customer.phoneNumber) && Objects.equals(imageUrl, customer.imageUrl) && Objects.equals(isEmailVerified, customer.isEmailVerified) && Objects.equals(address, customer.address) && Objects.equals(isLogged, customer.isLogged) && Objects.equals(isRegistered, customer.isRegistered) && Objects.equals(isSubscribed, customer.isSubscribed) && Objects.equals(movies, customer.movies) && Objects.equals(roles, customer.roles) && Objects.equals(createdAt, customer.createdAt) && Objects.equals(updatedAt, customer.updatedAt);
+        if (!(o instanceof Customer)) return false;
+        Customer that = (Customer) o;
+        return id != null && id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, email, password, phoneNumber, imageUrl, isEmailVerified, address, isLogged, isRegistered, isSubscribed, movies, roles, createdAt, updatedAt);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<GrantedAuthority> authorities = new HashSet<>();
-
-        for (Role role : this.getRoles()) {
-            RoleName roleName = role.getName();
-
-            // Add role itself as authority
-            authorities.add(new SimpleGrantedAuthority(roleName.name()));
-
-            // Add mapped permissions
-            RolePermissionMapper.getPermissions(roleName)
-                    .forEach(permission ->
-                            authorities.add(
-                                    new SimpleGrantedAuthority(permission.name())
-                            )
-                    );
-        }
-
-        return authorities;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+        return getClass().hashCode();
     }
 
     public void addMovie(Movie movie) {
