@@ -1,0 +1,219 @@
+:root {
+  --card-bg: #020617;
+  --card-bg-soft: #0b1220;
+  --card-border: rgba(148, 163, 184, 0.35);
+  --card-shadow: 0 20px 45px rgba(15, 23, 42, 0.9);
+  --card-radius: 16px;
+  --text-main: #f9fafb;
+  --text-soft: #9ca3af;
+  --accent: #f97316;
+}
+
+.card {
+  width: 100%;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  color: var(--text-main);
+  cursor: pointer;
+  border: 1px solid rgba(15, 23, 42, 0.9);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  text-decoration: none;
+  display: block;
+}
+
+.card-hovered {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: var(--card-shadow);
+  border-color: var(--card-border);
+}
+
+.card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #020617;
+  overflow: hidden;
+}
+
+.card-poster,
+.card-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.card-badge {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  color: #f9fafb;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.8),
+    rgba(15, 23, 42, 0.95)
+  );
+  border: 1px solid rgba(148, 163, 184, 0.7);
+}
+
+.card-audio-toggle {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: none;
+  background: radial-gradient(
+    circle at center,
+    rgba(15, 23, 42, 0.9),
+    rgba(0, 0, 0, 0.9)
+  );
+  color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.9);
+  transition: all 0.2s ease;
+}
+
+.card-audio-toggle:hover {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: #020617;
+}
+
+.card-body {
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.card-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.card-chip-age {
+  background: #450a0a;
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.8);
+}
+
+.card-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.card-meta-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.card-star {
+  color: #facc15;
+  margin-left: 1px;
+  font-size: 0.85rem;
+}
+
+.card-overview {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #d1d5db;
+  max-height: 4em;
+  overflow: hidden;
+}
+
+.card-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.card-genre-chip {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.card-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(15, 23, 42, 0.95);
+  color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-action:hover {
+  background: rgba(15, 23, 42, 1);
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.9);
+}
+
+@media (max-width: 768px) {
+  .card {
+    max-width: 320px;
+  }
+  .card-body {
+    padding: 12px;
+  }
+}

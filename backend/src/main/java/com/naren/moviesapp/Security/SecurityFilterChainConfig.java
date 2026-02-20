@@ -1,10 +1,11 @@
 package com.naren.moviesapp.Security;
 
-import com.naren.moviesapp.Service.CustomUserDetailsService;
+import com.naren.moviesapp.Service.CustomerUserDetailsService;
 import com.naren.moviesapp.Service.TokenBlacklistService;
 import com.naren.moviesapp.jwt.JwtAuthFilter;
 import com.naren.moviesapp.jwt.JwtUtil;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -46,7 +47,7 @@ public class SecurityFilterChainConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder encoder) {
+    public AuthenticationProvider authenticationProvider(@Qualifier("customerUserDetailsService") UserDetailsService userDetailsService, PasswordEncoder encoder) {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(encoder);
@@ -59,7 +60,7 @@ public class SecurityFilterChainConfig {
     }
 
     @Bean
-    public JwtAuthFilter jwtAuthFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService, TokenBlacklistService tokenBlacklistService) {
+    public JwtAuthFilter jwtAuthFilter(JwtUtil jwtUtil, @Qualifier("customerUserDetailsService") CustomerUserDetailsService userDetailsService, TokenBlacklistService tokenBlacklistService) {
         return new JwtAuthFilter(jwtUtil, userDetailsService, tokenBlacklistService);
     }
 
@@ -80,9 +81,6 @@ public class SecurityFilterChainConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-
-                        /* ================= PUBLIC ================= */
-
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/ping",
                                 "/api/v1/movies/**",
@@ -102,16 +100,11 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/subscription/intent"
                         ).permitAll()
-
-                        // Swagger UI endpoints
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-
-                        /* ================= AUTHENTICATED ================= */
-
                         .requestMatchers(
                                 "/api/v1/profile/**",
                                 "/api/v1/customers/currentUser",
@@ -119,9 +112,6 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/payments/**",
                                 "/api/v1/video/**"
                         ).authenticated()
-
-                        /* ================= ADMIN ================= */
-
                         .requestMatchers(
                                 "/api/v1/customers/**",
                                 "/api/v1/roles/**",
@@ -142,9 +132,6 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/movies/**",
                                 "/api/v1/shows/**"
                         ).hasAuthority("MOVIE_DELETE")
-
-                        /* ================= SUPER ADMIN ================= */
-
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/admin/create"
                         ).hasAuthority("SYSTEM_CONFIG")
