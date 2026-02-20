@@ -14,12 +14,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 public class JwtAuthFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
     private final TokenBlacklistService tokenBlacklistService;
@@ -30,8 +30,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.tokenBlacklistService = tokenBlacklistService;
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
-
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
@@ -40,16 +38,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         logger.debug("JWT FILTER EXECUTING: {}", request.getRequestURI());
 
-        // First try to get token from Authorization header (for backward compatibility)
-
-        // First try to get token from Authorization header (for backward compatibility)
         String token = null;
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
         } else {
-            // If no header, try to get from httpOnly cookie
             jakarta.servlet.http.Cookie[] cookies = request.getCookies();
             if (cookies != null) {
                 for (jakarta.servlet.http.Cookie cookie : cookies) {
@@ -66,7 +60,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Check if token is blacklisted
         if (tokenBlacklistService.isTokenBlacklisted(token)) {
             logger.debug("Token is blacklisted");
             filterChain.doFilter(request, response);
