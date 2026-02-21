@@ -86,6 +86,7 @@ public class TestDataFactory {
         movie.setRuntime(FAKER.number().numberBetween(80, 180) + " mins");
         movie.setGenre(FAKER.book().genre() + "," + FAKER.book().genre());
         movie.setType("movies");
+        movie.setCategory("General");
         movie.setCreatedAt(LocalDateTime.now());
         movie.setUpdatedAt(LocalDateTime.now());
         return movie;
@@ -100,7 +101,8 @@ public class TestDataFactory {
                 FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
                 FAKER.number().numberBetween(1980, 2023),
                 FAKER.number().numberBetween(80, 180) + " mins",
-                FAKER.book().genre()
+                FAKER.book().genre(),
+                "General"
         );
     }
 
@@ -113,7 +115,8 @@ public class TestDataFactory {
                 FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
                 FAKER.number().numberBetween(1980, 2023),
                 FAKER.number().numberBetween(80, 180) + " mins",
-                FAKER.book().genre()
+                FAKER.book().genre(),
+                "General"
         );
     }
 
@@ -136,6 +139,7 @@ public class TestDataFactory {
         show.setRuntime(FAKER.number().numberBetween(20, 60) + " mins");
         show.setGenre(FAKER.book().genre() + "," + FAKER.book().genre());
         show.setType("shows");
+        show.setCategory("General");
         show.setCreatedAt(LocalDateTime.now());
         show.setUpdatedAt(LocalDateTime.now());
         return show;
@@ -150,7 +154,8 @@ public class TestDataFactory {
                 FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
                 FAKER.number().numberBetween(1980, 2023),
                 FAKER.number().numberBetween(20, 60) + " mins",
-                FAKER.book().genre()
+                FAKER.book().genre(),
+                "General"
         );
     }
 
@@ -163,7 +168,8 @@ public class TestDataFactory {
                 FAKER.options().option("G", "PG", "PG-13", "R", "NC-17"),
                 FAKER.number().numberBetween(1980, 2023),
                 FAKER.number().numberBetween(20, 60) + " mins",
-                FAKER.book().genre()
+                FAKER.book().genre(),
+                "General"
         );
     }
 

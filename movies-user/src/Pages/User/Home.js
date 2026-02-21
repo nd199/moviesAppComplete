@@ -34,8 +34,8 @@ const Home = () => {
       <NavBar />
       <div className="main">
         <Featured loading={loading} />
-        <List title={"Movies"} />
-        <List title={"Shows"} />
+        <List title={"Trending Movies"} type="tmdb-movies" />
+        <List title={"Trending TV Shows"} type="tmdb-shows" />
       </div>
       <Footer />
     </div>

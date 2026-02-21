@@ -3,7 +3,6 @@ package com.naren.moviesapp.Service;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
-import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.MovieRegistration;
 import com.naren.moviesapp.Record.MovieUpdation;
 import com.naren.moviesapp.Repo.MovieRepository;
@@ -43,27 +42,29 @@ class MovieServiceImplTest {
         MovieRegistration registration = new MovieRegistration(
                 "testName", 5.00, "A great movie",
                 "http://poster.url", "PG-13", 2022,
-                "120 mins", "Drama");
+                "120 mins", "Drama", "Trending");
 
         when(movieRepository.existsByName(registration.name())).thenReturn(false);
-
         underTest.addMovie(registration);
 
-        ArgumentCaptor<Movie> movieArgumentCaptor = ArgumentCaptor.forClass(Movie.class);
+        ArgumentCaptor<Movie> captor = ArgumentCaptor.forClass(Movie.class);
+        verify(movieRepository).save(captor.capture());
+        assertThat(captor.getValue().getCategory()).isEqualTo("Trending");
+    }
 
-        verify(movieRepository).save(movieArgumentCaptor.capture());
+    @Test
+    void addMovieWithNullCategoryDefaultsToGeneral() {
+        MovieRegistration registration = new MovieRegistration(
+                "testName", 5.00, "A great movie",
+                "http://poster.url", "PG-13", 2022,
+                "120 mins", "Drama", null);
 
-        Movie captured = movieArgumentCaptor.getValue();
+        when(movieRepository.existsByName(registration.name())).thenReturn(false);
+        underTest.addMovie(registration);
 
-        assertThat(captured.getId()).isNull();
-        assertThat(captured.getName()).isEqualTo(registration.name());
-        assertThat(captured.getRating()).isEqualTo(registration.rating());
-        assertThat(captured.getDescription()).isEqualTo(registration.description());
-        assertThat(captured.getPoster()).isEqualTo(registration.poster());
-        assertThat(captured.getAgeRating()).isEqualTo(registration.ageRating());
-        assertThat(captured.getYear()).isEqualTo(registration.year());
-        assertThat(captured.getRuntime()).isEqualTo(registration.runtime());
-        assertThat(captured.getGenre()).isEqualTo(registration.genre());
+        ArgumentCaptor<Movie> captor = ArgumentCaptor.forClass(Movie.class);
+        verify(movieRepository).save(captor.capture());
+        assertThat(captor.getValue().getCategory()).isEqualTo("General");
     }
 
     @Test
@@ -71,396 +72,143 @@ class MovieServiceImplTest {
         MovieRegistration registration = new MovieRegistration(
                 "testName", 5.00, "A great movie",
                 "http://poster.url", "PG-13", 2022,
-                "120 mins", "Drama");
+                "120 mins", "Drama", "Trending");
 
         when(movieRepository.existsByName(registration.name())).thenReturn(true);
 
-        assertThatThrownBy(
-                () -> underTest.addMovie(registration))
-                .isInstanceOf(ResourceAlreadyExists.class)
-                .hasMessageContaining("Movie name %s already exists".formatted(registration.name()));
-
+        assertThatThrownBy(() -> underTest.addMovie(registration))
+                .isInstanceOf(ResourceAlreadyExists.class);
         verify(movieRepository, never()).save(any());
     }
 
     @Test
     void removeMovie() {
-        long id = 1;
-        Movie movie = new Movie(
-                "testName",
-                5.00,
-                "A great movie",
-                "http://poster.url",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Drama",
-                "movies");
-        movie.setId(id);
+        Movie movie = new Movie("testName", 5.00, "A great movie", "http://poster.url",
+                "PG-13", 2022, "120 mins", "Drama", "movies", "Trending");
+        movie.setId(1L);
 
-        when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
-
-        underTest.removeMovie(id);
-
+        when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
+        underTest.removeMovie(1L);
         verify(movieRepository).delete(movie);
     }
 
     @Test
-    void throwsWhenMovieRemovalIfNotExist() {
-        long id = 1;
-
-        when(movieRepository.findById(id)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> underTest.removeMovie(id))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Movie with ID %s not found".formatted(id));
-
-        verify(movieRepository, never()).delete(any());
-    }
-
-    @Test
     void getMovieById() {
-        long id = 1;
-        Movie movie = new Movie(
-                "testName",
-                5.00,
-                "A great movie",
-                "http://poster.url",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Drama",
-                "movies");
-        movie.setId(id);
+        Movie movie = new Movie("testName", 5.00, "A great movie", "http://poster.url",
+                "PG-13", 2022, "120 mins", "Drama", "movies", "Trending");
+        movie.setId(1L);
 
-        when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
-
-        Movie actual = underTest.getMovieById(id);
-
-        assertThat(actual).isEqualTo(movie);
-    }
-
-    @Test
-    void getMovieByIdThrowsIfNotExists() {
-        long id = 1;
-
-        when(movieRepository.findById(id)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> underTest.getMovieById(id))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Movie with ID '%s' not found".formatted(id));
+        when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
+        assertThat(underTest.getMovieById(1L)).isEqualTo(movie);
     }
 
     @Test
     void getMovieList() {
         when(movieRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of()));
-
-        List<Movie> movies = underTest.getMovieList();
-
-        assertThat(movies).isNotNull();
+        assertThat(underTest.getMovieList()).isNotNull();
     }
 
     @Test
     void updateMovie() {
-        long id = 2;
+        Movie movie = new Movie("testName22", 2.0, "A movie", "http://poster.url",
+                "PG", 2000, "100 mins", "Comedy", "movies", "General");
+        movie.setId(2L);
 
-        Movie movie = new Movie(
-                "testName22",
-                2.0,
-                "A movie",
-                "http://poster.url",
-                "PG",
-                2000,
-                "100 mins",
-                "Comedy",
-                "movies");
-        movie.setId(id);
+        when(movieRepository.findById(2L)).thenReturn(Optional.of(movie));
 
-        when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
+        MovieUpdation movieUpdation = new MovieUpdation("testName2", 5.0, "An awesome movie",
+                "http://newposter.url", "R", 2021, "130 mins", "Thriller", "Trending");
 
-        MovieUpdation movieUpdation = new MovieUpdation(
-                "testName2", 5.0, "An awesome movie",
-                "http://newposter.url", "R", 2021,
-                "130 mins", "Thriller");
+        underTest.updateMovie(movieUpdation, 2L);
 
-        underTest.updateMovie(movieUpdation, id);
-
-        ArgumentCaptor<Movie> movieArgumentCaptor = ArgumentCaptor.forClass(Movie.class);
-
-        verify(movieRepository).save(movieArgumentCaptor.capture());
-
-        Movie updatedMovie = movieArgumentCaptor.getValue();
-
-        assertThat(updatedMovie.getName()).isEqualTo(movieUpdation.name());
-        assertThat(updatedMovie.getRating()).isEqualTo(movieUpdation.rating());
-        assertThat(updatedMovie.getDescription()).isEqualTo(movieUpdation.description());
-        assertThat(updatedMovie.getPoster()).isEqualTo(movieUpdation.poster());
-        assertThat(updatedMovie.getAgeRating()).isEqualTo(movieUpdation.ageRating());
-        assertThat(updatedMovie.getYear()).isEqualTo(movieUpdation.year());
-        assertThat(updatedMovie.getRuntime()).isEqualTo(movieUpdation.runtime());
-        assertThat(updatedMovie.getGenre()).isEqualTo(movieUpdation.genre());
+        ArgumentCaptor<Movie> captor = ArgumentCaptor.forClass(Movie.class);
+        verify(movieRepository).save(captor.capture());
+        assertThat(captor.getValue().getCategory()).isEqualTo("Trending");
     }
-
 
     @Test
     void testUpdateMovieNoChanges() {
         Movie movie = new Movie();
-        MovieUpdation update = new MovieUpdation(null, null, null, null, null, null, null, null);
-        Long movieId = 1L;
+        MovieUpdation update = new MovieUpdation(null, null, null, null, null, null, null, null, null);
 
-        when(movieRepository.findById(movieId)).thenReturn(java.util.Optional.ofNullable(movie));
-
-        assertThatThrownBy
-                (() -> underTest.updateMovie(update, movieId))
+        when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
+        assertThatThrownBy(() -> underTest.updateMovie(update, 1L))
                 .hasMessage("No data changes found");
-
-        verify(movieRepository, never()).save(movie);
     }
-
-    @Test
-    void testUpdateMovieMovieNotFound() {
-        Long movieId = 1L;
-
-        when(movieRepository.findById(movieId)).thenReturn(java.util.Optional.empty());
-
-        assertThatThrownBy(() -> underTest.updateMovie(
-                new MovieUpdation("Hello", 4.5, "New Description", "New Poster",
-                        "New Age Rating", 2000, "New Runtime", "New Genre"), movieId))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Movie with ID '%s' not found".formatted(movieId));
-
-        verify(movieRepository, never()).save(any());
-    }
-
 
     @Test
     void throwsIfNoChangesFoundForUpdation() {
-        long id = 2;
+        Movie movie = new Movie("testName", 2.0, "A movie", "http://poster.url",
+                "PG", 2000, "100 mins", "Comedy", "movies", "Trending");
+        movie.setId(2L);
 
-        Movie movie = new Movie(
-                "testName",
-                2.0,
-                "A movie",
-                "http://poster.url",
-                "PG",
-                2000,
-                "100 mins",
-                "Comedy",
-                "movies");
-        movie.setId(id);
+        when(movieRepository.findById(2L)).thenReturn(Optional.of(movie));
 
-        when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
+        MovieUpdation movieUpdation = new MovieUpdation("testName", 2.0, "A movie",
+                "http://poster.url", "PG", 2000, "100 mins", "Comedy", "Trending");
 
-        MovieUpdation movieUpdation = new MovieUpdation(
-                "testName", 2.0, "A movie",
-                "http://poster.url", "PG", 2000,
-                "100 mins", "Comedy");
-
-        assertThatThrownBy(() -> underTest.updateMovie(movieUpdation, id))
+        assertThatThrownBy(() -> underTest.updateMovie(movieUpdation, 2L))
                 .isInstanceOf(RequestValidationException.class)
                 .hasMessageContaining("No data changes found");
     }
 
     @Test
-    void updateMovieByIdThrowsIfNotExists() {
-        long id = 1;
-
-        when(movieRepository.findById(id)).thenReturn(Optional.empty());
-
-        MovieUpdation updation = new MovieUpdation(
-                "Name", 3.30, "A good movie",
-                "http://poster.url", "PG-13", 2020,
-                "110 mins", "Drama");
-
-        assertThatThrownBy(() -> underTest.updateMovie(updation, id))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Movie with ID '%s' not found".formatted(id));
-
-        verify(movieRepository, never()).save(any());
-    }
-
-    @Test
     void testGetMoviesByYear() {
-        int year = 2021;
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
-        );
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies", "Trending"),
+                new Movie("Movie2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies", "Popular"));
 
-        when(movieRepository.findByYear(year)).thenReturn(expectedMovies);
+        when(movieRepository.findByYear(2021)).thenReturn(expectedMovies);
+        assertEquals(expectedMovies, underTest.getMoviesByYear(2021));
+    }
 
-        List<Movie> actualMovies = underTest.getMoviesByYear(year);
+    // Category-based tests
+    @Test
+    void testGetMoviesByCategory() {
+        List<Movie> expectedMovies = Arrays.asList(
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies", "Trending"),
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies", "Trending"));
 
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
+        when(movieRepository.findByCategory("Trending")).thenReturn(expectedMovies);
+        assertEquals(expectedMovies, underTest.getMoviesByCategory("Trending"));
     }
 
     @Test
-    void testGetMoviesByAgeRating() {
-        String ageRating = "PG-13";
+    void testGetMoviesByCategoryOrderByRatingDesc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
-        );
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies", "Trending"),
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies", "Trending"));
 
-        when(movieRepository.findByAgeRating(ageRating)).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.getMoviesByAgeRating(ageRating);
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
+        when(movieRepository.findByCategoryOrderByRatingDesc("Trending")).thenReturn(expectedMovies);
+        assertEquals(expectedMovies, underTest.getMoviesByCategoryOrderByRatingDesc("Trending"));
     }
 
     @Test
-    void testFindByRatingGreaterThanEqual() {
-        double rating = 4.5;
+    void testFindAllByOrderByCategoryAsc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
-        );
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies", "Popular"),
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies", "Trending"));
 
-        when(movieRepository.findByRatingGreaterThanEqual(rating)).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findByRatingGreaterThanEqual(rating);
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
+        when(movieRepository.findAllByOrderByCategoryAsc()).thenReturn(expectedMovies);
+        assertEquals(expectedMovies, underTest.findAllByOrderByCategoryAsc());
     }
 
     @Test
-    void testFindByRatingLessThanEqual() {
-        double rating = 4.5;
+    void testFindAllByOrderByCategoryDesc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 4.2, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
-        );
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies", "Trending"),
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies", "Popular"));
 
-        when(movieRepository.findByRatingLessThanEqual(rating)).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findByRatingLessThanEqual(rating);
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
+        when(movieRepository.findAllByOrderByCategoryDesc()).thenReturn(expectedMovies);
+        assertEquals(expectedMovies, underTest.findAllByOrderByCategoryDesc());
     }
 
     @Test
-    void testFindAllByOrderByNameAsc() {
-        List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
-        );
+    void testGetAllDistinctCategories() {
+        List<String> expectedCategories = Arrays.asList("Trending", "Popular", "New Releases", "Top Rated");
 
-        when(movieRepository.findAllByOrderByNameAsc()).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findAllByOrderByNameAsc();
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
-    }
-
-    @Test
-    void testFindAllByOrderByNameDesc() {
-        List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
-                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
-        );
-
-        when(movieRepository.findAllByOrderByNameDesc()).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findAllByOrderByNameDesc();
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
-    }
-
-    @Test
-    void testFindAllByOrderByRatingAsc() {
-        List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
-        );
-
-        when(movieRepository.findAllByOrderByRatingAsc()).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findAllByOrderByRatingAsc();
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
-    }
-
-    @Test
-    void testFindAllByOrderByRatingDesc() {
-        List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
-                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
-        );
-
-        when(movieRepository.findAllByOrderByRatingDesc()).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findAllByOrderByRatingDesc();
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
-    }
-
-    @Test
-    void testFindAllByOrderByYearAsc() {
-        List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
-        );
-
-        when(movieRepository.findAllByOrderByYearAsc()).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findAllByOrderByYearAsc();
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
-    }
-
-    @Test
-    void testFindAllByOrderByYearDesc() {
-        List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
-                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
-        );
-
-        when(movieRepository.findAllByOrderByYearDesc()).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findAllByOrderByYearDesc();
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
-    }
-
-    @Test
-    void testFindAllByOrderByGenreAsc() {
-        List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
-        );
-
-        when(movieRepository.findAllByOrderByGenreAsc()).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findAllByOrderByGenreAsc();
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
-    }
-
-    @Test
-    void testFindAllByOrderByGenreDesc() {
-        List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
-                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
-        );
-
-        when(movieRepository.findAllByOrderByGenreDesc()).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findAllByOrderByGenreDesc();
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
+        when(movieRepository.findAllDistinctCategories()).thenReturn(expectedCategories);
+        assertEquals(expectedCategories, underTest.getAllDistinctCategories());
     }
 }

@@ -18,10 +18,12 @@ spring:
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
     baseline-on-migrate: true
+    validate-on-migrate: false
+    out-of-order: true
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect

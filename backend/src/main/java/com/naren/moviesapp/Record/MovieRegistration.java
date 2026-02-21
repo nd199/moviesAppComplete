@@ -8,6 +8,7 @@ public record MovieRegistration(
         String ageRating,
         Integer year,
         String runtime,
-        String genre
+        String genre,
+        String category
 ) {
 }

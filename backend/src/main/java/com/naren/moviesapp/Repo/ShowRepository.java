@@ -2,10 +2,12 @@ package com.naren.moviesapp.Repo;
 
 import com.naren.moviesapp.Entity.Show;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface ShowRepository extends JpaRepository<Show, Long> {
+
     boolean existsByName(String name);
 
     Show findByName(String name);
@@ -36,4 +38,20 @@ public interface ShowRepository extends JpaRepository<Show, Long> {
 
     List<Show> findAllByOrderByGenreDesc();
 
+    List<Show> findShowByType(String type);
+
+    // Category-based queries
+    List<Show> findByCategory(String category);
+
+    List<Show> findByCategoryOrderByRatingDesc(String category);
+
+    List<Show> findByCategoryOrderByCreatedAtDesc(String category);
+
+    List<Show> findAllByOrderByCategoryAsc();
+
+    List<Show> findAllByOrderByCategoryDesc();
+
+    // Get all distinct categories using native query
+    @Query("SELECT DISTINCT s.category FROM Show s WHERE s.category IS NOT NULL")
+    List<String> findAllDistinctCategories();
 }

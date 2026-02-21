@@ -42,4 +42,16 @@ public interface ShowServiceInterface {
 
     List<Show> findAllByOrderByGenreDesc();
 
+    // Category-based methods
+    List<Show> getShowsByCategory(String category);
+
+    List<Show> getShowsByCategoryOrderByRatingDesc(String category);
+
+    List<Show> getShowsByCategoryOrderByCreatedAtDesc(String category);
+
+    List<Show> findAllByOrderByCategoryAsc();
+
+    List<Show> findAllByOrderByCategoryDesc();
+
+    List<String> getAllDistinctCategories();
 }

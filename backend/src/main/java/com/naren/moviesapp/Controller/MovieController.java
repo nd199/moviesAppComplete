@@ -48,4 +48,41 @@ public class MovieController {
     public void deleteMovie(@PathVariable("id") Long movieId) {
         movieService.removeMovie(movieId);
     }
+
+    // Category-based endpoints
+    @GetMapping("/movies/category/{category}")
+    public ResponseEntity<List<Movie>> getMoviesByCategory(@PathVariable("category") String category) {
+        List<Movie> movies = movieService.getMoviesByCategory(category);
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @GetMapping("/movies/category/{category}/rating")
+    public ResponseEntity<List<Movie>> getMoviesByCategoryOrderByRating(@PathVariable("category") String category) {
+        List<Movie> movies = movieService.getMoviesByCategoryOrderByRatingDesc(category);
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @GetMapping("/movies/category/{category}/newest")
+    public ResponseEntity<List<Movie>> getMoviesByCategoryOrderByNewest(@PathVariable("category") String category) {
+        List<Movie> movies = movieService.getMoviesByCategoryOrderByCreatedAtDesc(category);
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @GetMapping("/movies/categories")
+    public ResponseEntity<List<String>> getAllCategories() {
+        List<String> categories = movieService.getAllDistinctCategories();
+        return new ResponseEntity<>(categories, HttpStatus.OK);
+    }
+
+    @GetMapping("/movies/sort/category/asc")
+    public ResponseEntity<List<Movie>> getMoviesSortedByCategoryAsc() {
+        List<Movie> movies = movieService.findAllByOrderByCategoryAsc();
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @GetMapping("/movies/sort/category/desc")
+    public ResponseEntity<List<Movie>> getMoviesSortedByCategoryDesc() {
+        List<Movie> movies = movieService.findAllByOrderByCategoryDesc();
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
 }

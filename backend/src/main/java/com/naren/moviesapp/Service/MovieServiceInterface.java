@@ -41,4 +41,17 @@ public interface MovieServiceInterface {
     List<Movie> findAllByOrderByGenreAsc();
 
     List<Movie> findAllByOrderByGenreDesc();
+
+    // Category-based methods
+    List<Movie> getMoviesByCategory(String category);
+
+    List<Movie> getMoviesByCategoryOrderByRatingDesc(String category);
+
+    List<Movie> getMoviesByCategoryOrderByCreatedAtDesc(String category);
+
+    List<Movie> findAllByOrderByCategoryAsc();
+
+    List<Movie> findAllByOrderByCategoryDesc();
+
+    List<String> getAllDistinctCategories();
 }

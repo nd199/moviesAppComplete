@@ -77,7 +77,7 @@ public class MovieIT extends AbstractIntegrationTest {
         String genre = "Action";
 
         registration = new MovieRegistration(movieName, rating, description,
-                poster, ageRating, year, runtime, genre);
+                poster, ageRating, year, runtime, genre, "General");
     }
 
     private void createRoleIfNotExists() {
@@ -252,7 +252,7 @@ public class MovieIT extends AbstractIntegrationTest {
                 registration.ageRating(),
                 registration.year(),
                 registration.runtime(),
-                registration.genre()
+                registration.genre(), "General"
         );
 
         // Update the movie

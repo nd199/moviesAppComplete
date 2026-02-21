@@ -32,7 +32,19 @@ public class MovieService implements MovieServiceInterface {
         return savedMovie;
     }
 
+    /**
+     * Add a movie entity directly (used for TMDB sync)
+     */
+    public Movie addMovie(Movie movie) {
+        if (movieRepository.existsByName(movie.getName())) {
+            String errorMessage = "Movie name %s already exists".formatted(movie.getName());
+            throw new ResourceAlreadyExists(errorMessage);
+        }
+        return movieRepository.save(movie);
+    }
+
     private Movie createMovie(MovieRegistration registration) {
+        String category = registration.category() != null ? registration.category() : "General";
         return new Movie(
                 registration.name(),
                 registration.rating(),
@@ -42,7 +54,8 @@ public class MovieService implements MovieServiceInterface {
                 registration.year(),
                 registration.runtime(),
                 registration.genre(),
-                "movies");
+                "movies",
+                category);
     }
 
     @Override
@@ -106,6 +119,10 @@ public class MovieService implements MovieServiceInterface {
         }
         if (update.genre() != null && !update.genre().equals(movie.getGenre())) {
             movie.setGenre(update.genre());
+            changes = true;
+        }
+        if (update.category() != null && !update.category().equals(movie.getCategory())) {
+            movie.setCategory(update.category());
             changes = true;
         }
 
@@ -174,5 +191,36 @@ public class MovieService implements MovieServiceInterface {
     @Override
     public List<Movie> findAllByOrderByGenreDesc() {
         return movieRepository.findAllByOrderByGenreDesc();
+    }
+
+    // Category-based methods
+    @Override
+    public List<Movie> getMoviesByCategory(String category) {
+        return movieRepository.findByCategory(category);
+    }
+
+    @Override
+    public List<Movie> getMoviesByCategoryOrderByRatingDesc(String category) {
+        return movieRepository.findByCategoryOrderByRatingDesc(category);
+    }
+
+    @Override
+    public List<Movie> getMoviesByCategoryOrderByCreatedAtDesc(String category) {
+        return movieRepository.findByCategoryOrderByCreatedAtDesc(category);
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByCategoryAsc() {
+        return movieRepository.findAllByOrderByCategoryAsc();
+    }
+
+    @Override
+    public List<Movie> findAllByOrderByCategoryDesc() {
+        return movieRepository.findAllByOrderByCategoryDesc();
+    }
+
+    @Override
+    public List<String> getAllDistinctCategories() {
+        return movieRepository.findAllDistinctCategories();
     }
 }

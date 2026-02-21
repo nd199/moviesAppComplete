@@ -4,12 +4,12 @@ import ColListItem from "../../Components/Col-ListItem";
 import FilterNavbar from "../../Components/FilterNavbar";
 import Footer from "../../Components/Footer";
 import NavBar from "../../Components/NavBar";
-import { fetchMovies } from "../../Network/ApiCalls";
+import { fetchTmdbTrendingMovies, searchTmdbMovies } from "../../Network/ApiCalls";
 import "./Movies.css";
 
 const Movies = () => {
   const dispatch = useDispatch();
-  const { movies = [], loading = false } = useSelector(
+  const { tmdbTrendingMovies = [], tmdbFetching = false, tmdbSearchResults = [] } = useSelector(
     (state) => state?.product || {}
   );
 
@@ -18,37 +18,44 @@ const Movies = () => {
   const [genre, setGenre] = useState("");
   const [year, setYear] = useState("");
   const [rating, setRating] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
-    fetchMovies(dispatch);
-  }, [dispatch]);
+    if (searchQuery.trim()) {
+      setIsSearching(true);
+      searchTmdbMovies(dispatch, searchQuery);
+    } else {
+      fetchTmdbTrendingMovies(dispatch);
+      setIsSearching(false);
+    }
+  }, [dispatch, searchQuery]);
 
   const filterMovies = useCallback(
     (movies) => {
       if (!movies?.length) return [];
 
       return movies
-        .filter(
-          (movie) =>
-            !searchQuery ||
-            movie.name?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .filter((movie) => !genre || movie.genre?.includes(genre))
+        .filter((movie) => !genre || genre === 'All' || 
+          (movie.genre && 
+            (movie.genre.toLowerCase().includes(genre.toLowerCase()) || 
+            movie.genre.split(',').some(g => g.trim().toLowerCase().includes(genre.toLowerCase()))
+          )))
         .filter((movie) => !year || movie.year === parseInt(year))
         .filter((movie) => !rating || movie.rating >= parseFloat(rating))
         .sort((a, b) => {
           if (sortBy === "popularity") {
-            return (b.popularity || 0) - (a.popularity || 0);
+            return (b.voteCount || 0) - (a.voteCount || 0);
           } else if (sortBy === "rating") {
             return (b.rating || 0) - (a.rating || 0);
           }
           return 0;
         });
     },
-    [searchQuery, genre, year, rating, sortBy]
+    [genre, year, rating, sortBy]
   );
 
-  const filteredMovies = filterMovies(movies);
+  const moviesToDisplay = searchQuery ? tmdbSearchResults : tmdbTrendingMovies;
+  const filteredMovies = filterMovies(moviesToDisplay);
 
   return (
     <div className="moviesPage">
@@ -68,7 +75,7 @@ const Movies = () => {
           setRating={setRating}
         />
         <div className="movieContainerContent">
-          {loading ? (
+          {tmdbFetching ? (
             <div className="loading-container">
               <div className="loading-spinner"></div>
               <p className="loading-text-primary">

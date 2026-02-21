@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { ThreeDots } from "react-loader-spinner";
 
-const VideoPlayer = ({ className, videoId = "X27pvZBu1ykSt5rHtmZA" }) => {
+const VideoPlayer = ({ className, videoId, isYouTube = false }) => {
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Determine the correct embed URL based on whether it's a YouTube video
+  const embedUrl = isYouTube 
+    ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`
+    : `https://jumpshare.com/embed/${videoId}`;
 
   return (
     <div className={className}>
@@ -14,9 +19,9 @@ const VideoPlayer = ({ className, videoId = "X27pvZBu1ykSt5rHtmZA" }) => {
 
       <iframe
         id={`featured-video-${videoId}`}
-        src={`https://jumpshare.com/embed/${videoId}`}
+        src={embedUrl}
         frameBorder="0"
-        allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
         loading="lazy"
         onLoad={() => setIsLoaded(true)}

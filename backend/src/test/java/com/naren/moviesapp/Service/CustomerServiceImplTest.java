@@ -433,7 +433,7 @@ class CustomerServiceImplTest {
                 2000,
                 "none",
                 "none",
-                "movies");
+                "movies", "General");
         movie.setId(1L);
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
@@ -463,7 +463,7 @@ class CustomerServiceImplTest {
                 2000,
                 "none",
                 "none",
-                "movies");
+                "movies", "General");
         movie.setId(1L);
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
@@ -490,7 +490,7 @@ class CustomerServiceImplTest {
                 2000,
                 "none",
                 "none",
-                "movies");
+                "movies", "General");
         movie.setId(1L);
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
@@ -522,7 +522,7 @@ class CustomerServiceImplTest {
                 2000,
                 "none",
                 "none",
-                "movies");
+                "movies", "General");
         movie.setId(1L);
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));

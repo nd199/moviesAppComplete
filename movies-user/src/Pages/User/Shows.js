@@ -4,12 +4,12 @@ import ColListItem from "../../Components/Col-ListItem";
 import FilterNavbar from "../../Components/FilterNavbar";
 import Footer from "../../Components/Footer";
 import NavBar from "../../Components/NavBar";
-import { fetchShows } from "../../Network/ApiCalls";
+import { fetchTmdbTrendingShows, searchTmdbShows } from "../../Network/ApiCalls";
 import "./Shows.css";
 
 const Shows = () => {
   const dispatch = useDispatch();
-  const { shows = [], loading = false } = useSelector(
+  const { tmdbTrendingShows = [], tmdbFetching = false, tmdbSearchResults = [] } = useSelector(
     (state) => state?.product || {}
   );
 
@@ -18,37 +18,44 @@ const Shows = () => {
   const [genre, setGenre] = useState("");
   const [year, setYear] = useState("");
   const [rating, setRating] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
-    fetchShows(dispatch);
-  }, [dispatch]);
+    if (searchQuery.trim()) {
+      setIsSearching(true);
+      searchTmdbShows(dispatch, searchQuery);
+    } else {
+      fetchTmdbTrendingShows(dispatch);
+      setIsSearching(false);
+    }
+  }, [dispatch, searchQuery]);
 
   const filterShows = useCallback(
     (shows) => {
       if (!shows?.length) return [];
 
       return shows
-        .filter(
-          (show) =>
-            !searchQuery ||
-            show.name?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .filter((show) => !genre || show.genre?.includes(genre))
+        .filter((show) => !genre || genre === 'All' || 
+          (show.genre && 
+            (show.genre.toLowerCase().includes(genre.toLowerCase()) || 
+            show.genre.split(',').some(g => g.trim().toLowerCase().includes(genre.toLowerCase()))
+          )))
         .filter((show) => !year || show.year === parseInt(year))
         .filter((show) => !rating || show.rating >= parseFloat(rating))
         .sort((a, b) => {
           if (sortBy === "popularity") {
-            return (b.popularity || 0) - (a.popularity || 0);
+            return (b.voteCount || 0) - (a.voteCount || 0);
           } else if (sortBy === "rating") {
             return (b.rating || 0) - (a.rating || 0);
           }
           return 0;
         });
     },
-    [searchQuery, genre, year, rating, sortBy]
+    [genre, year, rating, sortBy]
   );
 
-  const filteredShows = filterShows(shows);
+  const showsToDisplay = searchQuery ? tmdbSearchResults : tmdbTrendingShows;
+  const filteredShows = filterShows(showsToDisplay);
 
   return (
     <div className="showsPage">
@@ -68,7 +75,7 @@ const Shows = () => {
           setRating={setRating}
         />
         <div className="showContainerContent">
-          {loading ? (
+          {tmdbFetching ? (
             <div className="loading-container">
               <div className="loading-spinner"></div>
               <p className="loading-text-primary">Loading TV shows...</p>

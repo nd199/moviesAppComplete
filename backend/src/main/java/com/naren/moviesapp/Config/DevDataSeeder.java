@@ -12,11 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 @Configuration
@@ -29,10 +32,40 @@ public class DevDataSeeder {
     private static final Faker FAKER = new Faker();
     private static final int DEMO_DATA_COUNT = 20;
 
+    // OTT Platform Categories
+    private static final List<String> MOVIE_CATEGORIES = Arrays.asList(
+            "Trending",
+            "New Releases",
+            "Popular",
+            "Top Rated",
+            "Action",
+            "Comedy",
+            "Drama",
+            "Sci-Fi",
+            "Horror",
+            "Romance"
+    );
+
+    private static final List<String> SHOW_CATEGORIES = Arrays.asList(
+            "Trending",
+            "New Releases",
+            "Popular",
+            "Top Rated",
+            "Binge Worthy",
+            "Originals",
+            "Drama",
+            "Comedy",
+            "Reality TV",
+            "Documentary"
+    );
+
     private final CustomerRepository customerRepository;
     private final MovieRepository movieRepository;
     private final ShowRepository showRepository;
     private final PasswordEncoder passwordEncoder;
+    
+    @Value("${app.tmdb.api-key:}")
+    private String tmdbApiKey;
 
     @Bean
     @Transactional
@@ -42,10 +75,22 @@ public class DevDataSeeder {
 
             createDemoUser();
 
+            // Only create random customers
             for (int i = 0; i < DEMO_DATA_COUNT; i++) {
                 createRandomCustomer();
-                createRandomMovie();
-                createRandomShow();
+            }
+            
+            // Only create fake movies/shows if TMDB is not configured
+            // If TMDB is configured, TmdbDataSeeder will import real data
+            boolean tmdbConfigured = tmdbApiKey != null && !tmdbApiKey.isBlank();
+            if (!tmdbConfigured) {
+                log.info("TMDB not configured. Creating fake movies and shows...");
+                for (int i = 0; i < DEMO_DATA_COUNT; i++) {
+                    createRandomMovie();
+                    createRandomShow();
+                }
+            } else {
+                log.info("TMDB is configured. Skipping fake movie/show creation. Real data will be imported by TmdbDataSeeder.");
             }
 
             log.info("Development data seeding completed.");
@@ -127,6 +172,9 @@ public class DevDataSeeder {
         String genre1 = FAKER.book().genre();
         String genre2 = FAKER.book().genre();
         String instant = Instant.now().toString().substring(20, 24);
+        
+        // Assign random category
+        String category = MOVIE_CATEGORIES.get(RANDOM.nextInt(MOVIE_CATEGORIES.size()));
 
         Movie movie = new Movie();
         movie.setName(movieName + "-" + instant);
@@ -138,9 +186,10 @@ public class DevDataSeeder {
         movie.setRuntime(runtime);
         movie.setGenre(genre1 + "," + genre2);
         movie.setType("movies");
+        movie.setCategory(category);
 
         movieRepository.save(movie);
-        log.debug("Created movie: {}", movie.getName());
+        log.debug("Created movie: {} with category: {}", movie.getName(), category);
     }
 
     private void createRandomShow() {
@@ -154,6 +203,9 @@ public class DevDataSeeder {
         String genre1 = FAKER.book().genre();
         String genre2 = FAKER.book().genre();
         String instant = Instant.now().toString().substring(20, 24);
+        
+        // Assign random category
+        String category = SHOW_CATEGORIES.get(RANDOM.nextInt(SHOW_CATEGORIES.size()));
 
         Show show = new Show();
         show.setName(showName + "-" + instant);
@@ -165,8 +217,9 @@ public class DevDataSeeder {
         show.setRuntime(runtime);
         show.setGenre(genre1 + "," + genre2);
         show.setType("shows");
+        show.setCategory(category);
 
         showRepository.save(show);
-        log.debug("Created show: {}", show.getName());
+        log.debug("Created show: {} with category: {}", show.getName(), category);
     }
 }

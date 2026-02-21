@@ -170,6 +170,17 @@
             <version>2.2.0</version>
         </dependency>
 
+        <!-- WebClient for TMDB API calls -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok-mapstruct-binding</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+
 
     </dependencies>
 

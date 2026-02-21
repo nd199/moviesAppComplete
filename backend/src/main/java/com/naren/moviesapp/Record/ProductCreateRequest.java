@@ -9,6 +9,7 @@ public record ProductCreateRequest(
         Integer year,
         String type,
         String runtime,
-        String genre
+        String genre,
+        String category
 ) {
 }

@@ -336,7 +336,7 @@ public class CustomerIT extends AbstractIntegrationTest {
         MovieRegistration movie =
                 new MovieRegistration(movieName,
                         rating, description, poster, ageRating,
-                        year, runtime, genre);
+                        year, runtime, genre, "General");
 
         webTestClient.post()
                 .uri("/api/v1/movies")

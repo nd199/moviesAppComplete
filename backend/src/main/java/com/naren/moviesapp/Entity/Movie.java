@@ -32,13 +32,16 @@ public class Movie {
     @Column(name = "movie_id")
     private Long id;
 
+    @Column(name = "tmdb_id")
+    private Long tmdbId;
+
     @Column(name = "name", nullable = false, columnDefinition = "TEXT")
     private String name;
 
     @Column(name = "rating", nullable = false)
     private Double rating;
 
-    @Column(nullable = false, length = 1000) // Example length
+    @Column(nullable = false, length = 1000)
     private String description;
 
     @Column(nullable = false)
@@ -59,6 +62,9 @@ public class Movie {
     @Column(nullable = false, columnDefinition = "varchar(255) default 'movies'")
     private String type;
 
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'General'")
+    private String category;
+
     @ManyToOne
     @JoinColumn(name = "customer_id",
             foreignKey = @ForeignKey(name = "fk_customer_movie_id"))
@@ -73,7 +79,7 @@ public class Movie {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Movie(String name, Double rating, String description, String poster, String ageRating, Integer year, String runtime, String genre, String type) {
+    public Movie(String name, Double rating, String description, String poster, String ageRating, Integer year, String runtime, String genre, String type, String category) {
         this.name = name;
         this.rating = rating;
         this.description = description;
@@ -83,6 +89,7 @@ public class Movie {
         this.runtime = runtime;
         this.genre = genre;
         this.type = type;
+        this.category = category;
     }
 
 }

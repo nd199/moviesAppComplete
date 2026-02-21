@@ -14,6 +14,15 @@ import {
   fetchShowsFailure,
   fetchShowsStart,
   fetchShowsSuccess,
+  fetchTmdbTrendingMoviesStart,
+  fetchTmdbTrendingMoviesSuccess,
+  fetchTmdbTrendingMoviesFailure,
+  fetchTmdbTrendingShowsStart,
+  fetchTmdbTrendingShowsSuccess,
+  fetchTmdbTrendingShowsFailure,
+  fetchTmdbSearchResultsStart,
+  fetchTmdbSearchResultsSuccess,
+  fetchTmdbSearchResultsFailure,
 } from '../redux/ProductsRedux';
 import {
   fetchCurrentFailure,
@@ -303,6 +312,83 @@ export const deleteUser = async id => {
     return { success: true };
   } catch (error) {
     console.error('Failed to delete user:', error);
+    throw error;
+  }
+};
+
+// TMDB API Calls
+export const fetchTmdbTrendingMovies = async dispatch => {
+  dispatch(fetchTmdbTrendingMoviesStart());
+  try {
+    const res = await publicRequest().get('/tmdb/trending/movies');
+    const results = res.data?.results || [];
+    dispatch(fetchTmdbTrendingMoviesSuccess(results));
+    return results;
+  } catch (error) {
+    const message = error.response?.data?.message || 'Failed to fetch trending movies';
+    dispatch(fetchTmdbTrendingMoviesFailure({ message }));
+    return [];
+  }
+};
+
+export const fetchTmdbTrendingShows = async dispatch => {
+  dispatch(fetchTmdbTrendingShowsStart());
+  try {
+    const res = await publicRequest().get('/tmdb/trending/shows');
+    const results = res.data?.results || [];
+    dispatch(fetchTmdbTrendingShowsSuccess(results));
+    return results;
+  } catch (error) {
+    const message = error.response?.data?.message || 'Failed to fetch trending shows';
+    dispatch(fetchTmdbTrendingShowsFailure({ message }));
+    return [];
+  }
+};
+
+export const searchTmdbMovies = async (dispatch, query, page = 1) => {
+  dispatch(fetchTmdbSearchResultsStart());
+  try {
+    const res = await publicRequest().get(`/tmdb/search/movies?query=${encodeURIComponent(query)}&page=${page}`);
+    const results = res.data?.results || [];
+    dispatch(fetchTmdbSearchResultsSuccess(results));
+    return results;
+  } catch (error) {
+    const message = error.response?.data?.message || 'Failed to search movies';
+    dispatch(fetchTmdbSearchResultsFailure({ message }));
+    return [];
+  }
+};
+
+export const searchTmdbShows = async (dispatch, query, page = 1) => {
+  dispatch(fetchTmdbSearchResultsStart());
+  try {
+    const res = await publicRequest().get(`/tmdb/search/shows?query=${encodeURIComponent(query)}&page=${page}`);
+    const results = res.data?.results || [];
+    dispatch(fetchTmdbSearchResultsSuccess(results));
+    return results;
+  } catch (error) {
+    const message = error.response?.data?.message || 'Failed to search shows';
+    dispatch(fetchTmdbSearchResultsFailure({ message }));
+    return [];
+  }
+};
+
+export const syncTmdbMovie = async (tmdbId) => {
+  try {
+    const res = await userRequest().post(`/tmdb/sync/movie/${tmdbId}`);
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error('Failed to sync movie:', error);
+    throw error;
+  }
+};
+
+export const syncTmdbTvShow = async (tmdbId) => {
+  try {
+    const res = await userRequest().post(`/tmdb/sync/tv/${tmdbId}`);
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error('Failed to sync TV show:', error);
     throw error;
   }
 };

@@ -71,41 +71,42 @@ public class SecurityFilterChainConfig {
         System.out.println("SECURITY FILTER CHAIN CREATED");
 
         http.csrf(AbstractHttpConfigurer::disable)
-
                 .cors(cors -> cors.configure(http))
-
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .authorizeHttpRequests(auth -> auth
+                        // GET endpoints - public access
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/ping",
                                 "/api/v1/movies/**",
                                 "/api/v1/shows/**",
                                 "/api/v1/products/**",
                                 "/api/v1/about",
-                                "/api/v1/test-data/status"
+                                "/api/v1/test-data/status",
+                                "/api/v1/tmdb/**"
                         ).permitAll()
 
+                        // POST public endpoints
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/customers",
                                 "/api/v1/auth/refresh-token",
                                 "/api/v1/verify/email",
                                 "/api/v1/validate/Otp",
-                                "/api/password-reset/**"
-                        ).permitAll()
-
-                        .requestMatchers(HttpMethod.POST,
+                                "/api/password-reset/**",
                                 "/api/v1/subscription/intent",
                                 "/pingSpring"
                         ).permitAll()
+
+                        // Swagger - public
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+
+                        // Authenticated endpoints
                         .requestMatchers(
                                 "/api/v1/profile/**",
                                 "/api/v1/customers/currentUser",
@@ -113,12 +114,15 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/payments/**",
                                 "/api/v1/video/**"
                         ).authenticated()
+
+                        // User management - requires authority
                         .requestMatchers(
                                 "/api/v1/customers/**",
                                 "/api/v1/roles/**",
                                 "/api/v1/auth/admins"
                         ).hasAuthority("USER_MANAGE")
 
+                        // Movie/Show write permissions
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/movies",
                                 "/api/v1/shows"
@@ -133,10 +137,13 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/movies/**",
                                 "/api/v1/shows/**"
                         ).hasAuthority("MOVIE_DELETE")
+
+                        // Admin creation
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/admin/create"
                         ).hasAuthority("SYSTEM_CONFIG")
 
+                        // All other requests need authentication
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)

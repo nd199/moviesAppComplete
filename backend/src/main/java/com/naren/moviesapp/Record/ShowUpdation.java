@@ -8,6 +8,7 @@ public record ShowUpdation(
         String ageRating,
         Integer year,
         String runtime,
-        String genre
+        String genre,
+        String category
 ) {
 }

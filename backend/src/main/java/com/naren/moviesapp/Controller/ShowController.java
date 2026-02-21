@@ -49,4 +49,41 @@ public class ShowController {
     public void deleteShow(@PathVariable("id") Long showId) {
         showService.removeShow(showId);
     }
+
+    // Category-based endpoints
+    @GetMapping("/shows/category/{category}")
+    public ResponseEntity<List<Show>> getShowsByCategory(@PathVariable("category") String category) {
+        List<Show> shows = showService.getShowsByCategory(category);
+        return new ResponseEntity<>(shows, HttpStatus.OK);
+    }
+
+    @GetMapping("/shows/category/{category}/rating")
+    public ResponseEntity<List<Show>> getShowsByCategoryOrderByRating(@PathVariable("category") String category) {
+        List<Show> shows = showService.getShowsByCategoryOrderByRatingDesc(category);
+        return new ResponseEntity<>(shows, HttpStatus.OK);
+    }
+
+    @GetMapping("/shows/category/{category}/newest")
+    public ResponseEntity<List<Show>> getShowsByCategoryOrderByNewest(@PathVariable("category") String category) {
+        List<Show> shows = showService.getShowsByCategoryOrderByCreatedAtDesc(category);
+        return new ResponseEntity<>(shows, HttpStatus.OK);
+    }
+
+    @GetMapping("/shows/categories")
+    public ResponseEntity<List<String>> getAllCategories() {
+        List<String> categories = showService.getAllDistinctCategories();
+        return new ResponseEntity<>(categories, HttpStatus.OK);
+    }
+
+    @GetMapping("/shows/sort/category/asc")
+    public ResponseEntity<List<Show>> getShowsSortedByCategoryAsc() {
+        List<Show> shows = showService.findAllByOrderByCategoryAsc();
+        return new ResponseEntity<>(shows, HttpStatus.OK);
+    }
+
+    @GetMapping("/shows/sort/category/desc")
+    public ResponseEntity<List<Show>> getShowsSortedByCategoryDesc() {
+        List<Show> shows = showService.findAllByOrderByCategoryDesc();
+        return new ResponseEntity<>(shows, HttpStatus.OK);
+    }
 }

@@ -35,7 +35,8 @@ public class ProductService {
                         productUpdateRequest.ageRating(),
                         productUpdateRequest.year(),
                         productUpdateRequest.runtime(),
-                        productUpdateRequest.genre()
+                        productUpdateRequest.genre(),
+                        productUpdateRequest.category()
                 );
                 Movie movieUpdated = movieService.updateMovie(movieUpdation, id);
                 return ResponseEntity.ok()
@@ -49,7 +50,8 @@ public class ProductService {
                         productUpdateRequest.ageRating(),
                         productUpdateRequest.year(),
                         productUpdateRequest.runtime(),
-                        productUpdateRequest.genre()
+                        productUpdateRequest.genre(),
+                        productUpdateRequest.category()
                 );
                 Show showUpdated = showService.updateShow(showUpdation, id);
                 return ResponseEntity.ok()
@@ -62,7 +64,7 @@ public class ProductService {
                     .body("Product not found: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                    .body("Invalid request: " + e.getMessage());
+                    .body(" Invalid request: " + e.getMessage());
         } catch (Exception e) {
             logger.error("Unexpected error updating product with id {} and type {}: {}", id, type, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -96,7 +98,8 @@ public class ProductService {
                         productCreateRequest.ageRating(),
                         productCreateRequest.year(),
                         productCreateRequest.runtime(),
-                        productCreateRequest.genre()
+                        productCreateRequest.genre(),
+                        productCreateRequest.category()
                 );
                 movieService.addMovie(movieRegistration);
                 return new ResponseEntity<>(movieRegistration, HttpStatus.CREATED);
@@ -109,7 +112,8 @@ public class ProductService {
                         productCreateRequest.ageRating(),
                         productCreateRequest.year(),
                         productCreateRequest.runtime(),
-                        productCreateRequest.genre()
+                        productCreateRequest.genre(),
+                        productCreateRequest.category()
                 );
                 showService.addShow(showRegistration);
                 return new ResponseEntity<>(showRegistration, HttpStatus.CREATED);
@@ -121,7 +125,7 @@ public class ProductService {
                     .body("Product already exists: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                    .body("Invalid request: " + e.getMessage());
+                    .body(" Invalid request: " + e.getMessage());
         } catch (Exception e) {
             logger.error("Unexpected error adding product of type {}: {}", productCreateRequest.type(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

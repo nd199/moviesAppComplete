@@ -76,7 +76,7 @@ public class MoviesApplication {
         var instant = Instant.now().toString().substring(20, 24);
 
         Movie movie = new Movie(movieName + "-" + instant, rating,
-                description, poster, ageRating, year, runtime, genre1 + "," + genre2, "movies");
+                description, poster, ageRating, year, runtime, genre1 + "," + genre2, "movies", "General");
         movieRepository.save(movie);
 
     }
@@ -94,7 +94,7 @@ public class MoviesApplication {
         var instant = Instant.now().toString().substring(20, 24);
 
         Show show = new Show(showName + "-" + instant, rating, description, poster,
-                ageRating, year, runtime, genre1 + "," + genre2, "shows");
+                ageRating, year, runtime, genre1 + "," + genre2, "shows", "General");
         showRepository.save(show);
     }
 

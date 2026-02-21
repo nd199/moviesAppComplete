@@ -32,7 +32,19 @@ public class ShowService implements ShowServiceInterface {
         return saved;
     }
 
+    /**
+     * Add a show entity directly (used for TMDB sync)
+     */
+    public Show addShow(Show show) {
+        if (showRepository.existsByName(show.getName())) {
+            String errorMessage = "Show name %s already exists".formatted(show.getName());
+            throw new ResourceAlreadyExists(errorMessage);
+        }
+        return showRepository.save(show);
+    }
+
     private Show createShow(ShowRegistration registration) {
+        String category = registration.category() != null ? registration.category() : "General";
         return new Show(
                 registration.name(),
                 registration.rating(),
@@ -42,7 +54,8 @@ public class ShowService implements ShowServiceInterface {
                 registration.year(),
                 registration.runtime(),
                 registration.genre(),
-                "shows");
+                "shows",
+                category);
     }
 
     @Override
@@ -108,6 +121,10 @@ public class ShowService implements ShowServiceInterface {
         if (update.genre() != null && !update.genre().equals(show.getGenre())) {
             changes = true;
             show.setGenre(update.genre());
+        }
+        if (update.category() != null && !update.category().equals(show.getCategory())) {
+            changes = true;
+            show.setCategory(update.category());
         }
 
         if (!changes) {
@@ -176,6 +193,37 @@ public class ShowService implements ShowServiceInterface {
     @Override
     public List<Show> findAllByOrderByGenreDesc() {
         return showRepository.findAllByOrderByGenreDesc();
+    }
+
+    // Category-based methods
+    @Override
+    public List<Show> getShowsByCategory(String category) {
+        return showRepository.findByCategory(category);
+    }
+
+    @Override
+    public List<Show> getShowsByCategoryOrderByRatingDesc(String category) {
+        return showRepository.findByCategoryOrderByRatingDesc(category);
+    }
+
+    @Override
+    public List<Show> getShowsByCategoryOrderByCreatedAtDesc(String category) {
+        return showRepository.findByCategoryOrderByCreatedAtDesc(category);
+    }
+
+    @Override
+    public List<Show> findAllByOrderByCategoryAsc() {
+        return showRepository.findAllByOrderByCategoryAsc();
+    }
+
+    @Override
+    public List<Show> findAllByOrderByCategoryDesc() {
+        return showRepository.findAllByOrderByCategoryDesc();
+    }
+
+    @Override
+    public List<String> getAllDistinctCategories() {
+        return showRepository.findAllDistinctCategories();
     }
 
 }

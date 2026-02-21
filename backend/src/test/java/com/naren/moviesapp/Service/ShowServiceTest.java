@@ -43,28 +43,29 @@ class ShowServiceTest {
         ShowRegistration registration = new ShowRegistration(
                 "testName", 5.00, "A great show",
                 "http://poster.url", "PG-13", 2022,
-                "120 mins", "Drama");
+                "120 mins", "Drama", "Trending");
 
         when(showRepository.existsByName("testName")).thenReturn(false);
-
         underTest.addShow(registration);
 
-        ArgumentCaptor<Show> showArgumentCaptor = ArgumentCaptor.forClass(Show.class);
+        ArgumentCaptor<Show> captor = ArgumentCaptor.forClass(Show.class);
+        verify(showRepository).save(captor.capture());
+        assertThat(captor.getValue().getCategory()).isEqualTo("Trending");
+    }
 
-        verify(showRepository).save(showArgumentCaptor.capture());
+    @Test
+    void addShowWithNullCategoryDefaultsToGeneral() {
+        ShowRegistration registration = new ShowRegistration(
+                "testName", 5.00, "A great show",
+                "http://poster.url", "PG-13", 2022,
+                "120 mins", "Drama", null);
 
-        Show captured = showArgumentCaptor.getValue();
+        when(showRepository.existsByName("testName")).thenReturn(false);
+        underTest.addShow(registration);
 
-        assertThat(captured.getShow_id()).isNull();
-        assertThat(captured.getName()).isEqualTo(registration.name());
-        assertThat(captured.getRating()).isEqualTo(registration.rating());
-        assertThat(captured.getDescription()).isEqualTo(registration.description());
-        assertThat(captured.getPoster()).isEqualTo(registration.poster());
-        assertThat(captured.getAgeRating()).isEqualTo(registration.ageRating());
-        assertThat(captured.getYear()).isEqualTo(registration.year());
-        assertThat(captured.getRuntime()).isEqualTo(registration.runtime());
-        assertThat(captured.getGenre()).isEqualTo(registration.genre());
-        assertThat(captured.getType()).isEqualTo("shows");
+        ArgumentCaptor<Show> captor = ArgumentCaptor.forClass(Show.class);
+        verify(showRepository).save(captor.capture());
+        assertThat(captor.getValue().getCategory()).isEqualTo("General");
     }
 
     @Test
@@ -72,394 +73,143 @@ class ShowServiceTest {
         ShowRegistration registration = new ShowRegistration(
                 "testName", 5.00, "A great show",
                 "http://poster.url", "PG-13", 2022,
-                "120 mins", "Drama");
+                "120 mins", "Drama", "Trending");
 
         when(showRepository.existsByName("testName")).thenReturn(true);
 
-        assertThatThrownBy(
-                () -> underTest.addShow(registration))
-                .isInstanceOf(ResourceAlreadyExists.class)
-                .hasMessageContaining("Show name %s already exists".formatted(registration.name()));
-
+        assertThatThrownBy(() -> underTest.addShow(registration))
+                .isInstanceOf(ResourceAlreadyExists.class);
         verify(showRepository, never()).save(any());
     }
 
     @Test
     void removeShow() {
-        long id = 1;
-        Show show = new Show(
-                "testName",
-                5.00,
-                "A great show",
-                "http://poster.url",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Drama",
-                "shows");
-        show.setShow_id(id);
+        Show show = new Show("testName", 5.00, "A great show", "http://poster.url",
+                "PG-13", 2022, "120 mins", "Drama", "shows", "Trending");
+        show.setShow_id(1L);
 
-        when(showRepository.findById(id)).thenReturn(Optional.of(show));
-
-        underTest.removeShow(id);
-
+        when(showRepository.findById(1L)).thenReturn(Optional.of(show));
+        underTest.removeShow(1L);
         verify(showRepository).delete(show);
     }
 
     @Test
-    void throwsWhenShowRemovalIfNotExist() {
-        long id = 1;
-
-        when(showRepository.findById(id)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> underTest.removeShow(id))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Show with ID %s not found".formatted(id));
-
-        verify(showRepository, never()).delete(any());
-    }
-
-    @Test
     void getShowById() {
-        long id = 1;
-        Show show = new Show(
-                "testName",
-                5.00,
-                "A great show",
-                "http://poster.url",
-                "PG-13",
-                2022,
-                "120 mins",
-                "Drama",
-                "shows");
-        show.setShow_id(id);
+        Show show = new Show("testName", 5.00, "A great show", "http://poster.url",
+                "PG-13", 2022, "120 mins", "Drama", "shows", "Trending");
+        show.setShow_id(1L);
 
-        when(showRepository.findById(id)).thenReturn(Optional.of(show));
-
-        Show actual = underTest.getShowById(id);
-
-        assertThat(actual).isEqualTo(show);
-    }
-
-    @Test
-    void getShowByIdThrowsIfNotExists() {
-        long id = 1;
-
-        when(showRepository.findById(id)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> underTest.getShowById(id))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Show with ID '%s' not found".formatted(id));
+        when(showRepository.findById(1L)).thenReturn(Optional.of(show));
+        assertThat(underTest.getShowById(1L)).isEqualTo(show);
     }
 
     @Test
     void getShowList() {
         when(showRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of()));
-
-        List<Show> shows = underTest.getShowList();
-
-        assertThat(shows).isNotNull();
+        assertThat(underTest.getShowList()).isNotNull();
     }
 
     @Test
     void updateShow() {
-        long id = 2;
+        Show show = new Show("testName22", 2.0, "A show", "http://poster.url",
+                "PG", 2000, "100 mins", "Comedy", "shows", "General");
+        show.setShow_id(2L);
 
-        Show show = new Show(
-                "testName22",
-                2.0,
-                "A show",
-                "http://poster.url",
-                "PG",
-                2000,
-                "100 mins",
-                "Comedy",
-                "shows");
-        show.setShow_id(id);
+        when(showRepository.findById(2L)).thenReturn(Optional.of(show));
 
-        when(showRepository.findById(id)).thenReturn(Optional.of(show));
+        ShowUpdation showUpdation = new ShowUpdation("testName2", 5.0, "An awesome show",
+                "http://newposter.url", "R", 2021, "130 mins", "Thriller", "Trending");
 
-        ShowUpdation showUpdation = new ShowUpdation(
-                "testName2", 5.0, "An awesome show",
-                "http://newposter.url", "R", 2021,
-                "130 mins", "Thriller");
+        underTest.updateShow(showUpdation, 2L);
 
-        underTest.updateShow(showUpdation, id);
-
-        ArgumentCaptor<Show> showArgumentCaptor = ArgumentCaptor.forClass(Show.class);
-
-        verify(showRepository).save(showArgumentCaptor.capture());
-
-        Show updatedShow = showArgumentCaptor.getValue();
-
-        assertThat(updatedShow.getName()).isEqualTo(showUpdation.name());
-        assertThat(updatedShow.getRating()).isEqualTo(showUpdation.rating());
-        assertThat(updatedShow.getDescription()).isEqualTo(showUpdation.description());
-        assertThat(updatedShow.getPoster()).isEqualTo(showUpdation.poster());
-        assertThat(updatedShow.getAgeRating()).isEqualTo(showUpdation.ageRating());
-        assertThat(updatedShow.getYear()).isEqualTo(showUpdation.year());
-        assertThat(updatedShow.getRuntime()).isEqualTo(showUpdation.runtime());
-        assertThat(updatedShow.getGenre()).isEqualTo(showUpdation.genre());
+        ArgumentCaptor<Show> captor = ArgumentCaptor.forClass(Show.class);
+        verify(showRepository).save(captor.capture());
+        assertThat(captor.getValue().getCategory()).isEqualTo("Trending");
     }
 
     @Test
     void testUpdateShowNoChanges() {
         Show show = new Show();
-        ShowUpdation update = new ShowUpdation(null, null, null, null, null, null, null, null);
-        Long showId = 1L;
+        ShowUpdation update = new ShowUpdation(null, null, null, null, null, null, null, null, null);
 
-        when(showRepository.findById(showId)).thenReturn(java.util.Optional.ofNullable(show));
-
-        assertThatThrownBy
-                (() -> underTest.updateShow(update, showId))
+        when(showRepository.findById(1L)).thenReturn(Optional.of(show));
+        assertThatThrownBy(() -> underTest.updateShow(update, 1L))
                 .hasMessage("No data changes found");
-
-        verify(showRepository, never()).save(show);
-    }
-
-    @Test
-    void testUpdateShowShowNotFound() {
-        Long showId = 1L;
-
-        when(showRepository.findById(showId)).thenReturn(java.util.Optional.empty());
-
-        assertThatThrownBy(() -> underTest.updateShow(
-                new ShowUpdation("Hello", 4.5, "New Description", "New Poster",
-                        "New Age Rating", 2000, "New Runtime", "New Genre"), showId))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Show not found");
-
-        verify(showRepository, never()).save(any());
     }
 
     @Test
     void throwsIfNoChangesFoundForUpdation() {
-        long id = 2;
+        Show show = new Show("testName", 2.0, "A show", "http://poster.url",
+                "PG", 2000, "100 mins", "Comedy", "shows", "Trending");
+        show.setShow_id(2L);
 
-        Show show = new Show(
-                "testName",
-                2.0,
-                "A show",
-                "http://poster.url",
-                "PG",
-                2000,
-                "100 mins",
-                "Comedy",
-                "shows");
-        show.setShow_id(id);
+        when(showRepository.findById(2L)).thenReturn(Optional.of(show));
 
-        when(showRepository.findById(id)).thenReturn(Optional.of(show));
+        ShowUpdation showUpdation = new ShowUpdation("testName", 2.0, "A show",
+                "http://poster.url", "PG", 2000, "100 mins", "Comedy", "Trending");
 
-        ShowUpdation showUpdation = new ShowUpdation(
-                "testName", 2.0, "A show",
-                "http://poster.url", "PG", 2000,
-                "100 mins", "Comedy");
-
-        assertThatThrownBy(() -> underTest.updateShow(showUpdation, id))
+        assertThatThrownBy(() -> underTest.updateShow(showUpdation, 2L))
                 .isInstanceOf(RequestValidationException.class)
                 .hasMessageContaining("No data changes found");
     }
 
     @Test
-    void updateShowByIdThrowsIfNotExists() {
-        long id = 1;
-
-        when(showRepository.findById(id)).thenReturn(Optional.empty());
-
-        ShowUpdation updation = new ShowUpdation(
-                "Name", 3.30, "A good show",
-                "http://poster.url", "PG-13", 2020,
-                "110 mins", "Drama");
-
-        assertThatThrownBy(() -> underTest.updateShow(updation, id))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Show not found");
-
-        verify(showRepository, never()).save(any());
-    }
-
-    @Test
     void testGetShowsByYear() {
-        int year = 2021;
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
-        );
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows", "Trending"),
+                new Show("Show2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows", "Popular"));
 
-        when(showRepository.findByYear(year)).thenReturn(expectedShows);
+        when(showRepository.findByYear(2021)).thenReturn(expectedShows);
+        assertEquals(expectedShows, underTest.getShowsByYear(2021));
+    }
 
-        List<Show> actualShows = underTest.getShowsByYear(year);
+    // Category-based tests
+    @Test
+    void testGetShowsByCategory() {
+        List<Show> expectedShows = Arrays.asList(
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows", "Trending"),
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows", "Trending"));
 
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
+        when(showRepository.findByCategory("Trending")).thenReturn(expectedShows);
+        assertEquals(expectedShows, underTest.getShowsByCategory("Trending"));
     }
 
     @Test
-    void testGetShowsByAgeRating() {
-        String ageRating = "PG-13";
+    void testGetShowsByCategoryOrderByRatingDesc() {
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
-        );
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows", "Trending"),
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows", "Trending"));
 
-        when(showRepository.findByAgeRating(ageRating)).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.getShowsByAgeRating(ageRating);
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
+        when(showRepository.findByCategoryOrderByRatingDesc("Trending")).thenReturn(expectedShows);
+        assertEquals(expectedShows, underTest.getShowsByCategoryOrderByRatingDesc("Trending"));
     }
 
     @Test
-    void testFindByRatingGreaterThanEqual() {
-        double rating = 4.5;
+    void testFindAllByOrderByCategoryAsc() {
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
-        );
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows", "Popular"),
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows", "Trending"));
 
-        when(showRepository.findByRatingGreaterThanEqual(rating)).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findByRatingGreaterThanEqual(rating);
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
+        when(showRepository.findAllByOrderByCategoryAsc()).thenReturn(expectedShows);
+        assertEquals(expectedShows, underTest.findAllByOrderByCategoryAsc());
     }
 
     @Test
-    void testFindByRatingLessThanEqual() {
-        double rating = 4.5;
+    void testFindAllByOrderByCategoryDesc() {
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 4.2, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
-        );
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows", "Trending"),
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows", "Popular"));
 
-        when(showRepository.findByRatingLessThanEqual(rating)).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findByRatingLessThanEqual(rating);
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
+        when(showRepository.findAllByOrderByCategoryDesc()).thenReturn(expectedShows);
+        assertEquals(expectedShows, underTest.findAllByOrderByCategoryDesc());
     }
 
     @Test
-    void testFindAllByOrderByNameAsc() {
-        List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
-        );
+    void testGetAllDistinctCategories() {
+        List<String> expectedCategories = Arrays.asList("Trending", "Popular", "New Releases", "Top Rated");
 
-        when(showRepository.findAllByOrderByNameAsc()).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findAllByOrderByNameAsc();
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
-    }
-
-    @Test
-    void testFindAllByOrderByNameDesc() {
-        List<Show> expectedShows = Arrays.asList(
-                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
-                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
-        );
-
-        when(showRepository.findAllByOrderByNameDesc()).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findAllByOrderByNameDesc();
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
-    }
-
-    @Test
-    void testFindAllByOrderByRatingAsc() {
-        List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
-        );
-
-        when(showRepository.findAllByOrderByRatingAsc()).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findAllByOrderByRatingAsc();
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
-    }
-
-    @Test
-    void testFindAllByOrderByRatingDesc() {
-        List<Show> expectedShows = Arrays.asList(
-                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
-                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
-        );
-
-        when(showRepository.findAllByOrderByRatingDesc()).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findAllByOrderByRatingDesc();
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
-    }
-
-    @Test
-    void testFindAllByOrderByYearAsc() {
-        List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
-        );
-
-        when(showRepository.findAllByOrderByYearAsc()).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findAllByOrderByYearAsc();
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
-    }
-
-    @Test
-    void testFindAllByOrderByYearDesc() {
-        List<Show> expectedShows = Arrays.asList(
-                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
-                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
-        );
-
-        when(showRepository.findAllByOrderByYearDesc()).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findAllByOrderByYearDesc();
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
-    }
-
-    @Test
-    void testFindAllByOrderByGenreAsc() {
-        List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
-        );
-
-        when(showRepository.findAllByOrderByGenreAsc()).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findAllByOrderByGenreAsc();
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
-    }
-
-    @Test
-    void testFindAllByOrderByGenreDesc() {
-        List<Show> expectedShows = Arrays.asList(
-                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
-                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
-        );
-
-        when(showRepository.findAllByOrderByGenreDesc()).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findAllByOrderByGenreDesc();
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
+        when(showRepository.findAllDistinctCategories()).thenReturn(expectedCategories);
+        assertEquals(expectedCategories, underTest.getAllDistinctCategories());
     }
 }

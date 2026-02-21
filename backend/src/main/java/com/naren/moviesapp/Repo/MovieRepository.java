@@ -2,6 +2,7 @@ package com.naren.moviesapp.Repo;
 
 import com.naren.moviesapp.Entity.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -39,4 +40,18 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     List<Movie> findMovieByType(String type);
 
+    // Category-based queries
+    List<Movie> findByCategory(String category);
+
+    List<Movie> findByCategoryOrderByRatingDesc(String category);
+
+    List<Movie> findByCategoryOrderByCreatedAtDesc(String category);
+
+    List<Movie> findAllByOrderByCategoryAsc();
+
+    List<Movie> findAllByOrderByCategoryDesc();
+
+    // Get all distinct categories using native query
+    @Query("SELECT DISTINCT m.category FROM Movie m WHERE m.category IS NOT NULL")
+    List<String> findAllDistinctCategories();
 }

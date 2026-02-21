@@ -8,6 +8,7 @@ public record MovieUpdation(
         String ageRating,
         Integer year,
         String runtime,
-        String genre
+        String genre,
+        String category
 ) {
 }

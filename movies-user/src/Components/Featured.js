@@ -1,5 +1,5 @@
 import { AddToQueueOutlined, PlayArrowOutlined } from '@mui/icons-material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -8,66 +8,78 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import './Featured.css';
 import VideoPlayer from './VideoPlayer';
 import { FeaturedSkeleton } from './GlobalLoader';
+import { publicRequest } from '../AxiosMethods';
 
 const Featured = ({ loading = false }) => {
   const [expandedItems, setExpandedItems] = useState({});
+  const [featuredData, setFeaturedData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   
-  if (loading) {
+  useEffect(() => {
+    const fetchFeaturedData = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch trending movies from TMDB
+        const response = await publicRequest().get('/tmdb/trending/movies');
+        const movies = response.data.results || [];
+        
+        // Get first 5 trending movies and fetch their videos
+        const featuredMovies = await Promise.all(
+          movies.slice(0, 5).map(async (movie) => {
+            try {
+              // Fetch videos for this movie
+              const videoResponse = await publicRequest().get(`/tmdb/movie/${movie.tmdbId}/videos`);
+              const videos = videoResponse.data.results || [];
+              
+              // Find the first trailer or teaser
+              const trailer = videos.find(video => 
+                video.type === 'Trailer' || video.type === 'Teaser'
+              );
+              
+              return {
+                title: movie.title,
+                year: movie.year,
+                rating: movie.ageRating || 'PG-13',
+                genre: movie.genre || 'Action',
+                desc: movie.description || 'No description available',
+                descMore: movie.description || 'No description available',
+                videoId: trailer ? trailer.key : '',
+                hasTrailer: !!trailer
+              };
+            } catch (error) {
+              console.error(`Error fetching videos for movie ${movie.tmdbId}:`, error);
+              return {
+                title: movie.title,
+                year: movie.year,
+                rating: movie.ageRating || 'PG-13',
+                genre: movie.genre || 'Action',
+                desc: movie.description || 'No description available',
+                descMore: movie.description || 'No description available',
+                videoId: '',
+                hasTrailer: false
+              };
+            }
+          })
+        );
+        
+        setFeaturedData(featuredMovies.filter(movie => movie.hasTrailer));
+      } catch (error) {
+        console.error('Error fetching featured data:', error);
+        // Fallback to empty array
+        setFeaturedData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    if (!loading) {
+      fetchFeaturedData();
+    }
+  }, [loading]);
+  
+  if (loading || isLoading) {
     return <FeaturedSkeleton />;
   }
-
-  const featuredData = [
-    {
-      title: 'John Wick 4',
-      year: '2023',
-      rating: 'R',
-      genre: 'Action • Thriller',
-      desc: 'An action-packed thriller that follows legendary hitman John Wick (Keanu Reeves) as he continues his relentless quest for freedom. With the bounty on his head ever increasing, Wick faces his most formidable foes yet across New York, Paris, Osaka, and Berlin.',
-      descMore:
-        'John Wick uncovers a path to defeating the High Table once and for all, but a powerful new enemy, the Marquis de Gramont, forces old allies to turn against him. Each city brings stylized, brutal combat, stunning choreography, and a deeper emotional core as his past catches up. One final fight for peace, freedom, and redemption.',
-      videoId: 'X27pvZBu1ykSt5rHtmZA',
-    },
-    {
-      title: 'Coolie',
-      year: '2025',
-      rating: 'U/A',
-      genre: 'Action • Thriller',
-      desc: 'A man from a humble background rises against a powerful criminal system in a high-octane action drama.',
-      descMore:
-        'Coolie (2025) is an action-thriller centered around a protagonist from the working class who challenges a deeply rooted criminal network, blending mass action sequences with social themes.',
-      videoId: 'sIwcMUy8Y3xypseKBH7E',
-    },
-    {
-      title: 'Athadu',
-      year: '2005',
-      rating: 'U/A',
-      genre: 'Action • Thriller',
-      desc: 'A professional assassin takes on a new identity after being framed for a political murder.',
-      descMore:
-        'Athadu follows a highly skilled hitman who, after being falsely accused of assassinating a politician, assumes the identity of a deceased stranger and finds redemption while evading law enforcement and powerful enemies.',
-      videoId: 'ER3zitX5AEe45hn9KGq5',
-    },
-    {
-      title: 'Vedhalam',
-      year: '2015',
-      rating: 'U/A',
-      genre: 'Action • Drama',
-      desc: 'A taxi driver with a mysterious past seeks justice while protecting his sister.',
-      descMore:
-        'Vedhalam tells the story of a seemingly simple taxi driver whose violent past resurfaces when his sister becomes the target of criminals, leading to a gripping tale of revenge, sacrifice, and redemption.',
-      videoId: 'BoneWfjXFHFzsbWY22lJ',
-    },
-    {
-      title: 'Jailer 2',
-      year: '2025',
-      rating: 'U/A',
-      genre: 'Action • Thriller',
-      desc: 'A retired jailer is forced back into action when a powerful criminal network threatens his family.',
-      descMore:
-        'Jailer 2 continues the story of a fearless former jailer who confronts an even deadlier criminal syndicate, delivering intense action and emotional moments.',
-      videoId: 'ExGx22jAdDWUZ9jYAODc',
-    },
-  ];
 
   const toggleMore = index => {
     setExpandedItems(prev => ({
@@ -98,7 +110,7 @@ const Featured = ({ loading = false }) => {
         }}
         loop={true}
         className="featured-swiper">
-        {featuredData.map((item, index) => (
+        {featuredData.length > 0 && featuredData.map((item, index) => (
           <SwiperSlide key={index}>
             <div className="featured-slide">
               <div className="featured-overlay" />
@@ -108,6 +120,7 @@ const Featured = ({ loading = false }) => {
                   <VideoPlayer
                     className="featured-video"
                     videoId={item.videoId}
+                    isYouTube={true}
                   />
                 </div>
 

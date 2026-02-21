@@ -20,4 +20,8 @@ app:
     password: ${SUPER_ADMIN_PASSWORD:ChangeMe123!}
   data-initialization:
     enabled: ${DATA_INITIALIZATION_ENABLED:true}
+  tmdb:
+    api-key: ${TMDB_API_KEY:eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YjIxODI1MjJkNzI5Njk4YWY2ZTgwMzQxNDBlNWQwOSIsIm5iZiI6MTc3MTY3MjAwMS4yMjIwMDAxLCJzdWIiOiI2OTk5OTFjMWJjZDU2NTAxOTljNTk5ZGMiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.HvztG-XaYtv2K7i339C1lv7-97vsKROYiDZRNoxGiWg}
+    base-url: https://api.themoviedb.org/3
+    image-base-url: https://image.tmdb.org/t/p
 

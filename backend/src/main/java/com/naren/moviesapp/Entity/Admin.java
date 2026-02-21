@@ -11,7 +11,7 @@ import lombok.Setter;
 import java.util.*;
 
 @Entity
-@Table(name = "Admin", uniqueConstraints = {
+@Table(name = "admin", uniqueConstraints = {
         @UniqueConstraint(name = "admin_email_unique", columnNames = "email"),
         @UniqueConstraint(name = "admin_phone_number_unique", columnNames = "phone_number")
 })
