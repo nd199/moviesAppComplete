@@ -12,9 +12,10 @@ import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Security.AppUserPrincipal;
 import com.naren.moviesapp.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,70 +38,73 @@ public class AuthService {
         validateRequest(authRequest);
 
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            authRequest.username(),
-                            authRequest.password())
-            );
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            
-            // Get the actual entity from AppUserPrincipal
-            if (userDetails instanceof AppUserPrincipal appUserPrincipal) {
-                Object entity = appUserPrincipal.getUserEntity();
-                
-                if (entity instanceof Customer) {
-                    // Re-fetch from database to get fresh data with roles initialized
-                    Customer customer = customerRepository.findByEmail(authRequest.username())
-                            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-                    // Force initialize roles
-                    customer.getRoles().size();
-                    
-                    validateAccountState(customer);
-                    String token = generateTokenForUser(customer);
-                    return new AuthResponse(customerDTOMapper.apply(customer), token);
-                } else if (entity instanceof Admin) {
-                    // Re-fetch from database to get fresh data with roles initialized
-                    Admin admin = adminRepository.findByEmail(authRequest.username())
-                            .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
-                    // Force initialize roles
-                    admin.getRoles().size();
-                    
-                    String token = generateTokenForAdmin(admin);
-                    return new AuthResponse(customerDTOMapper.apply(convertAdminToCustomer(admin)), token);
-                }
+            Authentication authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    authRequest.username(),
+                                    authRequest.password()
+                            )
+                    );
+
+            AppUserPrincipal principal =
+                    (AppUserPrincipal) authentication.getPrincipal();
+
+            Object entity = principal.getUserEntity();
+
+            if (entity instanceof Admin admin) {
+
+                Admin dbAdmin = adminRepository
+                        .findByEmail(admin.getEmail())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Admin not found")
+                        );
+
+                String token = generateTokenForAdmin(dbAdmin);
+
+                CustomerDTO dto = customerDTOMapper.applyFromAdmin(dbAdmin);
+
+                return new AuthResponse(dto, token);
             }
-            
-            throw new AuthenticationException("Unknown user type", "UNKNOWN_USER_TYPE");
 
-        } catch (DisabledException e) {
-            throw new AuthenticationException(
-                    "Account has been disabled. Please contact support.",
-                    "ACCOUNT_DISABLED"
-            );
-        } catch (LockedException e) {
-            throw new AccountLockedException(
-                    "Account has been locked due to multiple failed login attempts. Please try again later or contact support."
-            );
+            if (entity instanceof Customer customerEntity) {
+
+                Customer customer = customerRepository
+                        .findByEmail(customerEntity.getEmail())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("User not found")
+                        );
+
+                validateAccountState(customer);
+
+                customer.setIsSubscribed(true);
+                customerRepository.save(customer);
+
+                CustomerDTO dto = customerDTOMapper.apply(customer);
+
+                String token = jwtUtil.issueToken(
+                        dto.email(),
+                        new HashSet<>(customer.getRoles())
+                );
+
+                return new AuthResponse(dto, token);
+            }
+
+            throw new AuthenticationException("Invalid principal type", "INVALID_PRINCIPAL");
+
         } catch (BadCredentialsException e) {
             throw new InvalidCredentialsException(
                     "Invalid email or password. Please check your credentials and try again."
             );
-        } catch (ResourceNotFoundException |
-                 EmailNotVerifiedException |
-                 AccountNotRegisteredException e) {
-            throw e;
-        } catch (AuthenticationException e) {
-            throw e;
-        } catch (Exception e) {
-            System.err.println("Unexpected login error: " + e.getMessage());
-            e.printStackTrace();
-            throw new AuthenticationException(
-                    "Login failed due to an unexpected error. Please try again later.",
-                    "LOGIN_ERROR",
-                    e
-            );
         }
+    }
+
+    private Set<Role> buildRoles(CustomerDTO dto) {
+        Set<Role> roles = new HashSet<>();
+        for (String roleName : dto.roles()) {
+            roles.add(new Role(RoleName.valueOf(roleName)));
+        }
+        return roles;
     }
 
     private void validateRequest(AuthRequest authRequest) {
@@ -115,28 +119,21 @@ public class AuthService {
 
     private void validateAccountState(Customer customer) {
 
-        if (!customerRepository.existsByEmail(customer.getEmail())) {
-            throw new ResourceNotFoundException(
-                    "Account not found. Please check your email or register for a new account."
-            );
-        }
-
         boolean isSuperAdmin = customer.getRoles().stream()
                 .anyMatch(role -> role.getName() == RoleName.ROLE_SUPER_ADMIN);
 
         if (!isSuperAdmin && !Boolean.TRUE.equals(customer.getIsEmailVerified())) {
             throw new EmailNotVerifiedException(
-                    "Email address not verified. Please check your inbox and verify your email before logging in."
+                    "Email address not verified."
             );
         }
 
         if (!isSuperAdmin && !Boolean.TRUE.equals(customer.getIsRegistered())) {
             throw new AccountNotRegisteredException(
-                    "Account registration incomplete. Please complete the registration process."
+                    "Account registration incomplete."
             );
         }
     }
-
 
     public String generateTokenForUser(Customer user) {
         CustomerDTO customerDTO = customerDTOMapper.apply(user);
@@ -152,22 +149,5 @@ public class AuthService {
     private String generateTokenForAdmin(Admin admin) {
         Set<Role> roles = new HashSet<>(admin.getRoles());
         return jwtUtil.issueToken(admin.getEmail(), roles);
-    }
-
-    // Helper to convert Admin to CustomerDTO for response
-    private Customer convertAdminToCustomer(Admin admin) {
-        return new Customer(
-                admin.getId(),
-                admin.getName(),
-                admin.getEmail(),
-                admin.getPassword(),
-                admin.getPhoneNumber(),
-                admin.getIsEmailVerified(),
-                admin.getAddress(),
-                admin.getIsRegistered(),
-                null,
-                admin.getRoles(),
-                null
-        );
     }
 }

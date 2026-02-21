@@ -326,7 +326,6 @@ public class CustomerIT extends AbstractIntegrationTest {
 
         String movieName = FAKER.book().title();
         Double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
-        Double cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
         String description = "Hello Hi Bye!";
         String poster = FAKER.internet().url();
         String ageRating = "PG-13";
@@ -335,7 +334,7 @@ public class CustomerIT extends AbstractIntegrationTest {
         String genre = "Action";
 
         MovieRegistration movie =
-                new MovieRegistration(movieName, cost,
+                new MovieRegistration(movieName,
                         rating, description, poster, ageRating,
                         year, runtime, genre);
 
@@ -367,7 +366,6 @@ public class CustomerIT extends AbstractIntegrationTest {
 
         assertThat(addedMovie.getName()).isEqualTo(movie.name());
         assertThat(addedMovie.getRating()).isEqualTo(movie.rating());
-        assertThat(addedMovie.getCost()).isEqualTo(movie.cost());
         assertThat(addedMovie.getDescription()).isEqualTo(movie.description());
         assertThat(addedMovie.getPoster()).isEqualTo(movie.poster());
         assertThat(addedMovie.getYear()).isEqualTo(movie.year());

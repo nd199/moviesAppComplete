@@ -35,7 +35,6 @@ public class ShowService implements ShowServiceInterface {
     private Show createShow(ShowRegistration registration) {
         return new Show(
                 registration.name(),
-                registration.cost(),
                 registration.rating(),
                 registration.description(),
                 registration.poster(),
@@ -81,10 +80,6 @@ public class ShowService implements ShowServiceInterface {
         if (update.name() != null && !update.name().equals(show.getName())) {
             changes = true;
             show.setName(update.name());
-        }
-        if (update.cost() != null && !update.cost().equals(show.getCost())) {
-            changes = true;
-            show.setCost(update.cost());
         }
         if (update.rating() != null && !update.rating().equals(show.getRating())) {
             changes = true;
@@ -144,11 +139,6 @@ public class ShowService implements ShowServiceInterface {
     }
 
     @Override
-    public List<Show> findByCostBetween(Double minCost, Double maxCost) {
-        return showRepository.findByCostBetween(minCost, maxCost);
-    }
-
-    @Override
     public List<Show> findAllByOrderByNameAsc() {
         return showRepository.findAllByOrderByNameAsc();
     }
@@ -156,16 +146,6 @@ public class ShowService implements ShowServiceInterface {
     @Override
     public List<Show> findAllByOrderByNameDesc() {
         return showRepository.findAllByOrderByNameDesc();
-    }
-
-    @Override
-    public List<Show> findAllByOrderByCostAsc() {
-        return showRepository.findAllByOrderByCostAsc();
-    }
-
-    @Override
-    public List<Show> findAllByOrderByCostDesc() {
-        return showRepository.findAllByOrderByCostDesc();
     }
 
     @Override

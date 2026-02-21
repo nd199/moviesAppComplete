@@ -13,7 +13,6 @@ public class MovieDTOMapper implements Function<Movie, MovieDTO> {
         return new MovieDTO(
                 movie.getId(),
                 movie.getName(),
-                movie.getCost(),
                 movie.getRating(),
                 movie.getDescription(),
                 movie.getPoster(),

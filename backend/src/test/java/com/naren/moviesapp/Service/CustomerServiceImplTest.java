@@ -426,7 +426,6 @@ class CustomerServiceImplTest {
         Customer customer = new Customer(1L, "testName", "test@example.com", "password", "20220292232", false, false, "Chennai, India", false);
         Movie movie = new Movie(
                 "testName",
-                230.00,
                 9.00,
                 "none",
                 "none",
@@ -457,7 +456,6 @@ class CustomerServiceImplTest {
         Customer customer = new Customer(1L, "testName", "test@example.com", "password", "20220292232", false, false, "Chennai, India", false);
         Movie movie = new Movie(
                 "testName",
-                230.00,
                 9.00,
                 "none",
                 "none",
@@ -485,7 +483,6 @@ class CustomerServiceImplTest {
         Customer customer = new Customer(1L, "testName", "test@example.com", "password", "20220292232", false, false, "Chennai, India", false);
         Movie movie = new Movie(
                 "testMovie",
-                230.00,
                 9.00,
                 "none",
                 "none",
@@ -518,7 +515,6 @@ class CustomerServiceImplTest {
         Customer customer = new Customer(1L, "testName", "test@example.com", "password", "20220292232", false, false, "Chennai, India", false);
         Movie movie = new Movie(
                 "testMovie",
-                230.00,
                 9.00,
                 "none",
                 "none",

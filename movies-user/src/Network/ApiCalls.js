@@ -46,19 +46,17 @@ import {
   verifyEmailSuccess,
 } from '../redux/userSlice';
 
-/* ================= REGISTER ================= */
 export const register = async (dispatch, customerInfo) => {
   dispatch(registerStart());
   try {
     const res = await authRequest().post('/auth/customers', customerInfo);
     
-    // Save JWT token to cookies
     if (res.data.accessToken) {
       Cookies.set("jwt_token", res.data.accessToken, {
         path: "/",
-        secure: false, // Set to true for HTTPS in production
+        secure: false,
         sameSite: "strict",
-        expires: 7, // 7 days in js-cookie format
+        expires: 7,
       });
       console.log('Register: JWT token saved to cookies');
     }
@@ -75,7 +73,6 @@ export const register = async (dispatch, customerInfo) => {
   }
 };
 
-/* ================= FORGOT PASSWORD ================= */
 export const forgotPasswordRequest = async (dispatch, email) => {
   dispatch(forgotPasswordStart());
   try {
@@ -91,19 +88,17 @@ export const forgotPasswordRequest = async (dispatch, email) => {
   }
 };
 
-/* ================= LOGIN ================= */
 export const login = async (dispatch, userInfo) => {
   dispatch(loginStart());
   try {
     const res = await authRequest().post('/auth/login', userInfo);
     
-    // Save JWT token to cookies
     if (res.data.accessToken) {
       Cookies.set("jwt_token", res.data.accessToken, {
         path: "/",
-        secure: false, // Set to true for HTTPS in production
+        secure: false,
         sameSite: "strict",
-        expires: 7, // 7 days in js-cookie format
+        expires: 7,
       });
       console.log('Login: JWT token saved to cookies');
     }
@@ -120,7 +115,6 @@ export const login = async (dispatch, userInfo) => {
   }
 };
 
-/* ================= FETCH MOVIES ================= */
 export const fetchMovies = async dispatch => {
   dispatch(fetchMoviesStart());
   try {
@@ -133,7 +127,6 @@ export const fetchMovies = async dispatch => {
   }
 };
 
-/* ================= FETCH SHOWS ================= */
 export const fetchShows = async dispatch => {
   dispatch(fetchShowsStart());
   try {
@@ -146,7 +139,6 @@ export const fetchShows = async dispatch => {
   }
 };
 
-/* ================= VERIFY EMAIL ================= */
 export const verifyEmail = async (dispatch, email) => {
   dispatch(verifyEmailStart());
   try {
@@ -161,7 +153,6 @@ export const verifyEmail = async (dispatch, email) => {
   }
 };
 
-/* ================= VALIDATE OTP ================= */
 export const validateOtp = async (dispatch, validateInfo) => {
   dispatch(validateOtpStart());
   try {
@@ -175,7 +166,6 @@ export const validateOtp = async (dispatch, validateInfo) => {
   }
 };
 
-/* ================= UPDATE PROFILE ================= */
 export const updateProfile = async (dispatch, userUpdateInfo, id) => {
   dispatch(updateUserStart());
   try {
@@ -189,7 +179,6 @@ export const updateProfile = async (dispatch, userUpdateInfo, id) => {
   }
 };
 
-/* ================= FETCH USERS ================= */
 export const fetchUsers = async dispatch => {
   dispatch(fetchUsersStart());
   try {
@@ -201,7 +190,6 @@ export const fetchUsers = async dispatch => {
   }
 };
 
-/* ================= FETCH CURRENT USER ================= */
 export const fetchCurrentUserDetails = async dispatch => {
   dispatch(fetchCurrentStart());
   try {
@@ -213,19 +201,16 @@ export const fetchCurrentUserDetails = async dispatch => {
   } catch (error) {
     const message = error.response?.data?.message || 'Failed to fetch user';
     
-    // If it's a 401 or 403 auth error, set as unauthenticated
     if (error.response?.status === 401 || error.response?.status === 403) {
       console.warn('Auth error - setting user as unauthenticated');
       dispatch(fetchCurrentFailure({ message }));
       return;
     }
     
-    // For other errors, proceed normally
     dispatch(fetchCurrentFailure({ message }));
   }
 };
 
-/* ================= RESET PASSWORD ================= */
 export const updatePasswordAndPushToLoginPage = async (dispatch, data) => {
   dispatch(updatePassPushStart());
   try {
@@ -237,7 +222,6 @@ export const updatePasswordAndPushToLoginPage = async (dispatch, data) => {
   }
 };
 
-/* ================= PAYMENT APIS ================= */
 export const savePaymentApi = payload =>
   paymentRequest.post('/payments/submitPayment', payload);
 
@@ -261,7 +245,6 @@ export const markUserSubscribedApi = async (email) => {
 
 export const pingSpringApi = email => springRequest.post('/', { email });
 
-/* ================= ADMIN APIS ================= */
 export const fetchProducts = async dispatch => {
   try {
     const res = await userRequest().get('/products/AllProducts');
@@ -269,7 +252,6 @@ export const fetchProducts = async dispatch => {
     return products;
   } catch (error) {
     console.error('Failed to fetch products:', error);
-    // Don't throw error to prevent app crash, return empty array instead
     console.warn('Returning empty products array due to auth error');
     return [];
   }

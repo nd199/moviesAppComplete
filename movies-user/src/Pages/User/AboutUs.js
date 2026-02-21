@@ -19,7 +19,6 @@ const AboutUs = () => {
     <div className="about-page">
       <NavBar />
       <main className="about-main">
-        {/* Hero Section */}
         <section className="hero-section">
           <div className="hero-content">
             <h1 className="hero-title">Welcome to CN.io</h1>
@@ -33,7 +32,6 @@ const AboutUs = () => {
           </div>
         </section>
 
-        {/* Features Grid */}
         <section className="features-section">
           <h2 className="section-title">Why Choose CN.io?</h2>
           <div className="features-grid">
@@ -80,7 +78,6 @@ const AboutUs = () => {
           </div>
         </section>
 
-        {/* Commitment */}
         <section className="commitment-section">
           <h2 className="section-title">Our Promise</h2>
           <p className="commitment-text">

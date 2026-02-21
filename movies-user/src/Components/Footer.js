@@ -15,7 +15,6 @@ const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer-container">
-        {/* Logo & Description */}
         <div className="footer-brand">
           <div className="logo">
             <div className="logo-icon">🎬</div>
@@ -41,7 +40,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Quick Links */}
         <div className="footer-links">
           <h3>Quick Links</h3>
           <ul>
@@ -62,7 +60,6 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Contact Info */}
         <div className="footer-contact">
           <h3>Contact Info</h3>
           <div className="contact-item">
@@ -79,7 +76,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Payment & Legal */}
         <div className="footer-bottom">
           <div className="payment-methods">
             <HandshakeOutlined />

@@ -7,6 +7,7 @@ import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;
+import com.naren.moviesapp.Entity.UserPlanInfo;
 import com.naren.moviesapp.Exception.*;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Record.CustomerSubscription;
@@ -26,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -56,7 +58,6 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
     public void addRole(Role role) {
         if (role == null) {
             throw new ResourceNotFoundException("Role cannot be null");
@@ -68,19 +69,16 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
     public List<Role> getRoles() {
         return roleService.getAllRoles();
     }
 
     @Override
-    // Simplified
     public Role getRoleById(Long id) {
         return roleService.findRoleById(id);
     }
 
     @Override
-    // Simplified
     public void removeRole(Long id) {
         Role role = getRoleById(id);
         if (role == null) {
@@ -179,7 +177,6 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
     public CustomerDTO getCustomerById(Long customerId) {
         return customerRepository.findById(customerId)
                 .map(customerDTOMapper)
@@ -189,7 +186,6 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
     @Transactional
     public CustomerDTO updateCustomer(CustomerUpdateRequest request, Long id) {
 
@@ -252,7 +248,6 @@ public class CustomerService implements CustomerServiceInterface {
                             + email + " not found");
                 });
 
-        // Check if new password is same as current password by encoding the new password and comparing
         String encodedNewPassword = passwordEncoder.encode(newPassword);
         if (passwordEncoder.matches(newPassword, customer.getPassword())) {
             logger.warn("Password update failed - new password same as current for email: {}", email);
@@ -271,7 +266,6 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
     public List<CustomerDTO> getAllCustomers() {
         List<CustomerDTO> customers = customerRepository.findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent()
                 .stream()
@@ -281,7 +275,6 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
     @Transactional
     public void deleteCustomer(Long customerId) {
 
@@ -297,7 +290,6 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
     public void addMovieToCustomer(Long customerId, Long movieId) {
 
         Customer customer = customerRepository.findById(customerId)
@@ -319,7 +311,6 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
     public void removeMovieFromCustomer(Long customerId, Long movieId) {
 
         Customer customer = customerRepository.findById(customerId)
@@ -340,7 +331,6 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
     public void removeAllMovies(Long customerId) {
 
         Customer customer = customerRepository.findById(customerId)
@@ -360,7 +350,6 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    
     public CustomerDTO getCustomerByEmail(String email) {
         return customerRepository.findByEmail(email).map((customerDTOMapper))
                 .orElseThrow(
@@ -370,7 +359,15 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
+    public Customer getCustomerEntityByEmail(String email) {
+        return customerRepository.findByEmail(email)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Could not find customer by email " + email)
+                );
+    }
+
+    @Override
     public CustomerDTO getCustomerByPhoneNumber(String phoneNumber) {
         return customerRepository.getCustomerByPhoneNumber(phoneNumber)
                 .map(customerDTOMapper).orElseThrow(
@@ -379,13 +376,11 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
     public void generateAndSendMailOtp(EmailVerificationRequest emailVerificationRequest) {
         otpService.generateAndSendMailOtp(emailVerificationRequest.email());
     }
 
     @Override
-    // Simplified
     public List<CustomerDTO> getLatestCustomerList() {
         return customerRepository.getCustomersByTop5()
                 .stream().map(customerDTOMapper)
@@ -393,7 +388,6 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    // Simplified
     public List<CustomerStatsDTO> getCustomerStats() {
         return customerRepository.getCustomerCountByEachMonthInYear()
                 .stream()
@@ -419,5 +413,33 @@ public class CustomerService implements CustomerServiceInterface {
     public boolean isOwner(Long customerId, String username) {
         Customer customer = customerRepository.findById(customerId).orElse(null);
         return customer != null && customer.getEmail().equals(username);
+    }
+
+    public boolean hasActiveSubscription(Customer customer) {
+        if (customer == null) {
+            return false;
+        }
+        if (!customer.getIsActive()) {
+            return false;
+        }
+        UserPlanInfo userPlanInfo = customer.getUserPlanInfo();
+        if (userPlanInfo == null) {
+            return false;
+        }
+        if (!userPlanInfo.getIsActive()) {
+            return false;
+        }
+        if (userPlanInfo.getSubscriptionEndDate() == null) {
+            return false;
+        }
+        if (userPlanInfo.getSubscriptionEndDate().isBefore(LocalDateTime.now())) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean hasActiveSubscription(String email) {
+        Customer customer = customerRepository.findByEmail(email).orElse(null);
+        return hasActiveSubscription(customer);
     }
 }

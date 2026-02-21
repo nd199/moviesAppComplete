@@ -58,11 +58,12 @@ class CustomUserDetailsServiceTest {
     void loadUserByUsername_NotFound() {
         String username = "nonexistent@example.com";
 
+        when(adminRepository.findByEmail(username)).thenReturn(Optional.empty());
         when(customerRepository.findByEmail(username)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.loadUserByUsername(username))
                 .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("User not found: " + username);
+                .hasMessage("User not found with email: " + username);
 
         verify(customerRepository).findByEmail(username);
     }
@@ -71,11 +72,12 @@ class CustomUserDetailsServiceTest {
     void loadUserByUsername_NullUsername() {
         String username = null;
 
+        when(adminRepository.findByEmail(username)).thenReturn(Optional.empty());
         when(customerRepository.findByEmail(username)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.loadUserByUsername(username))
                 .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("User not found: null");
+                .hasMessage("User not found with email: null");
 
         verify(customerRepository).findByEmail(username);
     }
@@ -84,11 +86,12 @@ class CustomUserDetailsServiceTest {
     void loadUserByUsername_EmptyUsername() {
         String username = "";
 
+        when(adminRepository.findByEmail(username)).thenReturn(Optional.empty());
         when(customerRepository.findByEmail(username)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.loadUserByUsername(username))
                 .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("User not found: ");
+                .hasMessage("User not found with email: ");
 
         verify(customerRepository).findByEmail(username);
     }

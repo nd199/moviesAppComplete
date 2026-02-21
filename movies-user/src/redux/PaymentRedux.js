@@ -47,7 +47,6 @@ export const savePayment = createAsyncThunk(
   },
 );
 
-/* UPDATE USER */
 export const updateFinalUser = createAsyncThunk(
   'payment/updateUser',
   async (finalUser, { rejectWithValue }) => {
@@ -60,7 +59,6 @@ export const updateFinalUser = createAsyncThunk(
   },
 );
 
-/* PING SPRING */
 export const pingSpring = createAsyncThunk('payment/ping', async email => {
   await pingSpringApi(email);
 });

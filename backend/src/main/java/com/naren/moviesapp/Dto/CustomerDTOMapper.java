@@ -1,5 +1,6 @@
 package com.naren.moviesapp.Dto;
 
+import com.naren.moviesapp.Entity.Admin;
 import com.naren.moviesapp.Entity.Customer;
 import org.springframework.stereotype.Service;
 
@@ -28,5 +29,24 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
         );
 
         return customerDTO;
+    }
+
+    public CustomerDTO applyFromAdmin(Admin admin) {
+        return new CustomerDTO(
+                admin.getId(),
+                admin.getName(),
+                admin.getEmail(),
+                admin.getPhoneNumber(),
+                admin.getImageUrl(),
+                admin.getIsEmailVerified(),
+                admin.getAddress(),
+                admin.getIsRegistered(),
+                null,
+                null,
+                admin.getRoles().stream().map(role -> role.getName().name()).toList(),
+                admin.getCreatedAt(),
+                admin.getUpdatedAt(),
+                null
+        );
     }
 }

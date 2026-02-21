@@ -24,10 +24,8 @@ const LoginForm = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     
-    // Convert email to lowercase for consistency
     const normalizedEmail = email.toLowerCase().trim();
     
-    // Basic validation
     if (!normalizedEmail || !password) {
       setPopupMessage("Please enter both email and password");
       setShowPopup(true);

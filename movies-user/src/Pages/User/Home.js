@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Featured from "../../Components/Featured";
 import Footer from "../../Components/Footer";
@@ -11,15 +11,29 @@ const Home = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.user);
   const currentUser = user?.currentUser;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCurrentUserDetails(dispatch, currentUser?.email);
+    const fetchUserData = async () => {
+      setLoading(true);
+      try {
+        await fetchCurrentUserDetails(dispatch, currentUser?.email);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      } finally {
+        // Add a small delay to show the skeleton animation
+        setTimeout(() => setLoading(false), 500);
+      }
+    };
+    
+    fetchUserData();
   }, [dispatch, currentUser?.email]);
+
   return (
     <div className="home">
       <NavBar />
       <div className="main">
-        <Featured />
+        <Featured loading={loading} />
         <List title={"Movies"} />
         <List title={"Shows"} />
       </div>

@@ -7,9 +7,14 @@ import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import './Featured.css';
 import VideoPlayer from './VideoPlayer';
+import { FeaturedSkeleton } from './GlobalLoader';
 
-const Featured = () => {
+const Featured = ({ loading = false }) => {
   const [expandedItems, setExpandedItems] = useState({});
+  
+  if (loading) {
+    return <FeaturedSkeleton />;
+  }
 
   const featuredData = [
     {
@@ -106,7 +111,6 @@ const Featured = () => {
                   />
                 </div>
 
-                {/* RIGHT: INFO */}
                 <div className="featured-info">
                   <div className="featured-tag">Now Streaming</div>
 

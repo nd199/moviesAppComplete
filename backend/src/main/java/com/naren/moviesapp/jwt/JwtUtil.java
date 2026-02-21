@@ -34,10 +34,8 @@ public class JwtUtil {
     private long jwtExpirationMinutes;
 
     private SecretKey getSigningKey() {
-        // Use raw string bytes for signing key
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         
-        // Ensure key is at least 256 bits (32 bytes) for HS256
         if (keyBytes.length < 32) {
             keyBytes = java.util.Arrays.copyOf(keyBytes, 32);
         }

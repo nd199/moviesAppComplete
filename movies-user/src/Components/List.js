@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import SwiperCore from 'swiper';
@@ -8,6 +8,7 @@ import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { fetchMovies, fetchShows } from '../Network/ApiCalls';
+import { MovieListSkeleton } from './GlobalLoader';
 import './List.css';
 import ListItem from './ListItem';
 
@@ -17,9 +18,11 @@ const List = ({ title }) => {
   const dispatch = useDispatch();
   const movies = useSelector(state => state?.product?.movies);
   const shows = useSelector(state => state?.product?.shows);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         await Promise.all([
           fetchMovies(dispatch),
@@ -27,6 +30,8 @@ const List = ({ title }) => {
         ]);
       } catch (error) {
         console.error('Failed to fetch data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -37,6 +42,10 @@ const List = ({ title }) => {
     title === 'Movies' ? '/movies' : title === 'Shows' ? '/shows' : '#';
 
   const items = title === 'Movies' ? movies : shows;
+
+  if (loading) {
+    return <MovieListSkeleton count={5} />;
+  }
 
   if (!items || items.length === 0) return null;
 

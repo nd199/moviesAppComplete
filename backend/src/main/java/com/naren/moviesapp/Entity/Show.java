@@ -34,9 +34,6 @@ public class Show {
     @Column(name = "name", nullable = false, columnDefinition = "TEXT")
     private String name;
 
-    @Column(name = "cost", nullable = false)
-    private Double cost;
-
     @Column(name = "rating", nullable = false)
     private Double rating;
 
@@ -75,11 +72,10 @@ public class Show {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Show(String name, Double cost, Double rating, String description,
+    public Show(String name, Double rating, String description,
                 String poster, String ageRating,
                 Integer year, String runtime, String genre, String type) {
         this.name = name;
-        this.cost = cost;
         this.rating = rating;
         this.description = description;
         this.poster = poster;
@@ -90,11 +86,10 @@ public class Show {
         this.type = type;
     }
 
-    public Show(Long show_id, String name, Double cost, Double rating, String description,
+    public Show(Long show_id, String name, Double rating, String description,
                 String poster, String ageRating, Integer year, String runtime, String genre, String type) {
         this.show_id = show_id;
         this.name = name;
-        this.cost = cost;
         this.rating = rating;
         this.description = description;
         this.poster = poster;
@@ -109,7 +104,6 @@ public class Show {
         return "Show{" +
                 "show_id=" + show_id +
                 ", name='" + name + '\'' +
-                ", cost=" + cost +
                 ", rating=" + rating +
                 ", description='" + description + '\'' +
                 ", poster='" + poster + '\'' +
@@ -128,10 +122,10 @@ public class Show {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Show show = (Show) o;
-        return Objects.equals(show_id, show.show_id) && Objects.equals(name, show.name) && Objects.equals(cost, show.cost) && Objects.equals(rating, show.rating) && Objects.equals(description, show.description) && Objects.equals(poster, show.poster) && Objects.equals(ageRating, show.ageRating) && Objects.equals(year, show.year) && Objects.equals(runtime, show.runtime) && Objects.equals(genre, show.genre) && Objects.equals(type, show.type) && Objects.equals(customer, show.customer) && Objects.equals(createdAt, show.createdAt) && Objects.equals(updatedAt, show.updatedAt);
+        return Objects.equals(show_id, show.show_id) && Objects.equals(name, show.name) && Objects.equals(rating, show.rating) && Objects.equals(description, show.description) && Objects.equals(poster, show.poster) && Objects.equals(ageRating, show.ageRating) && Objects.equals(year, show.year) && Objects.equals(runtime, show.runtime) && Objects.equals(genre, show.genre) && Objects.equals(type, show.type) && Objects.equals(customer, show.customer) && Objects.equals(createdAt, show.createdAt) && Objects.equals(updatedAt, show.updatedAt);
     }
 
     public int hashCode() {
-        return Objects.hash(show_id, name, cost, rating, description, poster, ageRating, year, runtime, genre, type, customer, createdAt, updatedAt);
+        return Objects.hash(show_id, name, rating, description, poster, ageRating, year, runtime, genre, type, customer, createdAt, updatedAt);
     }
 }

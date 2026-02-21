@@ -18,10 +18,8 @@ const PaymentCheckout = () => {
   const location = useLocation();
   const currentUser = useSelector((state) => state?.user?.currentUser);
   
-  // Get plan from route state (from email verification)
   const plan = location.state?.plan;
   
-  // Use current user data or create fallback
   const user = currentUser || {
     email: userId,
     name: "",
@@ -50,7 +48,6 @@ const PaymentCheckout = () => {
         transactionId
       });
 
-      // Use real backend payment API
       const paymentPayload = {
         finalPayment: {
           finalUser: {
@@ -67,24 +64,19 @@ const PaymentCheckout = () => {
 
       console.log('PaymentCheckout - Sending to backend:', paymentPayload);
       
-      // Call real backend payment API
       const paymentResponse = await dispatch(savePayment(paymentPayload)).unwrap();
       console.log('PaymentCheckout - Backend payment response:', paymentResponse);
 
-      // Update user in backend
       await updateFinalUserApi(finalUser);
       console.log('PaymentCheckout - Backend user updated');
 
-      // Mark user as subscribed in backend (this will update database)
       const subscriptionResponse = await markUserSubscribedApi(finalUser.email);
       console.log('PaymentCheckout - Backend subscription response:', subscriptionResponse);
 
-      // Update Redux state with backend-confirmed data
       if (subscriptionResponse.data) {
         console.log('PaymentCheckout - Updating Redux with backend subscription data:', subscriptionResponse.data);
         dispatch(updateUserSuccess(subscriptionResponse.data));
       } else {
-        // Fallback: Update Redux state
         const updatedUser = {
           ...currentUser,
           ...finalUser,
@@ -94,7 +86,6 @@ const PaymentCheckout = () => {
         dispatch(updateUserSuccess(updatedUser));
       }
       
-      // Navigate to success page
       const finalUpdatedUser = subscriptionResponse.data || {
         ...currentUser,
         ...finalUser,
@@ -116,14 +107,11 @@ const PaymentCheckout = () => {
     } catch (err) {
       console.error('PaymentCheckout - Backend payment failed, trying fallback:', err);
       
-      // Fallback to mock payment if backend fails
       try {
         console.log('PaymentCheckout - Using mock payment fallback');
         
-        // Simulate payment processing delay
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Mock successful payment response
         const mockResponse = {
           success: true,
           transactionId,
@@ -133,7 +121,6 @@ const PaymentCheckout = () => {
 
         console.log('PaymentCheckout - Mock payment fallback successful:', mockResponse);
 
-        // Try to mark user as subscribed in backend even in fallback
         try {
           const fallbackSubscriptionResponse = await markUserSubscribedApi(finalUser.email);
           console.log('PaymentCheckout - Fallback backend subscription response:', fallbackSubscriptionResponse);
@@ -142,7 +129,6 @@ const PaymentCheckout = () => {
             console.log('PaymentCheckout - Updating Redux with fallback backend data:', fallbackSubscriptionResponse.data);
             dispatch(updateUserSuccess(fallbackSubscriptionResponse.data));
           } else {
-            // Fallback to manual Redux update
             const updatedUser = {
               ...currentUser,
               ...finalUser,
@@ -162,13 +148,11 @@ const PaymentCheckout = () => {
           dispatch(updateUserSuccess(updatedUser));
         }
         
-        // Prevent automatic user fetch from overwriting our subscription status
         if (window.paymentSuccess) {
           window.paymentSuccess();
           console.log('PaymentCheckout - Called payment success handler (fallback)');
         }
         
-        // Navigate to success page
         const finalFallbackUser = {
           ...currentUser,
           ...finalUser,
@@ -185,7 +169,6 @@ const PaymentCheckout = () => {
       } catch (fallbackErr) {
         console.error('PaymentCheckout - Even fallback failed:', fallbackErr);
         
-        // More detailed error handling
         if (err.includes('plan not found') || err.includes('Subscription plan not found')) {
           alert('Payment failed: Selected plan is not available. Please choose a different plan.');
           nav("/subscription");
@@ -200,7 +183,6 @@ const PaymentCheckout = () => {
     }
   };
 
-  /* VALIDATION */
   const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
     address: Yup.string().required("Address is required"),

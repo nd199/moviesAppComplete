@@ -42,6 +42,8 @@ public interface CustomerServiceInterface {
 
     CustomerDTO getCustomerByEmail(String email);
 
+    Customer getCustomerEntityByEmail(String email);
+
     CustomerDTO getCustomerByPhoneNumber(String phoneNumber);
 
     void generateAndSendMailOtp(EmailVerificationRequest emailVerificationRequest);

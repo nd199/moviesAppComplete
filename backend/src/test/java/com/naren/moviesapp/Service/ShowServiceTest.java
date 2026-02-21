@@ -41,7 +41,7 @@ class ShowServiceTest {
     @Test
     void addShow() {
         ShowRegistration registration = new ShowRegistration(
-                "testName", 300.23, 5.00, "A great show",
+                "testName", 5.00, "A great show",
                 "http://poster.url", "PG-13", 2022,
                 "120 mins", "Drama");
 
@@ -57,7 +57,6 @@ class ShowServiceTest {
 
         assertThat(captured.getShow_id()).isNull();
         assertThat(captured.getName()).isEqualTo(registration.name());
-        assertThat(captured.getCost()).isEqualTo(registration.cost());
         assertThat(captured.getRating()).isEqualTo(registration.rating());
         assertThat(captured.getDescription()).isEqualTo(registration.description());
         assertThat(captured.getPoster()).isEqualTo(registration.poster());
@@ -71,7 +70,7 @@ class ShowServiceTest {
     @Test
     void throwsShowNameExists() {
         ShowRegistration registration = new ShowRegistration(
-                "testName", 300.23, 5.00, "A great show",
+                "testName", 5.00, "A great show",
                 "http://poster.url", "PG-13", 2022,
                 "120 mins", "Drama");
 
@@ -90,7 +89,6 @@ class ShowServiceTest {
         long id = 1;
         Show show = new Show(
                 "testName",
-                300.22,
                 5.00,
                 "A great show",
                 "http://poster.url",
@@ -126,7 +124,6 @@ class ShowServiceTest {
         long id = 1;
         Show show = new Show(
                 "testName",
-                300.22,
                 5.00,
                 "A great show",
                 "http://poster.url",
@@ -171,7 +168,6 @@ class ShowServiceTest {
 
         Show show = new Show(
                 "testName22",
-                200.0,
                 2.0,
                 "A show",
                 "http://poster.url",
@@ -185,7 +181,7 @@ class ShowServiceTest {
         when(showRepository.findById(id)).thenReturn(Optional.of(show));
 
         ShowUpdation showUpdation = new ShowUpdation(
-                "testName2", 300.00, 5.0, "An awesome show",
+                "testName2", 5.0, "An awesome show",
                 "http://newposter.url", "R", 2021,
                 "130 mins", "Thriller");
 
@@ -198,7 +194,6 @@ class ShowServiceTest {
         Show updatedShow = showArgumentCaptor.getValue();
 
         assertThat(updatedShow.getName()).isEqualTo(showUpdation.name());
-        assertThat(updatedShow.getCost()).isEqualTo(showUpdation.cost());
         assertThat(updatedShow.getRating()).isEqualTo(showUpdation.rating());
         assertThat(updatedShow.getDescription()).isEqualTo(showUpdation.description());
         assertThat(updatedShow.getPoster()).isEqualTo(showUpdation.poster());
@@ -211,7 +206,7 @@ class ShowServiceTest {
     @Test
     void testUpdateShowNoChanges() {
         Show show = new Show();
-        ShowUpdation update = new ShowUpdation(null, null, null, null, null, null, null, null, null);
+        ShowUpdation update = new ShowUpdation(null, null, null, null, null, null, null, null);
         Long showId = 1L;
 
         when(showRepository.findById(showId)).thenReturn(java.util.Optional.ofNullable(show));
@@ -230,7 +225,7 @@ class ShowServiceTest {
         when(showRepository.findById(showId)).thenReturn(java.util.Optional.empty());
 
         assertThatThrownBy(() -> underTest.updateShow(
-                new ShowUpdation("Hello", 100.0, 4.5, "New Description", "New Poster",
+                new ShowUpdation("Hello", 4.5, "New Description", "New Poster",
                         "New Age Rating", 2000, "New Runtime", "New Genre"), showId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Show not found");
@@ -244,7 +239,6 @@ class ShowServiceTest {
 
         Show show = new Show(
                 "testName",
-                200.0,
                 2.0,
                 "A show",
                 "http://poster.url",
@@ -258,7 +252,7 @@ class ShowServiceTest {
         when(showRepository.findById(id)).thenReturn(Optional.of(show));
 
         ShowUpdation showUpdation = new ShowUpdation(
-                "testName", 200.0, 2.0, "A show",
+                "testName", 2.0, "A show",
                 "http://poster.url", "PG", 2000,
                 "100 mins", "Comedy");
 
@@ -274,7 +268,7 @@ class ShowServiceTest {
         when(showRepository.findById(id)).thenReturn(Optional.empty());
 
         ShowUpdation updation = new ShowUpdation(
-                "Name", 220.0, 3.30, "A good show",
+                "Name", 3.30, "A good show",
                 "http://poster.url", "PG-13", 2020,
                 "110 mins", "Drama");
 
@@ -289,8 +283,8 @@ class ShowServiceTest {
     void testGetShowsByYear() {
         int year = 2021;
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
+                new Show("Show2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
         when(showRepository.findByYear(year)).thenReturn(expectedShows);
@@ -305,8 +299,8 @@ class ShowServiceTest {
     void testGetShowsByAgeRating() {
         String ageRating = "PG-13";
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
+                new Show("Show2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
         when(showRepository.findByAgeRating(ageRating)).thenReturn(expectedShows);
@@ -321,8 +315,8 @@ class ShowServiceTest {
     void testFindByRatingGreaterThanEqual() {
         double rating = 4.5;
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 10.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
         when(showRepository.findByRatingGreaterThanEqual(rating)).thenReturn(expectedShows);
@@ -337,8 +331,8 @@ class ShowServiceTest {
     void testFindByRatingLessThanEqual() {
         double rating = 4.5;
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 10.0, 4.2, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
+                new Show("Show1", 4.2, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
+                new Show("Show2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
         when(showRepository.findByRatingLessThanEqual(rating)).thenReturn(expectedShows);
@@ -350,27 +344,10 @@ class ShowServiceTest {
     }
 
     @Test
-    void testFindByCostBetween() {
-        double minCost = 5.0;
-        double maxCost = 15.0;
-        List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
-        );
-
-        when(showRepository.findByCostBetween(minCost, maxCost)).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findByCostBetween(minCost, maxCost);
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
-    }
-
-    @Test
     void testFindAllByOrderByNameAsc() {
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
         when(showRepository.findAllByOrderByNameAsc()).thenReturn(expectedShows);
@@ -384,8 +361,8 @@ class ShowServiceTest {
     @Test
     void testFindAllByOrderByNameDesc() {
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
         );
 
         when(showRepository.findAllByOrderByNameDesc()).thenReturn(expectedShows);
@@ -397,40 +374,10 @@ class ShowServiceTest {
     }
 
     @Test
-    void testFindAllByOrderByCostAsc() {
-        List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
-        );
-
-        when(showRepository.findAllByOrderByCostAsc()).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findAllByOrderByCostAsc();
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
-    }
-
-    @Test
-    void testFindAllByOrderByCostDesc() {
-        List<Show> expectedShows = Arrays.asList(
-                new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
-        );
-
-        when(showRepository.findAllByOrderByCostDesc()).thenReturn(expectedShows);
-
-        List<Show> actualShows = underTest.findAllByOrderByCostDesc();
-
-        assertEquals(expectedShows.size(), actualShows.size());
-        assertEquals(expectedShows, actualShows);
-    }
-
-    @Test
     void testFindAllByOrderByRatingAsc() {
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
         when(showRepository.findAllByOrderByRatingAsc()).thenReturn(expectedShows);
@@ -444,8 +391,8 @@ class ShowServiceTest {
     @Test
     void testFindAllByOrderByRatingDesc() {
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
         );
 
         when(showRepository.findAllByOrderByRatingDesc()).thenReturn(expectedShows);
@@ -459,8 +406,8 @@ class ShowServiceTest {
     @Test
     void testFindAllByOrderByYearAsc() {
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
         when(showRepository.findAllByOrderByYearAsc()).thenReturn(expectedShows);
@@ -474,8 +421,8 @@ class ShowServiceTest {
     @Test
     void testFindAllByOrderByYearDesc() {
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
         );
 
         when(showRepository.findAllByOrderByYearDesc()).thenReturn(expectedShows);
@@ -489,8 +436,8 @@ class ShowServiceTest {
     @Test
     void testFindAllByOrderByGenreAsc() {
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
-                new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows"),
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows")
         );
 
         when(showRepository.findAllByOrderByGenreAsc()).thenReturn(expectedShows);
@@ -504,8 +451,8 @@ class ShowServiceTest {
     @Test
     void testFindAllByOrderByGenreDesc() {
         List<Show> expectedShows = Arrays.asList(
-                new Show("Show2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
-                new Show("Show1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
+                new Show("Show2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "shows"),
+                new Show("Show1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "shows")
         );
 
         when(showRepository.findAllByOrderByGenreDesc()).thenReturn(expectedShows);

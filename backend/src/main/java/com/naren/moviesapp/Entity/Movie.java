@@ -35,9 +35,6 @@ public class Movie {
     @Column(name = "name", nullable = false, columnDefinition = "TEXT")
     private String name;
 
-    @Column(name = "cost", nullable = false)
-    private Double cost;
-
     @Column(name = "rating", nullable = false)
     private Double rating;
 
@@ -76,9 +73,8 @@ public class Movie {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Movie(String name, Double cost, Double rating, String description, String poster, String ageRating, Integer year, String runtime, String genre, String type) {
+    public Movie(String name, Double rating, String description, String poster, String ageRating, Integer year, String runtime, String genre, String type) {
         this.name = name;
-        this.cost = cost;
         this.rating = rating;
         this.description = description;
         this.poster = poster;

@@ -25,7 +25,6 @@ function LandingPage() {
         </div>
       </nav>
 
-      {/* HERO */}
       <header className="lp-hero">
         <div className="lp-container hero-content">
           <h1>
@@ -49,7 +48,6 @@ function LandingPage() {
         </div>
       </header>
 
-      {/* FEATURES */}
       <section className="lp-features lp-container">
         <div className="feature">
           <h3>🎥 HD Streaming</h3>
@@ -65,7 +63,6 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* STATS */}
       <section className="lp-stats">
         <div className="lp-container stats-grid">
           <div>
@@ -83,7 +80,6 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* FINAL CTA */}
       <footer className="lp-footer">
         <h2>Ready to Start Watching?</h2>
         <Link to="/register" className="lp-btn primary large">

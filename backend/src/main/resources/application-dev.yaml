@@ -13,14 +13,15 @@ spring:
     password: ${DB_PASSWORD:password}
 
   flyway:
-    enabled: false
+    enabled: true
     url: ${spring.datasource.url}
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
+    baseline-on-migrate: true
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -51,14 +52,12 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
 
-# JWT Configuration
 jwt:
   secret: ${JWT_SECRET:bXlTdXBlclNlY3JldEtleUZvckpXVFRva2VuR2VuZXJhdGlvblRoYXQaXNMZWFzdDI1NkJpdHNMb25n}
   issuer: ${JWT_ISSUER:codeNaren.com}
   expiration-minutes: ${JWT_EXPIRATION_MINUTES:30}
   refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:7}
 
-# Application Configuration
 app:
   data-initialization:
     enabled: ${APP_DATA_INITIALIZATION_ENABLED:true}

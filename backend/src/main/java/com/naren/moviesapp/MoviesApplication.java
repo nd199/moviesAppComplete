@@ -46,7 +46,6 @@ public class MoviesApplication {
             createDefaultPlans(subscriptionPlanRepository);
             createRole(roleRepository);
 
-            // Call SuperAdminSeeder to create super admin user
             superAdminSeeder.seedSuperAdmin();
         };
     }
@@ -67,7 +66,6 @@ public class MoviesApplication {
     private void createRandomMovie(MovieRepository movieRepository) {
         String movieName = FAKER.book().title();
         var rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
-        var cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
         String description = FAKER.lorem().sentence(40);
         String poster = FAKER.internet().url();
         String ageRating = FAKER.options().option("G", "PG", "PG-13", "R", "NC-17");
@@ -77,7 +75,7 @@ public class MoviesApplication {
         String genre2 = FAKER.book().genre();
         var instant = Instant.now().toString().substring(20, 24);
 
-        Movie movie = new Movie(movieName + "-" + instant, cost, rating,
+        Movie movie = new Movie(movieName + "-" + instant, rating,
                 description, poster, ageRating, year, runtime, genre1 + "," + genre2, "movies");
         movieRepository.save(movie);
 
@@ -86,7 +84,6 @@ public class MoviesApplication {
     private void createRandomShow(ShowRepository showRepository) {
         String showName = FAKER.book().title();
         double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
-        double cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
         String description = FAKER.lorem().sentence(40);
         String poster = FAKER.internet().url();
         String ageRating = FAKER.options().option("G", "PG", "PG-13", "R", "NC-17");
@@ -96,7 +93,7 @@ public class MoviesApplication {
         String genre2 = FAKER.book().genre();
         var instant = Instant.now().toString().substring(20, 24);
 
-        Show show = new Show(showName + "-" + instant, cost, rating, description, poster,
+        Show show = new Show(showName + "-" + instant, rating, description, poster,
                 ageRating, year, runtime, genre1 + "," + genre2, "shows");
         showRepository.save(show);
     }
@@ -164,5 +161,4 @@ public class MoviesApplication {
         }
     }
 
-    //REMOVED_JWT.eyJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzcxNDY3ODkxLCJhdXRob3JpdGllcyI6WyJNT1ZJRV9XUklURSIsIk1PVklFX1JFQUQiLCJNT1ZJRV9ERUxFVEUiLCJVU0VSX01BTkFHRSIsIlNZU1RFTV9DT05GSUciLCJVU0VSX1JFQUQiLCJST0xFX1NVUEVSX0FETUlOIiwiVklFV19SRVBPUlRTIl0sImp0aSI6ImRmZjVmMDYxLTk3MzQtNDZlYi04N2IzLTQzZWMzMjFjYTYyZSIsInN1YiI6InN1cGVyYWRtaW5AbW92aWVzLmNvbSIsImlzcyI6ImNvZGVOYXJlbi5jb20iLCJleHAiOjE3NzE0Njk2OTF9.95XzHTNk8So1U1GivjQAYLiw_DhKYk1wvSS0Sdq4UGBVo6vrOkj-B91wmoMn4xOH
 }

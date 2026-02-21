@@ -35,7 +35,6 @@ public class MovieService implements MovieServiceInterface {
     private Movie createMovie(MovieRegistration registration) {
         return new Movie(
                 registration.name(),
-                registration.cost(),
                 registration.rating(),
                 registration.description(),
                 registration.poster(),
@@ -79,10 +78,6 @@ public class MovieService implements MovieServiceInterface {
 
         if (update.name() != null && !update.name().equals(movie.getName())) {
             movie.setName(update.name());
-            changes = true;
-        }
-        if (update.cost() != null && !update.cost().equals(movie.getCost())) {
-            movie.setCost(update.cost());
             changes = true;
         }
         if (update.rating() != null && !update.rating().equals(movie.getRating())) {
@@ -142,11 +137,6 @@ public class MovieService implements MovieServiceInterface {
     }
 
     @Override
-    public List<Movie> findByCostBetween(Double minCost, Double maxCost) {
-        return movieRepository.findByCostBetween(minCost, maxCost);
-    }
-
-    @Override
     public List<Movie> findAllByOrderByNameAsc() {
         return movieRepository.findAllByOrderByNameAsc();
     }
@@ -154,16 +144,6 @@ public class MovieService implements MovieServiceInterface {
     @Override
     public List<Movie> findAllByOrderByNameDesc() {
         return movieRepository.findAllByOrderByNameDesc();
-    }
-
-    @Override
-    public List<Movie> findAllByOrderByCostAsc() {
-        return movieRepository.findAllByOrderByCostAsc();
-    }
-
-    @Override
-    public List<Movie> findAllByOrderByCostDesc() {
-        return movieRepository.findAllByOrderByCostDesc();
     }
 
     @Override

@@ -26,15 +26,9 @@ public interface MovieServiceInterface {
 
     List<Movie> findByRatingLessThanEqual(Double rating);
 
-    List<Movie> findByCostBetween(Double minCost, Double maxCost);
-
     List<Movie> findAllByOrderByNameAsc();
 
     List<Movie> findAllByOrderByNameDesc();
-
-    List<Movie> findAllByOrderByCostAsc();
-
-    List<Movie> findAllByOrderByCostDesc();
 
     List<Movie> findAllByOrderByRatingAsc();
 

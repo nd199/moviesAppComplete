@@ -40,7 +40,6 @@ public class DevDataSeeder {
         return args -> {
             log.info("Seeding development/demo data...");
 
-            // Create demo user
             createDemoUser();
 
             for (int i = 0; i < DEMO_DATA_COUNT; i++) {
@@ -56,10 +55,8 @@ public class DevDataSeeder {
     private void createDemoUser() {
         String demoEmail = "demo@example.com";
         
-        // Check if demo user already exists by email
         var existingUser = customerRepository.findByEmail(demoEmail);
         if (existingUser.isPresent()) {
-            // Update existing user to ensure they can login
             Customer user = existingUser.get();
             user.setIsEmailVerified(true);
             user.setIsRegistered(true);
@@ -70,10 +67,8 @@ public class DevDataSeeder {
             return;
         }
 
-        // Generate unique phone number
         String phoneNumber = "9999999" + String.format("%03d", RANDOM.nextInt(1000));
         
-        // Verify phone number doesn't exist (simple check)
         while (isPhoneNumberTaken(phoneNumber)) {
             phoneNumber = "9999999" + String.format("%03d", RANDOM.nextInt(1000));
         }
@@ -124,7 +119,6 @@ public class DevDataSeeder {
     private void createRandomMovie() {
         String movieName = FAKER.book().title();
         double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
-        double cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
         String description = FAKER.lorem().sentence(40);
         String poster = FAKER.internet().url();
         String ageRating = FAKER.options().option("G", "PG", "PG-13", "R", "NC-17");
@@ -136,7 +130,6 @@ public class DevDataSeeder {
 
         Movie movie = new Movie();
         movie.setName(movieName + "-" + instant);
-        movie.setCost(cost);
         movie.setRating(rating);
         movie.setDescription(description);
         movie.setPoster(poster);
@@ -153,7 +146,6 @@ public class DevDataSeeder {
     private void createRandomShow() {
         String showName = FAKER.book().title();
         double rating = Math.floor(RANDOM.nextDouble(2, 5) * 100) / 100;
-        double cost = Math.floor(RANDOM.nextDouble(200, 1200) * 100) / 100;
         String description = FAKER.lorem().sentence(40);
         String poster = FAKER.internet().url();
         String ageRating = FAKER.options().option("G", "PG", "PG-13", "R", "NC-17");
@@ -165,7 +157,6 @@ public class DevDataSeeder {
 
         Show show = new Show();
         show.setName(showName + "-" + instant);
-        show.setCost(cost);
         show.setRating(rating);
         show.setDescription(description);
         show.setPoster(poster);

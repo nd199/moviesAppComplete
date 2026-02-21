@@ -7,18 +7,14 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// Request interceptor - add security headers
 api.interceptors.request.use(
   (config) => {
-    // Get JWT token from cookies
     const token = Cookies.get("jwt_token");
     
-    // Add Authorization header if token exists
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    // Add other security headers
     config.headers['X-Requested-With'] = 'XMLHttpRequest';
     return config;
   },
@@ -27,15 +23,12 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - handle token refresh and errors
 api.interceptors.response.use(
   (response) => {
-    // Token will be set automatically via httpOnly cookie from backend
     return response;
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Only redirect if not already on login page
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }

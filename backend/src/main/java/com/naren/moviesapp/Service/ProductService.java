@@ -29,7 +29,6 @@ public class ProductService {
             if ("movies".equals(type)) {
                 MovieUpdation movieUpdation = new MovieUpdation(
                         productUpdateRequest.name(),
-                        productUpdateRequest.cost(),
                         productUpdateRequest.rating(),
                         productUpdateRequest.description(),
                         productUpdateRequest.poster(),
@@ -44,7 +43,6 @@ public class ProductService {
             } else if ("shows".equals(type)) {
                 ShowUpdation showUpdation = new ShowUpdation(
                         productUpdateRequest.name(),
-                        productUpdateRequest.cost(),
                         productUpdateRequest.rating(),
                         productUpdateRequest.description(),
                         productUpdateRequest.poster(),
@@ -92,7 +90,6 @@ public class ProductService {
                 MovieRegistration movieRegistration
                         = new MovieRegistration(
                         productCreateRequest.name(),
-                        productCreateRequest.cost(),
                         productCreateRequest.rating(),
                         productCreateRequest.description(),
                         productCreateRequest.poster(),
@@ -106,7 +103,6 @@ public class ProductService {
             } else if (productCreateRequest.type().equals("shows")) {
                 ShowRegistration showRegistration = new ShowRegistration(
                         productCreateRequest.name(),
-                        productCreateRequest.cost(),
                         productCreateRequest.rating(),
                         productCreateRequest.description(),
                         productCreateRequest.poster(),

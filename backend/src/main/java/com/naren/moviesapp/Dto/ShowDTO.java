@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 public record ShowDTO(
         Long id,
         String name,
-        Double cost,
         Double rating,
         String description,
         String poster,

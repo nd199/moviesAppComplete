@@ -13,7 +13,6 @@ const EmailVerification = () => {
   const [isVerifiedError, setIsVerifiedError] = useState("");
   const navigate = useNavigate();
 
-  // Get plan from route state (preferred) or fallback to Redux
   const plan = location.state?.plan || selectedPlan?.selectedPlan;
 
   const handleEmailUpdate = useCallback((email) => {

@@ -7,7 +7,6 @@ import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.MovieRegistration;
 import com.naren.moviesapp.Record.MovieUpdation;
 import com.naren.moviesapp.Repo.MovieRepository;
-import com.naren.moviesapp.TestData.TestDataFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,10 @@ class MovieServiceImplTest {
 
     @Test
     void addMovie() {
-        MovieRegistration registration = TestDataFactory.createTestMovieRegistration();
+        MovieRegistration registration = new MovieRegistration(
+                "testName", 5.00, "A great movie",
+                "http://poster.url", "PG-13", 2022,
+                "120 mins", "Drama");
 
         when(movieRepository.existsByName(registration.name())).thenReturn(false);
 
@@ -55,7 +57,6 @@ class MovieServiceImplTest {
 
         assertThat(captured.getId()).isNull();
         assertThat(captured.getName()).isEqualTo(registration.name());
-        assertThat(captured.getCost()).isEqualTo(registration.cost());
         assertThat(captured.getRating()).isEqualTo(registration.rating());
         assertThat(captured.getDescription()).isEqualTo(registration.description());
         assertThat(captured.getPoster()).isEqualTo(registration.poster());
@@ -67,7 +68,10 @@ class MovieServiceImplTest {
 
     @Test
     void throwsMovieNameExists() {
-        MovieRegistration registration = TestDataFactory.createTestMovieRegistration();
+        MovieRegistration registration = new MovieRegistration(
+                "testName", 5.00, "A great movie",
+                "http://poster.url", "PG-13", 2022,
+                "120 mins", "Drama");
 
         when(movieRepository.existsByName(registration.name())).thenReturn(true);
 
@@ -84,14 +88,13 @@ class MovieServiceImplTest {
         long id = 1;
         Movie movie = new Movie(
                 "testName",
-                300.22,
                 5.00,
                 "A great movie",
                 "http://poster.url",
                 "PG-13",
                 2022,
                 "120 mins",
-                "Action",
+                "Drama",
                 "movies");
         movie.setId(id);
 
@@ -120,14 +123,13 @@ class MovieServiceImplTest {
         long id = 1;
         Movie movie = new Movie(
                 "testName",
-                300.22,
                 5.00,
                 "A great movie",
                 "http://poster.url",
                 "PG-13",
                 2022,
                 "120 mins",
-                "Action",
+                "Drama",
                 "movies");
         movie.setId(id);
 
@@ -165,7 +167,6 @@ class MovieServiceImplTest {
 
         Movie movie = new Movie(
                 "testName22",
-                200.0,
                 2.0,
                 "A movie",
                 "http://poster.url",
@@ -179,7 +180,7 @@ class MovieServiceImplTest {
         when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
 
         MovieUpdation movieUpdation = new MovieUpdation(
-                "testName2", 300.00, 5.0, "An awesome movie",
+                "testName2", 5.0, "An awesome movie",
                 "http://newposter.url", "R", 2021,
                 "130 mins", "Thriller");
 
@@ -192,7 +193,6 @@ class MovieServiceImplTest {
         Movie updatedMovie = movieArgumentCaptor.getValue();
 
         assertThat(updatedMovie.getName()).isEqualTo(movieUpdation.name());
-        assertThat(updatedMovie.getCost()).isEqualTo(movieUpdation.cost());
         assertThat(updatedMovie.getRating()).isEqualTo(movieUpdation.rating());
         assertThat(updatedMovie.getDescription()).isEqualTo(movieUpdation.description());
         assertThat(updatedMovie.getPoster()).isEqualTo(movieUpdation.poster());
@@ -206,7 +206,7 @@ class MovieServiceImplTest {
     @Test
     void testUpdateMovieNoChanges() {
         Movie movie = new Movie();
-        MovieUpdation update = new MovieUpdation(null, null, null, null, null, null, null, null, null);
+        MovieUpdation update = new MovieUpdation(null, null, null, null, null, null, null, null);
         Long movieId = 1L;
 
         when(movieRepository.findById(movieId)).thenReturn(java.util.Optional.ofNullable(movie));
@@ -225,7 +225,7 @@ class MovieServiceImplTest {
         when(movieRepository.findById(movieId)).thenReturn(java.util.Optional.empty());
 
         assertThatThrownBy(() -> underTest.updateMovie(
-                new MovieUpdation("Hello", 100.0, 4.5, "New Description", "New Poster",
+                new MovieUpdation("Hello", 4.5, "New Description", "New Poster",
                         "New Age Rating", 2000, "New Runtime", "New Genre"), movieId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Movie with ID '%s' not found".formatted(movieId));
@@ -240,7 +240,6 @@ class MovieServiceImplTest {
 
         Movie movie = new Movie(
                 "testName",
-                200.0,
                 2.0,
                 "A movie",
                 "http://poster.url",
@@ -254,7 +253,7 @@ class MovieServiceImplTest {
         when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
 
         MovieUpdation movieUpdation = new MovieUpdation(
-                "testName", 200.0, 2.0, "A movie",
+                "testName", 2.0, "A movie",
                 "http://poster.url", "PG", 2000,
                 "100 mins", "Comedy");
 
@@ -270,7 +269,7 @@ class MovieServiceImplTest {
         when(movieRepository.findById(id)).thenReturn(Optional.empty());
 
         MovieUpdation updation = new MovieUpdation(
-                "Name", 220.0, 3.30, "A good movie",
+                "Name", 3.30, "A good movie",
                 "http://poster.url", "PG-13", 2020,
                 "110 mins", "Drama");
 
@@ -285,8 +284,8 @@ class MovieServiceImplTest {
     void testGetMoviesByYear() {
         int year = 2021;
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieRepository.findByYear(year)).thenReturn(expectedMovies);
@@ -301,8 +300,8 @@ class MovieServiceImplTest {
     void testGetMoviesByAgeRating() {
         String ageRating = "PG-13";
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieRepository.findByAgeRating(ageRating)).thenReturn(expectedMovies);
@@ -317,8 +316,8 @@ class MovieServiceImplTest {
     void testFindByRatingGreaterThanEqual() {
         double rating = 4.5;
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 10.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieRepository.findByRatingGreaterThanEqual(rating)).thenReturn(expectedMovies);
@@ -333,8 +332,8 @@ class MovieServiceImplTest {
     void testFindByRatingLessThanEqual() {
         double rating = 4.5;
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.2, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 10.0, 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
+                new Movie("Movie1", 4.2, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 4.5, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieRepository.findByRatingLessThanEqual(rating)).thenReturn(expectedMovies);
@@ -346,27 +345,10 @@ class MovieServiceImplTest {
     }
 
     @Test
-    void testFindByCostBetween() {
-        double minCost = 5.0;
-        double maxCost = 15.0;
-        List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
-        );
-
-        when(movieRepository.findByCostBetween(minCost, maxCost)).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findByCostBetween(minCost, maxCost);
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
-    }
-
-    @Test
     void testFindAllByOrderByNameAsc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieRepository.findAllByOrderByNameAsc()).thenReturn(expectedMovies);
@@ -380,8 +362,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByNameDesc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
         when(movieRepository.findAllByOrderByNameDesc()).thenReturn(expectedMovies);
@@ -393,40 +375,10 @@ class MovieServiceImplTest {
     }
 
     @Test
-    void testFindAllByOrderByCostAsc() {
-        List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
-        );
-
-        when(movieRepository.findAllByOrderByCostAsc()).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findAllByOrderByCostAsc();
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
-    }
-
-    @Test
-    void testFindAllByOrderByCostDesc() {
-        List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
-        );
-
-        when(movieRepository.findAllByOrderByCostDesc()).thenReturn(expectedMovies);
-
-        List<Movie> actualMovies = underTest.findAllByOrderByCostDesc();
-
-        assertEquals(expectedMovies.size(), actualMovies.size());
-        assertEquals(expectedMovies, actualMovies);
-    }
-
-    @Test
     void testFindAllByOrderByRatingAsc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieRepository.findAllByOrderByRatingAsc()).thenReturn(expectedMovies);
@@ -440,8 +392,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByRatingDesc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
         when(movieRepository.findAllByOrderByRatingDesc()).thenReturn(expectedMovies);
@@ -455,8 +407,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByYearAsc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieRepository.findAllByOrderByYearAsc()).thenReturn(expectedMovies);
@@ -470,8 +422,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByYearDesc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
         when(movieRepository.findAllByOrderByYearDesc()).thenReturn(expectedMovies);
@@ -485,8 +437,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByGenreAsc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies"),
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies")
         );
 
         when(movieRepository.findAllByOrderByGenreAsc()).thenReturn(expectedMovies);
@@ -500,8 +452,8 @@ class MovieServiceImplTest {
     @Test
     void testFindAllByOrderByGenreDesc() {
         List<Movie> expectedMovies = Arrays.asList(
-                new Movie("Movie2", 12.0, 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
-                new Movie("Movie1", 10.0, 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
+                new Movie("Movie2", 4.8, "Description2", "Poster2", "PG-13", 2021, "120 mins", "Drama", "movies"),
+                new Movie("Movie1", 4.5, "Description1", "Poster1", "PG-13", 2021, "120 mins", "Action", "movies")
         );
 
         when(movieRepository.findAllByOrderByGenreDesc()).thenReturn(expectedMovies);

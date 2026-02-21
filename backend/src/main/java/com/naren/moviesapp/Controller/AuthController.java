@@ -106,7 +106,6 @@ public class AuthController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             HttpServletResponse response) {
 
-        // Remove refresh token
         if (refreshToken != null) {
             RefreshToken token = refreshTokenService.findByToken(refreshToken);
             if (token != null) {
@@ -114,7 +113,6 @@ public class AuthController {
             }
         }
 
-        // Blacklist JWT
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             try {
                 String jwt = authHeader.substring(7);

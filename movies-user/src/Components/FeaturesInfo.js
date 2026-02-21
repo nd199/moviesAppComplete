@@ -42,15 +42,15 @@ const FeaturesInfo = () => {
               id: 2,
               title: 'Sales',
               money: `${incomeStats[0]?.total}`,
-              moneyRate: '-1.4%', // Example value, adjust accordingly
+              moneyRate: '-1.4%',
               icon:
                 parseFloat('-1.4') > 0 ? <ArrowUpward /> : <ArrowDownward />,
             },
             {
               id: 3,
               title: 'Cost',
-              money: '1,234', // Example value, adjust accordingly
-              moneyRate: '3.4%', // Example value, adjust accordingly
+              money: '1,234',
+              moneyRate: '3.4%',
               icon: parseFloat('3.4') > 0 ? <ArrowUpward /> : <ArrowDownward />,
             },
           ]}

@@ -13,7 +13,6 @@ public class ShowDTOMapper implements Function<Show, ShowDTO> {
         return new ShowDTO(
                 show.getShow_id(),
                 show.getName(),
-                show.getCost(),
                 show.getRating(),
                 show.getDescription(),
                 show.getPoster(),

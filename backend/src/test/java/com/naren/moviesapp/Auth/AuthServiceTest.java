@@ -7,8 +7,9 @@ import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Exception.InvalidCredentialsException;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
+import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
-import com.naren.moviesapp.TestData.TestDataFactory;
+import com.naren.moviesapp.Security.AppUserPrincipal;
 import com.naren.moviesapp.jwt.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -45,16 +45,21 @@ class AuthServiceTest {
     private CustomerRepository customerRepository;
 
     @Mock
+    private AdminRepository adminRepository;
+
+    @Mock
     private Authentication authentication;
 
     @InjectMocks
     private AuthService underTest;
 
     private Customer principal;
+    private AppUserPrincipal userPrincipal;
 
     @BeforeEach
     void setUp() {
-        principal = TestDataFactory.createTestCustomer(10L);
+        principal = new Customer();
+        principal.setId(10L);
         principal.setName("User");
         principal.setEmail("user@codeNaren.com");
         principal.setPhoneNumber("9999999999");
@@ -63,7 +68,10 @@ class AuthServiceTest {
         principal.setAddress("Chennai, India");
         principal.setIsRegistered(true);
         principal.setIsSubscribed(false);
+        principal.setPassword("encodedPassword");
         principal.setRoles(Set.of(new Role(RoleName.ROLE_USER)));
+
+        userPrincipal = new AppUserPrincipal(principal);
     }
 
     @Test
@@ -74,9 +82,9 @@ class AuthServiceTest {
         when(authenticationManager.authenticate(any()))
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
-                .thenReturn(principal);
-        when(customerRepository.existsByEmail(principal.getEmail()))
-                .thenReturn(true);
+                .thenReturn(userPrincipal);
+        when(customerRepository.findByEmail(principal.getEmail()))
+                .thenReturn(java.util.Optional.of(principal));
 
         CustomerDTO mapped = buildDTO("ROLE_USER");
         when(customerDTOMapper.apply(principal)).thenReturn(mapped);
@@ -101,9 +109,9 @@ class AuthServiceTest {
         when(authenticationManager.authenticate(any()))
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
-                .thenReturn(principal);
-        when(customerRepository.existsByEmail(principal.getEmail()))
-                .thenReturn(true);
+                .thenReturn(userPrincipal);
+        when(customerRepository.findByEmail(principal.getEmail()))
+                .thenReturn(java.util.Optional.of(principal));
 
         CustomerDTO mapped = buildDTO("ROLE_ADMIN");
         when(customerDTOMapper.apply(principal)).thenReturn(mapped);
@@ -116,7 +124,7 @@ class AuthServiceTest {
         assertThat(response.customerDTO()).isEqualTo(mapped);
         assertThat(response.token()).isEqualTo("jwt-token");
 
-        verify(customerRepository, never()).save(any());
+        verify(customerRepository).save(principal);
     }
 
     @Test
@@ -125,9 +133,9 @@ class AuthServiceTest {
         when(authenticationManager.authenticate(any()))
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
-                .thenReturn(principal);
-        when(customerRepository.existsByEmail(principal.getEmail()))
-                .thenReturn(false);
+                .thenReturn(userPrincipal);
+        when(customerRepository.findByEmail(principal.getEmail()))
+                .thenReturn(java.util.Optional.empty());
 
         assertThatThrownBy(() ->
                 underTest.login(new AuthRequest("user@codeNaren.com", "password"))
@@ -159,9 +167,9 @@ class AuthServiceTest {
         when(authenticationManager.authenticate(any()))
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
-                .thenReturn(principal);
-        when(customerRepository.existsByEmail(principal.getEmail()))
-                .thenReturn(true);
+                .thenReturn(userPrincipal);
+        when(customerRepository.findByEmail(principal.getEmail()))
+                .thenReturn(java.util.Optional.of(principal));
 
         CustomerDTO mapped = buildDTO("ROLE_SUPER_ADMIN");
         when(customerDTOMapper.apply(principal)).thenReturn(mapped);

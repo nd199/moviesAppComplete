@@ -7,7 +7,6 @@ import { persistor } from "./redux/store";
 import axios from "axios";
 import "./App.css";
 
-// Import components for all roles
 import Home from "./Pages/User/Home";
 import LoginForm from "./Pages/User/LoginForm";
 import RegistrationForm from "./Pages/User/RegistrationForm";
@@ -18,20 +17,14 @@ import AboutUs from "./Pages/User/AboutUs";
 import Movies from "./Pages/User/Movies";
 import Shows from "./Pages/User/Shows";
 
-// Admin pages - Using separate movies-admin frontend
-// The admin functionality is handled by movies-admin project
-
-// Payment pages
 import PaymentCheckout from "./Pages/Payment/PaymentCheckout";
 import Success from "./Pages/Payment/Success";
 
-// Shared components
 import Fallback from "./Utils/FallBackPage";
 import ServerConnection from "./Utils/ServerConnection";
 
-// Backend Health Check Component
 function AppWithHealthCheck() {
-  const [serverStatus, setServerStatus] = useState('checking'); // 'checking', 'up', 'down'
+  const [serverStatus, setServerStatus] = useState('checking');
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
@@ -48,16 +41,14 @@ function AppWithHealthCheck() {
       }
     };
 
-    // Initial health check
     checkServerHealth();
 
-    // Set up retry mechanism if server is down
     let retryInterval;
     if (serverStatus === 'down' && retryCount < 5) {
       retryInterval = setInterval(() => {
         setRetryCount(prev => prev + 1);
         checkServerHealth();
-      }, 10000); // Retry every 10 seconds
+      }, 10000);
     }
 
     return () => {
@@ -65,17 +56,14 @@ function AppWithHealthCheck() {
     };
   }, [serverStatus, retryCount]);
 
-  // Show server connection screen while checking
   if (serverStatus === 'checking') {
     return <ServerConnection />;
   }
-
-  // Show fallback page if server is down
+  
   if (serverStatus === 'down') {
     return <Fallback retryCount={retryCount} onRetry={() => setServerStatus('checking')} />;
   }
 
-  // Only render app if server is up
   return <AppWithNavigation />;
 }
 
@@ -84,7 +72,6 @@ function AppWithNavigation() {
   const [skipUserFetch, setSkipUserFetch] = useState(false);
 
   useEffect(() => {
-    // Skip user fetch if we just completed payment (to preserve subscription status)
     if (!skipUserFetch) {
       fetchCurrentUserDetails(dispatch);
     }
@@ -94,11 +81,9 @@ function AppWithNavigation() {
   useEffect(() => {
     const handlePaymentSuccess = () => {
       setSkipUserFetch(true);
-      // Reset flag after 10 seconds to allow normal fetching again
       setTimeout(() => setSkipUserFetch(false), 10000);
     };
 
-    // This will be called from PaymentCheckout
     window.paymentSuccess = handlePaymentSuccess;
     
     return () => {
@@ -106,7 +91,6 @@ function AppWithNavigation() {
     };
   }, []);
 
-  // Role-based routing component
   const ProtectedRoute = ({ children, requiredRole }) => {
     const authStatus = useSelector(state => state.user.authStatus);
     const currentUser = useSelector(state => state.user.currentUser);
@@ -151,11 +135,9 @@ function AppWithNavigation() {
   return (
     <Router>
       <Routes>
-        {/* Public routes */}
         <Route path="/server-status" element={<ServerConnection />} />
         <Route path="/fallback" element={<Fallback />} />
 
-        {/* User routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegistrationForm />} />
@@ -163,7 +145,6 @@ function AppWithNavigation() {
         <Route path="/movies" element={<Movies />} />
         <Route path="/shows" element={<Shows />} />
 
-        {/* Protected user routes */}
         <Route
           path="/subscription"
           element={
@@ -189,7 +170,6 @@ function AppWithNavigation() {
           }
         />
 
-        {/* Admin routes - Redirect to movies-admin frontend */}
         <Route path="/admin/login" element={<Navigate to="http://localhost:5173" replace />} />
         <Route path="/registerAdmin" element={<Navigate to="http://localhost:5173" replace />} />
         <Route
@@ -221,7 +201,6 @@ function AppWithNavigation() {
           element={<Navigate to="http://localhost:5173" replace />}
         />
 
-        {/* Payment routes */}
         <Route
           path="/payment/:userId"
           element={
@@ -239,7 +218,6 @@ function AppWithNavigation() {
           }
         />
 
-        {/* Fallback route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

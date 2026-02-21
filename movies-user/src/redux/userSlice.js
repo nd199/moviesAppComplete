@@ -14,7 +14,6 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    /* ================= COMMON ================= */
     resetErrorMessage: state => {
       state.error = false;
       state.errorMessage = null;
@@ -37,7 +36,6 @@ const userSlice = createSlice({
       }
     },
 
-    /* ================= REGISTER ================= */
     registerStart: state => {
       state.isFetching = true;
       state.error = false;
@@ -55,7 +53,6 @@ const userSlice = createSlice({
       state.errorMessage = action.payload?.message;
     },
 
-    /* ================= LOGIN ================= */
     loginStart: state => {
       state.isFetching = true;
       state.error = false;
@@ -74,7 +71,6 @@ const userSlice = createSlice({
       state.errorMessage = action.payload?.message;
     },
 
-    /* ================= FORGOT PASSWORD ================= */
     forgotPasswordStart: state => {
       state.isFetching = true;
       state.error = false;
@@ -89,7 +85,6 @@ const userSlice = createSlice({
       state.errorMessage = action.payload?.message;
     },
 
-    /* ================= VERIFY EMAIL ================= */
     verifyEmailStart: state => {
       state.isFetching = true;
       state.error = false;
@@ -104,7 +99,6 @@ const userSlice = createSlice({
       state.errorMessage = action.payload?.message;
     },
 
-    /* ================= VALIDATE OTP ================= */
     validateOtpStart: state => {
       state.isFetching = true;
       state.error = false;
@@ -119,7 +113,6 @@ const userSlice = createSlice({
       state.errorMessage = action.payload?.message;
     },
 
-    /* ================= UPDATE PASSWORD ================= */
     updatePassPushStart: state => {
       state.isFetching = true;
       state.error = false;
@@ -134,7 +127,6 @@ const userSlice = createSlice({
       state.errorMessage = action.payload?.message;
     },
 
-    /* ================= UPDATE PROFILE ================= */
     updateUserStart: state => {
       state.isFetching = true;
       state.error = false;
@@ -149,7 +141,6 @@ const userSlice = createSlice({
       state.errorMessage = action.payload?.message;
     },
 
-    /* ================= FETCH USERS ================= */
     fetchUsersStart: state => {
       state.isFetching = true;
       state.error = false;
@@ -164,7 +155,6 @@ const userSlice = createSlice({
       state.errorMessage = action.payload?.message;
     },
 
-    /* ================= FETCH CURRENT USER ================= */
     fetchCurrentStart: state => {
       state.isFetching = true;
       state.error = false;
@@ -179,7 +169,6 @@ const userSlice = createSlice({
       state.error = true;
       state.errorMessage = action.payload?.message;
       
-      // Only set unauthenticated if it's not an auth preservation error
       if (!action.payload?.preserveUser) {
         state.currentUser = null;
         state.authStatus = "unauthenticated";

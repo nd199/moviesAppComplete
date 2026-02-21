@@ -2,7 +2,6 @@ package com.naren.moviesapp.Record;
 
 public record ProductUpdateRequest(
         String name,
-        Double cost,
         Double rating,
         Integer entityId,
         String description,

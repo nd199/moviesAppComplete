@@ -120,14 +120,11 @@ public class PaymentService {
         if (planInfo.isPresent()) {
             UserPlanInfo userPlan = planInfo.get();
             if (isSubscribed) {
-                // Activate the user's plan when subscription is set to true
                 userPlan.setIsActive(true);
-                // If there's no subscription end date or it's in the past, set a default
                 if (userPlan.getSubscriptionEndDate() == null || userPlan.getSubscriptionEndDate().isBefore(LocalDateTime.now())) {
-                    userPlan.setSubscriptionEndDate(LocalDateTime.now().plusMonths(1)); // Default to 1 month
+                    userPlan.setSubscriptionEndDate(LocalDateTime.now().plusMonths(1));
                 }
             } else {
-                // Deactivate the user's plan when subscription is set to false
                 userPlan.setIsActive(false);
             }
             userPlanInfoRepository.save(userPlan);

@@ -78,7 +78,6 @@ public class TestDataFactory {
             movie.setId(id);
         }
         movie.setName(FAKER.book().title() + "-" + UUID.randomUUID().toString().substring(0, 8));
-        movie.setCost(FAKER.number().randomDouble(2, 50, 500));
         movie.setRating(FAKER.number().randomDouble(1, 1, 5));
         movie.setDescription(FAKER.lorem().sentence(20));
         movie.setPoster(FAKER.internet().url());
@@ -95,7 +94,6 @@ public class TestDataFactory {
     public static MovieRegistration createTestMovieRegistration() {
         return new MovieRegistration(
                 FAKER.book().title(),
-                FAKER.number().randomDouble(2, 50, 500),
                 FAKER.number().randomDouble(1, 1, 5),
                 FAKER.lorem().sentence(20),
                 FAKER.internet().url(),
@@ -109,7 +107,6 @@ public class TestDataFactory {
     public static MovieUpdation createTestMovieUpdation() {
         return new MovieUpdation(
                 FAKER.book().title(),
-                FAKER.number().randomDouble(2, 50, 500),
                 FAKER.number().randomDouble(1, 1, 5),
                 FAKER.lorem().sentence(20),
                 FAKER.internet().url(),
@@ -131,7 +128,6 @@ public class TestDataFactory {
             show.setShow_id(id);
         }
         show.setName(FAKER.book().title() + "-" + UUID.randomUUID().toString().substring(0, 8));
-        show.setCost(FAKER.number().randomDouble(2, 50, 500));
         show.setRating(FAKER.number().randomDouble(1, 1, 5));
         show.setDescription(FAKER.lorem().sentence(20));
         show.setPoster(FAKER.internet().url());
@@ -148,7 +144,6 @@ public class TestDataFactory {
     public static ShowRegistration createTestShowRegistration() {
         return new ShowRegistration(
                 FAKER.book().title(),
-                FAKER.number().randomDouble(2, 50, 500),
                 FAKER.number().randomDouble(1, 1, 5),
                 FAKER.lorem().sentence(20),
                 FAKER.internet().url(),
@@ -162,7 +157,6 @@ public class TestDataFactory {
     public static ShowUpdation createTestShowUpdation() {
         return new ShowUpdation(
                 FAKER.book().title(),
-                FAKER.number().randomDouble(2, 50, 500),
                 FAKER.number().randomDouble(1, 1, 5),
                 FAKER.lorem().sentence(20),
                 FAKER.internet().url(),

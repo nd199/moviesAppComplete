@@ -17,30 +17,25 @@ const Success = () => {
   const [updated, setUpdated] = useState(false);
 
   useEffect(() => {
-    // Prevent infinite loop by checking if already updated
     if (updated || !currentUser?.email) return;
 
     const markUserAsSubscribed = async () => {
       try {
         console.log('Success - Calling backend to mark user as subscribed:', currentUser.email);
         
-        // Call backend to update subscription status
         const response = await markUserSubscribedApi(currentUser.email);
         console.log('Success - Backend response:', response);
         
-        // Update Redux with the backend-confirmed user data
         if (response.data) {
           console.log('Success - Updating Redux with backend user data:', response.data);
           dispatch(updateUserSuccess(response.data));
         }
         
-        // Mark as updated to prevent infinite loop
         setUpdated(true);
         
         console.log('Success: User marked as subscribed in backend and Redux');
       } catch (error) {
         console.error('Success - Failed to mark user as subscribed:', error);
-        // Still mark as updated to prevent infinite loop
         setUpdated(true);
       }
     };
@@ -48,7 +43,6 @@ const Success = () => {
     markUserAsSubscribed();
   }, [dispatch, updated, currentUser]);
 
-  // Separate effect for timer
   useEffect(() => {
     const timeout = setTimeout(() => {
       console.log('Success: Redirecting to home page');
