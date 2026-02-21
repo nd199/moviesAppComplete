@@ -31,7 +31,6 @@ public class PasswordResetService {
         this.customerRepository = customerRepository;
     }
 
-    @PreAuthorize("permitAll()")
     public void createPasswordResetToken(String email) {
         if (!customerRepository.existsByEmail(email)) {
             throw new ResourceNotFoundException("Your account " +
@@ -52,13 +51,11 @@ public class PasswordResetService {
         }
     }
 
-    @PreAuthorize("permitAll()")
     public boolean isTokenValid(String token) {
         Optional<PasswordResetToken> resetToken = tokenRepository.findByToken(token);
         return resetToken.isPresent() && resetToken.get().getExpiry().isAfter(Instant.now());
     }
 
-    @PreAuthorize("permitAll()")
     public void resetPassword(PasswordResetRequest passwordResetRequest) {
         var token = passwordResetRequest.token();
         var newPassword = passwordResetRequest.newPassword();

@@ -2,16 +2,21 @@ package com.naren.moviesapp.Auth;
 
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
+import com.naren.moviesapp.Entity.Admin;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Exception.*;
+import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
+import com.naren.moviesapp.Security.AppUserPrincipal;
 import com.naren.moviesapp.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +29,9 @@ public class AuthService {
     private final CustomerDTOMapper customerDTOMapper;
     private final JwtUtil jwtUtil;
     private final CustomerRepository customerRepository;
+    private final AdminRepository adminRepository;
 
+    @Transactional
     public AuthResponse login(AuthRequest authRequest) {
 
         validateRequest(authRequest);
@@ -36,18 +43,35 @@ public class AuthService {
                             authRequest.password())
             );
 
-            Customer customer = (Customer) authentication.getPrincipal();
-
-            validateAccountState(customer);
-
-            if (!Boolean.TRUE.equals(customer.getIsLogged())) {
-                customer.setIsLogged(true);
-                customerRepository.save(customer);
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            
+            // Get the actual entity from AppUserPrincipal
+            if (userDetails instanceof AppUserPrincipal appUserPrincipal) {
+                Object entity = appUserPrincipal.getUserEntity();
+                
+                if (entity instanceof Customer) {
+                    // Re-fetch from database to get fresh data with roles initialized
+                    Customer customer = customerRepository.findByEmail(authRequest.username())
+                            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                    // Force initialize roles
+                    customer.getRoles().size();
+                    
+                    validateAccountState(customer);
+                    String token = generateTokenForUser(customer);
+                    return new AuthResponse(customerDTOMapper.apply(customer), token);
+                } else if (entity instanceof Admin) {
+                    // Re-fetch from database to get fresh data with roles initialized
+                    Admin admin = adminRepository.findByEmail(authRequest.username())
+                            .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
+                    // Force initialize roles
+                    admin.getRoles().size();
+                    
+                    String token = generateTokenForAdmin(admin);
+                    return new AuthResponse(customerDTOMapper.apply(convertAdminToCustomer(admin)), token);
+                }
             }
-
-            String token = generateTokenForUser(customer);
-
-            return new AuthResponse(customerDTOMapper.apply(customer), token);
+            
+            throw new AuthenticationException("Unknown user type", "UNKNOWN_USER_TYPE");
 
         } catch (DisabledException e) {
             throw new AuthenticationException(
@@ -66,8 +90,11 @@ public class AuthService {
                  EmailNotVerifiedException |
                  AccountNotRegisteredException e) {
             throw e;
+        } catch (AuthenticationException e) {
+            throw e;
         } catch (Exception e) {
             System.err.println("Unexpected login error: " + e.getMessage());
+            e.printStackTrace();
             throw new AuthenticationException(
                     "Login failed due to an unexpected error. Please try again later.",
                     "LOGIN_ERROR",
@@ -120,5 +147,27 @@ public class AuthService {
         }
 
         return jwtUtil.issueToken(customerDTO.email(), roles);
+    }
+
+    private String generateTokenForAdmin(Admin admin) {
+        Set<Role> roles = new HashSet<>(admin.getRoles());
+        return jwtUtil.issueToken(admin.getEmail(), roles);
+    }
+
+    // Helper to convert Admin to CustomerDTO for response
+    private Customer convertAdminToCustomer(Admin admin) {
+        return new Customer(
+                admin.getId(),
+                admin.getName(),
+                admin.getEmail(),
+                admin.getPassword(),
+                admin.getPhoneNumber(),
+                admin.getIsEmailVerified(),
+                admin.getAddress(),
+                admin.getIsRegistered(),
+                null,
+                admin.getRoles(),
+                null
+        );
     }
 }

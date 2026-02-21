@@ -32,9 +32,6 @@ public class Admin extends BaseUser {
     @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false)
-    private Boolean isLogged;
-
     @Column(name = "department", columnDefinition = "TEXT")
     private String department;
 
@@ -51,8 +48,8 @@ public class Admin extends BaseUser {
     @JsonBackReference
     private Set<Role> roles = new HashSet<>();
 
-    public Admin(Long id, String name, String email, String password, String phoneNumber, 
-                 Boolean isEmailVerified, String address, Boolean isLogged, Boolean isRegistered, 
+    public Admin(Long id, String name, String email, String password, String phoneNumber,
+                 Boolean isEmailVerified, String address, Boolean isRegistered,
                  Set<Role> roles, String department, Integer accessLevel, Boolean isActive) {
         this.id = id;
         this.name = name;
@@ -61,7 +58,6 @@ public class Admin extends BaseUser {
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
         this.address = address;
-        this.isLogged = isLogged;
         this.isRegistered = isRegistered;
         this.roles = roles;
         this.department = department;
@@ -69,8 +65,8 @@ public class Admin extends BaseUser {
         this.isActive = isActive;
     }
 
-    public Admin(String name, String email, String password, String phoneNumber, 
-                 Boolean isEmailVerified, Boolean isLogged, Boolean isRegistered, 
+    public Admin(String name, String email, String password, String phoneNumber,
+                 Boolean isEmailVerified, Boolean isRegistered,
                  String address, String department, Integer accessLevel) {
         this.name = name;
         this.email = email;
@@ -78,7 +74,6 @@ public class Admin extends BaseUser {
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
         this.address = address;
-        this.isLogged = isLogged;
         this.isRegistered = isRegistered;
         this.department = department;
         this.accessLevel = accessLevel;
@@ -86,8 +81,8 @@ public class Admin extends BaseUser {
     }
 
     public Admin(String name, String email, String password,
-                 String phoneNumber, String imageUrl, Boolean isEmailVerified, 
-                 String address, Boolean isLogged, Boolean isRegistered, 
+                 String phoneNumber, String imageUrl, Boolean isEmailVerified,
+                 String address, Boolean isRegistered,
                  String department, Integer accessLevel) {
         this.name = name;
         this.email = email;
@@ -96,7 +91,6 @@ public class Admin extends BaseUser {
         this.imageUrl = imageUrl;
         this.isEmailVerified = isEmailVerified;
         this.address = address;
-        this.isLogged = isLogged;
         this.isRegistered = isRegistered;
         this.department = department;
         this.accessLevel = accessLevel;
@@ -113,7 +107,6 @@ public class Admin extends BaseUser {
                 ", imageUrl='" + imageUrl + '\'' +
                 ", isEmailVerified=" + isEmailVerified +
                 ", address='" + address + '\'' +
-                ", isLogged=" + isLogged +
                 ", isRegistered=" + isRegistered +
                 ", department='" + department + '\'' +
                 ", accessLevel=" + accessLevel +

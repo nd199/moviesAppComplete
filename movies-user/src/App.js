@@ -18,16 +18,8 @@ import AboutUs from "./Pages/User/AboutUs";
 import Movies from "./Pages/User/Movies";
 import Shows from "./Pages/User/Shows";
 
-// Admin pages
-import AdminHome from "./Pages/Admin/Home";
-import AdminLogin from "./Pages/Admin/Login";
-import AdminRegister from "./Pages/Admin/Register";
-import UserList from "./Pages/Admin/UserList";
-import UserInfoAndEdit from "./Pages/Admin/UserInfoAndEdit";
-import NewUser from "./Pages/Admin/NewUser";
-import ProductList from "./Pages/Admin/ProductList";
-import ProductInfoAndEdit from "./Pages/Admin/ProductInfoAndEdit";
-import NewProduct from "./Pages/Admin/NewProduct";
+// Admin pages - Using separate movies-admin frontend
+// The admin functionality is handled by movies-admin project
 
 // Payment pages
 import PaymentCheckout from "./Pages/Payment/PaymentCheckout";
@@ -197,64 +189,36 @@ function AppWithNavigation() {
           }
         />
 
-        {/* Admin routes */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/registerAdmin" element={<AdminRegister />} />
+        {/* Admin routes - Redirect to movies-admin frontend */}
+        <Route path="/admin/login" element={<Navigate to="http://localhost:5173" replace />} />
+        <Route path="/registerAdmin" element={<Navigate to="http://localhost:5173" replace />} />
         <Route
           path="/admin"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <AdminHome />
-            </ProtectedRoute>
-          }
+          element={<Navigate to="http://localhost:5173" replace />}
         />
         <Route
           path="/admin/users"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <UserList />
-            </ProtectedRoute>
-          }
+          element={<Navigate to="http://localhost:5173" replace />}
         />
         <Route
           path="/admin/users/:id"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <UserInfoAndEdit />
-            </ProtectedRoute>
-          }
+          element={<Navigate to="http://localhost:5173" replace />}
         />
         <Route
           path="/admin/users/new"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <NewUser />
-            </ProtectedRoute>
-          }
+          element={<Navigate to="http://localhost:5173" replace />}
         />
         <Route
           path="/admin/products"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <ProductList />
-            </ProtectedRoute>
-          }
+          element={<Navigate to="http://localhost:5173" replace />}
         />
         <Route
           path="/admin/products/:id"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <ProductInfoAndEdit />
-            </ProtectedRoute>
-          }
+          element={<Navigate to="http://localhost:5173" replace />}
         />
         <Route
           path="/admin/products/new"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <NewProduct />
-            </ProtectedRoute>
-          }
+          element={<Navigate to="http://localhost:5173" replace />}
         />
 
         {/* Payment routes */}

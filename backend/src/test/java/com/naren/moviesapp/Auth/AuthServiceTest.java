@@ -62,13 +62,14 @@ class AuthServiceTest {
         principal.setIsEmailVerified(true);
         principal.setAddress("Chennai, India");
         principal.setIsRegistered(true);
+        principal.setIsSubscribed(false);
         principal.setRoles(Set.of(new Role(RoleName.ROLE_USER)));
     }
 
     @Test
     void login_whenCustomerNotLogged_updatesCustomer_andIssuesToken() {
 
-        principal.setIsLogged(false);
+        principal.setIsSubscribed(true);
 
         when(authenticationManager.authenticate(any()))
                 .thenReturn(authentication);
@@ -95,7 +96,7 @@ class AuthServiceTest {
     @Test
     void login_whenCustomerAlreadyLogged_doesNotUpdateCustomer() {
 
-        principal.setIsLogged(true);
+        principal.setIsSubscribed(true);
 
         when(authenticationManager.authenticate(any()))
                 .thenReturn(authentication);
@@ -152,7 +153,7 @@ class AuthServiceTest {
 
         principal.setIsEmailVerified(false);
         principal.setIsRegistered(false);
-        principal.setIsLogged(false);
+        principal.setIsSubscribed(true);
         principal.setRoles(Set.of(new Role(RoleName.ROLE_SUPER_ADMIN)));
 
         when(authenticationManager.authenticate(any()))
@@ -186,9 +187,8 @@ class AuthServiceTest {
                 principal.getImageUrl(),
                 principal.getIsEmailVerified(),
                 principal.getAddress(),
-                true,
                 principal.getIsRegistered(),
-                false,
+                principal.getIsSubscribed(),
                 List.of(),
                 List.of(role),
                 LocalDateTime.now(),

@@ -16,8 +16,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     Optional<Customer> getCustomerByPhoneNumber(String phoneNumber);
 
-    List<Customer> getCustomersByIsLogged(Boolean isLoggedIn);
-
     @Query(name = "getCustomerBy", nativeQuery = true,
             value = "Select * from customer order by  created_at limit 6")
     List<Customer> getCustomersByTop5();
@@ -33,11 +31,3 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
                     """)
     List<Object[]> getCustomerCountByEachMonthInYear();
 }
-/// dao -- lower level abstraction
-// repo -> higher,
-
-//dao -> boilerplate code
-// repo -> reduce boilerplate code
-
-// dao -> integration and configuration
-// repo -> simplifies integration and configuration

@@ -18,7 +18,6 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                 customer.getImageUrl(),
                 customer.getIsEmailVerified(),
                 customer.getAddress(),
-                customer.getIsLogged(),
                 customer.getIsRegistered(),
                 customer.getIsSubscribed(),
                 customer.getMovies(),

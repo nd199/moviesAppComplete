@@ -56,7 +56,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
+    // Simplified
     public void addRole(Role role) {
         if (role == null) {
             throw new ResourceNotFoundException("Role cannot be null");
@@ -68,19 +68,19 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
+    // Simplified
     public List<Role> getRoles() {
         return roleService.getAllRoles();
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
+    // Simplified
     public Role getRoleById(Long id) {
         return roleService.findRoleById(id);
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
+    // Simplified
     public void removeRole(Long id) {
         Role role = getRoleById(id);
         if (role == null) {
@@ -90,7 +90,6 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
     @Transactional
     public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration, Set<String> roleNames) {
 
@@ -116,7 +115,7 @@ public class CustomerService implements CustomerServiceInterface {
             registeredCustomer.setImageUrl(customerRegistration.imageUrl());
             customerRepository.save(registeredCustomer);
 
-            String token = jwtUtil.issueToken(registeredCustomer.getUsername(), roles);
+            String token = jwtUtil.issueToken(registeredCustomer.getEmail(), roles);
             CustomerDTO customerDTO = customerDTOMapper.apply(registeredCustomer);
 
             logger.info("Successfully registered user with email: {}, roles: {}",
@@ -152,7 +151,7 @@ public class CustomerService implements CustomerServiceInterface {
                 customerRegistration.email().toLowerCase(),
                 passwordEncoder.encode(customerRegistration.password()),
                 customerRegistration.phoneNumber(),
-                false, false, false, customerRegistration.address(), false);
+                "", false, customerRegistration.address(), false, false);
     }
 
     private boolean validatePassword(String password, String name, String email, String phoneNumber) {
@@ -180,7 +179,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
+    // Simplified
     public CustomerDTO getCustomerById(Long customerId) {
         return customerRepository.findById(customerId)
                 .map(customerDTOMapper)
@@ -190,7 +189,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
+    // Simplified
     @Transactional
     public CustomerDTO updateCustomer(CustomerUpdateRequest request, Long id) {
 
@@ -213,6 +212,9 @@ public class CustomerService implements CustomerServiceInterface {
             changes = true;
         }
         if (request.phoneNumber() != null && !request.phoneNumber().equals(customer.getPhoneNumber())) {
+            if (customerRepository.existsByPhoneNumber(request.phoneNumber())) {
+                throw new ResourceAlreadyExists("Phone number already taken");
+            }
             customer.setPhoneNumber(request.phoneNumber());
             changes = true;
         }
@@ -222,13 +224,10 @@ public class CustomerService implements CustomerServiceInterface {
         }
 
         if (request.imageUrl() != null && !request.imageUrl().equals(customer.getImageUrl())) {
-            customer.setImageUrl(request.imageUrl());
-            changes = true;
-        }
-
-        if (request.isLogged() != null && !Objects.equals(request.isLogged(), customer.getIsLogged())) {
-            customer.setIsLogged(request.isLogged());
-            changes = true;
+            if (customer.getImageUrl() != null || !request.imageUrl().isEmpty()) {
+                customer.setImageUrl(request.imageUrl());
+                changes = true;
+            }
         }
 
         if (!changes) {
@@ -241,7 +240,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_MANAGE') or #email == authentication.principal.username")
+    
     @Transactional
     public void updatePassword(String email, String newPassword) {
         logger.info("Password update request for email: {}", email);
@@ -272,7 +271,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
+    // Simplified
     public List<CustomerDTO> getAllCustomers() {
         List<CustomerDTO> customers = customerRepository.findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent()
                 .stream()
@@ -282,7 +281,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
+    // Simplified
     @Transactional
     public void deleteCustomer(Long customerId) {
 
@@ -298,7 +297,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_MANAGE') or #customerId == authentication.principal.id")
+    // Simplified
     public void addMovieToCustomer(Long customerId, Long movieId) {
 
         Customer customer = customerRepository.findById(customerId)
@@ -320,7 +319,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_MANAGE') or #customerId == authentication.principal.id")
+    // Simplified
     public void removeMovieFromCustomer(Long customerId, Long movieId) {
 
         Customer customer = customerRepository.findById(customerId)
@@ -341,7 +340,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_MANAGE') or #customerId == authentication.principal.id")
+    // Simplified
     public void removeAllMovies(Long customerId) {
 
         Customer customer = customerRepository.findById(customerId)
@@ -361,18 +360,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
-    public List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn) {
-        List<Customer> customers = customerRepository.getCustomersByIsLogged(isLoggedIn);
-        if (customers.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "No customers logged in");
-        }
-        return customers;
-    }
-
-    @Override
-    @PreAuthorize("hasPermission('USER_READ') or #email == authentication.principal.username")
+    
     public CustomerDTO getCustomerByEmail(String email) {
         return customerRepository.findByEmail(email).map((customerDTOMapper))
                 .orElseThrow(
@@ -382,7 +370,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
+    // Simplified
     public CustomerDTO getCustomerByPhoneNumber(String phoneNumber) {
         return customerRepository.getCustomerByPhoneNumber(phoneNumber)
                 .map(customerDTOMapper).orElseThrow(
@@ -391,13 +379,13 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
+    // Simplified
     public void generateAndSendMailOtp(EmailVerificationRequest emailVerificationRequest) {
         otpService.generateAndSendMailOtp(emailVerificationRequest.email());
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
+    // Simplified
     public List<CustomerDTO> getLatestCustomerList() {
         return customerRepository.getCustomersByTop5()
                 .stream().map(customerDTOMapper)
@@ -405,7 +393,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VIEW_REPORTS')")
+    // Simplified
     public List<CustomerStatsDTO> getCustomerStats() {
         return customerRepository.getCustomerCountByEachMonthInYear()
                 .stream()
@@ -424,7 +412,6 @@ public class CustomerService implements CustomerServiceInterface {
                 );
 
         customer.setIsSubscribed(true);
-        customer.setIsLogged(true);
         customerRepository.save(customer);
         return ResponseEntity.ok("Customer Subscribed");
     }

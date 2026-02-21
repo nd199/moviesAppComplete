@@ -3,6 +3,8 @@ package com.naren.moviesapp.Service;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
+import com.naren.moviesapp.Security.AppUserPrincipal;
+import com.naren.moviesapp.Security.CustomUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CustomerUserDetailsServiceTest {
+class CustomUserDetailsServiceTest {
 
     @Mock
     private CustomerRepository customerRepository;
@@ -27,11 +29,11 @@ class CustomerUserDetailsServiceTest {
     @Mock
     private AdminRepository adminRepository;
 
-    private CustomerUserDetailsService underTest;
+    private CustomUserDetailsService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new CustomerUserDetailsService(customerRepository, adminRepository);
+        underTest = new CustomUserDetailsService(customerRepository, adminRepository);
     }
 
     @Test
@@ -47,6 +49,7 @@ class CustomerUserDetailsServiceTest {
         UserDetails result = underTest.loadUserByUsername(username);
 
         assertThat(result).isNotNull();
+        assertThat(result).isInstanceOf(AppUserPrincipal.class);
         assertThat(result.getUsername()).isEqualTo(username);
         verify(customerRepository).findByEmail(username);
     }

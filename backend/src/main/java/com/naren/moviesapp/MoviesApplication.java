@@ -47,7 +47,7 @@ public class MoviesApplication {
             createRole(roleRepository);
 
             // Call SuperAdminSeeder to create super admin user
-            superAdminSeeder.seedSuperAdmin().run(args);
+            superAdminSeeder.seedSuperAdmin();
         };
     }
 
@@ -57,10 +57,9 @@ public class MoviesApplication {
         String customerEmail = customerName.toLowerCase().replace(" ", "") + "@" + domain;
         String password = encoder.encode(FAKER.internet().password(8, 12));
         String phoneNumber = FAKER.phoneNumber().subscriberNumber(9);
-        Boolean isLoggedIn = FAKER.options().<Boolean>option(true, false);
         Boolean isRegistered = FAKER.options().<Boolean>option(true, false);
         Customer customer = new Customer(customerName, customerEmail, password,
-                phoneNumber, "", false, "Chennai, India", isLoggedIn, isRegistered, false);
+                phoneNumber, "", false, "Chennai, India", isRegistered, false);
 
         customerRepository.save(customer);
     }

@@ -40,8 +40,6 @@ public interface CustomerServiceInterface {
 
     void removeAllMovies(Long customerId);
 
-    List<Customer> getCustomersByIsLoggedIn(Boolean isLoggedIn);
-
     CustomerDTO getCustomerByEmail(String email);
 
     CustomerDTO getCustomerByPhoneNumber(String phoneNumber);

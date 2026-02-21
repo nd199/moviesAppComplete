@@ -29,7 +29,6 @@ public class TestDataFactory {
         customer.setPhoneNumber(FAKER.phoneNumber().subscriberNumber(9));
         customer.setImageUrl(FAKER.internet().url());
         customer.setIsEmailVerified(FAKER.bool().bool());
-        customer.setIsLogged(FAKER.bool().bool());
         customer.setIsRegistered(FAKER.bool().bool());
         customer.setIsSubscribed(FAKER.bool().bool());
         customer.setAddress(FAKER.address().fullAddress());
@@ -47,7 +46,6 @@ public class TestDataFactory {
                 FAKER.internet().url(),
                 FAKER.bool().bool(),
                 FAKER.address().fullAddress(),
-                FAKER.bool().bool(),
                 FAKER.bool().bool()
         );
     }

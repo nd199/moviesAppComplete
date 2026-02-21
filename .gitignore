@@ -29,6 +29,7 @@ backend/**/dependency-cache/
 backend/**/build/
 backend/out/
 backend/.mvn/wrapper/maven-wrapper.jar
+backend/*.sh
 
 # ===============================
 # Frontend (React)
@@ -43,8 +44,14 @@ movies-frontend/build/
 movies-frontend/.cache/
 movies-frontend/.next/
 movies-frontend/out/
-frontendAdmin/node_modules/
-frontendAdmin/build/
+movies-user/node_modules/
+movies-user/build/
+movies-user/.cache/
+movies-user/package-lock.json
+movies-admin/node_modules/
+movies-admin/build/
+movies-admin/dist/
+movies-admin/package-lock.json
 frontendpayment/node_modules/
 frontendpayment/build/
 payment/node_modules/

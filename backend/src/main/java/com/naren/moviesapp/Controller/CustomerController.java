@@ -50,7 +50,8 @@ public class CustomerController {
     }
 
     @GetMapping("/customers/currentUser")
-    public ResponseEntity<?> getCustomerByEmail(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        // Pass the email explicitly for @PreAuthorize to work
         CustomerDTO customerDTO = customerService.getCustomerByEmail(userDetails.getUsername());
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
@@ -114,12 +115,6 @@ public class CustomerController {
     @DeleteMapping("/roles/{id}")
     public void deleteRole(@PathVariable("id") Long id) {
         customerService.removeRole(id);
-    }
-
-    @GetMapping("/customers/loggedIn/{isLoggedIn}")
-    public List<Customer> loggedInCustomers(@PathVariable boolean isLoggedIn) {
-        List<Customer> customers = customerService.getCustomersByIsLoggedIn(isLoggedIn);
-        return customers;
     }
 
     @GetMapping("/customers/stats")

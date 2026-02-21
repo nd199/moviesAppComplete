@@ -14,7 +14,6 @@ public record CustomerDTO(
         String imageUrl,
         Boolean isEmailVerified,
         String address,
-        Boolean isLogged,
         Boolean isRegistered,
         Boolean isSubscribed,
         List<Movie> movies,

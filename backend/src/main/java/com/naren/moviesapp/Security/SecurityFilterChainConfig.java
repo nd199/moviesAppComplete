@@ -1,6 +1,6 @@
 package com.naren.moviesapp.Security;
 
-import com.naren.moviesapp.Service.CustomerUserDetailsService;
+import com.naren.moviesapp.Security.CustomUserDetailsService;
 import com.naren.moviesapp.Service.TokenBlacklistService;
 import com.naren.moviesapp.jwt.JwtAuthFilter;
 import com.naren.moviesapp.jwt.JwtUtil;
@@ -14,7 +14,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -28,7 +27,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @Configuration
-@EnableMethodSecurity
 public class SecurityFilterChainConfig {
 
     @PostConstruct
@@ -47,7 +45,7 @@ public class SecurityFilterChainConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(@Qualifier("customerUserDetailsService") UserDetailsService userDetailsService, PasswordEncoder encoder) {
+    public AuthenticationProvider authenticationProvider(@Qualifier("customUserDetailsService") UserDetailsService userDetailsService, PasswordEncoder encoder) {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(encoder);
@@ -60,7 +58,7 @@ public class SecurityFilterChainConfig {
     }
 
     @Bean
-    public JwtAuthFilter jwtAuthFilter(JwtUtil jwtUtil, @Qualifier("customerUserDetailsService") CustomerUserDetailsService userDetailsService, TokenBlacklistService tokenBlacklistService) {
+    public JwtAuthFilter jwtAuthFilter(JwtUtil jwtUtil, @Qualifier("customUserDetailsService") CustomUserDetailsService userDetailsService, TokenBlacklistService tokenBlacklistService) {
         return new JwtAuthFilter(jwtUtil, userDetailsService, tokenBlacklistService);
     }
 
@@ -86,11 +84,13 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/movies/**",
                                 "/api/v1/shows/**",
                                 "/api/v1/products/**",
-                                "/api/v1/about"
+                                "/api/v1/about",
+                                "/api/v1/test-data/status"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/auth/login",
+                                "/api/v1/auth/customers",
                                 "/api/v1/auth/refresh-token",
                                 "/api/v1/verify/email",
                                 "/api/v1/validate/Otp",
@@ -98,7 +98,8 @@ public class SecurityFilterChainConfig {
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.POST,
-                                "/api/v1/subscription/intent"
+                                "/api/v1/subscription/intent",
+                                "/pingSpring"
                         ).permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",

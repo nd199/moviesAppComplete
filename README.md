@@ -54,7 +54,7 @@ MoviesApp is an example of an Internet Streaming Service Platform (OTT applicati
 
 ```
 moviesAppComplete/
-├── backend/
+├── backend/                              # Spring Boot backend
 │   ├── src/
 │   │   ├── main/
 │   │   │   └── java/com/naren/moviesapp/
@@ -68,17 +68,26 @@ moviesAppComplete/
 │   │   │       └── Utils/               # Utility classes
 │   │   └── test/                        # Test classes
 │   └── pom.xml                          # Maven configuration
-├── movies-frontend/
+├── movies-user/                          # User frontend (React)
 │   ├── src/
 │   │   ├── Components/                  # React components
 │   │   ├── Pages/                       # Page components
 │   │   ├── Network/                     # API calls
 │   │   ├── Utils/                       # Utility functions
-│   │   ├── redux/                       # Redux store
-│   │   └── animations/                  # Animation assets
+│   │   └── redux/                       # Redux store
+│   ├── public/                          # Static assets
+│   ├── package.json                     # npm configuration
+│   └── .env                             # Environment variables
+├── movies-admin/                         # Admin frontend (React)
+│   ├── src/
+│   │   ├── Components/                  # React components
+│   │   ├── Pages/                       # Page components
+│   │   ├── Network/                     # API calls
+│   │   └── Utils/                       # Utility functions
 │   ├── public/                          # Static assets
 │   └── package.json                     # npm configuration
 ├── docker-compose.yaml                  # Docker services
+├── .gitignore                           # Git ignore rules
 └── README.md                           # This file
 ```
 
@@ -108,9 +117,16 @@ moviesAppComplete/
     mvn spring-boot:run
     ```
 
-4. Start the frontend (in a new terminal):
+4. Start the frontend user interface (in a new terminal):
     ```bash
-    cd movies-frontend
+    cd movies-user
+    npm install
+    npm start
+    ```
+
+5. Start the frontend admin interface (in another new terminal):
+    ```bash
+    cd movies-admin
     npm install
     npm start
     ```
@@ -134,10 +150,28 @@ moviesAppComplete/
     mvn spring-boot:run
     ```
 
-### Frontend
-1. Navigate to the frontend directory:
+### Frontend Setup
+
+#### User Frontend
+1. Navigate to the user frontend directory:
     ```bash
-    cd movies-frontend
+    cd movies-user
+    ```
+
+2. Install the dependencies:
+    ```bash
+    npm install
+    ```
+
+3. Start the development server:
+    ```bash
+    npm start
+    ```
+
+#### Admin Frontend
+1. Navigate to the admin frontend directory:
+    ```bash
+    cd movies-admin
     ```
 
 2. Install the dependencies:
@@ -159,11 +193,12 @@ moviesAppComplete/
 - `npm run format` - Format code with Prettier
 
 ## Usage
-1. Open your browser and go to `http://localhost:3000` for the user interface.
-2. Register a new account or log in with an existing account.
-3. As an admin, you can access the admin dashboard to manage movies, shows as products, users, and screenings.
-4. As a user, you can browse available movies and make bookings.
-5. Use the payment interface for processing payments.
+1. **User Interface:** Open your browser and go to `http://localhost:3000` for the user interface.
+2. **Admin Interface:** Open your browser and go to `http://localhost:3001` for the admin interface.
+3. Register a new account or log in with an existing account.
+4. As an admin, you can access the admin dashboard to manage movies, shows as products, users, and screenings.
+5. As a user, you can browse available movies and make bookings.
+6. Use the payment interface for processing payments.
 
 ### API Documentation
 Once the backend is running, you can access the interactive API documentation:
@@ -189,10 +224,19 @@ The API documentation includes:
 - `REDIS_HOST` - Redis server host (default: localhost)
 - `REDIS_PORT` - Redis server port (default: 6379)
 
-#### Frontend (.env)
-Create a `.env` file in the movies-frontend directory:
+#### Frontend Environment Variables
+
+**User Frontend (.env in movies-user/)**
 ```env
-REACT_APP_API_URL=http://localhost:8080
+REACT_APP_API_URL=http://localhost:8080/api/v1
+REACT_APP_IMGBB_API_KEY=your_imgbb_api_key
+GENERATE_SOURCEMAP=false
+```
+
+**Admin Frontend (.env in movies-admin/)**
+```env
+REACT_APP_API_URL=http://localhost:8080/api/v1
+GENERATE_SOURCEMAP=false
 ```
 
 ## API Endpoints
@@ -321,9 +365,13 @@ mvn jib:dockerBuild
    # Build backend
    mvn clean package -Pprod
    
-   # Build frontend
-   cd movies-frontend
-   npm run build:prod
+   # Build user frontend
+   cd movies-user
+   npm run build
+   
+   # Build admin frontend
+   cd ../movies-admin
+   npm run build
    
    # Deploy with Docker
    docker-compose -f docker-compose.prod.yaml up -d
@@ -384,7 +432,8 @@ npm run dev
 
 #### Port Conflicts
 - **Backend:** Default port 8080 (configurable via `server.port`)
-- **Frontend:** Default port 3000
+- **User Frontend:** Default port 3000
+- **Admin Frontend:** Default port 3001
 - **Database:** PostgreSQL on 5332, Redis on 6379
 
 #### Database Connection Issues

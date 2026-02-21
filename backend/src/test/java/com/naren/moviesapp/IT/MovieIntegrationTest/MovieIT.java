@@ -59,11 +59,11 @@ public class MovieIT extends AbstractIntegrationTest {
         String address = "Chennai, India";
 
         new CustomerRegistration(customerName, customerEmail,
-                password, customerPhone, "", isEmailVerified, address, false, false);
+                password, customerPhone, "", isEmailVerified, address, false);
 
         String adminName = "IM ADMIN " + FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".1123131213") + "@codeNaren.com";
-        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, "", isEmailVerified, address, false, false);
+        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, "", isEmailVerified, address, false);
         Random random = new Random();
         var randomNumber = random.nextInt(100);
 
@@ -299,7 +299,7 @@ public class MovieIT extends AbstractIntegrationTest {
         String superAdminEmail = superAdminName.replace(" ", ".") + "@codeNaren.com";
         CustomerRegistration superAdminRegistration = new CustomerRegistration(
                 superAdminName, superAdminEmail, FAKER.internet().password(8, 12),
-                FAKER.phoneNumber().subscriberNumber(9), "", false, "Chennai, India", false, false);
+                FAKER.phoneNumber().subscriberNumber(9), "", false, "Chennai, India", false);
 
         String superAdminToken = registerSuperAdminAndGetToken(superAdminRegistration);
 

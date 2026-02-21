@@ -17,7 +17,13 @@ public class WebConfig implements WebMvcConfigurer {
 
         // If allowedOrigins is not set or empty, use localhost for development
         if (allowedOrigins == null || allowedOrigins.trim().isEmpty()) {
-            origins = new String[]{"http://localhost:3000"};
+            // Allow both React (3000) and Vite (5173) development servers
+            origins = new String[]{
+                "http://localhost:3000", 
+                "http://localhost:5173",
+                "http://127.0.0.1:3000",
+                "http://127.0.0.1:5173"
+            };
         } else {
             // Split comma-separated origins and trim whitespace
             origins = allowedOrigins.split(",");

@@ -12,7 +12,6 @@ public class PlanService implements PlanServiceInterface {
     public SubscriptionPlanRepository planRepository;
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
     public SubscriptionPlan findById(Long id) {
         return planRepository.findById(id)
                 .orElseThrow(() ->

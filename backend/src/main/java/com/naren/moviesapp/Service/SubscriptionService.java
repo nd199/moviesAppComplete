@@ -22,7 +22,6 @@ public class SubscriptionService implements SubscriptionServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
     public String generatePaymentToken(Long userId, Long planId) {
         if (subscriptionIntentRepository.existsByUserIdAndPlanId(userId, planId)) {
             throw new ResourceAlreadyExists("User already subscribed to this plan");
@@ -40,7 +39,6 @@ public class SubscriptionService implements SubscriptionServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
     public void updateIntentStatus(String intentToken, IntentStatus status) {
         SubscriptionIntent intent = subscriptionIntentRepository.findByIntentToken(intentToken)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid intent token"));
@@ -55,14 +53,12 @@ public class SubscriptionService implements SubscriptionServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
     public SubscriptionIntent findByIntentToken(String intentToken) {
         return subscriptionIntentRepository.findByIntentToken(intentToken)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid intent token"));
     }
 
     @Override
-    @PreAuthorize("hasPermission('USER_READ')")
     public SubscriptionIntent findByUserId(Long userId) {
         return subscriptionIntentRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid user id"));

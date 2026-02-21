@@ -27,7 +27,7 @@ public class DevDataSeeder {
 
     private static final Random RANDOM = new Random();
     private static final Faker FAKER = new Faker();
-    private static final int DEMO_DATA_COUNT = 4;
+    private static final int DEMO_DATA_COUNT = 20;
 
     private final CustomerRepository customerRepository;
     private final MovieRepository movieRepository;
@@ -40,6 +40,9 @@ public class DevDataSeeder {
         return args -> {
             log.info("Seeding development/demo data...");
 
+            // Create demo user
+            createDemoUser();
+
             for (int i = 0; i < DEMO_DATA_COUNT; i++) {
                 createRandomCustomer();
                 createRandomMovie();
@@ -48,6 +51,52 @@ public class DevDataSeeder {
 
             log.info("Development data seeding completed.");
         };
+    }
+
+    private void createDemoUser() {
+        String demoEmail = "demo@example.com";
+        
+        // Check if demo user already exists by email
+        var existingUser = customerRepository.findByEmail(demoEmail);
+        if (existingUser.isPresent()) {
+            // Update existing user to ensure they can login
+            Customer user = existingUser.get();
+            user.setIsEmailVerified(true);
+            user.setIsRegistered(true);
+            user.setIsActive(true);
+            user.setIsSubscribed(true);
+            customerRepository.save(user);
+            log.info("Demo user updated with verified email and active status");
+            return;
+        }
+
+        // Generate unique phone number
+        String phoneNumber = "9999999" + String.format("%03d", RANDOM.nextInt(1000));
+        
+        // Verify phone number doesn't exist (simple check)
+        while (isPhoneNumberTaken(phoneNumber)) {
+            phoneNumber = "9999999" + String.format("%03d", RANDOM.nextInt(1000));
+        }
+
+        Customer demoUser = new Customer();
+        demoUser.setName("Demo User");
+        demoUser.setEmail(demoEmail);
+        demoUser.setPassword(passwordEncoder.encode("Demo123456"));
+        demoUser.setPhoneNumber(phoneNumber);
+        demoUser.setImageUrl("");
+        demoUser.setAddress("123 Demo Street");
+        demoUser.setIsActive(true);
+        demoUser.setIsSubscribed(true);
+        demoUser.setIsEmailVerified(true);
+        demoUser.setIsRegistered(true);
+
+        customerRepository.save(demoUser);
+        log.info("Created demo user: {} with phone: {}", demoEmail, phoneNumber);
+    }
+    
+    private boolean isPhoneNumberTaken(String phoneNumber) {
+        return customerRepository.findAll().stream()
+            .anyMatch(c -> c.getPhoneNumber() != null && c.getPhoneNumber().equals(phoneNumber));
     }
 
     private void createRandomCustomer() {

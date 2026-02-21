@@ -43,7 +43,6 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
     @Transactional
     public ResponseEntity<?> registerAdmin(AdminRegistration registration, Set<String> roleNames) {
         logger.info("Registering new admin with email: {}", registration.email());
@@ -74,6 +73,9 @@ public class AdminService implements AdminServiceInterface {
         Set<Role> roles = new HashSet<>();
         for (String roleName : roleNames) {
             Role role = roleService.findRoleByName(RoleName.valueOf(roleName));
+            if (role == null) {
+                throw new IllegalArgumentException("Role not found: " + roleName);
+            }
             roles.add(role);
         }
         admin.setRoles(roles);
@@ -85,7 +87,6 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_MANAGE') or #adminId == authentication.principal.id")
     @Transactional
     public ResponseEntity<?> updateAdmin(Long adminId, AdminUpdateRequest updateRequest) {
         logger.info("Updating admin with ID: {}", adminId);
@@ -126,7 +127,6 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
     @Transactional
     public ResponseEntity<?> deleteAdmin(Long adminId) {
         logger.info("Deleting admin with ID: {}", adminId);
@@ -141,7 +141,6 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ') or #adminId == authentication.principal.id")
     public ResponseEntity<?> getAdminById(Long adminId) {
         logger.info("Fetching admin with ID: {}", adminId);
 
@@ -152,7 +151,6 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ') or #email == authentication.principal.username")
     public ResponseEntity<?> getAdminByEmail(String email) {
         logger.info("Fetching admin with email: {}", email);
 
@@ -163,7 +161,6 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<?> getAllAdmins() {
         logger.info("Fetching all admins");
 
@@ -176,7 +173,6 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<?> getActiveAdmins() {
         logger.info("Fetching all active admins");
 
@@ -189,7 +185,6 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<?> getAdminsByDepartment(String department) {
         logger.info("Fetching admins by department: {}", department);
 
@@ -202,7 +197,6 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VIEW_REPORTS')")
     public ResponseEntity<?> getAdminStats() {
         logger.info("Fetching admin statistics");
 
@@ -216,7 +210,6 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
     @Transactional
     public ResponseEntity<?> toggleAdminStatus(Long adminId) {
         logger.info("Toggling status for admin with ID: {}", adminId);

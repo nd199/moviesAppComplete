@@ -55,6 +55,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if (token == null) {
+            logger.debug("No token found in request");
             filterChain.doFilter(request, response);
             return;
         }
@@ -66,9 +67,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String userName = jwtUtil.getSubject(token);
+        logger.debug("Extracted username from token: {}", userName);
 
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+            logger.debug("Loaded user details for: {}", userName);
 
             boolean valid = jwtUtil.isTokenValid(token, userDetails.getUsername());
             logger.debug("Token validation result: {}", valid);
@@ -83,6 +86,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                logger.debug("Authentication set in security context for: {}", userName);
             }
         }
 

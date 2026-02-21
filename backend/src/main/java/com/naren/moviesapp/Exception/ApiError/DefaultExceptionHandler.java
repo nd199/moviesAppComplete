@@ -2,6 +2,8 @@ package com.naren.moviesapp.Exception.ApiError;
 
 import com.naren.moviesapp.Exception.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,7 +21,7 @@ import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
-
+    private static final Logger logger = LoggerFactory.getLogger(DefaultExceptionHandler.class);
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiError> handleAuthenticationException(AuthenticationException e,
                                                                   HttpServletRequest request) {
@@ -96,6 +98,90 @@ public class DefaultExceptionHandler {
                 "RESOURCE_NOT_FOUND"
         );
         return new ResponseEntity<>(apiError, NOT_FOUND);
+    }
+
+    @ExceptionHandler(ResourceAlreadyExists.class)
+    public ResponseEntity<ApiError> handleResourceAlreadyExists(ResourceAlreadyExists e,
+                                                                 HttpServletRequest request) {
+        logger.warn("Resource already exists: {}", e.getMessage());
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                CONFLICT.value(),
+                LocalDateTime.now(),
+                "RESOURCE_ALREADY_EXISTS"
+        );
+        return new ResponseEntity<>(apiError, CONFLICT);
+    }
+
+    @ExceptionHandler(AdminAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleAdminAlreadyExists(AdminAlreadyExistsException e,
+                                                            HttpServletRequest request) {
+        logger.warn("Admin already exists: {}", e.getMessage());
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                CONFLICT.value(),
+                LocalDateTime.now(),
+                "ADMIN_ALREADY_EXISTS"
+        );
+        return new ResponseEntity<>(apiError, CONFLICT);
+    }
+
+    @ExceptionHandler(AdminNotFoundException.class)
+    public ResponseEntity<ApiError> handleAdminNotFound(AdminNotFoundException e,
+                                                       HttpServletRequest request) {
+        logger.warn("Admin not found: {}", e.getMessage());
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                NOT_FOUND.value(),
+                LocalDateTime.now(),
+                "ADMIN_NOT_FOUND"
+        );
+        return new ResponseEntity<>(apiError, NOT_FOUND);
+    }
+
+    @ExceptionHandler(PasswordInvalidException.class)
+    public ResponseEntity<ApiError> handlePasswordInvalid(PasswordInvalidException e,
+                                                        HttpServletRequest request) {
+        logger.warn("Password validation failed: {}", e.getMessage());
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                "INVALID_PASSWORD"
+        );
+        return new ResponseEntity<>(apiError, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> handleIllegalArgument(IllegalArgumentException e,
+                                                        HttpServletRequest request) {
+        logger.warn("Invalid argument: {}", e.getMessage());
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                "BAD_REQUEST"
+        );
+        return new ResponseEntity<>(apiError, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RequestValidationException.class)
+    public ResponseEntity<ApiError> handleRequestValidation(RequestValidationException e,
+                                                          HttpServletRequest request) {
+        logger.warn("Request validation failed: {}", e.getMessage());
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                "VALIDATION_ERROR"
+        );
+        return new ResponseEntity<>(apiError, BAD_REQUEST);
     }
 
     @ExceptionHandler(BadCredentialsException.class)

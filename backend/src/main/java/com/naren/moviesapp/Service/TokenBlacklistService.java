@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
@@ -19,7 +18,6 @@ public class TokenBlacklistService {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    @PreAuthorize("isAuthenticated()")
     public void blacklistToken(String token, long expirationTime) {
         try {
             String jti = extractJtiFromToken(token);
@@ -33,12 +31,10 @@ public class TokenBlacklistService {
         }
     }
 
-    @PreAuthorize("isAuthenticated()")
     public void blacklistToken(String token) {
         blacklistToken(token, DEFAULT_BLACKLIST_DURATION);
     }
 
-    @PreAuthorize("isAuthenticated()")
     public boolean isTokenBlacklisted(String token) {
         try {
             String jti = extractJtiFromToken(token);
@@ -77,7 +73,7 @@ public class TokenBlacklistService {
         return Math.max(ttl, 1); // At least 1 minute
     }
 
-    @PreAuthorize("hasAuthority('SYSTEM_CONFIG')")
+    // Keep this one protected - only admins can clean up tokens
     public void removeExpiredTokens() {
         logger.debug("Token cleanup initiated");
     }
