@@ -25,10 +25,7 @@ spring:
       url: ${SPRING_DATA_REDIS_URL}
 app:
   allowed:
-    origins: "https://movies-app-complete-payment.vercel.app,
-    https://movies-app-complete.vercel.app,
-    https://movies-app-complete-gmco.vercel.app
-    https://movie-payment.onrender.com"
+    origins: "https://movieticket-api.onrender.com"
 
 logging:
   level:
