@@ -22,10 +22,7 @@ spring:
       email: ${SENDGRID_FROM_EMAIL}
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      username: ${REDIS_USERNAME}
-      password: ${REDIS_PASSWORD}
+      url: ${SPRING_DATA_REDIS_URL}
 app:
   allowed:
     origins: "https://movies-app-complete-payment.vercel.app,

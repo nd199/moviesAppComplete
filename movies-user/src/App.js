@@ -31,7 +31,9 @@ function AppWithHealthCheck() {
     const checkServerHealth = async () => {
       try {
 
-        await axios.get(`${process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1"}/ping`, {
+        const baseURL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+        const url = `${baseURL}/api/v1/ping`;
+        await axios.get(url, {
           timeout: 5000,
         });
         setServerStatus('up');
@@ -170,35 +172,36 @@ function AppWithNavigation() {
           }
         />
 
-        <Route path="/admin/login" element={<Navigate to="http://localhost:5173" replace />} />
-        <Route path="/registerAdmin" element={<Navigate to="http://localhost:5173" replace />} />
+        {/* Admin routes should be handled separately or removed for user app */}
+        <Route path="/admin/login" element={<Navigate to="/" replace />} />
+        <Route path="/registerAdmin" element={<Navigate to="/" replace />} />
         <Route
           path="/admin"
-          element={<Navigate to="http://localhost:5173" replace />}
+          element={<Navigate to="/" replace />}
         />
         <Route
           path="/admin/users"
-          element={<Navigate to="http://localhost:5173" replace />}
+          element={<Navigate to="/" replace />}
         />
         <Route
           path="/admin/users/:id"
-          element={<Navigate to="http://localhost:5173" replace />}
+          element={<Navigate to="/" replace />}
         />
         <Route
           path="/admin/users/new"
-          element={<Navigate to="http://localhost:5173" replace />}
+          element={<Navigate to="/" replace />}
         />
         <Route
           path="/admin/products"
-          element={<Navigate to="http://localhost:5173" replace />}
+          element={<Navigate to="/" replace />}
         />
         <Route
           path="/admin/products/:id"
-          element={<Navigate to="http://localhost:5173" replace />}
+          element={<Navigate to="/" replace />}
         />
         <Route
           path="/admin/products/new"
-          element={<Navigate to="http://localhost:5173" replace />}
+          element={<Navigate to="/" replace />}
         />
 
         <Route

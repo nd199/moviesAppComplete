@@ -17,10 +17,10 @@
     "formik": "2.4.9",
     "js-cookie": "^3.0.5",
     "lottie-react": "2.4.1",
-    "react": "19.2.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-cookie": "8.0.1",
     "react-cookie-consent": "10.0.1",
-    "react-dom": "19.2.4",
     "react-icons": "5.5.0",
     "react-loader-spinner": "8.0.2",
     "react-lottie": "1.2.10",
@@ -59,17 +59,10 @@
     "build:prod": "NODE_ENV=production GENERATE_SOURCEMAP=false npm run build"
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "extends": ["react-app", "react-app/jest"]
   },
   "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
+    "production": [">0.2%", "not dead", "not op_mini all"],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
