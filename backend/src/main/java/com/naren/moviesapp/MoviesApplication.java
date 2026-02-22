@@ -54,6 +54,12 @@ public class MoviesApplication {
         String customerName = FAKER.name().fullName();
         String domain = System.getenv().getOrDefault("EMAIL_DOMAIN", "codeNaren.com");
         String customerEmail = customerName.toLowerCase().replace(" ", "") + "@" + domain;
+        
+        // Check if customer with this email already exists
+        if (customerRepository.existsByEmail(customerEmail)) {
+            return; // Skip creating duplicate customer
+        }
+        
         String password = encoder.encode(FAKER.internet().password(8, 12));
         String phoneNumber = FAKER.phoneNumber().subscriberNumber(9);
         Boolean isRegistered = FAKER.options().<Boolean>option(true, false);

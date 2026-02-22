@@ -45,10 +45,17 @@ class MovieServiceImplTest {
                 "120 mins", "Drama", "Trending");
 
         when(movieRepository.existsByName(registration.name())).thenReturn(false);
+        
+        // Mock save to return the captured entity
+        ArgumentCaptor<Movie> captor = ArgumentCaptor.forClass(Movie.class);
+        when(movieRepository.save(captor.capture())).thenAnswer(invocation -> {
+            Movie movie = invocation.getArgument(0);
+            movie.setId(1L); // Simulate DB-generated ID
+            return movie;
+        });
+        
         underTest.addMovie(registration);
 
-        ArgumentCaptor<Movie> captor = ArgumentCaptor.forClass(Movie.class);
-        verify(movieRepository).save(captor.capture());
         assertThat(captor.getValue().getCategory()).isEqualTo("Trending");
     }
 
@@ -60,10 +67,17 @@ class MovieServiceImplTest {
                 "120 mins", "Drama", null);
 
         when(movieRepository.existsByName(registration.name())).thenReturn(false);
+        
+        // Mock save to return the captured entity
+        ArgumentCaptor<Movie> captor = ArgumentCaptor.forClass(Movie.class);
+        when(movieRepository.save(captor.capture())).thenAnswer(invocation -> {
+            Movie movie = invocation.getArgument(0);
+            movie.setId(1L); // Simulate DB-generated ID
+            return movie;
+        });
+        
         underTest.addMovie(registration);
 
-        ArgumentCaptor<Movie> captor = ArgumentCaptor.forClass(Movie.class);
-        verify(movieRepository).save(captor.capture());
         assertThat(captor.getValue().getCategory()).isEqualTo("General");
     }
 

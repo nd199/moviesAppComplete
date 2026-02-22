@@ -6,7 +6,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
@@ -15,22 +15,46 @@ spring:
   main:
     web-application-type: servlet
 
-  sendgrid:
-    api:
-      key: ${SENDGRID_API_KEY}
-    from:
-      email: ${SENDGRID_FROM_EMAIL}
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
   data:
     redis:
       url: ${SPRING_DATA_REDIS_URL}
 app:
+  superadmin:
+    email: ${SUPER_ADMIN_EMAIL}
+    password: ${SUPER_ADMIN_PASSWORD}
+  data-initialization:
+    enabled: ${DATA_INITIALIZATION_ENABLED:false}
   allowed:
-    origins: "https://movies-app-complete-sukx.vercel.app"
+    origins: "https://movies-app-complete-sukx.vercel.app,https://movies-app-complete.vercel.app"
+  tmdb:
+    api-key: ${TMDB_API_KEY}
+    base-url: https://api.themoviedb.org/3
+    image-base-url: https://image.tmdb.org/t/p
 
 logging:
   level:
-    web: debug
-    sql: debug
+    root: DEBUG
+    web: DEBUG
     org:
       springframework:
-        security: debug
+        security: DEBUG
+        mail: DEBUG
+
+server:
+  error:
+    include-message: always
+    include-binding-errors: always

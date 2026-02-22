@@ -1,5 +1,6 @@
 package com.naren.moviesapp.Utils;
 
+import com.naren.moviesapp.Exception.EmailSendingException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
@@ -12,15 +13,14 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-@Profile("dev")
-@Service
+@Service("emailService")
 public class SmtpEmailService implements EmailService {
     private static final Logger logger = LoggerFactory.getLogger(SmtpEmailService.class);
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
 
     @Value("${spring.mail.username}")
-    private String username;
+    private String fromEmail;
 
     public SmtpEmailService(JavaMailSender javaMailSender, SpringTemplateEngine templateEngine) {
         this.javaMailSender = javaMailSender;
@@ -32,7 +32,7 @@ public class SmtpEmailService implements EmailService {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(username);
+            helper.setFrom(fromEmail);
             helper.setTo(toEmail);
             helper.setSubject("Your OTP");
 
@@ -45,8 +45,8 @@ public class SmtpEmailService implements EmailService {
             javaMailSender.send(message);
 
         } catch (MessagingException e) {
-            logger.error("Failed to send OTP email to {}: {}", toEmail, e.getMessage());
-            throw new RuntimeException("Failed to send OTP email", e);
+            logger.error("Failed to send OTP email to {}: {}", toEmail, e.getMessage(), e);
+            throw new EmailSendingException("Failed to send OTP email to " + toEmail, e);
         }
     }
 
@@ -55,7 +55,7 @@ public class SmtpEmailService implements EmailService {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(username);
+            helper.setFrom(fromEmail);
             helper.setTo(toEmail);
             helper.setSubject("Password Reset Request");
 
@@ -68,8 +68,8 @@ public class SmtpEmailService implements EmailService {
             javaMailSender.send(message);
 
         } catch (MessagingException e) {
-            logger.error("Failed to send password reset email to {}: {}", toEmail, e.getMessage());
-            throw new RuntimeException("Failed to send password reset email", e);
+            logger.error("Failed to send password reset email to {}: {}", toEmail, e.getMessage(), e);
+            throw new EmailSendingException("Failed to send password reset email to " + toEmail, e);
         }
     }
 }

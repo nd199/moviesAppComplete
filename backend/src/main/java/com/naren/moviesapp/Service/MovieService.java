@@ -7,6 +7,8 @@ import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.MovieRegistration;
 import com.naren.moviesapp.Record.MovieUpdation;
 import com.naren.moviesapp.Repo.MovieRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,9 @@ import java.util.List;
 @Transactional
 @Service
 public class MovieService implements MovieServiceInterface {
+
+    private static final Logger logger = LoggerFactory.getLogger(MovieService.class);
+
     private final MovieRepository movieRepository;
 
     public MovieService(MovieRepository movieRepository) {
@@ -23,12 +28,15 @@ public class MovieService implements MovieServiceInterface {
 
     @Override
     public Movie addMovie(MovieRegistration registration) {
+        logger.info("Adding new movie: {}", registration.name());
         Movie movie = createMovie(registration);
         if (movieRepository.existsByName(registration.name())) {
             String errorMessage = "Movie name %s already exists".formatted(registration.name());
+            logger.warn("Movie creation failed: {}", errorMessage);
             throw new ResourceAlreadyExists(errorMessage);
         }
         Movie savedMovie = movieRepository.save(movie);
+        logger.info("Movie added successfully with ID: {}", savedMovie.getId());
         return savedMovie;
     }
 
@@ -36,11 +44,15 @@ public class MovieService implements MovieServiceInterface {
      * Add a movie entity directly (used for TMDB sync)
      */
     public Movie addMovie(Movie movie) {
+        logger.info("Adding movie from TMDB: {}", movie.getName());
         if (movieRepository.existsByName(movie.getName())) {
             String errorMessage = "Movie name %s already exists".formatted(movie.getName());
+            logger.warn("Movie creation from TMDB failed: {}", errorMessage);
             throw new ResourceAlreadyExists(errorMessage);
         }
-        return movieRepository.save(movie);
+        Movie savedMovie = movieRepository.save(movie);
+        logger.info("Movie added from TMDB successfully with ID: {}", savedMovie.getId());
+        return savedMovie;
     }
 
     private Movie createMovie(MovieRegistration registration) {
@@ -60,31 +72,38 @@ public class MovieService implements MovieServiceInterface {
 
     @Override
     public void removeMovie(Long id) {
+        logger.info("Removing movie with ID: {}", id);
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> {
                     String errorMessage = "Movie with ID %s not found".formatted(id);
+                    logger.warn("Movie removal failed: {}", errorMessage);
                     return new ResourceNotFoundException(errorMessage);
                 });
         movieRepository.delete(movie);
+        logger.info("Movie removed successfully with ID: {}", id);
     }
 
     @Override
     public List<Movie> getMovieList() {
+        logger.debug("Fetching all movies");
         List<Movie> movies = movieRepository.findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
         return movies;
     }
 
     @Override
     public Movie getMovieById(Long id) {
+        logger.debug("Fetching movie by ID: {}", id);
         return movieRepository.findById(id)
                 .orElseThrow(() -> {
                     String errorMessage = "Movie with ID '%s' not found".formatted(id);
+                    logger.warn("Movie not found: {}", errorMessage);
                     return new ResourceNotFoundException(errorMessage);
                 });
     }
 
     @Override
     public Movie updateMovie(MovieUpdation update, Long movieId) {
+        logger.info("Updating movie with ID: {}", movieId);
         Movie movie = getMovieById(movieId);
 
         boolean changes = false;

@@ -25,5 +25,5 @@ app:
     base-url: https://api.themoviedb.org/3
     image-base-url: https://image.tmdb.org/t/p
   allowed:
-    origins: ${ALLOWED_ORIGINS:}
+    origins: ${ALLOWED_ORIGINS:https://movies-app-complete.vercel.app}
 

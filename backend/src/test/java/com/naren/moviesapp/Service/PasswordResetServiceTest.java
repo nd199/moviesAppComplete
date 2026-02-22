@@ -84,8 +84,8 @@ class PasswordResetServiceTest {
         doThrow(new RuntimeException("Email failed")).when(emailService).sendPasswordResetMail(any(), any());
 
         assertThatThrownBy(() -> underTest.createPasswordResetToken(email))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Failed to send email");
+                .isInstanceOf(com.naren.moviesapp.Exception.EmailSendingException.class)
+                .hasMessage("Failed to send password reset email");
 
         verify(tokenRepository).deleteByEmail(email);
         verify(tokenRepository).save(any());

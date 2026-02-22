@@ -60,15 +60,8 @@ export const register = async (dispatch, customerInfo) => {
   try {
     const res = await authRequest().post('/auth/customers', customerInfo);
     
-    if (res.data.accessToken) {
-      Cookies.set("jwt_token", res.data.accessToken, {
-        path: "/",
-        secure: false,
-        sameSite: "strict",
-        expires: 7,
-      });
-      console.log('Register: JWT token saved to cookies');
-    }
+    // Token is handled via HTTP-only cookies, no need to store in JS cookies
+    console.log('Register: Authentication cookies set by server');
     
     dispatch(registerSuccess(res.data));
     dispatch(setAuthStatus("authenticated"));
@@ -102,15 +95,8 @@ export const login = async (dispatch, userInfo) => {
   try {
     const res = await authRequest().post('/auth/login', userInfo);
     
-    if (res.data.accessToken) {
-      Cookies.set("jwt_token", res.data.accessToken, {
-        path: "/",
-        secure: false,
-        sameSite: "strict",
-        expires: 7,
-      });
-      console.log('Login: JWT token saved to cookies');
-    }
+    // Token is handled via HTTP-only cookies, no need to store in JS cookies
+    console.log('Login: Authentication cookies set by server');
     
     dispatch(loginSuccess(res.data));
     dispatch(setAuthStatus("authenticated"));

@@ -12,6 +12,8 @@ import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Security.AppUserPrincipal;
 import com.naren.moviesapp.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +28,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+
     private final AuthenticationManager authenticationManager;
     private final CustomerDTOMapper customerDTOMapper;
     private final JwtUtil jwtUtil;
@@ -34,6 +38,7 @@ public class AuthService {
 
     @Transactional
     public AuthResponse login(AuthRequest authRequest) {
+        logger.info("Login attempt started for username: {}", authRequest.username());
 
         validateRequest(authRequest);
 
@@ -53,6 +58,7 @@ public class AuthService {
             Object entity = principal.getUserEntity();
 
             if (entity instanceof Admin admin) {
+                logger.debug("Admin login detected for email: {}", admin.getEmail());
 
                 Admin dbAdmin = adminRepository
                         .findByEmail(admin.getEmail())
@@ -60,20 +66,26 @@ public class AuthService {
                                 new ResourceNotFoundException("Admin not found")
                         );
 
+                logger.info("Admin found in database: {}", dbAdmin.getEmail());
+
                 String token = generateTokenForAdmin(dbAdmin);
 
                 CustomerDTO dto = customerDTOMapper.applyFromAdmin(dbAdmin);
 
+                logger.info("Admin login successful for email: {}", dbAdmin.getEmail());
                 return new AuthResponse(dto, token);
             }
 
             if (entity instanceof Customer customerEntity) {
+                logger.debug("Customer login detected for email: {}", customerEntity.getEmail());
 
                 Customer customer = customerRepository
                         .findByEmail(customerEntity.getEmail())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("User not found")
                         );
+
+                logger.info("Customer found in database: {}", customer.getEmail());
 
                 validateAccountState(customer);
 
@@ -87,12 +99,14 @@ public class AuthService {
                         new HashSet<>(customer.getRoles())
                 );
 
+                logger.info("Customer login successful for email: {}", customer.getEmail());
                 return new AuthResponse(dto, token);
             }
 
             throw new AuthenticationException("Invalid principal type", "INVALID_PRINCIPAL");
 
         } catch (BadCredentialsException e) {
+            logger.warn("Login failed for username: {} - Invalid credentials", authRequest.username());
             throw new InvalidCredentialsException(
                     "Invalid email or password. Please check your credentials and try again."
             );
@@ -100,6 +114,7 @@ public class AuthService {
     }
 
     private Set<Role> buildRoles(CustomerDTO dto) {
+        logger.debug("Building roles for customer DTO");
         Set<Role> roles = new HashSet<>();
         for (String roleName : dto.roles()) {
             roles.add(new Role(RoleName.valueOf(roleName)));
@@ -108,34 +123,42 @@ public class AuthService {
     }
 
     private void validateRequest(AuthRequest authRequest) {
+        logger.debug("Validating login request for username: {}", authRequest.username());
         if (authRequest.username() == null || authRequest.username().trim().isEmpty()) {
+            logger.warn("Login validation failed: Email address is required");
             throw new AuthenticationException("Email address is required", "MISSING_EMAIL");
         }
 
         if (authRequest.password() == null || authRequest.password().trim().isEmpty()) {
+            logger.warn("Login validation failed: Password is required");
             throw new AuthenticationException("Password is required", "MISSING_PASSWORD");
         }
     }
 
     private void validateAccountState(Customer customer) {
+        logger.debug("Validating account state for customer: {}", customer.getEmail());
 
         boolean isSuperAdmin = customer.getRoles().stream()
                 .anyMatch(role -> role.getName() == RoleName.ROLE_SUPER_ADMIN);
 
         if (!isSuperAdmin && !Boolean.TRUE.equals(customer.getIsEmailVerified())) {
+            logger.warn("Account validation failed for {}: Email not verified", customer.getEmail());
             throw new EmailNotVerifiedException(
                     "Email address not verified."
             );
         }
 
         if (!isSuperAdmin && !Boolean.TRUE.equals(customer.getIsRegistered())) {
+            logger.warn("Account validation failed for {}: Account not registered", customer.getEmail());
             throw new AccountNotRegisteredException(
                     "Account registration incomplete."
             );
         }
+        logger.debug("Account state validation passed for customer: {}", customer.getEmail());
     }
 
     public String generateTokenForUser(Customer user) {
+        logger.info("Generating token for user: {}", user.getEmail());
         CustomerDTO customerDTO = customerDTOMapper.apply(user);
 
         Set<Role> roles = new HashSet<Role>();
@@ -143,10 +166,13 @@ public class AuthService {
             roles.add(new Role(RoleName.valueOf(roleName)));
         }
 
-        return jwtUtil.issueToken(customerDTO.email(), roles);
+        String token = jwtUtil.issueToken(customerDTO.email(), roles);
+        logger.debug("Token generated successfully for user: {}", user.getEmail());
+        return token;
     }
 
     private String generateTokenForAdmin(Admin admin) {
+        logger.debug("Generating token for admin: {}", admin.getEmail());
         Set<Role> roles = new HashSet<>(admin.getRoles());
         return jwtUtil.issueToken(admin.getEmail(), roles);
     }

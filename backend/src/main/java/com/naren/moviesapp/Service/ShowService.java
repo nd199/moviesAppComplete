@@ -7,6 +7,8 @@ import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.ShowRegistration;
 import com.naren.moviesapp.Record.ShowUpdation;
 import com.naren.moviesapp.Repo.ShowRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,9 @@ import java.util.List;
 @Transactional
 @Service
 public class ShowService implements ShowServiceInterface {
+
+    private static final Logger logger = LoggerFactory.getLogger(ShowService.class);
+
     private final ShowRepository showRepository;
 
     public ShowService(ShowRepository showRepository) {
@@ -23,12 +28,15 @@ public class ShowService implements ShowServiceInterface {
 
     @Override
     public Show addShow(ShowRegistration registration) {
+        logger.info("Adding new show: {}", registration.name());
         Show show = createShow(registration);
         if (showRepository.existsByName(registration.name())) {
             String errorMessage = "Show name %s already exists".formatted(registration.name());
+            logger.warn("Show creation failed: {}", errorMessage);
             throw new ResourceAlreadyExists(errorMessage);
         }
         Show saved = showRepository.save(show);
+        logger.info("Show added successfully with ID: {}", saved.getShow_id());
         return saved;
     }
 
@@ -36,11 +44,15 @@ public class ShowService implements ShowServiceInterface {
      * Add a show entity directly (used for TMDB sync)
      */
     public Show addShow(Show show) {
+        logger.info("Adding show from TMDB: {}", show.getName());
         if (showRepository.existsByName(show.getName())) {
             String errorMessage = "Show name %s already exists".formatted(show.getName());
+            logger.warn("Show creation from TMDB failed: {}", errorMessage);
             throw new ResourceAlreadyExists(errorMessage);
         }
-        return showRepository.save(show);
+        Show saved = showRepository.save(show);
+        logger.info("Show added from TMDB successfully with ID: {}", saved.getShow_id());
+        return saved;
     }
 
     private Show createShow(ShowRegistration registration) {
@@ -60,31 +72,38 @@ public class ShowService implements ShowServiceInterface {
 
     @Override
     public void removeShow(Long id) {
+        logger.info("Removing show with ID: {}", id);
         Show show = showRepository.findById(id)
                 .orElseThrow(() -> {
                     String errorMessage = "Show with ID %s not found".formatted(id);
+                    logger.warn("Show removal failed: {}", errorMessage);
                     return new ResourceNotFoundException(errorMessage);
                 });
         showRepository.delete(show);
+        logger.info("Show removed successfully with ID: {}", id);
     }
 
     @Override
     public Show getShowById(Long id) {
+        logger.debug("Fetching show by ID: {}", id);
         return showRepository.findById(id)
                 .orElseThrow(() -> {
                     String errorMessage = "Show with ID '%s' not found".formatted(id);
+                    logger.warn("Show not found: {}", errorMessage);
                     return new ResourceNotFoundException(errorMessage);
                 });
     }
 
     @Override
     public List<Show> getShowList() {
+        logger.debug("Fetching all shows");
         List<Show> shows = showRepository.findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
         return shows;
     }
 
     @Override
     public Show updateShow(ShowUpdation update, Long showId) {
+        logger.info("Updating show with ID: {}", showId);
         Show show = showRepository.findById(showId)
                 .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
 

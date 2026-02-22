@@ -9,6 +9,8 @@ import com.naren.moviesapp.Repo.PaymentRepository;
 import com.naren.moviesapp.Repo.SubscriptionPlanRepository;
 import com.naren.moviesapp.Repo.UserPlanInfoRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
+
     private final PaymentRepository paymentRepository;
     private final UserPlanInfoRepository userPlanInfoRepository;
     private final CustomerRepository customerRepository;
@@ -27,6 +32,7 @@ public class PaymentService {
 
     @Transactional
     public Payment processPayment(String email, Long planId, String paymentMethod) {
+        logger.info("Processing payment for email: {}, planId: {}, method: {}", email, planId, paymentMethod);
         try {
             Customer customer = customerRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Customer not found with email: " + email));

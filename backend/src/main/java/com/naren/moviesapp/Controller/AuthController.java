@@ -54,23 +54,27 @@ public class AuthController {
 
     @PostMapping("/customers")
     public ResponseEntity<?> registerCustomer(@Valid @RequestBody CustomerRegistration request) {
+        logger.info("Customer registration request received for email: {}", request.email());
         return customerService.registerUser(request, Set.of("ROLE_USER"));
     }
 
     @PostMapping("/admins")
     @PreAuthorize("hasAuthority('USER_MANAGE')")
     public ResponseEntity<?> registerAdmin(@Valid @RequestBody CustomerRegistration request) {
+        logger.info("Admin registration request received for email: {}", request.email());
         return customerService.registerUser(request, Set.of("ROLE_ADMIN"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request,
                                    HttpServletResponse response) {
+        logger.info("Login request received for username: {}", request.username());
 
         AuthResponse authResponse = authService.login(request);
 
         setAuthCookies(response, authResponse);
 
+        logger.info("Login successful for username: {}", request.username());
         return ResponseEntity.ok(authResponse.customerDTO());
     }
 
@@ -79,13 +83,17 @@ public class AuthController {
             @CookieValue(name = "refresh_token", required = false) String refreshTokenValue,
             HttpServletResponse response) {
 
+        logger.debug("Token refresh request received");
+
         if (refreshTokenValue == null) {
+            logger.warn("Refresh token missing in request");
             return ResponseEntity.badRequest().body("Refresh token missing");
         }
 
         RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenValue);
 
         if (refreshToken == null || refreshToken.isExpired()) {
+            logger.warn("Invalid or expired refresh token");
             return ResponseEntity.status(401).body("Invalid or expired refresh token");
         }
 
@@ -97,6 +105,7 @@ public class AuthController {
 
         setCookies(response, newJwt, newRefreshToken.getToken());
 
+        logger.info("Token refreshed successfully for user: {}", refreshToken.getUser().getEmail());
         return ResponseEntity.ok(Map.of("message", "Token refreshed"));
     }
 
@@ -106,10 +115,13 @@ public class AuthController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             HttpServletResponse response) {
 
+        logger.info("Logout request received");
+
         if (refreshToken != null) {
             RefreshToken token = refreshTokenService.findByToken(refreshToken);
             if (token != null) {
                 refreshTokenService.deleteByUser(token.getUser());
+                logger.debug("Refresh token deleted for user: {}", token.getUser().getEmail());
             }
         }
 
@@ -118,6 +130,7 @@ public class AuthController {
                 String jwt = authHeader.substring(7);
                 long expiry = jwtUtil.extractExpiration(jwt).getTime();
                 tokenBlacklistService.blacklistToken(jwt, expiry);
+                logger.debug("JWT token blacklisted during logout");
             } catch (Exception e) {
                 logger.warn("Failed to blacklist JWT token during logout: {}", e.getMessage());
             }
@@ -125,6 +138,7 @@ public class AuthController {
 
         clearCookies(response);
 
+        logger.info("Logout successful");
         return ResponseEntity.ok(Map.of(
                 "message", "Logged out successfully",
                 "status", "success"
@@ -149,7 +163,7 @@ public class AuthController {
                 .secure(isProduction)
                 .path("/")
                 .maxAge(Duration.ofMinutes(30))
-                .sameSite("Strict")
+                .sameSite(isProduction ? "None" : "Strict")
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
@@ -157,7 +171,7 @@ public class AuthController {
                 .secure(isProduction)
                 .path("/")
                 .maxAge(Duration.ofDays(7))
-                .sameSite("Strict")
+                .sameSite(isProduction ? "None" : "Strict")
                 .build();
 
         response.addHeader("Set-Cookie", jwtCookie.toString());
@@ -172,7 +186,7 @@ public class AuthController {
                 .secure(isProduction)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Strict")
+                .sameSite(isProduction ? "None" : "Strict")
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "")
@@ -180,7 +194,7 @@ public class AuthController {
                 .secure(isProduction)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Strict")
+                .sameSite(isProduction ? "None" : "Strict")
                 .build();
 
         response.addHeader("Set-Cookie", jwtCookie.toString());

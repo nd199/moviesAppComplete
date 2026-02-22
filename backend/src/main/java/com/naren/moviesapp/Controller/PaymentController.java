@@ -4,6 +4,8 @@ import com.naren.moviesapp.Entity.Payment;
 import com.naren.moviesapp.Entity.UserPlanInfo;
 import com.naren.moviesapp.Service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +17,14 @@ import java.util.Optional;
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
 public class PaymentController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
+
     private final PaymentService paymentService;
 
     @PostMapping("/submitPayment")
     public ResponseEntity<?> submitPayment(@RequestBody Map<String, Object> requestBody) {
+        logger.info("Submit payment request received");
         try {
             @SuppressWarnings("unchecked")
             Map<String, Object> finalPayment = (Map<String, Object>) requestBody.get("finalPayment");
@@ -47,6 +53,7 @@ public class PaymentController {
 
     @PostMapping("/api/auth/payment")
     public ResponseEntity<?> processPayment(@RequestBody Map<String, Object> requestBody) {
+        logger.info("Process payment request received");
         try {
             @SuppressWarnings("unchecked")
             Map<String, Object> currentUser = (Map<String, Object>) requestBody.get("currentUser");
@@ -55,6 +62,8 @@ public class PaymentController {
 
             String email = (String) currentUser.get("email");
             Long planId = Long.valueOf(selectedPlan.get("id").toString());
+
+            logger.debug("Processing payment for user: {} with plan: {}", email, planId);
 
             Payment payment = paymentService.processPayment(email, planId, "credit_card");
 
@@ -66,6 +75,7 @@ public class PaymentController {
             ));
 
         } catch (Exception e) {
+            logger.error("Payment failed: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body(Map.<String, Object>of(
                     "message", "Payment failed: " + e.getMessage()
             ));
@@ -74,10 +84,12 @@ public class PaymentController {
 
     @GetMapping("/paymentDetails")
     public ResponseEntity<Object> getPaymentDetails(@RequestParam String email) {
+        logger.debug("Fetching payment details for email: {}", email);
         try {
             Optional<UserPlanInfo> userPlanInfo = paymentService.getUserPlanInfo(email);
 
             if (userPlanInfo.isEmpty()) {
+                logger.warn("Payment details not found for email: {}", email);
                 return ResponseEntity.notFound().build();
             }
 
@@ -87,6 +99,7 @@ public class PaymentController {
             ));
 
         } catch (Exception e) {
+            logger.error("Failed to fetch payment details: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body(Map.<String, Object>of(
                     "message", "Failed to fetch details: " + e.getMessage()
             ));
@@ -95,11 +108,14 @@ public class PaymentController {
 
     @PostMapping("/updateFinalUser")
     public ResponseEntity<?> updateFinalUser(@RequestBody Map<String, Object> requestBody) {
+        logger.info("Update final user subscription request received");
         try {
             @SuppressWarnings("unchecked")
             Map<String, Object> finalUser = (Map<String, Object>) requestBody.get("finalUser");
             String email = (String) finalUser.get("email");
             Boolean isSubscribed = (Boolean) finalUser.get("isSubscribed");
+
+            logger.debug("Updating subscription status for email: {} to {}", email, isSubscribed);
 
             var customer = paymentService.updateSubscriptionStatus(email, isSubscribed);
             Optional<Payment> payment = paymentService.getLatestPaymentByEmail(email);
@@ -110,6 +126,7 @@ public class PaymentController {
             ));
 
         } catch (Exception e) {
+            logger.error("Failed to update user subscription: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body(Map.<String, Object>of(
                     "message", "Internal server error: " + e.getMessage()
             ));
@@ -118,12 +135,14 @@ public class PaymentController {
 
     @GetMapping("/api/payment/intent")
     public ResponseEntity<?> getPaymentIntent(@RequestParam String token) {
+        logger.debug("Getting payment intent with token");
         try {
             return ResponseEntity.ok(Map.<String, Object>of(
                     "message", "Payment intent retrieved",
                     "token", token
             ));
         } catch (Exception e) {
+            logger.warn("Invalid or expired payment intent token");
             return ResponseEntity.badRequest().body(Map.<String, Object>of(
                     "message", "Invalid or expired token"
             ));
@@ -132,6 +151,7 @@ public class PaymentController {
 
     @GetMapping("/history")
     public ResponseEntity<?> getPaymentHistory(@RequestParam String email) {
+        logger.debug("Fetching payment history for email: {}", email);
         try {
             List<Payment> payments = paymentService.getPaymentsByEmail(email);
             return ResponseEntity.ok(Map.<String, Object>of(
@@ -139,6 +159,7 @@ public class PaymentController {
                     "data", payments
             ));
         } catch (Exception e) {
+            logger.error("Failed to fetch payment history: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body(Map.<String, Object>of(
                     "message", "Failed to fetch payment history: " + e.getMessage()
             ));
@@ -147,6 +168,7 @@ public class PaymentController {
 
     @PostMapping("/subscribe-success")
     public ResponseEntity<?> markUserSubscribed(@RequestParam String email) {
+        logger.info("Mark user subscribed request for email: {}", email);
         try {
             var updatedCustomer = paymentService.updateSubscriptionStatus(email, true);
             return ResponseEntity.ok(Map.<String, Object>of(
@@ -162,6 +184,7 @@ public class PaymentController {
                     )
             ));
         } catch (Exception e) {
+            logger.error("Failed to update subscription: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body(Map.<String, Object>of(
                     "message", "Failed to update subscription: " + e.getMessage()
             ));

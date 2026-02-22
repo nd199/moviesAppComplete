@@ -9,12 +9,8 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = Cookies.get("jwt_token");
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    
+    // For HTTP-only cookies, we don't need to manually add the token
+    // The browser will automatically include cookies with withCredentials: true
     config.headers['X-Requested-With'] = 'XMLHttpRequest';
     return config;
   },

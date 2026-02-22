@@ -10,6 +10,8 @@ import com.naren.moviesapp.Entity.Show;
 import com.naren.moviesapp.Service.MovieService;
 import com.naren.moviesapp.Service.ShowService;
 import com.naren.moviesapp.Service.TmdbService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/tmdb")
 public class TmdbController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TmdbController.class);
 
     private final TmdbService tmdbService;
     private final MovieService movieService;
@@ -36,6 +40,7 @@ public class TmdbController {
      */
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> getStatus() {
+        logger.debug("Checking TMDB configuration status");
         return ResponseEntity.ok(Map.of(
                 "configured", tmdbService.isConfigured(),
                 "message", tmdbService.isConfigured() ? "TMDB is configured" : "TMDB API key not configured"
@@ -49,6 +54,7 @@ public class TmdbController {
     public ResponseEntity<?> searchMovies(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int page) {
+        logger.info("Searching TMDB movies with query: {}, page: {}", query, page);
         
         if (!tmdbService.isConfigured()) {
             return ResponseEntity.badRequest().body(Map.of(

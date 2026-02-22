@@ -2,6 +2,8 @@ package com.naren.moviesapp.Exception;
 
 import com.naren.moviesapp.Exception.ApiError.ApiError;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,8 +22,11 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException e, HttpServletRequest request) {
+        logger.warn("Resource not found: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -34,6 +39,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceAlreadyExists.class)
     public ResponseEntity<ApiError> handleResourceAlreadyExists(ResourceAlreadyExists e, HttpServletRequest request) {
+        logger.warn("Resource already exists: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -46,6 +52,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({AdminNotFoundException.class, UserNotFoundException.class})
     public ResponseEntity<ApiError> handleNotFoundExceptions(RuntimeException e, HttpServletRequest request) {
+        logger.warn("Not found exception: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -58,6 +65,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AdminAlreadyExistsException.class)
     public ResponseEntity<ApiError> handleAdminAlreadyExists(AdminAlreadyExistsException e, HttpServletRequest request) {
+        logger.warn("Admin already exists: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -70,6 +78,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PasswordInvalidException.class)
     public ResponseEntity<ApiError> handlePasswordInvalid(PasswordInvalidException e, HttpServletRequest request) {
+        logger.warn("Invalid password: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -82,6 +91,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RequestValidationException.class)
     public ResponseEntity<ApiError> handleRequestValidation(RequestValidationException e, HttpServletRequest request) {
+        logger.warn("Request validation error: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -94,6 +104,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ApiError> handleRoleNotFound(RoleNotFoundException e, HttpServletRequest request) {
+        logger.warn("Role not found: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -106,6 +117,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidRegistration.class)
     public ResponseEntity<ApiError> handleInvalidRegistration(InvalidRegistration e, HttpServletRequest request) {
+        logger.warn("Invalid registration: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -118,6 +130,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiError> handleBadCredentials(BadCredentialsException e, HttpServletRequest request) {
+        logger.warn("Bad credentials: {}", request.getRequestURI());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 "Invalid credentials",
@@ -130,6 +143,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<ApiError> handleDisabledAccount(DisabledException e, HttpServletRequest request) {
+        logger.warn("Account disabled: {}", request.getRequestURI());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 "Account is disabled",
@@ -142,6 +156,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(LockedException.class)
     public ResponseEntity<ApiError> handleLockedAccount(LockedException e, HttpServletRequest request) {
+        logger.warn("Account locked: {}", request.getRequestURI());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 "Account is locked",
@@ -154,6 +169,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException e, HttpServletRequest request) {
+        logger.warn("Access denied: {}", request.getRequestURI());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 "Access denied",
@@ -166,6 +182,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidationExceptions(MethodArgumentNotValidException e, HttpServletRequest request) {
+        logger.warn("Validation exception: {} - {}", request.getRequestURI(), e.getMessage());
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
@@ -185,6 +202,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PaymentProcessingException.class)
     public ResponseEntity<ApiError> handlePaymentProcessing(PaymentProcessingException e, HttpServletRequest request) {
+        logger.error("Payment processing error: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -197,6 +215,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TokenRefreshException.class)
     public ResponseEntity<ApiError> handleTokenRefresh(TokenRefreshException e, HttpServletRequest request) {
+        logger.warn("Token refresh error: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -209,6 +228,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TokenExpiredException.class)
     public ResponseEntity<ApiError> handleTokenExpired(TokenExpiredException e, HttpServletRequest request) {
+        logger.warn("Token expired: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -221,6 +241,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailSendingException.class)
     public ResponseEntity<ApiError> handleEmailSending(EmailSendingException e, HttpServletRequest request) {
+        logger.error("Email sending error: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -233,6 +254,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProductOperationException.class)
     public ResponseEntity<ApiError> handleProductOperation(ProductOperationException e, HttpServletRequest request) {
+        logger.error("Product operation error: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -245,6 +267,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PasswordResetException.class)
     public ResponseEntity<ApiError> handlePasswordReset(PasswordResetException e, HttpServletRequest request) {
+        logger.warn("Password reset error: {} - {}", request.getRequestURI(), e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -257,8 +280,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGenericException(Exception e, HttpServletRequest request) {
-        // Log the full stack trace for debugging
-        e.printStackTrace();
+        logger.error("Unexpected error: {} - {}", request.getRequestURI(), e.getMessage(), e);
         
         ApiError apiError = new ApiError(
                 request.getRequestURI(),

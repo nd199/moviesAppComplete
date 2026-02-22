@@ -46,10 +46,17 @@ class ShowServiceTest {
                 "120 mins", "Drama", "Trending");
 
         when(showRepository.existsByName("testName")).thenReturn(false);
+        
+        // Mock save to return the captured entity
+        ArgumentCaptor<Show> captor = ArgumentCaptor.forClass(Show.class);
+        when(showRepository.save(captor.capture())).thenAnswer(invocation -> {
+            Show show = invocation.getArgument(0);
+            show.setShow_id(1L); // Simulate DB-generated ID
+            return show;
+        });
+        
         underTest.addShow(registration);
 
-        ArgumentCaptor<Show> captor = ArgumentCaptor.forClass(Show.class);
-        verify(showRepository).save(captor.capture());
         assertThat(captor.getValue().getCategory()).isEqualTo("Trending");
     }
 
@@ -61,10 +68,17 @@ class ShowServiceTest {
                 "120 mins", "Drama", null);
 
         when(showRepository.existsByName("testName")).thenReturn(false);
+        
+        // Mock save to return the captured entity
+        ArgumentCaptor<Show> captor = ArgumentCaptor.forClass(Show.class);
+        when(showRepository.save(captor.capture())).thenAnswer(invocation -> {
+            Show show = invocation.getArgument(0);
+            show.setShow_id(1L); // Simulate DB-generated ID
+            return show;
+        });
+        
         underTest.addShow(registration);
 
-        ArgumentCaptor<Show> captor = ArgumentCaptor.forClass(Show.class);
-        verify(showRepository).save(captor.capture());
         assertThat(captor.getValue().getCategory()).isEqualTo("General");
     }
 

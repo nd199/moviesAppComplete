@@ -1,15 +1,16 @@
 package com.naren.moviesapp.Security;
 
-import com.naren.moviesapp.Security.CustomUserDetailsService;
 import com.naren.moviesapp.Service.TokenBlacklistService;
 import com.naren.moviesapp.jwt.JwtAuthFilter;
 import com.naren.moviesapp.jwt.JwtUtil;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -29,14 +30,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityFilterChainConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(SecurityFilterChainConfig.class);
+
     @PostConstruct
     public void init() {
-        System.out.println("SECURITY CONFIG LOADED");
+        logger.info("SECURITY CONFIG LOADED");
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
@@ -45,11 +48,14 @@ public class SecurityFilterChainConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(@Qualifier("customUserDetailsService") UserDetailsService userDetailsService, PasswordEncoder encoder) {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(encoder);
-        return daoAuthenticationProvider;
+    public AuthenticationProvider authenticationProvider(
+            @Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
+            PasswordEncoder encoder) {
+
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(encoder);
+        return provider;
     }
 
     @Bean
@@ -58,27 +64,45 @@ public class SecurityFilterChainConfig {
     }
 
     @Bean
-    public JwtAuthFilter jwtAuthFilter(JwtUtil jwtUtil, @Qualifier("customUserDetailsService") CustomUserDetailsService userDetailsService, TokenBlacklistService tokenBlacklistService) {
-        return new JwtAuthFilter(jwtUtil, userDetailsService, tokenBlacklistService);
+    public JwtAuthFilter jwtAuthFilter(
+            JwtUtil jwtUtil,
+            @Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
+            TokenBlacklistService blacklistService) {
+
+        return new JwtAuthFilter(jwtUtil, userDetailsService, blacklistService);
     }
 
     @Bean
-    public SecurityFilterChain customSecurityFilterChain(HttpSecurity http,
-                                                         AuthenticationProvider authenticationProvider,
-                                                         JwtAuthFilter authFilter,
-                                                         AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
+    public SecurityFilterChain customSecurityFilterChain(
+            HttpSecurity http,
+            AuthenticationProvider authenticationProvider,
+            JwtAuthFilter authFilter,
+            AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
 
-        System.out.println("SECURITY FILTER CHAIN CREATED");
-
-        http.csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configure(http))
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> {})  // Enable CORS from WebConfig
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
                 .authorizeHttpRequests(auth -> auth
-                        // GET endpoints - public access
-                        .requestMatchers(HttpMethod.GET,
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        .requestMatchers(
                                 "/api/v1/ping",
+                                "/api/v1/auth/**",
+                                "/api/v1/verify/email",
+                                "/verify/email",
+                                "/api/v1/validate/Otp",
+                                "/api/password-reset/**",
+                                "/pingSpring",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        .requestMatchers(
                                 "/api/v1/movies/**",
                                 "/api/v1/shows/**",
                                 "/api/v1/products/**",
@@ -87,26 +111,6 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/tmdb/**"
                         ).permitAll()
 
-                        // POST public endpoints
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/v1/auth/login",
-                                "/api/v1/auth/customers",
-                                "/api/v1/auth/refresh-token",
-                                "/api/v1/verify/email",
-                                "/api/v1/validate/Otp",
-                                "/api/password-reset/**",
-                                "/api/v1/subscription/intent",
-                                "/pingSpring"
-                        ).permitAll()
-
-                        // Swagger - public
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
-
-                        // Authenticated endpoints
                         .requestMatchers(
                                 "/api/v1/profile/**",
                                 "/api/v1/customers/currentUser",
@@ -115,37 +119,35 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/video/**"
                         ).authenticated()
 
-                        // User management - requires authority
                         .requestMatchers(
                                 "/api/v1/customers/**",
-                                "/api/v1/roles/**",
-                                "/api/v1/auth/admins"
+                                "/api/v1/roles/**"
                         ).hasAuthority("USER_MANAGE")
 
-                        // Movie/Show write permissions
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/v1/movies",
-                                "/api/v1/shows"
-                        ).hasAuthority("MOVIE_WRITE")
+                        .requestMatchers("/api/v1/movies")
+                        .hasAuthority("MOVIE_WRITE")
 
-                        .requestMatchers(HttpMethod.PUT,
-                                "/api/v1/movies/**",
-                                "/api/v1/shows/**"
-                        ).hasAuthority("MOVIE_WRITE")
+                        .requestMatchers("/api/v1/shows")
+                        .hasAuthority("MOVIE_WRITE")
 
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/v1/movies/**",
-                                "/api/v1/shows/**"
-                        ).hasAuthority("MOVIE_DELETE")
+                        .requestMatchers("/api/v1/movies/**")
+                        .hasAuthority("MOVIE_WRITE")
 
-                        // Admin creation
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/v1/admin/create"
-                        ).hasAuthority("SYSTEM_CONFIG")
+                        .requestMatchers("/api/v1/shows/**")
+                        .hasAuthority("MOVIE_WRITE")
 
-                        // All other requests need authentication
+                        .requestMatchers("/api/v1/movies/**")
+                        .hasAuthority("MOVIE_DELETE")
+
+                        .requestMatchers("/api/v1/shows/**")
+                        .hasAuthority("MOVIE_DELETE")
+
+                        .requestMatchers("/api/v1/admin/create")
+                        .hasAuthority("SYSTEM_CONFIG")
+
                         .anyRequest().authenticated()
                 )
+
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex ->

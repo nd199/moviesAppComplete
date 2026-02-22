@@ -3,6 +3,8 @@ package com.naren.moviesapp.Controller;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Repo.ShowRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/test-data")
 public class TestDataController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestDataController.class);
 
     private final MovieRepository movieRepository;
     private final ShowRepository showRepository;
@@ -31,6 +35,7 @@ public class TestDataController {
 
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> getDataStatus() {
+        logger.debug("Fetching test data status");
         Map<String, Object> result = new HashMap<>();
 
         long movieCount = movieRepository.count();
@@ -48,6 +53,7 @@ public class TestDataController {
     @PostMapping("/reset")
     @PreAuthorize("hasAuthority('SYSTEM_CONFIG')")
     public ResponseEntity<Map<String, Object>> resetTestData() {
+        logger.info("Reset test data request received");
         Map<String, Object> result = new HashMap<>();
 
         long movieCount = movieRepository.count();
@@ -66,6 +72,7 @@ public class TestDataController {
     @PostMapping("/seed")
     @PreAuthorize("hasAuthority('SYSTEM_CONFIG')")
     public ResponseEntity<Map<String, Object>> seedAdditionalData() {
+        logger.info("Seed additional data request received");
         Map<String, Object> result = new HashMap<>();
         result.put("message", "Additional seeding should be done via DevDataSeeder on application startup");
         result.put("recommendation", "Restart application with 'dev' profile to trigger DevDataSeeder");
