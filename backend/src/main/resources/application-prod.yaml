@@ -25,7 +25,7 @@ spring:
       url: ${SPRING_DATA_REDIS_URL}
 app:
   allowed:
-    origins: "https://movies-app-complete-js4w-bx4rq0iry-nd199s-projects.vercel.app"
+    origins: "https://movies-app-complete-sukx.vercel.app"
 
 logging:
   level:
