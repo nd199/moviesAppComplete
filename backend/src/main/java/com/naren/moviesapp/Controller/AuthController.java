@@ -164,6 +164,7 @@ public class AuthController {
                 .path("/")
                 .maxAge(Duration.ofMinutes(30))
                 .sameSite(isProduction ? "None" : "Strict")
+                .domain(isProduction ? ".vercel.app" : null)
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
@@ -172,7 +173,13 @@ public class AuthController {
                 .path("/")
                 .maxAge(Duration.ofDays(7))
                 .sameSite(isProduction ? "None" : "Strict")
+                .domain(isProduction ? ".vercel.app" : null)
                 .build();
+
+        logger.info("Setting auth cookies - Production: {}, Domain: {}, SameSite: {}", 
+            isProduction, isProduction ? ".vercel.app" : "localhost", isProduction ? "None" : "Strict");
+        logger.debug("JWT Cookie: {}", jwtCookie.toString());
+        logger.debug("Refresh Cookie: {}", refreshCookie.toString());
 
         response.addHeader("Set-Cookie", jwtCookie.toString());
         response.addHeader("Set-Cookie", refreshCookie.toString());
@@ -187,6 +194,7 @@ public class AuthController {
                 .path("/")
                 .maxAge(0)
                 .sameSite(isProduction ? "None" : "Strict")
+                .domain(isProduction ? ".vercel.app" : null)
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "")
@@ -195,6 +203,7 @@ public class AuthController {
                 .path("/")
                 .maxAge(0)
                 .sameSite(isProduction ? "None" : "Strict")
+                .domain(isProduction ? ".vercel.app" : null)
                 .build();
 
         response.addHeader("Set-Cookie", jwtCookie.toString());
