@@ -34,7 +34,7 @@ app:
     enabled: ${DATA_INITIALIZATION_ENABLED:false}
 
   allowed:
-    origins: "https://movies-app-complete-sukx.vercel.app,https://movies-app-complete.vercel.app"
+    origins: "https://movies-app-complete.vercel.app"
 
   tmdb:
     api-key: ${TMDB_API_KEY}
@@ -44,10 +44,10 @@ app:
 logging:
   level:
     root: INFO
-    com.naren.moviesapp: INFO
+    com.naren.moviesapp: DEBUG
     org.springframework.security: WARN
-    org.springframework.mail: INFO
-    jakarta.mail: INFO
+    org.springframework.mail: DEBUG
+    jakarta.mail: DEBUG
     org.springframework.web: INFO
     org.hibernate.SQL: WARN
     org.hibernate.type.descriptor.sql: WARN

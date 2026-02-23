@@ -137,7 +137,7 @@ export const fetchShows = async dispatch => {
 export const verifyEmail = async (dispatch, email) => {
   dispatch(verifyEmailStart());
   try {
-    const res = await publicRequest().post('/verify/email', email);
+    const res = await publicRequest().post('/verify/email', { email });
     dispatch(verifyEmailSuccess(res.data.message));
     return res.data;
   } catch (error) {

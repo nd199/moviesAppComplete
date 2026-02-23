@@ -25,29 +25,48 @@ public class OtpService {
 
     // ===== Generate OTP for email (registration / verification) =====
     public void generateAndSendMailOtp(String email) {
+        logger.info("Starting OTP generation for email: {}", email);
+        
         String normalizedEmail = email.toLowerCase().trim();
         String key = generateKey(normalizedEmail);
+        
+        logger.debug("Normalized email: {}, Redis key: {}", normalizedEmail, key);
 
-        // Check if a valid OTP exists
-        if (redisTemplate.hasKey(key)) {
-            logger.warn("OTP already sent and still valid for email: {}. Resending same OTP.", email);
-            String existingOtp = redisTemplate.opsForValue().get(key);
-            emailService.sendOTPEmail(email, existingOtp);
-            return;
+        try {
+            // Check if a valid OTP exists
+            logger.debug("Checking if OTP already exists for email: {}", email);
+            if (redisTemplate.hasKey(key)) {
+                logger.warn("OTP already sent and still valid for email: {}. Resending same OTP.", email);
+                String existingOtp = redisTemplate.opsForValue().get(key);
+                logger.debug("Retrieved existing OTP from Redis: {}", existingOtp);
+                emailService.sendOTPEmail(email, existingOtp);
+                return;
+            }
+
+            String otp = generateOtp();
+            logger.debug("Generated new OTP: {} for email: {}", otp, email);
+            
+            redisTemplate.opsForValue().set(key, otp, OTP_EXPIRE_INTERVAL_MIN, TimeUnit.MINUTES);
+            logger.debug("Stored OTP in Redis with expiration: {} minutes", OTP_EXPIRE_INTERVAL_MIN);
+
+            emailService.sendOTPEmail(email, otp);
+            logger.info("OTP sent successfully to email: {}", email);
+            
+        } catch (Exception e) {
+            logger.error("Error in OTP generation process for email {}: {}", email, e.getMessage(), e);
+            throw e; // Re-throw to let the controller handle it
         }
-
-        String otp = generateOtp();
-        redisTemplate.opsForValue().set(key, otp, OTP_EXPIRE_INTERVAL_MIN, TimeUnit.MINUTES);
-
-        emailService.sendOTPEmail(email, otp);
-        logger.info("OTP sent successfully to email: {}", email);
     }
 
     // ===== Validate OTP =====
     public boolean validateOtp(String email, String enteredOtp) {
+        logger.debug("Validating OTP for email: {}", email);
+        
         String normalizedEmail = email.toLowerCase().trim();
         String key = generateKey(normalizedEmail);
         String savedOtp = redisTemplate.opsForValue().get(key);
+        
+        logger.debug("Retrieved saved OTP from Redis: {} for key: {}", savedOtp, key);
 
         if (savedOtp == null) {
             logger.warn("OTP validation failed: OTP expired or not found for email: {}", email);
@@ -55,7 +74,8 @@ public class OtpService {
         }
 
         if (!savedOtp.equals(enteredOtp)) {
-            logger.warn("OTP validation failed: Invalid OTP for email: {}", email);
+            logger.warn("OTP validation failed: Invalid OTP for email: {}. Expected: {}, Got: {}", 
+                email, savedOtp, enteredOtp);
             return false;
         }
 
@@ -67,11 +87,15 @@ public class OtpService {
 
     // ===== Helpers =====
     private String generateKey(String email) {
-        return "otp:" + email;
+        String key = "otp:" + email;
+        logger.debug("Generated Redis key: {} for email: {}", key, email);
+        return key;
     }
 
     private String generateOtp() {
         Random random = new Random();
-        return String.valueOf(100000 + random.nextInt(900000)); // 6-digit OTP
+        String otp = String.valueOf(100000 + random.nextInt(900000)); // 6-digit OTP
+        logger.debug("Generated 6-digit OTP: {}", otp);
+        return otp;
     }
 }
