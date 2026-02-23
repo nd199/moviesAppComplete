@@ -9,37 +9,33 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
-        format_sql: true
-    show-sql: true
+        format_sql: false
+    show-sql: false
 
   main:
     web-application-type: servlet
 
-  mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
   data:
     redis:
       url: ${SPRING_DATA_REDIS_URL}
+
 app:
   superadmin:
     email: ${SUPER_ADMIN_EMAIL}
     password: ${SUPER_ADMIN_PASSWORD}
+
+  brevo:
+    api-key: ${BREVO_API_KEY}
+    sender:
+      email: ${BREVO_SENDER_EMAIL}
+      name: ${BREVO_SENDER_NAME:MoviesApp}
+
   data-initialization:
     enabled: ${DATA_INITIALIZATION_ENABLED:false}
+
   allowed:
     origins: "https://movies-app-complete-sukx.vercel.app,https://movies-app-complete.vercel.app"
+
   tmdb:
     api-key: ${TMDB_API_KEY}
     base-url: https://api.themoviedb.org/3
@@ -47,14 +43,11 @@ app:
 
 logging:
   level:
-    root: DEBUG
-    web: DEBUG
-    org:
-      springframework:
-        security: DEBUG
-        mail: DEBUG
-
-server:
-  error:
-    include-message: always
-    include-binding-errors: always
+    root: INFO
+    com.naren.moviesapp: INFO
+    org.springframework.security: WARN
+    org.springframework.mail: INFO
+    jakarta.mail: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql: WARN

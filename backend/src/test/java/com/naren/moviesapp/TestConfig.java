@@ -32,8 +32,8 @@ public class TestConfig {
 
     @Bean
     @Primary
-    public OtpService otpService(EmailService emailService) {
-        return new OtpService(emailService);
+    public OtpService otpService(EmailService emailService,RedisTemplate<String, String> redisTemplate) {
+        return new OtpService(emailService,redisTemplate);
     }
 
     @Bean

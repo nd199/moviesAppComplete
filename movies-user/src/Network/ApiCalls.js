@@ -151,7 +151,7 @@ export const verifyEmail = async (dispatch, email) => {
 export const validateOtp = async (dispatch, validateInfo) => {
   dispatch(validateOtpStart());
   try {
-    const res = await publicRequest().post('/validate/Otp', validateInfo);
+    const res = await publicRequest().post('/validate/otp', validateInfo);
     dispatch(validateOtpSuccess(res.data));
     return res.data;
   } catch (error) {

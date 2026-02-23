@@ -35,7 +35,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        logger.debug("JWT FILTER EXECUTING: {}", request.getRequestURI());
+        String path = request.getRequestURI();
+        logger.debug("JWT FILTER EXECUTING: {}", path);
+
+        // Skip JWT validation for OTP endpoints - these are public
+        // Use lowercase comparison for case-insensitive matching
+        String pathLower = path.toLowerCase();
+        if (pathLower.startsWith("/api/v1/verify/email") || 
+            pathLower.startsWith("/api/v1/validate/otp") ||
+            pathLower.startsWith("/verify/email") ||
+            pathLower.startsWith("/validate/otp") ||
+            // Also handle paths without api/v1 prefix (when frontend omits it)
+            pathLower.equals("/verify/email") ||
+            pathLower.equals("/validate/otp")) {
+            logger.debug("Skipping JWT filter for public OTP endpoint: {}", path);
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String token = null;
         final String authHeader = request.getHeader("Authorization");

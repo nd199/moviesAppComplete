@@ -14,6 +14,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 @Service("emailService")
+@Profile("dev")
 public class SmtpEmailService implements EmailService {
     private static final Logger logger = LoggerFactory.getLogger(SmtpEmailService.class);
     private final JavaMailSender javaMailSender;

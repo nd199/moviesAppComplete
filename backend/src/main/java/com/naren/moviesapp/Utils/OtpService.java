@@ -1,109 +1,77 @@
 package com.naren.moviesapp.Utils;
 
+import com.naren.moviesapp.Exception.EmailSendingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class OtpService {
 
     private static final Logger logger = LoggerFactory.getLogger(OtpService.class);
-    private static final long OTP_EXPIRE_INTERVAL = 5;
-    private final Map<String, OtpData> otpStore = new ConcurrentHashMap<>();
-    private final EmailService emailService;
+    private static final long OTP_EXPIRE_INTERVAL_MIN = 5; // 5 minutes
 
-    public OtpService(EmailService emailService) {
+    private final EmailService emailService;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    public OtpService(EmailService emailService, RedisTemplate<String, String> redisTemplate) {
         this.emailService = emailService;
+        this.redisTemplate = redisTemplate;
     }
 
-    //Register Verification
+    // ===== Generate OTP for email (registration / verification) =====
     public void generateAndSendMailOtp(String email) {
-        logger.info("Generating OTP for email: {}", email);
-        String otp = generateOtp();
-        String key = generateKey(email);
+        String normalizedEmail = email.toLowerCase().trim();
+        String key = generateKey(normalizedEmail);
 
-        OtpData otpData = new OtpData(otp, System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(OTP_EXPIRE_INTERVAL));
-        otpStore.put(key, otpData);
+        // Check if a valid OTP exists
+        if (redisTemplate.hasKey(key)) {
+            logger.warn("OTP already sent and still valid for email: {}. Resending same OTP.", email);
+            String existingOtp = redisTemplate.opsForValue().get(key);
+            emailService.sendOTPEmail(email, existingOtp);
+            return;
+        }
+
+        String otp = generateOtp();
+        redisTemplate.opsForValue().set(key, otp, OTP_EXPIRE_INTERVAL_MIN, TimeUnit.MINUTES);
 
         emailService.sendOTPEmail(email, otp);
         logger.info("OTP sent successfully to email: {}", email);
     }
 
-    //Forgot Password
-    public void generateAndSendOtp(Long customerId, String sentType, String verificationType) {
-        logger.info("Generating OTP for customerId: {}, type: {}", customerId, verificationType);
-        String otp = generateOtp();
-        String key = generateKey(customerId, verificationType);
+    // ===== Validate OTP =====
+    public boolean validateOtp(String email, String enteredOtp) {
+        String normalizedEmail = email.toLowerCase().trim();
+        String key = generateKey(normalizedEmail);
+        String savedOtp = redisTemplate.opsForValue().get(key);
 
-        OtpData otpData = new OtpData(otp, System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(OTP_EXPIRE_INTERVAL));
-        otpStore.put(key, otpData);
-
-        emailService.sendOTPEmail(sentType, otp);
-        logger.info("OTP sent successfully for customerId: {}", customerId);
-    }
-
-    public boolean validateOtp(Long customerID, String verificationType, String enteredOtp) {
-        logger.debug("Validating OTP for customerId: {}, type: {}", customerID, verificationType);
-        String key = generateKey(customerID, verificationType);
-        return validateOtpInternal(key, enteredOtp);
-    }
-
-    public boolean validateOtp(String customerEmail, String enteredOtp) {
-        logger.debug("Validating OTP for email: {}", customerEmail);
-        String key = generateKey(customerEmail);
-        return validateOtpInternal(key, enteredOtp);
-    }
-
-    private boolean validateOtpInternal(String key, String enteredOtp) {
-        OtpData otpData = otpStore.get(key);
-        if (otpData == null) {
-            logger.warn("OTP validation failed: No OTP found for key");
+        if (savedOtp == null) {
+            logger.warn("OTP validation failed: OTP expired or not found for email: {}", email);
             return false;
         }
 
-        // Check if OTP has expired
-        if (System.currentTimeMillis() > otpData.expiryTime) {
-            otpStore.remove(key);
-            logger.warn("OTP validation failed: OTP expired");
+        if (!savedOtp.equals(enteredOtp)) {
+            logger.warn("OTP validation failed: Invalid OTP for email: {}", email);
             return false;
         }
 
-        boolean isValid = otpData.otp.equals(enteredOtp);
-        if (isValid) {
-            logger.info("OTP validated successfully");
-            otpStore.remove(key); // Remove OTP after successful validation
-        } else {
-            logger.warn("OTP validation failed: Invalid OTP");
-        }
-        return isValid;
+        // OTP is valid, remove it
+        redisTemplate.delete(key);
+        logger.info("OTP validated successfully for email: {}", email);
+        return true;
     }
 
+    // ===== Helpers =====
     private String generateKey(String email) {
-        return "One Time Password : " + email;
-    }
-
-    private String generateKey(Long customerId, String type) {
-        return "One Time Password : " + customerId + ":" + type;
+        return "otp:" + email;
     }
 
     private String generateOtp() {
         Random random = new Random();
-        return String.valueOf(100000 + random.nextInt(900000));
-    }
-
-    // Inner class to store OTP with expiry time
-    private static class OtpData {
-        final String otp;
-        final long expiryTime;
-
-        OtpData(String otp, long expiryTime) {
-            this.otp = otp;
-            this.expiryTime = expiryTime;
-        }
+        return String.valueOf(100000 + random.nextInt(900000)); // 6-digit OTP
     }
 }
