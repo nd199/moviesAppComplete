@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL + "/api/v1" || "http://localhost:8080/api/v1",
   withCredentials: true,
-  timeout: 10000,
+  timeout: 30000, // Increased from 10000 to 30000 for debugging
 });
 
 api.interceptors.request.use(
@@ -40,7 +40,7 @@ export const authRequest = () => {
   return axios.create({
     baseURL: baseURL,
     withCredentials: true,
-    timeout: 10000,
+    timeout: 30000, // Increased timeout
   });
 };
 export const passResetRequest = () => {
@@ -48,7 +48,7 @@ export const passResetRequest = () => {
   return axios.create({
     baseURL: baseURL,
     withCredentials: true,
-    timeout: 10000,
+    timeout: 30000, // Increased timeout
   });
 };
 export const publicRequest = () => api;
@@ -57,7 +57,7 @@ export const paymentRequest = () => {
   return axios.create({
     baseURL: baseURL,
     withCredentials: true,
-    timeout: 10000,
+    timeout: 30000, // Increased timeout
   });
 };
 export const springRequest = () => {
@@ -65,6 +65,6 @@ export const springRequest = () => {
   return axios.create({
     baseURL: baseURL,
     withCredentials: true,
-    timeout: 10000,
+    timeout: 30000, // Increased timeout
   });
 };

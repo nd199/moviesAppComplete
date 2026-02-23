@@ -38,11 +38,14 @@ public class AuthService {
 
     @Transactional
     public AuthResponse login(AuthRequest authRequest) {
+        long startTime = System.currentTimeMillis();
         logger.info("Login attempt started for username: {}", authRequest.username());
 
         validateRequest(authRequest);
 
         try {
+            logger.debug("Starting authentication process for: {}", authRequest.username());
+            long authStartTime = System.currentTimeMillis();
 
             Authentication authentication =
                     authenticationManager.authenticate(
@@ -51,6 +54,10 @@ public class AuthService {
                                     authRequest.password()
                             )
                     );
+
+            long authEndTime = System.currentTimeMillis();
+            logger.info("Authentication completed in {}ms for: {}", 
+                authEndTime - authStartTime, authRequest.username());
 
             AppUserPrincipal principal =
                     (AppUserPrincipal) authentication.getPrincipal();
@@ -73,6 +80,10 @@ public class AuthService {
                 CustomerDTO dto = customerDTOMapper.applyFromAdmin(dbAdmin);
 
                 logger.info("Admin login successful for email: {}", dbAdmin.getEmail());
+                
+                long totalTime = System.currentTimeMillis() - startTime;
+                logger.info("Total admin login process completed in {}ms for: {}", totalTime, dbAdmin.getEmail());
+                
                 return new AuthResponse(dto, token);
             }
 
@@ -100,6 +111,10 @@ public class AuthService {
                 );
 
                 logger.info("Customer login successful for email: {}", customer.getEmail());
+                
+                long totalTime = System.currentTimeMillis() - startTime;
+                logger.info("Total login process completed in {}ms for: {}", totalTime, customer.getEmail());
+                
                 return new AuthResponse(dto, token);
             }
 
