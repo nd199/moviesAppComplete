@@ -75,7 +75,13 @@ public class AuthController {
         setAuthCookies(response, authResponse);
 
         logger.info("Login successful for username: {}", request.username());
-        return ResponseEntity.ok(authResponse.customerDTO());
+        
+        // Return user data with token as fallback for cookie issues
+        Map<String, Object> responseBody = new java.util.HashMap<>();
+        responseBody.put("user", authResponse.customerDTO());
+        responseBody.put("token", authResponse.token()); // Fallback token
+        
+        return ResponseEntity.ok(responseBody);
     }
 
     @PostMapping("/refresh-token")
@@ -157,14 +163,15 @@ public class AuthController {
                             String refreshToken) {
 
         boolean isProduction = activeProfile.equals("prod");
-
+        String domain = isProduction ? null : null;
+        
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
                 .httpOnly(true)
                 .secure(isProduction)
                 .path("/")
                 .maxAge(Duration.ofMinutes(30))
-                .sameSite(isProduction ? "None" : "Strict")
-                .domain(isProduction ? ".vercel.app" : null)
+                .sameSite(isProduction ? "None" : "Lax")
+                .domain(domain)
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
@@ -172,12 +179,12 @@ public class AuthController {
                 .secure(isProduction)
                 .path("/")
                 .maxAge(Duration.ofDays(7))
-                .sameSite(isProduction ? "None" : "Strict")
-                .domain(isProduction ? ".vercel.app" : null)
+                .sameSite(isProduction ? "None" : "Lax")
+                .domain(domain)
                 .build();
 
         logger.info("Setting auth cookies - Production: {}, Domain: {}, SameSite: {}", 
-            isProduction, isProduction ? ".vercel.app" : "localhost", isProduction ? "None" : "Strict");
+            isProduction, domain, isProduction ? "None" : "Lax");
         logger.debug("JWT Cookie: {}", jwtCookie.toString());
         logger.debug("Refresh Cookie: {}", refreshCookie.toString());
 
@@ -188,13 +195,15 @@ public class AuthController {
     private void clearCookies(HttpServletResponse response) {
         boolean isProduction = activeProfile.equals("prod");
 
+        String domain = isProduction ? null : null; // Let browser handle domain automatically
+
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", "")
                 .httpOnly(true)
                 .secure(isProduction)
                 .path("/")
                 .maxAge(0)
-                .sameSite(isProduction ? "None" : "Strict")
-                .domain(isProduction ? ".vercel.app" : null)
+                .sameSite(isProduction ? "None" : "Lax")
+                .domain(domain)
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "")
@@ -202,8 +211,8 @@ public class AuthController {
                 .secure(isProduction)
                 .path("/")
                 .maxAge(0)
-                .sameSite(isProduction ? "None" : "Strict")
-                .domain(isProduction ? ".vercel.app" : null)
+                .sameSite(isProduction ? "None" : "Lax")
+                .domain(domain)
                 .build();
 
         response.addHeader("Set-Cookie", jwtCookie.toString());

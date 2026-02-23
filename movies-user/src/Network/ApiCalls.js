@@ -95,10 +95,20 @@ export const login = async (dispatch, userInfo) => {
   try {
     const res = await authRequest().post('/auth/login', userInfo);
     
-    // Token is handled via HTTP-only cookies, no need to store in JS cookies
-    console.log('Login: Authentication cookies set by server');
+    // Handle new response structure
+    const userData = res.data?.user || res.data; // Fallback to old structure
+    const token = res.data?.token;
     
-    dispatch(loginSuccess(res.data));
+    // Check if response contains token in body (fallback for cookie issues)
+    if (token) {
+      console.log('Login: Using token-based auth fallback');
+      // Store token in js-cookie as fallback
+      Cookies.set('jwt_token', token, { expires: 7 }); // 7 days
+    } else {
+      console.log('Login: Authentication cookies set by server');
+    }
+    
+    dispatch(loginSuccess(userData));
     dispatch(setAuthStatus("authenticated"));
   } catch (error) {
     const message =
