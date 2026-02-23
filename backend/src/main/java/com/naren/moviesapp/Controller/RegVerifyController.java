@@ -53,7 +53,6 @@ public class RegVerifyController {
         }
     }
 
-    // Handle both /api/v1/validate/Otp, /validate/Otp, /validate/otp (for frontend compatibility)
     @PostMapping(value = {"/api/v1/validate/Otp", "/validate/Otp", "/validate/otp", "/api/v1/validate/otp"})
     public ResponseEntity<?> verifyEmailOtp(@RequestBody VerifyOtpRequest request) {
         String email = request.customerEmail() != null ? request.customerEmail().trim().toLowerCase() : null;

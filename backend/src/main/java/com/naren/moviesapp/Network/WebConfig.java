@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import reactor.util.annotation.NonNullApi;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -14,20 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         // Always include Vercel origins + local development
-        String vercelOrigins = "https://movies-app-complete-sukx.vercel.app,https://movies-app-complete.vercel.app";
-        String localOrigins = "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173";
-        
-        String allOrigins;
-        if (allowedOrigins == null || allowedOrigins.trim().isEmpty()) {
-            // Use default origins
-            allOrigins = vercelOrigins + "," + localOrigins;
-        } else {
-            // Use environment variable + Vercel origins
-            allOrigins = vercelOrigins + "," + allowedOrigins;
-        }
-        
-        // Split comma-separated origins and trim whitespace
-        String[] origins = allOrigins.split(",");
+        String[] origins = getOrigins();
         for (int i = 0; i < origins.length; i++) {
             origins[i] = origins[i].trim();
         }
@@ -39,5 +27,23 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true)
                 .exposedHeaders("Authorization", "Content-Disposition", "Set-Cookie")
                 .maxAge(3600);
+    }
+
+    private String[] getOrigins() {
+        String vercelOrigins = "https://movies-app-complete.vercel.app";
+        String localOrigins = "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173";
+
+        String allOrigins;
+        if (allowedOrigins == null || allowedOrigins.trim().isEmpty()) {
+            // Use default origins
+            allOrigins = vercelOrigins + "," + localOrigins;
+        } else {
+            // Use environment variable + Vercel origins
+            allOrigins = vercelOrigins + "," + allowedOrigins;
+        }
+
+        // Split comma-separated origins and trim whitespace
+        String[] origins = allOrigins.split(",");
+        return origins;
     }
 }

@@ -33,20 +33,20 @@ spring:
   main:
     web-application-type: servlet
 
-  mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: codenaren@gmail.com
-    password: wmuwmbikdmvrinly
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
+  #  mail:
+  #    host: ${MAIL_HOST:smtp.gmail.com}
+  #    port: ${MAIL_PORT:587}
+  #    username: codenaren@gmail.com
+  #    password: wmuwmbikdmvrinly
+  #    properties:
+  #      mail:
+  #        smtp:
+  #          auth: true
+  #          starttls:
+  #            enable: true
+  #          connectiontimeout: 5000
+  #          timeout: 5000
+  #          writetimeout: 5000
 
   data:
     redis:
@@ -63,7 +63,11 @@ jwt:
 app:
   data-initialization:
     enabled: ${APP_DATA_INITIALIZATION_ENABLED:true}
-
+  brevo:
+    api-key: ${BREVO_API_KEY:REMOVED_BREVO_KEY}
+    sender:
+      email: ${BREVO_SENDER_EMAIL:codenaren@gmail.com}
+      name: ${BREVO_SENDER_NAME:MoviesApp}
 logging:
   level:
     web: debug
