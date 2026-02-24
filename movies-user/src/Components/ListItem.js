@@ -10,9 +10,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './ListItem.css';
 
-const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre, poster, id }) => {
+const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre, poster, id, trailer }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+
+  // Debug: Log trailer data
+  console.log('ListItem - Trailer data:', { name, trailer: trailer ? 'TRAILER_FOUND' : 'NO_TRAILER' });
 
   const toggleAudio = e => {
     e.stopPropagation();
@@ -41,13 +44,40 @@ const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre, poster,
       <div className="card-media">
         {isHovered ? (
           <div className="card-video-wrapper">
-            <video className="card-video" autoPlay loop muted={isMuted}>
-              <source
-                src="https://www.w3schools.com/html/mov_bbb.mp4"
-                type="video/mp4"
+            {trailer ? (
+              <>
+                {trailer.includes('youtube.com') ? (
+                  <iframe
+                    className="card-video"
+                    src={trailer.replace('watch?v=', 'embed/').replace('https://www.youtube.com/', 'https://www.youtube.com/embed/') + '?autoplay=1&mute=1&loop=1&playlist=' + trailer.split('v=')[1]}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="Trailer"
+                  />
+                ) : (
+                  <video
+                    className="card-video"
+                    autoPlay
+                    loop
+                    muted={isMuted}
+                    playsInline
+                    preload="metadata">
+                    <source
+                      src={trailer}
+                      type="video/mp4"
+                    />
+                  </video>
+                )}
+              </>
+            ) : (
+              <img
+                src={poster || "https://c4.wallpaperflare.com/wallpaper/123/991/646/avatar-blue-skin-james-cameron-s-movie-avatar-movie-poster-wallpaper-preview.jpg"}
+                alt={name}
+                className="card-poster"
               />
-            </video>
-            <span className="card-badge">Preview</span>
+            )}
+            <span className="card-badge">TRAILER</span>
 
             <button className="card-audio-toggle" onClick={toggleAudio}>
               {isMuted ? (

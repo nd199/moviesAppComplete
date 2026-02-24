@@ -83,6 +83,7 @@ const List = ({ title, type = 'local' }) => {
         runtime: item.runtime,
         genre: item.genre,
         poster: item.poster,
+        trailer: item.trailer,
       };
     }
     return item;
@@ -143,6 +144,7 @@ const List = ({ title, type = 'local' }) => {
                   runtime={formattedItem.runtime}
                   genre={formattedItem.genre}
                   poster={formattedItem.poster}
+                  trailer={formattedItem.trailer}
                 />
               </SwiperSlide>
             );
