@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class TmdbService {
@@ -24,6 +25,10 @@ public class TmdbService {
     private final String apiKey;
     private final String baseUrl;
     private final String imageBaseUrl;
+
+    // Cache for trailers to avoid repeated API calls
+    private final Map<Long, List<TmdbVideoDto>> movieTrailerCache = new ConcurrentHashMap<>();
+    private final Map<Long, List<TmdbVideoDto>> tvShowTrailerCache = new ConcurrentHashMap<>();
 
     public TmdbService(@Value("${app.tmdb.api-key}") String apiKey, @Value("${app.tmdb.base-url}") String baseUrl, @Value("${app.tmdb.image-base-url}") String imageBaseUrl) {
         this.apiKey = apiKey;
@@ -108,9 +113,6 @@ public class TmdbService {
         }
     }
 
-    /**
-     * Get trending movies for the day
-     */
     public Optional<TmdbSearchResponse<TmdbMovieDto>> getTrendingMovies(int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -127,9 +129,6 @@ public class TmdbService {
         }
     }
 
-    /**
-     * Get trending TV shows for the day
-     */
     public Optional<TmdbSearchResponse<TmdbTvShowDto>> getTrendingTvShows(int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -146,9 +145,6 @@ public class TmdbService {
         }
     }
 
-    /**
-     * Discover movies by genre, year, etc.
-     */
     public Optional<TmdbSearchResponse<TmdbMovieDto>> discoverMovies(String sortBy, Integer genreId, Integer year, Integer page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -179,9 +175,6 @@ public class TmdbService {
         }
     }
 
-    /**
-     * Discover TV shows by genre, year, etc.
-     */
     public Optional<TmdbSearchResponse<TmdbTvShowDto>> discoverTvShows(String sortBy, Integer genreId, Integer firstAirDateYear, Integer page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -211,8 +204,6 @@ public class TmdbService {
             return Optional.empty();
         }
     }
-
-    // Helper methods to convert Map to DTOs
 
     @SuppressWarnings("unchecked")
     private TmdbSearchResponse<TmdbMovieDto> convertToMovieSearchResponse(Map<String, Object> response) {
@@ -364,16 +355,21 @@ public class TmdbService {
         return apiKey != null && !apiKey.isBlank();
     }
 
-    /**
-     * Get videos (trailers, teasers) for a movie by TMDB ID
-     */
     public Optional<List<TmdbVideoDto>> getMovieVideos(Long tmdbId) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
             return Optional.empty();
         }
 
+        // Check cache first
+        List<TmdbVideoDto> cachedTrailers = movieTrailerCache.get(tmdbId);
+        if (cachedTrailers != null) {
+            logger.debug("Returning cached trailers for movie ID: {}", tmdbId);
+            return Optional.of(cachedTrailers);
+        }
+
         try {
+            logger.debug("Fetching trailers from TMDB API for movie ID: {}", tmdbId);
             Map<String, Object> response = webClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/movie/" + tmdbId + "/videos")
@@ -382,23 +378,33 @@ public class TmdbService {
                     .bodyToMono(Map.class)
                     .block();
 
-            return Optional.of(convertToVideoDtoList((List<Map<String, Object>>) response.get("results")));
+            List<TmdbVideoDto> trailers = convertToVideoDtoList((List<Map<String, Object>>) response.get("results"));
+
+            movieTrailerCache.put(tmdbId, trailers);
+            logger.debug("Cached trailers for movie ID: {}", tmdbId);
+            
+            return Optional.of(trailers);
         } catch (WebClientResponseException e) {
             logger.error("Error getting movie videos: {}", e.getMessage());
             return Optional.empty();
         }
     }
 
-    /**
-     * Get videos (trailers, teasers) for a TV show by TMDB ID
-     */
     public Optional<List<TmdbVideoDto>> getTvShowVideos(Long tmdbId) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
             return Optional.empty();
         }
 
+        // Check cache first
+        List<TmdbVideoDto> cachedTrailers = tvShowTrailerCache.get(tmdbId);
+        if (cachedTrailers != null) {
+            logger.debug("Returning cached trailers for TV show ID: {}", tmdbId);
+            return Optional.of(cachedTrailers);
+        }
+
         try {
+            logger.debug("Fetching trailers from TMDB API for TV show ID: {}", tmdbId);
             Map<String, Object> response = webClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/tv/" + tmdbId + "/videos")
@@ -407,7 +413,13 @@ public class TmdbService {
                     .bodyToMono(Map.class)
                     .block();
 
-            return Optional.of(convertToVideoDtoList((List<Map<String, Object>>) response.get("results")));
+            List<TmdbVideoDto> trailers = convertToVideoDtoList((List<Map<String, Object>>) response.get("results"));
+            
+            // Cache the result
+            tvShowTrailerCache.put(tmdbId, trailers);
+            logger.debug("Cached trailers for TV show ID: {}", tmdbId);
+            
+            return Optional.of(trailers);
         } catch (WebClientResponseException e) {
             logger.error("Error getting TV show videos: {}", e.getMessage());
             return Optional.empty();

@@ -25,6 +25,9 @@ const ColListItem = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
 
+  // Debug: Log trailer data
+  console.log('ColListItem - Trailer data:', { name, trailer: trailer ? 'TRAILER_FOUND' : 'NO_TRAILER' });
+
   const toggleAudio = e => {
     e.stopPropagation();
     setIsMuted(!isMuted);
@@ -55,18 +58,31 @@ const ColListItem = ({
         {isHovered ? (
           <div className="card-video-wrapper">
             {trailer ? (
-              <video
-                className="card-video"
-                autoPlay
-                loop
-                muted={isMuted}
-                playsInline
-                preload="metadata">
-                <source
-                  src={trailer}
-                  type="video/mp4"
-                />
-              </video>
+              <>
+                {trailer.includes('youtube.com') ? (
+                  <iframe
+                    className="card-video"
+                    src={trailer.replace('watch?v=', 'embed/').replace('https://www.youtube.com/', 'https://www.youtube.com/embed/') + '?autoplay=1&mute=1&loop=1&playlist=' + trailer.split('v=')[1]}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="Trailer"
+                  />
+                ) : (
+                  <video
+                    className="card-video"
+                    autoPlay
+                    loop
+                    muted={isMuted}
+                    playsInline
+                    preload="metadata">
+                    <source
+                      src={trailer}
+                      type="video/mp4"
+                    />
+                  </video>
+                )}
+              </>
             ) : (
               <img
                 src={img || 'https://via.placeholder.com/320x180/1a1a1a/9ca3af?text=No+Trailer'}
