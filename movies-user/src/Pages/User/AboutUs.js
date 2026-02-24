@@ -19,22 +19,22 @@ const AboutUs = () => {
     <div className="about-page">
       <NavBar />
       <main className="about-main">
-        <section className="hero-section">
-          <div className="hero-content">
-            <h1 className="hero-title">Welcome to CN.io</h1>
-            <p className="hero-desc">
+        <section className="about-hero-section">
+          <div className="about-hero-content">
+            <h1 className="about-hero-title">Welcome to CN.io</h1>
+            <p className="about-hero-desc">
               Your ultimate streaming destination. Movies, TV shows, and
               exclusive originals in 4K quality.
             </p>
           </div>
-          <div className="hero-animation">
+          <div className="about-hero-animation">
             <Lottie options={AboutUsOptions} />
           </div>
         </section>
 
-        <section className="features-section">
-          <h2 className="section-title">Why Choose CN.io?</h2>
-          <div className="features-grid">
+        <section className="about-features-section">
+          <h2 className="about-section-title">Why Choose CN.io?</h2>
+          <div className="about-features-grid">
             <FeatureCard
               icon={vastOptions}
               title="Vast Library"
@@ -78,9 +78,9 @@ const AboutUs = () => {
           </div>
         </section>
 
-        <section className="commitment-section">
-          <h2 className="section-title">Our Promise</h2>
-          <p className="commitment-text">
+        <section className="about-commitment-section">
+          <h2 className="about-section-title">Our Promise</h2>
+          <p className="about-commitment-text">
             Built in Chennai for the world. Fast, reliable streaming with
             content you'll love. Join 1M+ happy users today.
           </p>
@@ -92,8 +92,8 @@ const AboutUs = () => {
 };
 
 const FeatureCard = ({ icon, title, desc }) => (
-  <div className="feature-card">
-    <div className="feature-icon">
+  <div className="about-feature-card">
+    <div className="about-feature-icon">
       <Lottie options={icon} />
     </div>
     <h3>{title}</h3>

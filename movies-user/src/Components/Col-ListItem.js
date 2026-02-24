@@ -23,15 +23,6 @@ const ColListItem = ({
   className = '',
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-
-  // Debug: Log trailer data
-  console.log('ColListItem - Trailer data:', { name, trailer: trailer ? 'TRAILER_FOUND' : 'NO_TRAILER' });
-
-  const toggleAudio = e => {
-    e.stopPropagation();
-    setIsMuted(!isMuted);
-  };
 
   const formatRuntime = minutes => {
     if (!minutes) return '';
@@ -51,103 +42,70 @@ const ColListItem = ({
   return (
     <Link
       to="/play"
-      className={`card ${className} ${isHovered ? 'card-hovered' : ''}`}
+      className={`col-card ${className} ${isHovered ? 'col-card-hovered' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}>
-      <div className="card-media">
-        {isHovered ? (
-          <div className="card-video-wrapper">
-            {trailer ? (
-              <>
-                {trailer.includes('youtube.com') ? (
-                  <iframe
-                    className="card-video"
-                    src={trailer.replace('watch?v=', 'embed/').replace('https://www.youtube.com/', 'https://www.youtube.com/embed/') + '?autoplay=1&mute=1&loop=1&playlist=' + trailer.split('v=')[1]}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    title="Trailer"
-                  />
-                ) : (
-                  <video
-                    className="card-video"
-                    autoPlay
-                    loop
-                    muted={isMuted}
-                    playsInline
-                    preload="metadata">
-                    <source
-                      src={trailer}
-                      type="video/mp4"
-                    />
-                  </video>
-                )}
-              </>
-            ) : (
-              <img
-                src={img || 'https://via.placeholder.com/320x180/1a1a1a/9ca3af?text=No+Trailer'}
-                alt={name}
-                className="card-poster"
-                loading="lazy"
-              />
-            )}
-            <div className="card-badge">TRAILER</div>
-            <button className="card-audio-toggle" onClick={toggleAudio}>
-              {isMuted ? <VolumeOff /> : <VolumeUp />}
-            </button>
-          </div>
-        ) : (
-          <img
-            src={
-              img ||
-              'https://via.placeholder.com/320x180/1a1a1a/9ca3af?text=No+Image'
-            }
-            alt={name}
-            className="card-poster"
-            loading="lazy"
-          />
+      <div className="col-card-media">
+        <img
+          src={
+            img ||
+            'https://via.placeholder.com/320x180/1a1a1a/9ca3af?text=No+Image'
+          }
+          alt={name}
+          className="col-card-poster"
+          loading="lazy"
+        />
+        {isHovered && (
+          <div className="col-card-badge">TRAILER</div>
         )}
       </div>
 
-      <div className="card-body">
-        <div className="card-title-row">
-          <h3 className="card-title">{name}</h3>
-          <span className="card-chip card-chip-age">{ageRating}</span>
+      <div className="col-card-body">
+        <div className="col-card-title-row">
+          <h3 className="col-card-title">{name}</h3>
+          <span className="col-card-chip col-card-chip-age">{ageRating}</span>
         </div>
 
-        <div className="card-meta-row">
-          <span className="card-meta-text">{year}</span>
-          <span className="card-meta-text">{formatRuntime(runtime)}</span>
-          <span className="card-meta-text">
-            <span className="card-star">★</span> {rating}
+        <div className="col-card-meta-row">
+          <span className="col-card-meta-text">{year}</span>
+          <span className="col-card-meta-text">{formatRuntime(runtime)}</span>
+          <span className="col-card-meta-text">
+            <span className="col-card-star">★</span> {rating}
           </span>
         </div>
 
-        <div className="card-overview">{desc?.substring(0, 100)}...</div>
+        <div className="col-card-overview">{desc?.substring(0, 100)}...</div>
 
-        <div className="card-genres">
+        <div className="col-card-genres">
           {genres.map((g, i) => (
-            <span key={i} className="card-genre-chip">
+            <span key={i} className="col-card-genre-chip">
               {g}
             </span>
           ))}
         </div>
 
-        {/* Actions always rendered, visibility controlled by CSS */}
-        <div className="card-actions">
-          <div className="card-action">
-            <PlayArrow />
+        {isHovered && (
+          <div className="col-card-actions">
+            <Link 
+              to={`/video/${trailer ? trailer : name}`}
+              className="col-card-action"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <PlayArrow />
+            </Link>
+            <div className="col-card-action">
+              <Add />
+            </div>
+            <div className="col-card-action">
+              <ThumbUpAltOutlined />
+            </div>
+            <div className="col-card-action">
+              <ThumbDownOutlined />
+            </div>
           </div>
-          <div className="card-action">
-            <Add />
-          </div>
-          <div className="card-action">
-            <ThumbUpAltOutlined />
-          </div>
-          <div className="card-action">
-            <ThumbDownOutlined />
-          </div>
-        </div>
+        )}
       </div>
     </Link>
   );
