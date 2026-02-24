@@ -38,7 +38,7 @@ const ListItem = ({
 
             <div className="li-card-actions">
               <Link 
-                to={`/video/${trailer ? trailer : id}`} 
+                to={`/video/:id}`}
                 className="li-card-btn"
               >
                 <PlayArrow fontSize="small" />
