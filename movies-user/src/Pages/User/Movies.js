@@ -98,6 +98,7 @@ const Movies = () => {
                 rating={movie.rating}
                 runtime={movie.runtime}
                 genre={movie.genre}
+                trailer={movie.trailer}
                 className="card"
               />
             ))

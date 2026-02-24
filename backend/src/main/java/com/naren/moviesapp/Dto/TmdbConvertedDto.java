@@ -38,6 +38,7 @@ public class TmdbConvertedDto {
     private String imdbId;
     private List<String> productionCountries;
     private List<String> spokenLanguages;
+    private String trailer; // Add trailer field
     
     public static TmdbConvertedDto fromMovie(TmdbMovieDto movie, TmdbService tmdbService) {
         if (movie == null) return null;
@@ -85,6 +86,23 @@ public class TmdbConvertedDto {
                     .toList();
         }
         
+        // Get trailer URL
+        String trailerUrl = null;
+        try {
+            var videosOpt = tmdbService.getMovieVideos(movie.getTmdbId());
+            if (videosOpt.isPresent() && !videosOpt.get().isEmpty()) {
+                List<TmdbVideoDto> videos = videosOpt.get();
+                // Find first trailer (type "Trailer" and site "YouTube")
+                trailerUrl = videos.stream()
+                        .filter(video -> "Trailer".equals(video.getType()) && "YouTube".equals(video.getSite()))
+                        .findFirst()
+                        .map(video -> "https://www.youtube.com/watch?v=" + video.getKey())
+                        .orElse(null);
+            }
+        } catch (Exception e) {
+            // Ignore trailer fetch errors
+        }
+        
         return TmdbConvertedDto.builder()
                 .tmdbId(movie.getTmdbId())
                 .title(movie.getTitle())
@@ -106,6 +124,7 @@ public class TmdbConvertedDto {
                 .imdbId(movie.getImdbId())
                 .productionCountries(prodCountries)
                 .spokenLanguages(langs)
+                .trailer(trailerUrl)
                 .build();
     }
     
@@ -142,6 +161,23 @@ public class TmdbConvertedDto {
             }
         }
         
+        // Get trailer URL
+        String trailerUrl = null;
+        try {
+            var videosOpt = tmdbService.getTvShowVideos(tvShow.getTmdbId());
+            if (videosOpt.isPresent() && !videosOpt.get().isEmpty()) {
+                List<TmdbVideoDto> videos = videosOpt.get();
+                // Find first trailer (type "Trailer" and site "YouTube")
+                trailerUrl = videos.stream()
+                        .filter(video -> "Trailer".equals(video.getType()) && "YouTube".equals(video.getSite()))
+                        .findFirst()
+                        .map(video -> "https://www.youtube.com/watch?v=" + video.getKey())
+                        .orElse(null);
+            }
+        } catch (Exception e) {
+            // Ignore trailer fetch errors
+        }
+        
         return TmdbConvertedDto.builder()
                 .tmdbId(tvShow.getTmdbId())
                 .name(tvShow.getName())
@@ -159,6 +195,7 @@ public class TmdbConvertedDto {
                 .tagline(tvShow.getTagline())
                 .status(tvShow.getStatus())
                 .firstAirDate(tvShow.getFirstAirDate())
+                .trailer(trailerUrl)
                 .build();
     }
 }

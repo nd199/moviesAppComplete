@@ -95,6 +95,7 @@ const Shows = () => {
                 rating={show.rating}
                 runtime={show.runtime}
                 genre={show.genre}
+                trailer={show.trailer}
                 className="card"
               />
             ))

@@ -19,6 +19,7 @@ const ColListItem = ({
   rating,
   runtime,
   genre,
+  trailer,
   className = '',
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -53,18 +54,27 @@ const ColListItem = ({
       <div className="card-media">
         {isHovered ? (
           <div className="card-video-wrapper">
-            <video
-              className="card-video"
-              autoPlay
-              loop
-              muted={isMuted}
-              playsInline
-              preload="metadata">
-              <source
-                src="https://www.w3schools.com/html/mov_bbb.mp4"
-                type="video/mp4"
+            {trailer ? (
+              <video
+                className="card-video"
+                autoPlay
+                loop
+                muted={isMuted}
+                playsInline
+                preload="metadata">
+                <source
+                  src={trailer}
+                  type="video/mp4"
+                />
+              </video>
+            ) : (
+              <img
+                src={img || 'https://via.placeholder.com/320x180/1a1a1a/9ca3af?text=No+Trailer'}
+                alt={name}
+                className="card-poster"
+                loading="lazy"
               />
-            </video>
+            )}
             <div className="card-badge">TRAILER</div>
             <button className="card-audio-toggle" onClick={toggleAudio}>
               {isMuted ? <VolumeOff /> : <VolumeUp />}
