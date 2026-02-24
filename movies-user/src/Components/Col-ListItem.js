@@ -133,22 +133,21 @@ const ColListItem = ({
           ))}
         </div>
 
-        {isHovered && (
-          <div className="card-actions">
-            <div className="card-action">
-              <PlayArrow />
-            </div>
-            <div className="card-action">
-              <Add />
-            </div>
-            <div className="card-action">
-              <ThumbUpAltOutlined />
-            </div>
-            <div className="card-action">
-              <ThumbDownOutlined />
-            </div>
+        {/* Actions always rendered, visibility controlled by CSS */}
+        <div className="card-actions">
+          <div className="card-action">
+            <PlayArrow />
           </div>
-        )}
+          <div className="card-action">
+            <Add />
+          </div>
+          <div className="card-action">
+            <ThumbUpAltOutlined />
+          </div>
+          <div className="card-action">
+            <ThumbDownOutlined />
+          </div>
+        </div>
       </div>
     </Link>
   );

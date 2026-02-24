@@ -30,9 +30,26 @@ function AppWithHealthCheck() {
   useEffect(() => {
     const checkServerHealth = async () => {
       try {
+        // Use same environment detection as AxiosMethods
+        const isLocal = () => {
+          return window.location.hostname === 'localhost' || 
+                 window.location.hostname === '127.0.0.1' || 
+                 window.location.hostname === '';
+        };
 
-        const baseURL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+        const getBaseURL = () => {
+          // If REACT_APP_API_URL is set AND we're not local, use it
+          if (process.env.REACT_APP_API_URL && !isLocal()) {
+            return process.env.REACT_APP_API_URL;
+          }
+          // Default to localhost for local development
+          return "http://localhost:8080";
+        };
+
+        const baseURL = getBaseURL();
         const url = `${baseURL}/api/v1/ping`;
+        console.log('Health check URL:', url); // Debug log
+        
         await axios.get(url, {
           timeout: 5000,
         });

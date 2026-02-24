@@ -19,7 +19,6 @@ const Featured = ({ loading = false }) => {
     const fetchFeaturedData = async () => {
       setIsLoading(true);
       try {
-        // Fetch trending movies from TMDB
         const response = await publicRequest().get('/tmdb/trending/movies');
         const movies = response.data.results || [];
         
@@ -90,16 +89,9 @@ const Featured = ({ loading = false }) => {
 
   return (
     <section className="featured-slider">
-      <div className="featured-header">
-        <h2 className="featured-title-main">Featured</h2>
-        <span className="featured-subtitle">
-          Epic movies handpicked for you
-        </span>
-      </div>
-
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
-        spaceBetween={24}
+        spaceBetween={0}
         slidesPerView={1}
         navigation
         pagination={{ clickable: true }}
@@ -113,17 +105,20 @@ const Featured = ({ loading = false }) => {
         {featuredData.length > 0 && featuredData.map((item, index) => (
           <SwiperSlide key={index}>
             <div className="featured-slide">
+              {/* Full screen video background */}
+              <div className="featured-video-bg">
+                <VideoPlayer
+                  className="featured-video"
+                  videoId={item.videoId}
+                  isYouTube={true}
+                />
+              </div>
+
+              {/* Cinematic gradient overlay */}
               <div className="featured-overlay" />
 
-              <div className="featured-grid">
-                <div className="featured-video-wrapper">
-                  <VideoPlayer
-                    className="featured-video"
-                    videoId={item.videoId}
-                    isYouTube={true}
-                  />
-                </div>
-
+              {/* Floating content wrapper - info panel to the side */}
+              <div className="featured-content-wrapper">
                 <div className="featured-info">
                   <div className="featured-tag">Now Streaming</div>
 
@@ -154,7 +149,7 @@ const Featured = ({ loading = false }) => {
                   <div className="featured-buttons">
                     <button className="featured-btn featured-btn-primary">
                       <PlayArrowOutlined className="featured-btn-icon" />
-                      <span>Watch</span>
+                      <span>Watch Now</span>
                     </button>
 
                     <button className="featured-btn featured-btn-secondary">

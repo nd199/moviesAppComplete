@@ -1,8 +1,24 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
+// Detect if running locally
+const isLocal = () => {
+  return window.location.hostname === 'localhost' || 
+         window.location.hostname === '127.0.0.1' || 
+         window.location.hostname === '';
+};
+
+const getBaseURL = () => {
+  // If REACT_APP_API_URL is set AND we're not local, use it
+  if (process.env.REACT_APP_API_URL && !isLocal()) {
+    return `${process.env.REACT_APP_API_URL}/api/v1`;
+  }
+  // Default to localhost for local development
+  return "http://localhost:8080/api/v1";
+};
+
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL + "/api/v1" || "http://localhost:8080/api/v1",
+  baseURL: getBaseURL(),
   withCredentials: true,
   timeout: 30000, // Increased from 10000 to 30000 for debugging
 });
@@ -41,15 +57,14 @@ api.interceptors.response.use(
 export default api;
 export const userRequest = () => api;
 export const authRequest = () => {
-  const baseURL = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api/v1` : "http://localhost:8080/api/v1";
   return axios.create({
-    baseURL: baseURL,
+    baseURL: getBaseURL(),
     withCredentials: true,
     timeout: 30000, // Increased timeout
   });
 };
 export const passResetRequest = () => {
-  const baseURL = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/password-reset` : "http://localhost:8080/api/password-reset";
+  const baseURL = isLocal() ? "http://localhost:8080/api/password-reset" : `${process.env.REACT_APP_API_URL}/password-reset`;
   return axios.create({
     baseURL: baseURL,
     withCredentials: true,
@@ -58,7 +73,7 @@ export const passResetRequest = () => {
 };
 export const publicRequest = () => api;
 export const paymentRequest = () => {
-  const baseURL = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api/v1/payments` : "http://localhost:8080/api/v1/payments";
+  const baseURL = isLocal() ? "http://localhost:8080/api/v1/payments" : `${process.env.REACT_APP_API_URL}/api/v1/payments`;
   return axios.create({
     baseURL: baseURL,
     withCredentials: true,
@@ -66,7 +81,7 @@ export const paymentRequest = () => {
   });
 };
 export const springRequest = () => {
-  const baseURL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+  const baseURL = isLocal() ? "http://localhost:8080" : process.env.REACT_APP_API_URL;
   return axios.create({
     baseURL: baseURL,
     withCredentials: true,

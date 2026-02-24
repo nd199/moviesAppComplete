@@ -101,20 +101,6 @@ const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre, poster,
           <>
             <div className="card-header">
               <h3 className="card-title">{name}</h3>
-              <div className="card-actions">
-                <Link to={`/video/${id}`} className="card-action">
-                  <PlayArrow fontSize="small" />
-                </Link>
-                <button className="card-action">
-                  <Add fontSize="small" />
-                </button>
-                <button className="card-action">
-                  <ThumbUpAltOutlined fontSize="small" />
-                </button>
-                <button className="card-action">
-                  <ThumbDownOutlined fontSize="small" />
-                </button>
-              </div>
             </div>
 
             <div className="card-meta-row">
@@ -170,6 +156,22 @@ const ListItem = ({ name, desc, year, ageRating, rating, runtime, genre, poster,
             )}
           </>
         )}
+        
+        {/* Actions always rendered, visibility controlled by CSS */}
+        <div className="card-actions">
+          <Link to={`/video/${id}`} className="card-action">
+            <PlayArrow fontSize="small" />
+          </Link>
+          <button className="card-action">
+            <Add fontSize="small" />
+          </button>
+          <button className="card-action">
+            <ThumbUpAltOutlined fontSize="small" />
+          </button>
+          <button className="card-action">
+            <ThumbDownOutlined fontSize="small" />
+          </button>
+        </div>
       </div>
     </article>
   );
