@@ -1,163 +1,459 @@
+/* Profile Page - Enhanced Modern Design */
+:root {
+  --profile-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  --profile-card-bg: rgba(15, 23, 42, 0.85);
+  --profile-border: rgba(148, 163, 184, 0.15);
+  --profile-accent: #f97316;
+  --profile-accent-light: #fb923c;
+  --profile-accent-glow: rgba(249, 115, 22, 0.4);
+  --profile-text: #f1f5f9;
+  --profile-text-muted: #94a3b8;
+  --profile-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  --profile-shadow-hover: 0 25px 50px rgba(249, 115, 22, 0.25);
+}
+
 .profileContainer {
+  width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #020617 0%, #0a0e1a 100%);
-  padding: 2rem;
-  color: #f9fafb;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--profile-bg);
+  background-attachment: fixed;
+  padding: 2rem 1rem;
+  color: var(--profile-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.profileContainer::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(249, 115, 22, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(249, 115, 22, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Floating particles effect */
+.profileContainer::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20% 30%, rgba(249, 115, 22, 0.3) 50%, transparent 50%),
+    radial-gradient(2px 2px at 80% 70%, rgba(59, 130, 246, 0.2) 50%, transparent 50%),
+    radial-gradient(1px 1px at 40% 60%, rgba(249, 115, 22, 0.2) 50%, transparent 50%),
+    radial-gradient(1px 1px at 70% 20%, rgba(59, 130, 246, 0.2) 50%, transparent 50%);
+  background-size: 200px 200px;
+  animation: particles 20s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes particles {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-200px);
+  }
 }
 
 .profileTitleContainer {
-  max-width: 1200px;
-  margin: 0 auto 2rem;
+  max-width: 900px;
+  margin: 0 auto 1rem;
   text-align: center;
+  position: relative;
+  z-index: 2;
 }
 
 .profileTitle {
-  font-size: clamp(2rem, 4vw, 2.5rem);
-  background: linear-gradient(135deg, #f97316, #fb923c);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  background: linear-gradient(135deg, var(--profile-accent) 0%, var(--profile-accent-light) 50%, #fff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   margin: 0;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  position: relative;
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  0% {
+    filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.4));
+  }
+  100% {
+    filter: drop-shadow(0 0 25px rgba(249, 115, 22, 0.6));
+  }
 }
 
 .profileContentContainer {
-  max-width: 1200px;
+  max-width: 450px;
+  width: 100%;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
 }
 
+/* Profile Info Card - Left Side */
 .profileInfo {
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--profile-card-bg);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
-  padding: 3rem 2rem;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  padding: 2rem 1.75rem;
+  border: 1px solid var(--profile-border);
+  box-shadow: var(--profile-shadow);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  max-width: 450px;
+  box-sizing: border-box;
+}
+
+.profileInfo::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light), var(--profile-accent));
+  animation: shimmer 3s linear infinite;
+}
+
+.profileInfo::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.profileInfo:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--profile-shadow-hover);
+  border-color: rgba(249, 115, 22, 0.3);
 }
 
 .profileInfoContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
+/* Profile Avatar */
 .profileInfoImg {
-  width: 140px;
-  height: 140px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid rgba(249, 115, 22, 0.4);
-  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.2);
-  transition: all 0.3s ease;
+  border: 4px solid transparent;
+  background: linear-gradient(var(--profile-card-bg), var(--profile-card-bg)) padding-box,
+              linear-gradient(135deg, var(--profile-accent), var(--profile-accent-light), #fff) border-box;
+  box-shadow: 
+    0 10px 30px rgba(249, 115, 22, 0.25),
+    0 0 0 2px rgba(249, 115, 22, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 
 .profileInfoImg:hover {
-  transform: scale(1.05);
-  border-color: #f97316;
+  transform: scale(1.08) rotate(3deg);
+  box-shadow: 
+    0 20px 50px rgba(249, 115, 22, 0.35),
+    0 0 0 4px rgba(249, 115, 22, 0.2),
+    0 0 30px rgba(249, 115, 22, 0.2);
+}
+
+/* Verified badge overlay */
+.profileInfoImgContainer {
+  position: relative;
+  display: inline-block;
 }
 
 .profileInfoName {
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  margin: 0;
-  color: #f9fafb;
+  margin: 0.5rem 0 0;
+  color: var(--profile-text);
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.profileInfoName::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light));
+  border-radius: 2px;
 }
 
 .profileDetails {
   width: 100%;
+  margin-top: 1.5rem;
 }
 
 .profileInfoTitle {
   display: block;
-  font-size: 1.2rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #f97316;
-  margin-bottom: 1.5rem;
+  color: var(--profile-text-muted);
+  margin-bottom: 1rem;
   text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
 }
 
 .profileInfoItem {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(11, 18, 32, 0.6);
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(10px);
   border-radius: 12px;
-  margin-bottom: 0.75rem;
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  margin-bottom: 0.5rem;
+  border: 1px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.profileInfoItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--profile-accent), var(--profile-accent-light));
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.profileInfoItem:hover {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: rgba(249, 115, 22, 0.2);
+  transform: translateX(6px);
+}
+
+.profileInfoItem:hover::before {
+  transform: scaleY(1);
 }
 
 .profileInfoItem svg {
-  color: #9ca3af;
-  font-size: 1.4rem;
+  color: var(--profile-text-muted);
+  font-size: 1.5rem;
+  min-width: 24px;
+  transition: all 0.3s ease;
 }
 
+.profileInfoItem:hover svg {
+  color: var(--profile-accent);
+  transform: scale(1.15);
+}
+
+.profileInfoItem span {
+  color: var(--profile-text);
+  font-weight: 500;
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileInfoItem .profileInfoItemLabel {
+  font-size: 0.75rem;
+  color: var(--profile-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 70px;
+}
+
+/* Edit Profile Button */
 .profileUpdateButton {
   width: 100%;
-  background: linear-gradient(135deg, #f97316, #ea580c);
-  color: #020617;
+  background: linear-gradient(135deg, var(--profile-accent), var(--profile-accent-light));
+  color: #0f172a;
   border: none;
-  padding: 1rem 2rem;
+  padding: 0.875rem 1.25rem;
   border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.profileUpdateButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.profileUpdateButton:hover::before {
+  left: 100%;
 }
 
 .profileUpdateButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(249, 115, 22, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.45);
+  background: linear-gradient(135deg, var(--profile-accent-light), var(--profile-accent));
 }
 
+/* Edit Profile Modal */
 .profileUpdate {
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(25px);
-  border-radius: 20px;
+  background: var(--profile-card-bg);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-radius: 24px;
   padding: 2.5rem;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--profile-border);
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(249, 115, 22, 0.1);
   position: relative;
-  max-width: 500px;
+  overflow: hidden;
+  animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.profileUpdate::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light), var(--profile-accent));
+  animation: shimmer 3s linear infinite;
+}
+
+.profileUpdate::after {
+  content: '';
+  position: absolute;
+  bottom: -50%;
+  left: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 60%);
+  pointer-events: none;
 }
 
 .editProfileCloseButton {
   position: absolute;
-  top: -1.5rem;
+  top: 1rem;
   right: 1rem;
-  background: rgba(15, 23, 42, 0.9);
-  border: 2px solid #f9fafb;
-  color: #f9fafb;
-  width: 40px;
-  height: 40px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: var(--profile-text-muted);
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.25rem;
+  font-weight: 500;
   transition: all 0.3s ease;
+  z-index: 10;
 }
 
 .editProfileCloseButton:hover {
   background: #ef4444;
   border-color: #ef4444;
+  color: white;
   transform: rotate(90deg);
 }
 
 .profileUpdateForm {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  align-items: end;
+  grid-template-columns: 180px 1fr;
+  gap: 2rem;
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+
+.profileUpdateTitle {
+  grid-column: 1 / -1;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--profile-text);
+  margin: 0 0 0.5rem;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.profileUpdateSubtitle {
+  grid-column: 1 / -1;
+  font-size: 0.9rem;
+  color: var(--profile-text-muted);
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
 
 .profileUpdateRight {
@@ -179,16 +475,20 @@
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid rgba(148, 163, 184, 0.3);
+  border: 3px solid transparent;
+  background: linear-gradient(var(--profile-card-bg), var(--profile-card-bg)) padding-box,
+              linear-gradient(135deg, var(--profile-accent), var(--profile-accent-light)) border-box;
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.2);
 }
 
 .profileUpdateLabel {
-  background: linear-gradient(135deg, #f97316, #ea580c);
-  color: #020617;
+  background: linear-gradient(135deg, var(--profile-accent), #ea580c);
+  color: #0f172a;
   padding: 0.75rem 1.5rem;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -196,22 +496,30 @@
 }
 
 .profileUpdateLabel:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
 }
 
-.profileUpdateIcon {
-  font-size: 1.2rem;
+.profileUpdateLabel svg {
+  font-size: 1.1rem;
 }
 
 .uploadProgress {
   width: 100%;
   height: 6px;
   border-radius: 3px;
+  background: rgba(15, 23, 42, 0.8);
+  overflow: hidden;
 }
 
-.profileUpdateLeft .profileUpdateItem {
-  margin-bottom: 0;
+.uploadProgress .MuiLinearProgress-bar {
+  background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light));
+}
+
+.profileUpdateLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .profileUpdateItem {
@@ -221,53 +529,124 @@
 }
 
 .profileUpdateItem label {
-  font-size: 0.95rem;
-  color: #f9fafb;
+  font-size: 0.85rem;
+  color: var(--profile-text-muted);
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .profileUpdateInput {
-  background: rgba(11, 18, 32, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  color: #f9fafb;
-  padding: 0.875rem 1rem;
-  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: var(--profile-text);
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .profileUpdateInput:focus {
   outline: none;
-  border-color: #f97316;
-  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+  border-color: var(--profile-accent);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
 }
 
 .profileUpdateInput::placeholder {
-  color: #9ca3af;
+  color: var(--profile-text-muted);
+  opacity: 0.6;
 }
 
 .profileUpdateInput:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+  background: rgba(15, 23, 42, 0.5);
 }
 
-@media (max-width: 768px) {
-  .profileContentContainer {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+.profileUpdateForm .profileUpdateButton {
+  grid-column: 1 / -1;
+  margin-top: 1rem;
+}
+
+/* Profile Update Overlay */
+.profileUpdateOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: overlayFadeIn 0.3s ease;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .profileContainer {
+    padding: 1.5rem 1rem;
+  }
+
+  .profileInfo {
+    padding: 1.5rem 1.25rem;
+    width: 100%;
+  }
+
+  .profileInfoImg {
+    width: 90px;
+    height: 90px;
+  }
+
+  .profileInfoName {
+    font-size: 1.2rem;
+  }
+
+  .profileUpdate {
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 100%;
   }
 
   .profileUpdateForm {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
-  .profileInfo {
-    padding: 2rem 1.5rem;
+  .profileUpdateRight {
+    flex-direction: column;
+    align-items: center;
   }
-}
 
-@media (max-width: 480px) {
-  .profileContainer {
-    padding: 1rem;
+  .profileUpdateUpload {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .profileUpdateImg {
+    width: 80px;
+    height: 80px;
+  }
+
+  .profileInfoItem {
+    padding: 0.6rem 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .profileInfoItem svg {
+    font-size: 1.1rem;
+    min-width: 20px;
   }
 }

@@ -16,6 +16,7 @@ import VideoFullScreen from "./Pages/User/VideoFullScreen";
 import AboutUs from "./Pages/User/AboutUs";
 import Movies from "./Pages/User/Movies";
 import Shows from "./Pages/User/Shows";
+import Profile from "./Pages/User/Profile";
 
 import PaymentCheckout from "./Pages/Payment/PaymentCheckout";
 import Success from "./Pages/Payment/Success";
@@ -163,6 +164,14 @@ function AppWithNavigation() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/shows" element={<Shows />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/subscription"
