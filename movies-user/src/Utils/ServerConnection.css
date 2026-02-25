@@ -43,6 +43,66 @@
   color: #1a1a1a;
   margin-bottom: 16px;
   line-height: 1.2;
+  text-align: center;
+}
+
+.sco-elapsed {
+  font-size: 1.1rem;
+  color: #667eea;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 8px;
+  display: inline-block;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Warming details container */
+.sco-warming-details {
+  background: rgba(251, 191, 36, 0.05);
+  border: 1px solid rgba(251, 191, 36, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 16px;
+}
+
+.sco-warming-main {
+  font-size: 1rem;
+  color: #f97316;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.sco-warming-sub {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 400;
+  margin: 0 0 16px 0;
+  line-height: 1.4;
+}
+
+.sco-note {
+  font-size: 0.85rem;
+  color: #4a5568;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.sco-note strong {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+  }
 }
 
 .sco-text {
