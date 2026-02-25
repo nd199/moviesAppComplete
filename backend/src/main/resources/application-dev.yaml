@@ -63,6 +63,9 @@ jwt:
 app:
   data-initialization:
     enabled: ${APP_DATA_INITIALIZATION_ENABLED:true}
+  demo:
+    email: ${APP_DEMO_EMAIL:demo@moviesapp.com}
+    password: ${APP_DEMO_PASSWORD:demo1234567}
   brevo:
     api-key: ${BREVO_API_KEY:REMOVED_BREVO_KEY}
     sender:

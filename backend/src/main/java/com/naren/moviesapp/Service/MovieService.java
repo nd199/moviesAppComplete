@@ -40,9 +40,6 @@ public class MovieService implements MovieServiceInterface {
         return savedMovie;
     }
 
-    /**
-     * Add a movie entity directly (used for TMDB sync)
-     */
     public Movie addMovie(Movie movie) {
         logger.info("Adding movie from TMDB: {}", movie.getName());
         if (movieRepository.existsByName(movie.getName())) {

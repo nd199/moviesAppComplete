@@ -379,6 +379,112 @@ export const syncTmdbMovie = async (tmdbId) => {
   }
 };
 
+export const fetchTmdbMovieDetails = async (movieName) => {
+  try {
+    // First search for the movie by name to get TMDB ID
+    const searchRes = await publicRequest().get(`/tmdb/search/movies?query=${encodeURIComponent(movieName)}&page=1`);
+    const results = searchRes.data?.results || [];
+    
+    if (results.length === 0) {
+      return null;
+    }
+    
+    // Get the first result's TMDB ID
+    const tmdbId = results[0].tmdbId;
+    
+    // Fetch detailed movie information including trailer
+    const detailsRes = await publicRequest().get(`/tmdb/movie/${tmdbId}`);
+    return detailsRes.data;
+  } catch (error) {
+    console.error('Failed to fetch movie details:', error);
+    return null;
+  }
+};
+
+export const fetchTmdbPopularMovies = async dispatch => {
+  try {
+    const res = await publicRequest().get('/tmdb/discover/movies?sort_by=popularity.desc&vote_count.gte=1000');
+    const results = res.data?.results || [];
+    console.log('Popular movies API response:', res.data);
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch popular movies:', error);
+    return [];
+  }
+};
+
+export const fetchTmdbTopRatedMovies = async dispatch => {
+  try {
+    const res = await publicRequest().get('/tmdb/top-rated/movies');
+    const results = res.data?.results || [];
+    console.log('Top rated movies API response:', res.data);
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch top rated movies:', error);
+    return [];
+  }
+};
+
+export const fetchTmdbNowPlayingMovies = async dispatch => {
+  try {
+    const res = await publicRequest().get('/tmdb/now-playing/movies');
+    const results = res.data?.results || [];
+    console.log('Now playing movies API response:', res.data);
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch now playing movies:', error);
+    return [];
+  }
+};
+
+export const fetchTmdbUpcomingMovies = async dispatch => {
+  try {
+    const res = await publicRequest().get('/tmdb/upcoming/movies');
+    const results = res.data?.results || [];
+    console.log('Upcoming movies API response:', res.data);
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch upcoming movies:', error);
+    return [];
+  }
+};
+
+export const fetchTmdbPopularShows = async dispatch => {
+  try {
+    const res = await publicRequest().get('/tmdb/popular/shows');
+    const results = res.data?.results || [];
+    console.log('Popular shows API response:', res.data);
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch popular shows:', error);
+    return [];
+  }
+};
+
+export const fetchTmdbTopRatedShows = async dispatch => {
+  try {
+    const res = await publicRequest().get('/tmdb/top-rated/shows');
+    const results = res.data?.results || [];
+    console.log('Top rated shows API response:', res.data);
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch top rated shows:', error);
+    return [];
+  }
+};
+
+export const fetchTmdbSouthIndianMovies = async dispatch => {
+  try {
+    const res = await publicRequest().get('/tmdb/south-indian/movies');
+    const results = res.data?.results || [];
+    console.log('South Indian movies API response:', res.data);
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch South Indian movies:', error);
+    return [];
+  }
+};
+
 export const syncTmdbTvShow = async (tmdbId) => {
   try {
     const res = await userRequest().post(`/tmdb/sync/tv/${tmdbId}`);

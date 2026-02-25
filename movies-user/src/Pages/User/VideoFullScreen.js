@@ -1,49 +1,113 @@
-import { ExitToAppOutlined } from "@mui/icons-material";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Home, ArrowBack } from "@mui/icons-material";
+import { Link, useParams, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { fetchTmdbMovieDetails } from "../../Network/ApiCalls";
 import "./VideoFullScreen.css";
 
 const VideoFullScreen = () => {
   const { id } = useParams();
-  const [searchParams] = useSearchParams();
-  const trailer = searchParams.get('trailer');
+  const location = useLocation();
+  const [videoSrc, setVideoSrc] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [movieTitle, setMovieTitle] = useState("");
   
-  // Check if the id parameter is actually a trailer URL
-  const isTrailerUrl = id && (id.includes('youtube.com') || id.includes('http'));
+  // Get trailer from location state (passed from ColListItem)
+  const trailerFromState = location.state?.trailer;
+  
+  useEffect(() => {
+    const fetchTrailer = async () => {
+      setLoading(true);
+      
+      // If we have a trailer from state, use it
+      if (trailerFromState) {
+        setVideoSrc(trailerFromState);
+        setMovieTitle(id);
+        setLoading(false);
+        return;
+      }
+      
+      // Otherwise, fetch movie details by name
+      if (id) {
+        const movieDetails = await fetchTmdbMovieDetails(id);
+        
+        if (movieDetails?.trailer) {
+          setVideoSrc(movieDetails.trailer);
+          setMovieTitle(movieDetails.title || movieDetails.name || id);
+        } else {
+          setVideoSrc("https://videos.pexels.com/video-files/4782220/4782220-hd_1280_720_30fps.mp4");
+          setMovieTitle(id);
+        }
+      }
+      
+      setLoading(false);
+    };
+    
+    fetchTrailer();
+  }, [id, trailerFromState]);
   
   // Convert YouTube URL to embed format if needed
-  let videoSrc = isTrailerUrl ? id : (trailer || "https://videos.pexels.com/video-files/4782220/4782220-hd_1280_720_30fps.mp4");
-  
-  if (isTrailerUrl && id.includes('youtube.com')) {
+  let finalVideoSrc = videoSrc;
+  if (videoSrc && videoSrc.includes('youtube.com')) {
     // Convert YouTube watch URL to embed URL with autoplay
-    const videoId = id.split('v=')[1]?.split('&')[0];
+    const videoId = videoSrc.split('v=')[1]?.split('&')[0];
     if (videoId) {
-      videoSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&rel=0`;
+      finalVideoSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&rel=0&modestbranding=1&showinfo=0`;
     }
   }
   
-  console.log('VideoFullScreen - Component loaded with ID:', id);
-  console.log('VideoFullScreen - Is trailer URL:', isTrailerUrl);
-  console.log('VideoFullScreen - Trailer from query:', trailer);
-  console.log('VideoFullScreen - Final video source:', videoSrc);
+  if (loading) {
+    return (
+      <div className="videoFS">
+        <div className="video-nav">
+          <Link to={"/"} className="video-back-btn">
+            <ArrowBack />
+            <span>Back to Home</span>
+          </Link>
+        </div>
+        <div className="video-loading">
+          <div className="loading-spinner"></div>
+          <p>Loading trailer...</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="videoFS">
-      <div className="back">
-        <Link to={"/"}>
-          <ExitToAppOutlined />
-          Home
+      <div className="video-nav">
+        <Link to={"/"} className="video-back-btn">
+          <ArrowBack />
+          <span>Back to Home</span>
         </Link>
+        <div className="video-title">
+          <h1>{movieTitle}</h1>
+        </div>
       </div>
-      <div className="video-info">
-        <p>Playing {isTrailerUrl ? 'trailer' : `video ID: ${id}`}</p>
+      
+      <div className="video-container">
+        {finalVideoSrc.includes('youtube.com/embed') ? (
+          <iframe
+            src={finalVideoSrc}
+            className="video-player"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            allowFullScreen
+            frameBorder="0"
+            title="Movie Trailer"
+          />
+        ) : (
+          <video
+            src={finalVideoSrc}
+            autoPlay
+            controls
+            className="video-player"
+            title="Movie Trailer"
+          ></video>
+        )}
       </div>
-      <video
-        src={videoSrc}
-        autoPlay
-        controls
-        progress
-        className="vfs"
-      ></video>
+      
+      <div className="video-overlay">
+        <div className="video-gradient"></div>
+      </div>
     </div>
   );
 };

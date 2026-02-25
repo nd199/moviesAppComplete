@@ -15,10 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * TMDB Data Seeder - Imports real movies and shows from TMDB API into the local database.
- * This runs on startup in dev/default profiles to populate the database with real content.
- */
 @Configuration
 @Profile({"dev", "default"})
 @RequiredArgsConstructor

@@ -21,11 +21,18 @@ const Movies = () => {
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
+    // Initial load
+    fetchTmdbTrendingMovies(dispatch);
+  }, [dispatch]);
+
+  useEffect(() => {
     if (searchQuery.trim()) {
       setIsSearching(true);
-      searchTmdbMovies(dispatch, searchQuery);
+      const debounceTimer = setTimeout(() => {
+        searchTmdbMovies(dispatch, searchQuery);
+      }, 500);
+      return () => clearTimeout(debounceTimer);
     } else {
-      fetchTmdbTrendingMovies(dispatch);
       setIsSearching(false);
     }
   }, [dispatch, searchQuery]);
@@ -35,18 +42,34 @@ const Movies = () => {
       if (!movies?.length) return [];
 
       return movies
-        .filter((movie) => !genre || genre === 'All' || 
-          (movie.genre && 
-            (movie.genre.toLowerCase().includes(genre.toLowerCase()) || 
-            movie.genre.split(',').some(g => g.trim().toLowerCase().includes(genre.toLowerCase()))
-          )))
-        .filter((movie) => !year || movie.year === parseInt(year))
-        .filter((movie) => !rating || movie.rating >= parseFloat(rating))
+        .filter((movie) => {
+          // Genre filtering
+          if (genre && genre !== 'All') {
+            const movieGenres = movie.genre || '';
+            const genreMatch = movieGenres.toLowerCase().includes(genre.toLowerCase()) || 
+                              movieGenres.split(',').some(g => g.trim().toLowerCase().includes(genre.toLowerCase()));
+            if (!genreMatch) return false;
+          }
+          
+          // Year filtering
+          if (year) {
+            const movieYear = movie.year || (movie.release_date && new Date(movie.release_date).getFullYear());
+            if (movieYear !== parseInt(year)) return false;
+          }
+          
+          // Rating filtering
+          if (rating) {
+            const movieRating = parseFloat(movie.rating || movie.vote_average || 0);
+            if (movieRating < parseFloat(rating)) return false;
+          }
+          
+          return true;
+        })
         .sort((a, b) => {
           if (sortBy === "popularity") {
-            return (b.voteCount || 0) - (a.voteCount || 0);
+            return (b.voteCount || b.popularity || 0) - (a.voteCount || a.popularity || 0);
           } else if (sortBy === "rating") {
-            return (b.rating || 0) - (a.rating || 0);
+            return (parseFloat(b.rating || b.vote_average || 0) - parseFloat(a.rating || a.vote_average || 0));
           }
           return 0;
         });
@@ -56,6 +79,7 @@ const Movies = () => {
 
   const moviesToDisplay = searchQuery ? tmdbSearchResults : tmdbTrendingMovies;
   const filteredMovies = filterMovies(moviesToDisplay);
+  const isLoading = tmdbFetching || (isSearching && tmdbSearchResults.length === 0);
 
   return (
     <div className="moviesPage">
@@ -75,27 +99,27 @@ const Movies = () => {
           setRating={setRating}
         />
         <div className="movieContainerContent">
-          {tmdbFetching ? (
+          {isLoading ? (
             <div className="loading-container">
               <div className="loading-spinner"></div>
               <p className="loading-text-primary">
-                Loading your movies collection...
+                {isSearching ? 'Searching movies...' : 'Loading your movies collection...'}
               </p>
               <p className="loading-text-secondary">
-                Fetching latest ratings and trailers
+                {isSearching ? 'Finding the best matches for you' : 'Fetching latest ratings and trailers'}
               </p>
             </div>
           ) : filteredMovies.length > 0 ? (
             filteredMovies.map((movie, id) => (
               <ColListItem
-                key={`${movie.id || id}-${movie.name}`}
-                name={movie.name}
-                desc={movie.description}
+                key={`${movie.id || movie.tmdbId || id}-${movie.title || movie.name}`}
+                name={movie.title || movie.name}
+                desc={movie.description || movie.overview}
                 year={movie.year}
                 img={movie.poster}
                 ageRating={movie.ageRating}
                 cost={movie.cost}
-                rating={movie.rating}
+                rating={movie.rating || movie.vote_average}
                 runtime={movie.runtime}
                 genre={movie.genre}
                 trailer={movie.trailer}
@@ -104,10 +128,12 @@ const Movies = () => {
             ))
           ) : (
             <div className="empty-state">
-              <h3>No movies match your filters</h3>
+              <h3>{searchQuery ? 'No movies found' : 'No movies match your filters'}</h3>
               <p>
-                Try clearing some filters or search for something new. We've got
-                thousands of movies waiting!
+                {searchQuery 
+                  ? 'Try searching with different keywords or check the spelling.'
+                  : 'Try clearing some filters or adjusting your criteria. We\'ve got thousands of movies waiting!'
+                }
               </p>
             </div>
           )}

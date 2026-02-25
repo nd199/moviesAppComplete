@@ -10,10 +10,12 @@ spring:
     properties:
       hibernate:
         format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
 
   main:
     web-application-type: servlet
+    lazy-initialization: true
 
   data:
     redis:
@@ -23,6 +25,9 @@ app:
   superadmin:
     email: ${SUPER_ADMIN_EMAIL}
     password: ${SUPER_ADMIN_PASSWORD}
+  demo:
+    email: demo@example.com
+    password: Demo123456
 
   brevo:
     api-key: ${BREVO_API_KEY}
@@ -31,7 +36,7 @@ app:
       name: ${BREVO_SENDER_NAME:MoviesApp}
 
   data-initialization:
-    enabled: ${DATA_INITIALIZATION_ENABLED:false}
+    enabled: ${DATA_INITIALIZATION_ENABLED:true}
 
   allowed:
     origins: "https://movies-app-complete.vercel.app"
@@ -43,11 +48,11 @@ app:
 
 logging:
   level:
-    root: INFO
-    com.naren.moviesapp: DEBUG
+    root: WARN
+    com.naren.moviesapp: INFO
     org.springframework.security: WARN
-    org.springframework.mail: DEBUG
-    jakarta.mail: DEBUG
-    org.springframework.web: INFO
+    org.springframework.mail: WARN
+    jakarta.mail: WARN
+    org.springframework.web: WARN
     org.hibernate.SQL: WARN
     org.hibernate.type.descriptor.sql: WARN

@@ -21,11 +21,18 @@ const Shows = () => {
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
+    // Initial load
+    fetchTmdbTrendingShows(dispatch);
+  }, [dispatch]);
+
+  useEffect(() => {
     if (searchQuery.trim()) {
       setIsSearching(true);
-      searchTmdbShows(dispatch, searchQuery);
+      const debounceTimer = setTimeout(() => {
+        searchTmdbShows(dispatch, searchQuery);
+      }, 500);
+      return () => clearTimeout(debounceTimer);
     } else {
-      fetchTmdbTrendingShows(dispatch);
       setIsSearching(false);
     }
   }, [dispatch, searchQuery]);
@@ -35,18 +42,34 @@ const Shows = () => {
       if (!shows?.length) return [];
 
       return shows
-        .filter((show) => !genre || genre === 'All' || 
-          (show.genre && 
-            (show.genre.toLowerCase().includes(genre.toLowerCase()) || 
-            show.genre.split(',').some(g => g.trim().toLowerCase().includes(genre.toLowerCase()))
-          )))
-        .filter((show) => !year || show.year === parseInt(year))
-        .filter((show) => !rating || show.rating >= parseFloat(rating))
+        .filter((show) => {
+          // Genre filtering
+          if (genre && genre !== 'All') {
+            const showGenres = show.genre || '';
+            const genreMatch = showGenres.toLowerCase().includes(genre.toLowerCase()) || 
+                              showGenres.split(',').some(g => g.trim().toLowerCase().includes(genre.toLowerCase()));
+            if (!genreMatch) return false;
+          }
+          
+          // Year filtering - for TV shows, use first_air_date
+          if (year) {
+            const showYear = show.year || (show.first_air_date && new Date(show.first_air_date).getFullYear());
+            if (showYear !== parseInt(year)) return false;
+          }
+          
+          // Rating filtering
+          if (rating) {
+            const showRating = parseFloat(show.rating || show.vote_average || 0);
+            if (showRating < parseFloat(rating)) return false;
+          }
+          
+          return true;
+        })
         .sort((a, b) => {
           if (sortBy === "popularity") {
-            return (b.voteCount || 0) - (a.voteCount || 0);
+            return (b.voteCount || b.popularity || 0) - (a.voteCount || a.popularity || 0);
           } else if (sortBy === "rating") {
-            return (b.rating || 0) - (a.rating || 0);
+            return (parseFloat(b.rating || b.vote_average || 0) - parseFloat(a.rating || a.vote_average || 0));
           }
           return 0;
         });
@@ -56,6 +79,7 @@ const Shows = () => {
 
   const showsToDisplay = searchQuery ? tmdbSearchResults : tmdbTrendingShows;
   const filteredShows = filterShows(showsToDisplay);
+  const isLoading = tmdbFetching || (isSearching && tmdbSearchResults.length === 0);
 
   return (
     <div className="showsPage">
@@ -75,24 +99,26 @@ const Shows = () => {
           setRating={setRating}
         />
         <div className="showContainerContent">
-          {tmdbFetching ? (
+          {isLoading ? (
             <div className="loading-container">
               <div className="loading-spinner"></div>
-              <p className="loading-text-primary">Loading TV shows...</p>
+              <p className="loading-text-primary">
+                {isSearching ? 'Searching TV shows...' : 'Loading your TV shows collection...'}
+              </p>
               <p className="loading-text-secondary">
-                Fetching latest episodes & ratings
+                {isSearching ? 'Finding the best series for you' : 'Fetching latest episodes & ratings'}
               </p>
             </div>
           ) : filteredShows.length > 0 ? (
             filteredShows.map((show, id) => (
               <ColListItem
-                key={`${show.id || id}-${show.name}`}
-                name={show.name}
-                desc={show.description}
+                key={`${show.id || show.tmdbId || id}-${show.name || show.title}`}
+                name={show.name || show.title}
+                desc={show.description || show.overview}
                 year={show.year}
                 img={show.poster}
                 ageRating={show.ageRating}
-                rating={show.rating}
+                rating={show.rating || show.vote_average}
                 runtime={show.runtime}
                 genre={show.genre}
                 trailer={show.trailer}
@@ -101,10 +127,12 @@ const Shows = () => {
             ))
           ) : (
             <div className="empty-state">
-              <h3>No shows found</h3>
+              <h3>{searchQuery ? 'No TV shows found' : 'No shows match your filters'}</h3>
               <p>
-                Try adjusting your filters or search for your favorite series.
-                We've got thousands of episodes waiting!
+                {searchQuery 
+                  ? 'Try searching with different keywords or check the spelling.'
+                  : 'Try clearing some filters or adjusting your criteria. We\'ve got thousands of series waiting!'
+                }
               </p>
             </div>
           )}

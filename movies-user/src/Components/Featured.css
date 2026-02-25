@@ -114,6 +114,14 @@
   }
 }
 
+/* Tags container */
+.featured-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 /* Modern tag with glow effect */
 .featured-tag {
   display: inline-flex;
@@ -136,6 +144,25 @@
   box-shadow: 
     0 0 25px rgba(251, 146, 60, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* South Indian tag with distinct styling */
+.featured-tag-south {
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.15),
+    rgba(220, 38, 38, 0.08)
+  );
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: rgba(248, 113, 113, 0.7);
+  box-shadow: 
+    0 0 25px rgba(239, 68, 68, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.featured-tag-south::before {
+  background: #ef4444;
+  box-shadow: 0 0 12px #ef4444;
 }
 
 .featured-tag::before {

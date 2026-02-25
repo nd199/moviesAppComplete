@@ -35,6 +35,12 @@ const Home = () => {
       <div className="main">
         <Featured loading={loading} />
         <List title={"Trending Movies"} type="tmdb-movies" />
+        <List title={"Now Playing"} type="tmdb-now-playing" />
+        <List title={"Popular Movies"} type="tmdb-popular" />
+        <List title={"Upcoming Movies"} type="tmdb-upcoming" />
+        <List title={"Top Rated Movies"} type="tmdb-top-rated" />
+        <List title={"Popular TV Shows"} type="tmdb-popular-shows" />
+        <List title={"Top Rated TV Shows"} type="tmdb-top-rated-shows" />
         <List title={"Trending TV Shows"} type="tmdb-shows" />
       </div>
       <Footer />

@@ -7,7 +7,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { fetchMovies, fetchShows, fetchTmdbTrendingMovies, fetchTmdbTrendingShows } from '../Network/ApiCalls';
+import { fetchMovies, fetchShows, fetchTmdbTrendingMovies, fetchTmdbTrendingShows, fetchTmdbPopularMovies, fetchTmdbTopRatedMovies, fetchTmdbNowPlayingMovies, fetchTmdbUpcomingMovies, fetchTmdbPopularShows, fetchTmdbTopRatedShows } from '../Network/ApiCalls';
 import { MovieListSkeleton } from './GlobalLoader';
 import './List.css';
 import ListItem from './ListItem';
@@ -21,11 +21,19 @@ const List = ({ title, type = 'local' }) => {
   const tmdbMovies = useSelector(state => state?.product?.tmdbTrendingMovies);
   const tmdbShows = useSelector(state => state?.product?.tmdbTrendingShows);
   const [loading, setLoading] = useState(true);
+  const [popularMovies, setPopularMovies] = useState([]);
+  const [topRatedMovies, setTopRatedMovies] = useState([]);
+  const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
+  const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [popularShows, setPopularShows] = useState([]);
+  const [topRatedShows, setTopRatedShows] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        console.log(`Fetching data for type: ${type}`);
+        
         if (type === 'local') {
           // Fetch local movies and shows
           await Promise.all([
@@ -38,6 +46,42 @@ const List = ({ title, type = 'local' }) => {
         } else if (type === 'tmdb-shows') {
           // Fetch TMDB trending shows
           await fetchTmdbTrendingShows(dispatch);
+        } else if (type === 'tmdb-popular') {
+          // Fetch TMDB popular movies
+          console.log('Fetching popular movies...');
+          const results = await fetchTmdbPopularMovies(dispatch);
+          console.log('Popular movies results:', results);
+          setPopularMovies(results);
+        } else if (type === 'tmdb-top-rated') {
+          // Fetch TMDB top rated movies
+          console.log('Fetching top rated movies...');
+          const results = await fetchTmdbTopRatedMovies(dispatch);
+          console.log('Top rated movies results:', results);
+          setTopRatedMovies(results);
+        } else if (type === 'tmdb-now-playing') {
+          // Fetch TMDB now playing movies
+          console.log('Fetching now playing movies...');
+          const results = await fetchTmdbNowPlayingMovies(dispatch);
+          console.log('Now playing movies results:', results);
+          setNowPlayingMovies(results);
+        } else if (type === 'tmdb-upcoming') {
+          // Fetch TMDB upcoming movies
+          console.log('Fetching upcoming movies...');
+          const results = await fetchTmdbUpcomingMovies(dispatch);
+          console.log('Upcoming movies results:', results);
+          setUpcomingMovies(results);
+        } else if (type === 'tmdb-popular-shows') {
+          // Fetch TMDB popular TV shows
+          console.log('Fetching popular shows...');
+          const results = await fetchTmdbPopularShows(dispatch);
+          console.log('Popular shows results:', results);
+          setPopularShows(results);
+        } else if (type === 'tmdb-top-rated-shows') {
+          // Fetch TMDB top rated TV shows
+          console.log('Fetching top rated shows...');
+          const results = await fetchTmdbTopRatedShows(dispatch);
+          console.log('Top rated shows results:', results);
+          setTopRatedShows(results);
         }
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -64,15 +108,30 @@ const List = ({ title, type = 'local' }) => {
       return tmdbMovies || [];
     } else if (type === 'tmdb-shows') {
       return tmdbShows || [];
+    } else if (type === 'tmdb-popular') {
+      return popularMovies || [];
+    } else if (type === 'tmdb-top-rated') {
+      return topRatedMovies || [];
+    } else if (type === 'tmdb-now-playing') {
+      return nowPlayingMovies || [];
+    } else if (type === 'tmdb-upcoming') {
+      return upcomingMovies || [];
+    } else if (type === 'tmdb-popular-shows') {
+      return popularShows || [];
+    } else if (type === 'tmdb-top-rated-shows') {
+      return topRatedShows || [];
     }
     return [];
   };
 
   const items = getItems();
+  console.log(`Items for ${title} (${type}):`, items);
 
   // For TMDB items, map the fields to match the ListItem format
   const formatTmdbItem = (item) => {
-    if (type === 'tmdb-movies' || type === 'tmdb-shows') {
+    if (type === 'tmdb-movies' || type === 'tmdb-shows' || type === 'tmdb-popular' || type === 'tmdb-top-rated' || 
+        type === 'tmdb-now-playing' || type === 'tmdb-upcoming' || type === 'tmdb-popular-shows' || type === 'tmdb-top-rated-shows') {
+      console.log(`Formatting item: ${item.title || item.name}, trailer:`, item.trailer);
       return {
         id: item.tmdbId,
         name: item.title || item.name,

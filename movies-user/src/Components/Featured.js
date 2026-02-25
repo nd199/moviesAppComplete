@@ -1,5 +1,6 @@
 import { AddToQueueOutlined, PlayArrowOutlined } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -9,6 +10,7 @@ import './Featured.css';
 import VideoPlayer from './VideoPlayer';
 import { FeaturedSkeleton } from './GlobalLoader';
 import { publicRequest } from '../AxiosMethods';
+import { fetchTmdbSouthIndianMovies } from '../Network/ApiCalls';
 
 const Featured = ({ loading = false }) => {
   const [expandedItems, setExpandedItems] = useState({});
@@ -19,12 +21,27 @@ const Featured = ({ loading = false }) => {
     const fetchFeaturedData = async () => {
       setIsLoading(true);
       try {
-        const response = await publicRequest().get('/tmdb/trending/movies');
-        const movies = response.data.results || [];
+        // Fetch both Hollywood trending and South Indian movies
+        const [hollywoodResponse, southIndianResponse] = await Promise.all([
+          publicRequest().get('/tmdb/trending/movies'),
+          fetchTmdbSouthIndianMovies()
+        ]);
         
-        // Get first 5 trending movies and fetch their videos
+        const hollywoodMovies = hollywoodResponse.data.results || [];
+        const southIndianMovies = southIndianResponse || [];
+        
+        console.log('Hollywood movies:', hollywoodMovies.length);
+        console.log('South Indian movies:', southIndianMovies.length);
+        
+        // Mix: 3 Hollywood + 3 South Indian movies
+        const selectedMovies = [
+          ...hollywoodMovies.slice(0, 3),
+          ...southIndianMovies.slice(0, 3)
+        ];
+        
+        // Get videos for all selected movies
         const featuredMovies = await Promise.all(
-          movies.slice(0, 5).map(async (movie) => {
+          selectedMovies.map(async (movie) => {
             try {
               // Fetch videos for this movie
               const videoResponse = await publicRequest().get(`/tmdb/movie/${movie.tmdbId}/videos`);
@@ -43,7 +60,9 @@ const Featured = ({ loading = false }) => {
                 desc: movie.description || 'No description available',
                 descMore: movie.description || 'No description available',
                 videoId: trailer ? trailer.key : '',
-                hasTrailer: !!trailer
+                hasTrailer: !!trailer,
+                trailerUrl: trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : '',
+                isSouthIndian: southIndianMovies.some(si => si.tmdbId === movie.tmdbId)
               };
             } catch (error) {
               console.error(`Error fetching videos for movie ${movie.tmdbId}:`, error);
@@ -55,13 +74,25 @@ const Featured = ({ loading = false }) => {
                 desc: movie.description || 'No description available',
                 descMore: movie.description || 'No description available',
                 videoId: '',
-                hasTrailer: false
+                hasTrailer: false,
+                trailerUrl: '',
+                isSouthIndian: southIndianMovies.some(si => si.tmdbId === movie.tmdbId)
               };
             }
           })
         );
         
-        setFeaturedData(featuredMovies.filter(movie => movie.hasTrailer));
+        // Filter movies with trailers, but keep at least some South Indian movies even without trailers
+        const moviesWithTrailers = featuredMovies.filter(movie => movie.hasTrailer);
+        const southIndianWithoutTrailers = featuredMovies.filter(movie => !movie.hasTrailer && movie.isSouthIndian);
+        
+        // Prioritize movies with trailers, but add South Indian movies if needed
+        let finalFeatured = moviesWithTrailers;
+        if (finalFeatured.length < 4 && southIndianWithoutTrailers.length > 0) {
+          finalFeatured = [...finalFeatured, ...southIndianWithoutTrailers.slice(0, 4 - finalFeatured.length)];
+        }
+        
+        setFeaturedData(finalFeatured.slice(0, 6)); // Max 6 movies (3 Hollywood + 3 South Indian)
       } catch (error) {
         console.error('Error fetching featured data:', error);
         // Fallback to empty array
@@ -120,7 +151,12 @@ const Featured = ({ loading = false }) => {
               {/* Floating content wrapper - info panel to the side */}
               <div className="featured-content-wrapper">
                 <div className="featured-info">
-                  <div className="featured-tag">Now Streaming</div>
+                  <div className="featured-tags">
+                    {item.isSouthIndian && (
+                      <div className="featured-tag featured-tag-south">South Indian</div>
+                    )}
+                    <div className="featured-tag">Now Streaming</div>
+                  </div>
 
                   <h1 className="featured-title">{item.title}</h1>
 
@@ -147,10 +183,14 @@ const Featured = ({ loading = false }) => {
                   </div>
 
                   <div className="featured-buttons">
-                    <button className="featured-btn featured-btn-primary">
+                    <Link 
+                      to={`/video/${item.title}`}
+                      state={{ trailer: item.trailerUrl }}
+                      className="featured-btn featured-btn-primary"
+                    >
                       <PlayArrowOutlined className="featured-btn-icon" />
                       <span>Watch Now</span>
-                    </button>
+                    </Link>
 
                     <button className="featured-btn featured-btn-secondary">
                       <AddToQueueOutlined className="featured-btn-icon" />

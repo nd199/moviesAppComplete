@@ -40,9 +40,6 @@ public class ShowService implements ShowServiceInterface {
         return saved;
     }
 
-    /**
-     * Add a show entity directly (used for TMDB sync)
-     */
     public Show addShow(Show show) {
         logger.info("Adding show from TMDB: {}", show.getName());
         if (showRepository.existsByName(show.getName())) {

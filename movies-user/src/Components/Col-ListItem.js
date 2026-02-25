@@ -85,7 +85,8 @@ const ColListItem = ({
         {isHovered && (
           <div className="col-card-actions">
             <Link 
-              to={`/video/:id}`}
+              to={`/video/${name || 'unknown'}`}
+              state={{ trailer: trailer }}
               className="col-card-action"
               onClick={(e) => {
                 e.stopPropagation();

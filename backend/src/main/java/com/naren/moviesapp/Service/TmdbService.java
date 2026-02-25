@@ -37,9 +37,6 @@ public class TmdbService {
         this.webClient = WebClient.builder().baseUrl(baseUrl).defaultHeader("Authorization", "Bearer " + apiKey).build();
     }
 
-    /**
-     * Search for movies by query
-     */
     public Optional<TmdbSearchResponse<TmdbMovieDto>> searchMovies(String query, int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -56,9 +53,6 @@ public class TmdbService {
         }
     }
 
-    /**
-     * Search for TV shows by query
-     */
     public Optional<TmdbSearchResponse<TmdbTvShowDto>> searchTvShows(String query, int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -75,9 +69,6 @@ public class TmdbService {
         }
     }
 
-    /**
-     * Get movie details by TMDB ID
-     */
     public Optional<TmdbMovieDto> getMovieDetails(Long tmdbId) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -94,9 +85,6 @@ public class TmdbService {
         }
     }
 
-    /**
-     * Get TV show details by TMDB ID
-     */
     public Optional<TmdbTvShowDto> getTvShowDetails(Long tmdbId) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -125,6 +113,108 @@ public class TmdbService {
             return Optional.of(convertToMovieSearchResponse(response));
         } catch (WebClientResponseException e) {
             logger.error("Error getting trending movies: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<TmdbSearchResponse<TmdbMovieDto>> getTopRatedMovies(int page) {
+        if (apiKey == null || apiKey.isBlank()) {
+            logger.warn("TMDB API key not configured");
+            return Optional.empty();
+        }
+
+        try {
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/movie/top_rated").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+
+            return Optional.of(convertToMovieSearchResponse(response));
+        } catch (WebClientResponseException e) {
+            logger.error("Error getting top rated movies: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<TmdbSearchResponse<TmdbMovieDto>> getNowPlayingMovies(int page) {
+        if (apiKey == null || apiKey.isBlank()) {
+            logger.warn("TMDB API key not configured");
+            return Optional.empty();
+        }
+
+        try {
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/movie/now_playing").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+
+            return Optional.of(convertToMovieSearchResponse(response));
+        } catch (WebClientResponseException e) {
+            logger.error("Error getting now playing movies: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<TmdbSearchResponse<TmdbMovieDto>> getUpcomingMovies(int page) {
+        if (apiKey == null || apiKey.isBlank()) {
+            logger.warn("TMDB API key not configured");
+            return Optional.empty();
+        }
+
+        try {
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/movie/upcoming").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+
+            return Optional.of(convertToMovieSearchResponse(response));
+        } catch (WebClientResponseException e) {
+            logger.error("Error getting upcoming movies: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<TmdbSearchResponse<TmdbTvShowDto>> getPopularTvShows(int page) {
+        if (apiKey == null || apiKey.isBlank()) {
+            logger.warn("TMDB API key not configured");
+            return Optional.empty();
+        }
+
+        try {
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/tv/popular").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+
+            return Optional.of(convertToTvShowSearchResponse(response));
+        } catch (WebClientResponseException e) {
+            logger.error("Error getting popular TV shows: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<TmdbSearchResponse<TmdbTvShowDto>> getTopRatedTvShows(int page) {
+        if (apiKey == null || apiKey.isBlank()) {
+            logger.warn("TMDB API key not configured");
+            return Optional.empty();
+        }
+
+        try {
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/tv/top_rated").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+
+            return Optional.of(convertToTvShowSearchResponse(response));
+        } catch (WebClientResponseException e) {
+            logger.error("Error getting top rated TV shows: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<TmdbSearchResponse<TmdbMovieDto>> getSouthIndianMovies(int page) {
+        if (apiKey == null || apiKey.isBlank()) {
+            logger.warn("TMDB API key not configured");
+            return Optional.empty();
+        }
+
+        try {
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> {
+                var builder = uriBuilder.path("/discover/movie")
+                    .queryParam("page", page)
+                    .queryParam("with_original_language", "te") // Telugu
+                    .queryParam("sort_by", "popularity.desc");
+                return builder.build();
+            }).retrieve().bodyToMono(Map.class).block();
+
+            return Optional.of(convertToMovieSearchResponse(response));
+        } catch (WebClientResponseException e) {
+            logger.error("Error getting South Indian movies: {}", e.getMessage());
             return Optional.empty();
         }
     }

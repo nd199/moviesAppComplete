@@ -35,9 +35,6 @@ public class TmdbController {
         this.showService = showService;
     }
 
-    /**
-     * Check TMDB configuration status
-     */
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> getStatus() {
         logger.debug("Checking TMDB configuration status");
@@ -47,9 +44,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Search movies from TMDB
-     */
     @GetMapping("/search/movies")
     public ResponseEntity<?> searchMovies(
             @RequestParam String query,
@@ -96,9 +90,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Search TV shows from TMDB
-     */
     @GetMapping("/search/shows")
     public ResponseEntity<?> searchTvShows(
             @RequestParam String query,
@@ -144,9 +135,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Get trending movies from TMDB
-     */
     @GetMapping("/trending/movies")
     public ResponseEntity<?> getTrendingMovies(
             @RequestParam(defaultValue = "1") int page) {
@@ -185,9 +173,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Get trending TV shows from TMDB
-     */
     @GetMapping("/trending/shows")
     public ResponseEntity<?> getTrendingTvShows(
             @RequestParam(defaultValue = "1") int page) {
@@ -226,9 +211,44 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Discover movies from TMDB with optional filters
-     */
+    @GetMapping("/top-rated/movies")
+    public ResponseEntity<?> getTopRatedMovies(
+            @RequestParam(defaultValue = "1") int page) {
+        
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "TMDB API key not configured"
+            ));
+        }
+        
+        var response = tmdbService.getTopRatedMovies(page);
+        
+        if (response.isEmpty()) {
+            return ResponseEntity.ok(Map.of(
+                    "results", List.of(),
+                    "page", page,
+                    "totalPages", 0,
+                    "totalResults", 0
+            ));
+        }
+        
+        TmdbSearchResponse<TmdbMovieDto> searchResponse = response.get();
+        List<TmdbConvertedDto> results = new ArrayList<>();
+        
+        if (searchResponse.getResults() != null) {
+            for (TmdbMovieDto movie : searchResponse.getResults()) {
+                results.add(TmdbConvertedDto.fromMovie(movie, tmdbService));
+            }
+        }
+        
+        return ResponseEntity.ok(Map.of(
+                "results", results,
+                "page", searchResponse.getPage() != null ? searchResponse.getPage() : page,
+                "totalPages", searchResponse.getTotalPages() != null ? searchResponse.getTotalPages() : 0,
+                "totalResults", searchResponse.getTotalResults() != null ? searchResponse.getTotalResults() : 0
+        ));
+    }
+
     @GetMapping("/discover/movies")
     public ResponseEntity<?> discoverMovies(
             @RequestParam(required = false) String sortBy,
@@ -270,9 +290,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Discover TV shows from TMDB with optional filters
-     */
     @GetMapping("/discover/shows")
     public ResponseEntity<?> discoverTvShows(
             @RequestParam(required = false) String sortBy,
@@ -315,8 +332,210 @@ public class TmdbController {
     }
 
     /**
-     * Get movie details from TMDB by ID
+     * Get now playing movies from TMDB
      */
+    @GetMapping("/now-playing/movies")
+    public ResponseEntity<?> getNowPlayingMovies(
+            @RequestParam(defaultValue = "1") int page) {
+        
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "TMDB API key not configured"
+            ));
+        }
+        
+        var response = tmdbService.getNowPlayingMovies(page);
+        
+        if (response.isEmpty()) {
+            return ResponseEntity.ok(Map.of(
+                    "results", List.of(),
+                    "page", page,
+                    "totalPages", 0,
+                    "totalResults", 0
+            ));
+        }
+        
+        TmdbSearchResponse<TmdbMovieDto> searchResponse = response.get();
+        List<TmdbConvertedDto> results = new ArrayList<>();
+        
+        if (searchResponse.getResults() != null) {
+            for (TmdbMovieDto movie : searchResponse.getResults()) {
+                results.add(TmdbConvertedDto.fromMovie(movie, tmdbService));
+            }
+        }
+        
+        return ResponseEntity.ok(Map.of(
+                "results", results,
+                "page", searchResponse.getPage() != null ? searchResponse.getPage() : page,
+                "totalPages", searchResponse.getTotalPages() != null ? searchResponse.getTotalPages() : 0,
+                "totalResults", searchResponse.getTotalResults() != null ? searchResponse.getTotalResults() : 0
+        ));
+    }
+
+    /**
+     * Get upcoming movies from TMDB
+     */
+    @GetMapping("/upcoming/movies")
+    public ResponseEntity<?> getUpcomingMovies(
+            @RequestParam(defaultValue = "1") int page) {
+        
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "TMDB API key not configured"
+            ));
+        }
+        
+        var response = tmdbService.getUpcomingMovies(page);
+        
+        if (response.isEmpty()) {
+            return ResponseEntity.ok(Map.of(
+                    "results", List.of(),
+                    "page", page,
+                    "totalPages", 0,
+                    "totalResults", 0
+            ));
+        }
+        
+        TmdbSearchResponse<TmdbMovieDto> searchResponse = response.get();
+        List<TmdbConvertedDto> results = new ArrayList<>();
+        
+        if (searchResponse.getResults() != null) {
+            for (TmdbMovieDto movie : searchResponse.getResults()) {
+                results.add(TmdbConvertedDto.fromMovie(movie, tmdbService));
+            }
+        }
+        
+        return ResponseEntity.ok(Map.of(
+                "results", results,
+                "page", searchResponse.getPage() != null ? searchResponse.getPage() : page,
+                "totalPages", searchResponse.getTotalPages() != null ? searchResponse.getTotalPages() : 0,
+                "totalResults", searchResponse.getTotalResults() != null ? searchResponse.getTotalResults() : 0
+        ));
+    }
+
+    /**
+     * Get popular TV shows from TMDB
+     */
+    @GetMapping("/popular/shows")
+    public ResponseEntity<?> getPopularTvShows(
+            @RequestParam(defaultValue = "1") int page) {
+        
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "TMDB API key not configured"
+            ));
+        }
+        
+        var response = tmdbService.getPopularTvShows(page);
+        
+        if (response.isEmpty()) {
+            return ResponseEntity.ok(Map.of(
+                    "results", List.of(),
+                    "page", page,
+                    "totalPages", 0,
+                    "totalResults", 0
+            ));
+        }
+        
+        TmdbSearchResponse<TmdbTvShowDto> searchResponse = response.get();
+        List<TmdbConvertedDto> results = new ArrayList<>();
+        
+        if (searchResponse.getResults() != null) {
+            for (TmdbTvShowDto show : searchResponse.getResults()) {
+                results.add(TmdbConvertedDto.fromTvShow(show, tmdbService));
+            }
+        }
+        
+        return ResponseEntity.ok(Map.of(
+                "results", results,
+                "page", searchResponse.getPage() != null ? searchResponse.getPage() : page,
+                "totalPages", searchResponse.getTotalPages() != null ? searchResponse.getTotalPages() : 0,
+                "totalResults", searchResponse.getTotalResults() != null ? searchResponse.getTotalResults() : 0
+        ));
+    }
+
+    /**
+     * Get top rated TV shows from TMDB
+     */
+    @GetMapping("/top-rated/shows")
+    public ResponseEntity<?> getTopRatedTvShows(
+            @RequestParam(defaultValue = "1") int page) {
+        
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "TMDB API key not configured"
+            ));
+        }
+        
+        var response = tmdbService.getTopRatedTvShows(page);
+        
+        if (response.isEmpty()) {
+            return ResponseEntity.ok(Map.of(
+                    "results", List.of(),
+                    "page", page,
+                    "totalPages", 0,
+                    "totalResults", 0
+            ));
+        }
+        
+        TmdbSearchResponse<TmdbTvShowDto> searchResponse = response.get();
+        List<TmdbConvertedDto> results = new ArrayList<>();
+        
+        if (searchResponse.getResults() != null) {
+            for (TmdbTvShowDto show : searchResponse.getResults()) {
+                results.add(TmdbConvertedDto.fromTvShow(show, tmdbService));
+            }
+        }
+        
+        return ResponseEntity.ok(Map.of(
+                "results", results,
+                "page", searchResponse.getPage() != null ? searchResponse.getPage() : page,
+                "totalPages", searchResponse.getTotalPages() != null ? searchResponse.getTotalPages() : 0,
+                "totalResults", searchResponse.getTotalResults() != null ? searchResponse.getTotalResults() : 0
+        ));
+    }
+
+    /**
+     * Get South Indian movies from TMDB
+     */
+    @GetMapping("/south-indian/movies")
+    public ResponseEntity<?> getSouthIndianMovies(
+            @RequestParam(defaultValue = "1") int page) {
+        
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "TMDB API key not configured"
+            ));
+        }
+        
+        var response = tmdbService.getSouthIndianMovies(page);
+        
+        if (response.isEmpty()) {
+            return ResponseEntity.ok(Map.of(
+                    "results", List.of(),
+                    "page", page,
+                    "totalPages", 0,
+                    "totalResults", 0
+            ));
+        }
+        
+        TmdbSearchResponse<TmdbMovieDto> searchResponse = response.get();
+        List<TmdbConvertedDto> results = new ArrayList<>();
+        
+        if (searchResponse.getResults() != null) {
+            for (TmdbMovieDto movie : searchResponse.getResults()) {
+                results.add(TmdbConvertedDto.fromMovie(movie, tmdbService));
+            }
+        }
+        
+        return ResponseEntity.ok(Map.of(
+                "results", results,
+                "page", searchResponse.getPage() != null ? searchResponse.getPage() : page,
+                "totalPages", searchResponse.getTotalPages() != null ? searchResponse.getTotalPages() : 0,
+                "totalResults", searchResponse.getTotalResults() != null ? searchResponse.getTotalResults() : 0
+        ));
+    }
+
     @GetMapping("/movie/{tmdbId}")
     public ResponseEntity<?> getMovieDetails(@PathVariable Long tmdbId) {
         
@@ -336,9 +555,6 @@ public class TmdbController {
         return ResponseEntity.ok(result);
     }
 
-    /**
-     * Get TV show details from TMDB by ID
-     */
     @GetMapping("/tv/{tmdbId}")
     public ResponseEntity<?> getTvShowDetails(@PathVariable Long tmdbId) {
         
@@ -358,10 +574,6 @@ public class TmdbController {
         return ResponseEntity.ok(result);
     }
 
-    /**
-     * Get featured content for home page from TMDB
-     * Returns trending movies and TV shows with category set to "Featured"
-     */
     @GetMapping("/featured")
     public ResponseEntity<?> getFeaturedContent(
             @RequestParam(defaultValue = "1") int page) {
@@ -406,9 +618,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Sync movie from TMDB to local database
-     */
     @PostMapping("/sync/movie/{tmdbId}")
     public ResponseEntity<?> syncMovie(@PathVariable Long tmdbId) {
         
@@ -479,9 +688,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Sync TV show from TMDB to local database
-     */
     @PostMapping("/sync/tv/{tmdbId}")
     public ResponseEntity<?> syncTvShow(@PathVariable Long tmdbId) {
         
@@ -557,9 +763,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Get videos (trailers, teasers) for a movie by TMDB ID
-     */
     @GetMapping("/movie/{tmdbId}/videos")
     public ResponseEntity<?> getMovieVideos(@PathVariable Long tmdbId) {
         
@@ -583,9 +786,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Get videos (trailers, teasers) for a TV show by TMDB ID
-     */
     @GetMapping("/show/{tmdbId}/videos")
     public ResponseEntity<?> getTvShowVideos(@PathVariable Long tmdbId) {
         

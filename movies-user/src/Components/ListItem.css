@@ -86,10 +86,6 @@
   padding: 0 14px;
 }
 
-.li-card-actions:first-child {
-  translation: translateY(90px);
-}
-
 .li-card-btn {
   width: 32px;
   height: 32px;
@@ -103,6 +99,11 @@
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
+  vertical-align: middle;
+}
+
+.li-card-btn:first-child {
+  transform: translateY(5px);
 }
 
 .li-card-btn:hover {

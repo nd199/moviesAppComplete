@@ -2,6 +2,7 @@ package com.naren.moviesapp;
 
 import com.github.javafaker.Faker;
 import com.naren.moviesapp.Config.SuperAdminSeeder;
+import com.naren.moviesapp.Config.DemoUserSeeder;
 import com.naren.moviesapp.Entity.*;
 import com.naren.moviesapp.Repo.*;
 import org.springframework.boot.CommandLineRunner;
@@ -34,19 +35,14 @@ public class MoviesApplication {
                                                RoleRepository roleRepository,
                                                ShowRepository showRepository,
                                                SubscriptionPlanRepository subscriptionPlanRepository,
-                                               SuperAdminSeeder superAdminSeeder) {
+                                               SuperAdminSeeder superAdminSeeder,
+                                               DemoUserSeeder demoUserSeeder) {
         return args -> {
-            int i = 4;
-            while (i != 0) {
-                createRandomCustomer(customerRepository, encoder);
-                createRandomMovie(movieRepository);
-                createRandomShow(showRepository);
-                i--;
-            }
             createDefaultPlans(subscriptionPlanRepository);
             createRole(roleRepository);
 
             superAdminSeeder.seedSuperAdmin();
+            demoUserSeeder.seedDemoUser();
         };
     }
 

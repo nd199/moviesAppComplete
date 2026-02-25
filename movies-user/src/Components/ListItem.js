@@ -38,7 +38,8 @@ const ListItem = ({
 
             <div className="li-card-actions">
               <Link 
-                to={`/video/:id}`}
+                to={`/video/${name || 'unknown'}`}
+                state={{ trailer: trailer }}
                 className="li-card-btn"
               >
                 <PlayArrow fontSize="small" />

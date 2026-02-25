@@ -267,6 +267,7 @@
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>3.3.2</version>
+
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -277,14 +278,8 @@
                 </executions>
                 <configuration>
                     <from>
-                        <image>
-                            eclipse-temurin:17@sha256:49f9bff5392fcf25f2d5268858258f1ba36b9f127ab6fe418bb68baf9a9af945
-                        </image>
+                        <image>eclipse-temurin:17-jre-jammy</image>
                         <platforms>
-                            <platform>
-                                <architecture>arm64</architecture>
-                                <os>linux</os>
-                            </platform>
                             <platform>
                                 <architecture>amd64</architecture>
                                 <os>linux</os>
@@ -292,13 +287,19 @@
                         </platforms>
                     </from>
                     <to>
-                        <image>
-                            docker.io/codenaren23/movieticket-api
-                        </image>
+                        <image>docker.io/codenaren23/movieticket-api</image>
                         <tags>
                             <tag>latest</tag>
                         </tags>
                     </to>
+                    <container>
+                        <jvmFlags>
+                            <jvmFlag>-XX:+UseSerialGC</jvmFlag>
+                            <jvmFlag>-XX:TieredStopAtLevel=1</jvmFlag>
+                            <jvmFlag>-Xms128m</jvmFlag>
+                            <jvmFlag>-Xmx256m</jvmFlag>
+                        </jvmFlags>
+                    </container>
                 </configuration>
             </plugin>
             <plugin>
