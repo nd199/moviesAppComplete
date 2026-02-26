@@ -12,7 +12,6 @@ const Success = () => {
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.user.currentUser);
   const paymentData = location.state?.paymentData;
-  const userData = location.state?.user;
   const [countdown, setCountdown] = useState(5);
   const [updated, setUpdated] = useState(false);
 

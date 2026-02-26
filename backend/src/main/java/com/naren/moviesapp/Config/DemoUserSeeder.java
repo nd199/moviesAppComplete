@@ -62,11 +62,11 @@ public class DemoUserSeeder {
             customerRepository.save(demoUser);
             log.info("Created demo user: {} with phone: {}", demoEmail, phoneNumber);
         } else {
-            // Update existing demo user to ensure it's properly configured
             existingDemoUser.setIsEmailVerified(true);
             existingDemoUser.setIsRegistered(true);
             existingDemoUser.setIsSubscribed(true);
             existingDemoUser.setIsActive(true);
+            existingDemoUser.setPassword(passwordEncoder.encode(demoPassword));
             
             boolean hasUserRole = existingDemoUser.getRoles().stream()
                     .anyMatch(role -> role.getName() == RoleName.ROLE_USER);
@@ -76,7 +76,7 @@ public class DemoUserSeeder {
             }
             
             customerRepository.save(existingDemoUser);
-            log.info("Updated demo user: {} with verified email and active status", demoEmail);
+            log.info("Updated demo user: {} with new password and verified email/active status", demoEmail);
         }
     }
     

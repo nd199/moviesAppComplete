@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import './FilterNavbar.css';
 
 const FilterNavbar = ({

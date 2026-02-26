@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import './FallbackCheck.css';
 import Lottie from 'react-lottie';
 import { CheckOption } from './AnimationData';
@@ -10,12 +10,12 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
   const [elapsed, setElapsed] = useState(0);
   const [statusIndex, setStatusIndex] = useState(0);
 
-  const statusMessages = [
+  const statusMessages = useMemo(() => [
     'Initializing container...',
     'Booting Spring context...',
     'Establishing database connection...',
     'Finalizing startup sequence...'
-  ];
+  ], []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -31,7 +31,7 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
     }, 3000);
 
     return () => clearInterval(statusTimer);
-  }, []);
+  }, [statusMessages]);
 
   return (
     <div className="fallback-container">

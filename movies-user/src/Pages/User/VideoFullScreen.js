@@ -1,4 +1,4 @@
-import { Home, ArrowBack } from "@mui/icons-material";
+import { ArrowBack } from "@mui/icons-material";
 import { Link, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { fetchTmdbMovieDetails } from "../../Network/ApiCalls";

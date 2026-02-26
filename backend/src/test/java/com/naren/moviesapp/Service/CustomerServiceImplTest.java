@@ -200,7 +200,7 @@ class CustomerServiceImplTest {
         String email = "test@example.com";
         when(customerRepository.existsByEmail(email)).thenReturn(true);
 
-        CustomerRegistration registration = new CustomerRegistration("testName", email, "testpassword", "20220292232", "", false, "Chennai, India", false);
+        CustomerRegistration registration = new CustomerRegistration("John Doe", email, "SecurePass123!", "20220292232", "", false, "Chennai, India", false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
                 .isInstanceOf(ResourceAlreadyExists.class)
@@ -213,8 +213,8 @@ class CustomerServiceImplTest {
     void registerCustomerPhoneNumberAlreadyExistsThrowsResourceAlreadyExistsException() {
 
         CustomerRegistration registration =
-                new CustomerRegistration("testName", "test@example.com",
-                        "testPassword", "1234567890", "", false, "Chennai, India", false);
+                new CustomerRegistration("Jane Smith", "test@example.com",
+                        "MySecure@Pass123", "1234567890", "", false, "Chennai, India", false);
         when(customerRepository.existsByPhoneNumber(registration.phoneNumber())).thenReturn(true);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))

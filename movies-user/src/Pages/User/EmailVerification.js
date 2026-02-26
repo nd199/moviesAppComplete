@@ -55,7 +55,7 @@ const EmailVerification = () => {
       }
     }, 1500);
 
-}, [isVerified, plan, navigate, currentUser?.id, currentUser?.email, email, location.state?.plan, selectedPlan?.selectedPlan]);
+}, [isVerified, plan, navigate, currentUser?.id, currentUser?.email, email, location.state?.plan, selectedPlan?.selectedPlan, selectedPlan]);
 
   return (
     <div className="email-verification-page">

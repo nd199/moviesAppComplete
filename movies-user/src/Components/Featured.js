@@ -22,7 +22,7 @@ const Featured = ({ loading = false }) => {
       setIsLoading(true);
       try {
         // Fetch both Hollywood trending and South Indian movies
-        const [hollywoodResponse, southIndianResponse] = await Promise.all([
+        const [southIndianResponse, hollywoodResponse] = await Promise.all([
           publicRequest().get('/tmdb/trending/movies'),
           fetchTmdbSouthIndianMovies()
         ]);
@@ -35,8 +35,8 @@ const Featured = ({ loading = false }) => {
         
         // Mix: 3 Hollywood + 3 South Indian movies
         const selectedMovies = [
+          ...southIndianMovies.slice(0, 3),
           ...hollywoodMovies.slice(0, 3),
-          ...southIndianMovies.slice(0, 3)
         ];
         
         // Get videos for all selected movies

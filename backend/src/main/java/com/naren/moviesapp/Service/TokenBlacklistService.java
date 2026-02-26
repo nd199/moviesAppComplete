@@ -23,7 +23,9 @@ public class TokenBlacklistService {
             String jti = extractJtiFromToken(token);
             if (jti != null) {
                 long ttl = calculateTTL(expirationTime);
-                redisTemplate.opsForValue().set(BLACKLIST_PREFIX + jti, "true", ttl, TimeUnit.MINUTES);
+                redisTemplate.opsForValue().set(
+                        BLACKLIST_PREFIX + jti, "true",
+                        ttl, TimeUnit.MINUTES);
                 logger.info("Token {} blacklisted successfully", jti);
             }
         } catch (Exception e) {
@@ -39,7 +41,7 @@ public class TokenBlacklistService {
         try {
             String jti = extractJtiFromToken(token);
             if (jti != null) {
-                return Boolean.TRUE.equals(redisTemplate.hasKey(BLACKLIST_PREFIX + jti));
+                return redisTemplate.hasKey(BLACKLIST_PREFIX + jti);
             }
         } catch (Exception e) {
             logger.error("Failed to check blacklist status: {}", e.getMessage());

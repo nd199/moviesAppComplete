@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Configuration
-@Profile({"dev", "default"})
+@Profile({"prod", "production"})
 @RequiredArgsConstructor
 @Slf4j
 public class TmdbDataSeeder {
@@ -24,8 +24,6 @@ public class TmdbDataSeeder {
     private final TmdbService tmdbService;
     private final MovieRepository movieRepository;
     private final ShowRepository showRepository;
-
-    // Number of movies/shows to import from TMDB
     private static final int MOVIES_TO_IMPORT = 20;
     private static final int SHOWS_TO_IMPORT = 20;
 

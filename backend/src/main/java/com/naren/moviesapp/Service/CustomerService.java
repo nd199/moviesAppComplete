@@ -160,13 +160,40 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     private boolean containsPersonalInfo(String password, String name, String email, String phoneNumber) {
-
-        if (password.contains(name) ||
-                password.contains(email) ||
-                password.contains(phoneNumber)) {
-            throw new PasswordInvalidException("Password must " +
-                    "not contain personal info [Name,Email,Phone] ");
+      String passwordLower = password.toLowerCase();
+        
+        // Check name parts (3+ characters)
+        if (name != null) {
+            String[] nameParts = name.toLowerCase().split(" ");
+            for (String part : nameParts) {
+                if (part.length() >= 3 && passwordLower.contains(part)) {
+                    throw new PasswordInvalidException("Password must " +
+                            "not contain personal info [Name,Email,Phone] ");
+                }
+            }
         }
+        
+        // Check email local part (before @)
+        if (email != null) {
+            String emailLocal = email.toLowerCase().split("@")[0];
+            if (emailLocal.length() >= 3 && passwordLower.contains(emailLocal)) {
+                throw new PasswordInvalidException("Password must " +
+                        "not contain personal info [Name,Email,Phone] ");
+            }
+        }
+        
+        // Check phone number sequences (4+ digits to be less strict)
+        if (phoneNumber != null) {
+            String phoneDigits = phoneNumber.replaceAll("\\D", "");
+            for (int i = 0; i <= phoneDigits.length() - 4; i++) {
+                String sequence = phoneDigits.substring(i, i + 4);
+                if (password.contains(sequence)) {
+                    throw new PasswordInvalidException("Password must " +
+                            "not contain personal info [Name,Email,Phone] ");
+                }
+            }
+        }
+        
         return false;
     }
 
@@ -260,6 +287,43 @@ public class CustomerService implements CustomerServiceInterface {
             throw new PasswordInvalidException("Invalid password");
         }
         customer.setPassword(encodedNewPassword);
+        customerRepository.save(customer);
+
+        logger.info("Password successfully updated for email: {}", email);
+    }
+
+    @Transactional
+    public void updatePasswordWithValidation(String email, String currentPassword, String newPassword) {
+        logger.info("Password update request with current password validation for email: {}", email);
+
+        Customer customer = customerRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    logger.warn("Password update failed - user not found: {}", email);
+                    return new ResourceNotFoundException("Customer with email "
+                            + email + " not found");
+                });
+
+        // Verify current password
+        if (!passwordEncoder.matches(currentPassword, customer.getPassword())) {
+            logger.warn("Password update failed - current password incorrect for email: {}", email);
+            throw new PasswordInvalidException("Current password is incorrect");
+        }
+
+        // Check if new password is same as current
+        if (passwordEncoder.matches(newPassword, customer.getPassword())) {
+            logger.warn("Password update failed - new password same as current for email: {}", email);
+            throw new PasswordInvalidException("New password cannot be the same as your current password");
+        }
+
+        // Validate new password strength
+        var passwordIsValid = validatePassword(newPassword, customer.getName(), customer.getEmail(), customer.getPhoneNumber());
+        if (!passwordIsValid) {
+            logger.warn("Password update failed - validation error for email: {}", email);
+            throw new PasswordInvalidException("Invalid password. Password must be at least 8 characters long and contain uppercase, lowercase, digit, and special character.");
+        }
+
+        // Update password
+        customer.setPassword(passwordEncoder.encode(newPassword));
         customerRepository.save(customer);
 
         logger.info("Password successfully updated for email: {}", email);

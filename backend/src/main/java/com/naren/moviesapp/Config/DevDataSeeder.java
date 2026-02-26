@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,9 +62,6 @@ public class DevDataSeeder {
     private final MovieRepository movieRepository;
     private final ShowRepository showRepository;
     private final PasswordEncoder passwordEncoder;
-    
-    @Value("${app.tmdb.api-key:}")
-    private String tmdbApiKey;
 
     @Bean
     @Transactional
@@ -80,17 +76,11 @@ public class DevDataSeeder {
                 createRandomCustomer();
             }
             
-            // Only create fake movies/shows if TMDB is not configured
-            // If TMDB is configured, TmdbDataSeeder will import real data
-            boolean tmdbConfigured = tmdbApiKey != null && !tmdbApiKey.isBlank();
-            if (!tmdbConfigured) {
-                log.info("TMDB not configured. Creating fake movies and shows...");
-                for (int i = 0; i < DEMO_DATA_COUNT; i++) {
-                    createRandomMovie();
-                    createRandomShow();
-                }
-            } else {
-                log.info("TMDB is configured. Skipping fake movie/show creation. Real data will be imported by TmdbDataSeeder.");
+            // Always create fake movies/shows for development
+            log.info("Creating fake movies and shows for development environment...");
+            for (int i = 0; i < DEMO_DATA_COUNT; i++) {
+                createRandomMovie();
+                createRandomShow();
             }
 
             log.info("Development data seeding completed.");

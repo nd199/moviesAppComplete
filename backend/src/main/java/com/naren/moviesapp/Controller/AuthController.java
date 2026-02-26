@@ -79,7 +79,7 @@ public class AuthController {
         // Return user data with token as fallback for cookie issues
         Map<String, Object> responseBody = new java.util.HashMap<>();
         responseBody.put("user", authResponse.customerDTO());
-        responseBody.put("token", authResponse.token()); // Fallback token
+        responseBody.put("token", authResponse.token());
         
         return ResponseEntity.ok(responseBody);
     }
@@ -163,7 +163,7 @@ public class AuthController {
                             String refreshToken) {
 
         boolean isProduction = activeProfile.equals("prod");
-        String domain = isProduction ? null : null;
+        String domain = null;
         
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
                 .httpOnly(true)
@@ -185,8 +185,8 @@ public class AuthController {
 
         logger.info("Setting auth cookies - Production: {}, Domain: {}, SameSite: {}", 
             isProduction, domain, isProduction ? "None" : "Lax");
-        logger.debug("JWT Cookie: {}", jwtCookie.toString());
-        logger.debug("Refresh Cookie: {}", refreshCookie.toString());
+        logger.debug("JWT Cookie: {}", jwtCookie);
+        logger.debug("Refresh Cookie: {}", refreshCookie);
 
         response.addHeader("Set-Cookie", jwtCookie.toString());
         response.addHeader("Set-Cookie", refreshCookie.toString());
@@ -195,7 +195,7 @@ public class AuthController {
     private void clearCookies(HttpServletResponse response) {
         boolean isProduction = activeProfile.equals("prod");
 
-        String domain = isProduction ? null : null; // Let browser handle domain automatically
+        String domain = null;
 
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", "")
                 .httpOnly(true)

@@ -174,12 +174,58 @@ export const validateOtp = async (dispatch, validateInfo) => {
 export const updateProfile = async (dispatch, userUpdateInfo, id) => {
   dispatch(updateUserStart());
   try {
-    const res = await publicRequest().put(`/profile/${id}`, userUpdateInfo);
+    // Use authenticated userRequest instead of publicRequest for profile updates
+    const res = await userRequest().put(`/profile/current`, userUpdateInfo);
     dispatch(updateUserSuccess(res.data));
     return { success: true, data: res.data };
   } catch (error) {
     const message = error.response?.data?.message || 'Profile update failed';
     dispatch(updateUserFailure({ message }));
+    return { success: false, error: message };
+  }
+};
+
+export const updateProfileById = async (dispatch, userUpdateInfo, id) => {
+  dispatch(updateUserStart());
+  try {
+    // Use authenticated userRequest for profile updates by ID
+    const res = await userRequest().put(`/profile/${id}`, userUpdateInfo);
+    dispatch(updateUserSuccess(res.data));
+    return { success: true, data: res.data };
+  } catch (error) {
+    const message = error.response?.data?.message || 'Profile update failed';
+    dispatch(updateUserFailure({ message }));
+    return { success: false, error: message };
+  }
+};
+
+export const getCurrentUserProfile = async dispatch => {
+  dispatch(fetchCurrentStart());
+  try {
+    const res = await userRequest().get(`/profile/current`, {
+      withCredentials: true
+    });
+    dispatch(fetchCurrentSuccess(res.data));
+    return res.data;
+  } catch (error) {
+    const message = error.response?.data?.message || 'Failed to fetch user profile';
+    
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.warn('Auth error - setting user as unauthenticated');
+      dispatch(fetchCurrentFailure({ message }));
+      return;
+    }
+    
+    dispatch(fetchCurrentFailure({ message }));
+  }
+};
+
+export const changePassword = async (dispatch, passwordData) => {
+  try {
+    const res = await userRequest().put('/profile/current/password', passwordData);
+    return { success: true, data: res.data };
+  } catch (error) {
+    const message = error.response?.data?.message || 'Password change failed';
     return { success: false, error: message };
   }
 };
