@@ -36,7 +36,7 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
     if (!isValidEmail(email)) return;
     setIsSending(true);
     try {
-      await verifyEmail(dispatch, { email });
+      await verifyEmail(dispatch, { email: email });
       setShowOtpInput(true);
       setOtpTimer(60);
       setOtpMessage('');
@@ -130,7 +130,7 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
             disabled={!isValidOtp(otp) || isVerifying}>
             <Send />
           </button>
-          <p>{otpTimer}s</p>
+          <p>{Math.floor(otpTimer / 60)}:{(otpTimer % 60).toString().padStart(2, '0')}</p>
         </div>
       )}
 

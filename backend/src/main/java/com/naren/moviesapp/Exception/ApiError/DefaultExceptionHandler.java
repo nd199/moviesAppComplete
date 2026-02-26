@@ -246,6 +246,12 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGenericException(Exception e,
                                                            HttpServletRequest request) {
+        logger.error("=== GENERIC EXCEPTION CAUGHT ===");
+        logger.error("Request URI: {}", request.getRequestURI());
+        logger.error("Exception type: {}", e.getClass().getSimpleName());
+        logger.error("Exception message: {}", e.getMessage());
+        logger.error("Full stack trace:", e);
+        
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 "Something went wrong on our side. Please try again later.",

@@ -18,7 +18,7 @@ const EmailSubscriptionVerify = ({
   const [mailOtp, setMailOTP] = useState('');
   const [showEmailOtp, setShowEmailOtp] = useState(false);
   const [otpMessage, setOtpMessage] = useState('');
-  const [otpTimer, setOtpTimer] = useState();
+  const [otpTimer, setOtpTimer] = useState(0);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [placeholder, setPlaceHolder] = useState('Cena@gmail.com');
@@ -47,6 +47,9 @@ const EmailSubscriptionVerify = ({
       timer = setInterval(() => {
         setOtpTimer(prev => prev - 1);
       }, 1000);
+    } else if (otpTimer === 0) {
+      // Auto-reset when timer reaches 0
+      setOtpTimer(0);
     }
     return () => clearInterval(timer);
   }, [otpTimer]);
@@ -66,7 +69,7 @@ const EmailSubscriptionVerify = ({
     try {
       setEmShowVerify(false);
       setShowEmailOtp(true);
-      const res = await verifyEmail(dispatch, { email });
+      const res = await verifyEmail(dispatch, { email: email });
       setOtpMessage(res);
       setOtpTimer(60);
     } catch (error) {
@@ -231,8 +234,8 @@ const EmailSubscriptionVerify = ({
                         <Send className="send-icon" />
                       </button>
                       <span>
-                        OTP Expires in <span className="timer">{otpTimer}</span>{' '}
-                        seconds
+                        OTP Expires in <span className="timer">{Math.floor(otpTimer / 60)}:{(otpTimer % 60).toString().padStart(2, '0')}</span>{' '}
+                        minutes
                       </span>
                     </div>
                   )}

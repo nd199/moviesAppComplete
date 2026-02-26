@@ -42,20 +42,24 @@ public class BrevoEmailService implements EmailService {
 
     @Override
     public void sendOTPEmail(String toEmail, String otp) {
+        logger.info("=== BREVO EMAIL SERVICE CALLED ===");
         logger.info("Starting OTP email sending process to: {}", toEmail);
         
         try {
             // Check configuration
+            logger.info("Checking Brevo configuration...");
             if (brevoApiKey == null || brevoApiKey.trim().isEmpty()) {
+                logger.error("=== BREVO API KEY MISSING ===");
                 logger.error("Brevo API key is null or empty");
                 throw new EmailSendingException("Brevo API key is not configured");
             }
             if (senderEmail == null || senderEmail.trim().isEmpty()) {
+                logger.error("=== BREVO SENDER EMAIL MISSING ===");
                 logger.error("Brevo sender email is null or empty");
                 throw new EmailSendingException("Brevo sender email is not configured");
             }
             
-            logger.debug("Brevo API key present: {}, Sender email: {}", 
+            logger.info("Brevo configuration OK - API key present: {}, Sender email: {}", 
                 brevoApiKey != null ? "YES" : "NO", senderEmail);
             
             // Prepare HTML content from Thymeleaf template
@@ -66,15 +70,18 @@ public class BrevoEmailService implements EmailService {
             String htmlContent = templateEngine.process("otp-email", context);
             
             if (htmlContent == null || htmlContent.trim().isEmpty()) {
+                logger.error("=== TEMPLATE PROCESSING FAILED ===");
                 logger.error("Thymeleaf template processing returned null or empty content");
                 throw new EmailSendingException("Failed to process email template");
             }
             
-            logger.debug("Template processed successfully, content length: {}", htmlContent.length());
+            logger.info("Template processed successfully, content length: {}", htmlContent.length());
 
             sendViaBrevoAPI(toEmail, "Your OTP Code", htmlContent);
+            logger.info("=== BREVO EMAIL SENT SUCCESSFULLY ===");
             logger.info("OTP email sent successfully to {}", toEmail);
         } catch (Exception e) {
+            logger.error("=== BREVO EMAIL SENDING FAILED ===");
             logger.error("Failed to send OTP email to {}: {}", toEmail, e.getMessage(), e);
             throw new EmailSendingException("Failed to send OTP email to " + toEmail + ": " + e.getMessage(), e);
         }
@@ -99,14 +106,17 @@ public class BrevoEmailService implements EmailService {
 
     private void sendViaBrevoAPI(String toEmail, String subject, String htmlContent) {
         String url = "https://api.brevo.com/v3/smtp/email";
-        logger.debug("Sending email via Brevo API to: {}", toEmail);
+        logger.info("=== SENDING EMAIL VIA BREVO API ===");
+        logger.info("Sending email via Brevo API to: {}", toEmail);
 
         // Validate configuration
         if (brevoApiKey == null || brevoApiKey.trim().isEmpty()) {
+            logger.error("=== BREVO API KEY NOT CONFIGURED ===");
             logger.error("Brevo API key is not configured");
             throw new EmailSendingException("Brevo API key is not configured");
         }
         if (senderEmail == null || senderEmail.trim().isEmpty()) {
+            logger.error("=== BREVO SENDER EMAIL NOT CONFIGURED ===");
             logger.error("Brevo sender email is not configured");
             throw new EmailSendingException("Brevo sender email is not configured");
         }
@@ -115,7 +125,7 @@ public class BrevoEmailService implements EmailService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("api-key", brevoApiKey);
         
-        logger.debug("Brevo API headers configured, API key length: {}", brevoApiKey.length());
+        logger.info("Brevo API headers configured, API key length: {}", brevoApiKey.length());
 
         // Build request body safely using Maps
         Map<String, Object> body = new HashMap<>();
@@ -124,28 +134,35 @@ public class BrevoEmailService implements EmailService {
         body.put("subject", subject);
         body.put("htmlContent", htmlContent);
         
-        logger.debug("Request body built, sender: {}, recipient: {}", senderEmail, toEmail);
+        logger.info("Request body built, sender: {}, recipient: {}", senderEmail, toEmail);
+        logger.debug("Request body: {}", body);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         try {
-            logger.debug("Making POST request to Brevo API: {}", url);
+            logger.info("Making POST request to Brevo API: {}", url);
             ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+            logger.info("=== BREVO API RESPONSE RECEIVED ===");
             logger.info("Brevo API response status: {}", response.getStatusCode());
+            logger.info("Brevo API response body: {}", response.getBody());
             
             if (!response.getStatusCode().is2xxSuccessful()) {
+                logger.error("=== BREVO API RETURNED NON-2XX STATUS ===");
                 logger.error("Brevo API returned non-2xx status: {}, body: {}", 
                     response.getStatusCode(), response.getBody());
                 throw new EmailSendingException("Brevo API returned status: " + response.getStatusCode());
             }
             
         } catch (HttpClientErrorException e) {
+            logger.error("=== BREVO API HTTP ERROR ===");
             logger.error("Brevo API call failed. Status: {}, Body: {}", e.getStatusCode(), e.getResponseBodyAsString());
             throw new EmailSendingException("Brevo API error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);
         } catch (ResourceAccessException e) {
+            logger.error("=== BREVO API NETWORK ERROR ===");
             logger.error("Network error when calling Brevo API: {}", e.getMessage());
             throw new EmailSendingException("Network error when calling Brevo API: " + e.getMessage(), e);
         } catch (Exception e) {
+            logger.error("=== BREVO API UNEXPECTED ERROR ===");
             logger.error("Unexpected error while sending email via Brevo API: {}", e.getMessage(), e);
             throw new EmailSendingException("Unexpected error while sending email via Brevo API: " + e.getMessage(), e);
         }

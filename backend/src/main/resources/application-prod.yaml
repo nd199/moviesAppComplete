@@ -51,8 +51,8 @@ logging:
     root: WARN
     com.naren.moviesapp: INFO
     org.springframework.security: WARN
-    org.springframework.mail: WARN
-    jakarta.mail: WARN
+    org.springframework.mail: DEBUG
+    jakarta.mail: DEBUG
     org.springframework.web: WARN
     org.hibernate.SQL: WARN
     org.hibernate.type.descriptor.sql: WARN

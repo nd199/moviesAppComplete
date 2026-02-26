@@ -31,26 +31,13 @@ public class RegVerifyController {
     // Handle both /api/v1/verify/email and /verify/email (for frontend compatibility)
     @PostMapping(value = {"/api/v1/verify/email", "/verify/email"})
     public ResponseEntity<?> sendEmailToCustomer(@RequestBody EmailVerificationRequest emailVerificationRequest) {
-        logger.info("Sending email verification OTP to: {}", emailVerificationRequest.email());
-        try {
-            customerService.generateAndSendMailOtp(emailVerificationRequest);
-            logger.info("OTP sent successfully to email: {}", emailVerificationRequest.email());
-            return ResponseEntity.ok("OTP sent to email: " + emailVerificationRequest.email());
-        } catch (EmailSendingException e) {
-            // Log the specific email sending error
-            logger.error("Email sending failed for {}: {}", emailVerificationRequest.email(), e.getMessage(), e);
-            
-            // Return a user-friendly error message
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send OTP. Please try again later.");
-        } catch (Exception e) {
-            // Log the error for debugging
-            logger.error("Unexpected error during OTP sending to {}: {}", emailVerificationRequest.email(), e.getMessage(), e);
-            
-            // Return a user-friendly error message
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send OTP. Please try again later.");
-        }
+        logger.info("=== EMAIL VERIFICATION ENDPOINT CALLED ===");
+        logger.info("Request received for email: {}", emailVerificationRequest.email());
+        logger.info("Request body: {}", emailVerificationRequest);
+        
+        customerService.generateAndSendMailOtp(emailVerificationRequest);
+        logger.info("OTP sent successfully to email: {}", emailVerificationRequest.email());
+        return ResponseEntity.ok("OTP sent to email: " + emailVerificationRequest.email());
     }
 
     @PostMapping(value = {"/api/v1/validate/Otp", "/validate/Otp", "/validate/otp", "/api/v1/validate/otp"})
