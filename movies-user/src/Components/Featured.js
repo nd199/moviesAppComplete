@@ -21,36 +21,61 @@ const Featured = ({ loading = false }) => {
     const fetchFeaturedData = async () => {
       setIsLoading(true);
       try {
-        // Fetch both Hollywood trending and South Indian movies
-        const [southIndianResponse, hollywoodResponse] = await Promise.all([
-          publicRequest().get('/tmdb/trending/movies'),
-          fetchTmdbSouthIndianMovies()
-        ]);
+        // Check if we're in development mode
+        const isDevelopment = process.env.NODE_ENV === 'development' || 
+                           window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1';
         
-        const hollywoodMovies = hollywoodResponse.data.results || [];
-        const southIndianMovies = southIndianResponse || [];
+        let selectedMovies = [];
+        let southIndianMovies = []; // Define in outer scope
         
-        console.log('Hollywood movies:', hollywoodMovies.length);
-        console.log('South Indian movies:', southIndianMovies.length);
-        
-        // Mix: 3 Hollywood + 3 South Indian movies
-        const selectedMovies = [
-          ...southIndianMovies.slice(0, 3),
-          ...hollywoodMovies.slice(0, 3),
-        ];
+        if (isDevelopment) {
+          // In development, use local movies from database
+          console.log('Development mode: Using local movies');
+          const moviesResponse = await publicRequest().get('/movies');
+          const localMovies = moviesResponse.data || [];
+          
+          // Take first 6 movies for featured section
+          selectedMovies = localMovies.slice(0, 6);
+          
+          console.log('Local movies for featured:', selectedMovies.length);
+        } else {
+          // In production, use TMDB movies
+          console.log('Production mode: Using TMDB movies');
+          const [southIndianResponse, hollywoodResponse] = await Promise.all([
+            publicRequest().get('/tmdb/trending/movies'),
+            fetchTmdbSouthIndianMovies()
+          ]);
+          
+          const hollywoodMovies = hollywoodResponse.data.results || [];
+          southIndianMovies = southIndianResponse || []; // Assign to outer scope variable
+          
+          console.log('Hollywood movies:', hollywoodMovies.length);
+          console.log('South Indian movies:', southIndianMovies.length);
+          
+          // Mix: 3 Hollywood + 3 South Indian movies
+          selectedMovies = [
+            ...southIndianMovies.slice(0, 3),
+            ...hollywoodMovies.slice(0, 3),
+          ];
+        }
         
         // Get videos for all selected movies
         const featuredMovies = await Promise.all(
           selectedMovies.map(async (movie) => {
             try {
-              // Fetch videos for this movie
-              const videoResponse = await publicRequest().get(`/tmdb/movie/${movie.tmdbId}/videos`);
-              const videos = videoResponse.data.results || [];
+              let trailer = null;
               
-              // Find the first trailer or teaser
-              const trailer = videos.find(video => 
-                video.type === 'Trailer' || video.type === 'Teaser'
-              );
+              // Only fetch videos for TMDB movies (in production)
+              if (!isDevelopment && movie.tmdbId) {
+                const videoResponse = await publicRequest().get(`/tmdb/movie/${movie.tmdbId}/videos`);
+                const videos = videoResponse.data.results || [];
+                
+                // Find the first trailer or teaser
+                trailer = videos.find(video => 
+                  video.type === 'Trailer' || video.type === 'Teaser'
+                );
+              }
               
               return {
                 title: movie.title,
@@ -62,10 +87,10 @@ const Featured = ({ loading = false }) => {
                 videoId: trailer ? trailer.key : '',
                 hasTrailer: !!trailer,
                 trailerUrl: trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : '',
-                isSouthIndian: southIndianMovies.some(si => si.tmdbId === movie.tmdbId)
+                isSouthIndian: isDevelopment ? false : southIndianMovies.some(si => si.tmdbId === movie.tmdbId)
               };
             } catch (error) {
-              console.error(`Error fetching videos for movie ${movie.tmdbId}:`, error);
+              console.error(`Error processing movie ${movie.title}:`, error);
               return {
                 title: movie.title,
                 year: movie.year,
@@ -76,7 +101,7 @@ const Featured = ({ loading = false }) => {
                 videoId: '',
                 hasTrailer: false,
                 trailerUrl: '',
-                isSouthIndian: southIndianMovies.some(si => si.tmdbId === movie.tmdbId)
+                isSouthIndian: false
               };
             }
           })

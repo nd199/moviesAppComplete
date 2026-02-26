@@ -7,7 +7,7 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
   const maxRetries = 5;
   const canRetry = retryCount < maxRetries;
 
-  const [elapsed, setElapsed] = useState(0);
+  const ESTIMATED_TIME = 170; // 2 minutes 50 seconds - estimated wait time for users
   const [statusIndex, setStatusIndex] = useState(0);
 
   const statusMessages = useMemo(() => [
@@ -17,13 +17,6 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
     'Finalizing startup sequence...'
   ], []);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setElapsed((prev) => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     const statusTimer = setInterval(() => {
@@ -47,7 +40,7 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
           {statusMessages[statusIndex]}
         </p>
         <p className="fallback-elapsed">
-          Elapsed time: {elapsed}s
+          Estimated time: ~2 min 50 sec
         </p>
 
         {retryCount > 0 && (

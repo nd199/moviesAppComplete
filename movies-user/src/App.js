@@ -4,7 +4,9 @@ import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router-d
 import { PersistGate } from "redux-persist/integration/react";
 import { fetchCurrentUserDetails } from "./Network/ApiCalls";
 import { persistor } from "./redux/store";
+import { setAuthStatus } from "./redux/userSlice";
 import axios from "axios";
+import Cookies from "js-cookie";
 import "./App.css";
 
 import Home from "./Pages/User/Home";
@@ -92,8 +94,13 @@ function AppWithNavigation() {
   const [skipUserFetch, setSkipUserFetch] = useState(false);
 
   useEffect(() => {
-    if (!skipUserFetch) {
+    // Only fetch user details if there's a JWT token
+    const token = Cookies.get('jwt_token');
+    if (!skipUserFetch && token) {
       fetchCurrentUserDetails(dispatch);
+    } else if (!token) {
+      // If no token, set auth status to unauthenticated
+      dispatch(setAuthStatus('unauthenticated'));
     }
   }, [dispatch, skipUserFetch]);
 

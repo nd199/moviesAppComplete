@@ -1,18 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import './ServerConnection.css';
 import Lottie from 'react-lottie';
 import { ServerConnectingOptions } from './AnimationData';
 
 const ServerConnection = () => {
-  const [elapsed, setElapsed] = useState(0);
+  const ESTIMATED_TIME = 170; // 2 minutes 50 seconds - estimated wait time for users
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setElapsed((prev) => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <div className="sco-container">
@@ -22,17 +15,17 @@ const ServerConnection = () => {
         </div>
         <div className="sco-BH">🚀 Warming Up Backend Service</div>
         <div className="sco-elapsed">
-          Initializing... {elapsed}s
+          Initializing... Estimated time: ~2 min 50 sec
         </div>
         <div className="sco-warming-details">
           <p className="sco-warming-main">
             The backend service is starting up on free-tier infrastructure.
           </p>
           <p className="sco-warming-sub">
-            This may take up to some seconds to spin up
+            This may take up to 2 min 50 sec to spin up
           </p>
           <p className="sco-note">
-            <strong>Note:</strong> Initial warm-up typically takes 20–40 seconds on first access.
+            <strong>Note:</strong> Initial warm-up typically takes 2-3 minutes on first access.
           </p>
         </div>
       </div>
