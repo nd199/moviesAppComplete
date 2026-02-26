@@ -42,22 +42,31 @@ const Featured = ({ loading = false }) => {
         } else {
           // In production, use TMDB movies
           console.log('Production mode: Using TMDB movies');
-          const [southIndianResponse, hollywoodResponse] = await Promise.all([
-            publicRequest().get('/tmdb/trending/movies'),
-            fetchTmdbSouthIndianMovies()
-          ]);
-          
-          const hollywoodMovies = hollywoodResponse.data.results || [];
-          southIndianMovies = southIndianResponse || []; // Assign to outer scope variable
-          
-          console.log('Hollywood movies:', hollywoodMovies.length);
-          console.log('South Indian movies:', southIndianMovies.length);
-          
-          // Mix: 3 Hollywood + 3 South Indian movies
-          selectedMovies = [
-            ...southIndianMovies.slice(0, 3),
-            ...hollywoodMovies.slice(0, 3),
-          ];
+          try {
+            const [southIndianResponse, hollywoodResponse] = await Promise.all([
+              publicRequest().get('/tmdb/trending/movies'),
+              fetchTmdbSouthIndianMovies()
+            ]);
+            
+            const hollywoodMovies = hollywoodResponse.data.results || [];
+            southIndianMovies = southIndianResponse || [];
+            
+            console.log('Hollywood movies:', hollywoodMovies.length);
+            console.log('South Indian movies:', southIndianMovies.length);
+            
+            // Mix: 3 Hollywood + 3 South Indian movies
+            selectedMovies = [
+              ...southIndianMovies.slice(0, 3),
+              ...hollywoodMovies.slice(0, 3),
+            ];
+          } catch (tmdbError) {
+            console.warn('TMDB API not available, falling back to local movies:', tmdbError);
+            // Fallback to local movies if TMDB fails
+            const moviesResponse = await publicRequest().get('/movies');
+            const localMovies = moviesResponse.data || [];
+            selectedMovies = localMovies.slice(0, 6);
+            southIndianMovies = []; // Reset for local fallback
+          }
         }
         
         // Get videos for all selected movies
@@ -66,7 +75,7 @@ const Featured = ({ loading = false }) => {
             try {
               let trailer = null;
               
-              // Only fetch videos for TMDB movies (in production)
+              // Only fetch videos for TMDB movies (in production and when tmdbId exists)
               if (!isDevelopment && movie.tmdbId) {
                 const videoResponse = await publicRequest().get(`/tmdb/movie/${movie.tmdbId}/videos`);
                 const videos = videoResponse.data.results || [];
@@ -120,8 +129,30 @@ const Featured = ({ loading = false }) => {
         setFeaturedData(finalFeatured.slice(0, 6)); // Max 6 movies (3 Hollywood + 3 South Indian)
       } catch (error) {
         console.error('Error fetching featured data:', error);
-        // Fallback to empty array
-        setFeaturedData([]);
+        // Ultimate fallback: try to get local movies
+        try {
+          console.log('Attempting ultimate fallback to local movies');
+          const moviesResponse = await publicRequest().get('/movies');
+          const localMovies = moviesResponse.data || [];
+          
+          const fallbackMovies = localMovies.slice(0, 6).map(movie => ({
+            title: movie.title,
+            year: movie.year,
+            rating: movie.ageRating || 'PG-13',
+            genre: movie.genre || 'Action',
+            desc: movie.description || 'No description available',
+            descMore: movie.description || 'No description available',
+            videoId: '',
+            hasTrailer: false,
+            trailerUrl: '',
+            isSouthIndian: false
+          }));
+          
+          setFeaturedData(fallbackMovies);
+        } catch (fallbackError) {
+          console.error('Even fallback failed:', fallbackError);
+          setFeaturedData([]); // Last resort
+        }
       } finally {
         setIsLoading(false);
       }
@@ -158,7 +189,8 @@ const Featured = ({ loading = false }) => {
         }}
         loop={true}
         className="featured-swiper">
-        {featuredData.length > 0 && featuredData.map((item, index) => (
+        {featuredData.length > 0 ? (
+          featuredData.map((item, index) => (
           <SwiperSlide key={index}>
             <div className="featured-slide">
               {/* Full screen video background */}
@@ -229,7 +261,56 @@ const Featured = ({ loading = false }) => {
               </div>
             </div>
           </SwiperSlide>
-        ))}
+        ))) : (
+          <SwiperSlide>
+            <div className="featured-slide" style={{ 
+              background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              padding: '2rem'
+            }}>
+              <div style={{ color: 'white', maxWidth: '600px' }}>
+                <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem', fontWeight: 'bold' }}>
+                  🎬 Welcome to Movies App
+                </h2>
+                <p style={{ fontSize: '1.2rem', marginBottom: '1.5rem', opacity: 0.9 }}>
+                  Featured movies are loading. Please check back soon!
+                </p>
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '1rem', 
+                  justifyContent: 'center',
+                  flexWrap: 'wrap'
+                }}>
+                  <Link to="/movies" style={{
+                    background: '#667eea',
+                    color: 'white',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '0.5rem',
+                    textDecoration: 'none',
+                    fontWeight: 'bold',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    🎥 Browse Movies
+                  </Link>
+                  <Link to="/shows" style={{
+                    background: '#f56565',
+                    color: 'white',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '0.5rem',
+                    textDecoration: 'none',
+                    fontWeight: 'bold',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    📺 Browse Shows
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+        )}
       </Swiper>
     </section>
   );
