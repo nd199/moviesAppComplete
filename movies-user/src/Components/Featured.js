@@ -1,316 +1,148 @@
 import { AddToQueueOutlined, PlayArrowOutlined } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
+
 import './Featured.css';
 import VideoPlayer from './VideoPlayer';
 import { FeaturedSkeleton } from './GlobalLoader';
 import { publicRequest } from '../AxiosMethods';
-import { fetchTmdbSouthIndianMovies } from '../Network/ApiCalls';
 
-const Featured = ({ loading = false }) => {
-  const [expandedItems, setExpandedItems] = useState({});
+const Featured = () => {
   const [featuredData, setFeaturedData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  
+  const [loading, setLoading] = useState(true);
+  const [expandedItems, setExpandedItems] = useState({});
+
   useEffect(() => {
-    const fetchFeaturedData = async () => {
-      setIsLoading(true);
+    const fetchFeatured = async () => {
       try {
-        // Check if we're in development mode
-        const isDevelopment = process.env.NODE_ENV === 'development' || 
-                           window.location.hostname === 'localhost' || 
-                           window.location.hostname === '127.0.0.1';
-        
-        let selectedMovies = [];
-        let southIndianMovies = []; // Define in outer scope
-        
-        if (isDevelopment) {
-          // In development, use local movies from database
-          console.log('Development mode: Using local movies');
-          const moviesResponse = await publicRequest().get('/movies');
-          const localMovies = moviesResponse.data || [];
-          
-          // Take first 6 movies for featured section
-          selectedMovies = localMovies.slice(0, 6);
-          
-          console.log('Local movies for featured:', selectedMovies.length);
-        } else {
-          // In production, use TMDB movies
-          console.log('Production mode: Using TMDB movies');
-          try {
-            const [southIndianResponse, hollywoodResponse] = await Promise.all([
-              publicRequest().get('/tmdb/trending/movies'),
-              fetchTmdbSouthIndianMovies()
-            ]);
-            
-            const hollywoodMovies = hollywoodResponse.data.results || [];
-            southIndianMovies = southIndianResponse || [];
-            
-            console.log('Hollywood movies:', hollywoodMovies.length);
-            console.log('South Indian movies:', southIndianMovies.length);
-            
-            // Mix: 3 Hollywood + 3 South Indian movies
-            selectedMovies = [
-              ...southIndianMovies.slice(0, 3),
-              ...hollywoodMovies.slice(0, 3),
-            ];
-          } catch (tmdbError) {
-            console.warn('TMDB API not available, falling back to local movies:', tmdbError);
-            // Fallback to local movies if TMDB fails
-            const moviesResponse = await publicRequest().get('/movies');
-            const localMovies = moviesResponse.data || [];
-            selectedMovies = localMovies.slice(0, 6);
-            southIndianMovies = []; // Reset for local fallback
-          }
-        }
-        
-        // Get videos for all selected movies
-        const featuredMovies = await Promise.all(
-          selectedMovies.map(async (movie) => {
-            try {
-              let trailer = null;
-              
-              // Only fetch videos for TMDB movies (in production and when tmdbId exists)
-              if (!isDevelopment && movie.tmdbId) {
-                const videoResponse = await publicRequest().get(`/tmdb/movie/${movie.tmdbId}/videos`);
-                const videos = videoResponse.data.results || [];
-                
-                // Find the first trailer or teaser
-                trailer = videos.find(video => 
-                  video.type === 'Trailer' || video.type === 'Teaser'
-                );
-              }
-              
-              return {
-                title: movie.title,
-                year: movie.year,
-                rating: movie.ageRating || 'PG-13',
-                genre: movie.genre || 'Action',
-                desc: movie.description || 'No description available',
-                descMore: movie.description || 'No description available',
-                videoId: trailer ? trailer.key : '',
-                hasTrailer: !!trailer,
-                trailerUrl: trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : '',
-                isSouthIndian: isDevelopment ? false : southIndianMovies.some(si => si.tmdbId === movie.tmdbId)
-              };
-            } catch (error) {
-              console.error(`Error processing movie ${movie.title}:`, error);
-              return {
-                title: movie.title,
-                year: movie.year,
-                rating: movie.ageRating || 'PG-13',
-                genre: movie.genre || 'Action',
-                desc: movie.description || 'No description available',
-                descMore: movie.description || 'No description available',
-                videoId: '',
-                hasTrailer: false,
-                trailerUrl: '',
-                isSouthIndian: false
-              };
-            }
-          })
-        );
-        
-        // Filter movies with trailers, but keep at least some South Indian movies even without trailers
-        const moviesWithTrailers = featuredMovies.filter(movie => movie.hasTrailer);
-        const southIndianWithoutTrailers = featuredMovies.filter(movie => !movie.hasTrailer && movie.isSouthIndian);
-        
-        // Prioritize movies with trailers, but add South Indian movies if needed
-        let finalFeatured = moviesWithTrailers;
-        if (finalFeatured.length < 4 && southIndianWithoutTrailers.length > 0) {
-          finalFeatured = [...finalFeatured, ...southIndianWithoutTrailers.slice(0, 4 - finalFeatured.length)];
-        }
-        
-        setFeaturedData(finalFeatured.slice(0, 6)); // Max 6 movies (3 Hollywood + 3 South Indian)
+        const response = await publicRequest().get('/tmdb/south-indian/movies?page=1');
+        const movies = response.data.results?.slice(0, 10) || [];
+        console.log(`Fetched ${response.data.results?.length || 0} South Indian movies, showing ${movies.length}`);
+        setFeaturedData(movies);
       } catch (error) {
-        console.error('Error fetching featured data:', error);
-        // Ultimate fallback: try to get local movies
-        try {
-          console.log('Attempting ultimate fallback to local movies');
-          const moviesResponse = await publicRequest().get('/movies');
-          const localMovies = moviesResponse.data || [];
-          
-          const fallbackMovies = localMovies.slice(0, 6).map(movie => ({
-            title: movie.title,
-            year: movie.year,
-            rating: movie.ageRating || 'PG-13',
-            genre: movie.genre || 'Action',
-            desc: movie.description || 'No description available',
-            descMore: movie.description || 'No description available',
-            videoId: '',
-            hasTrailer: false,
-            trailerUrl: '',
-            isSouthIndian: false
-          }));
-          
-          setFeaturedData(fallbackMovies);
-        } catch (fallbackError) {
-          console.error('Even fallback failed:', fallbackError);
-          setFeaturedData([]); // Last resort
-        }
+        console.error('Failed to load featured movies:', error);
+        setFeaturedData([]);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
-    
-    if (!loading) {
-      fetchFeaturedData();
-    }
-  }, [loading]);
-  
-  if (loading || isLoading) {
-    return <FeaturedSkeleton />;
-  }
 
-  const toggleMore = index => {
-    setExpandedItems(prev => ({
+    fetchFeatured();
+  }, []);
+
+  const toggleMore = (index) => {
+    setExpandedItems((prev) => ({
       ...prev,
       [index]: !prev[index],
     }));
   };
 
+  if (loading) return <FeaturedSkeleton />;
+
+  if (!featuredData.length) {
+    return (
+      <section className="featured-slider">
+        <div className="featured-empty">
+          <h2>No Featured Movies Available</h2>
+          <Link to="/movies" className="featured-btn featured-btn-primary">
+            Browse Movies
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="featured-slider">
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
-        spaceBetween={0}
         slidesPerView={1}
         navigation
         pagination={{ clickable: true }}
-        autoplay={{
-          delay: 8000,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: true,
-        }}
-        loop={true}
-        className="featured-swiper">
-        {featuredData.length > 0 ? (
-          featuredData.map((item, index) => (
+        autoplay={{ delay: 15000, disableOnInteraction: false }}
+        loop
+        className="featured-swiper"
+      >
+        {featuredData.map((item, index) => (
           <SwiperSlide key={index}>
             <div className="featured-slide">
-              {/* Full screen video background */}
-              <div className="featured-video-bg">
-                <VideoPlayer
-                  className="featured-video"
-                  videoId={item.videoId}
-                  isYouTube={true}
-                />
-              </div>
 
-              {/* Cinematic gradient overlay */}
+              {item.trailer && (
+                <div className="featured-video-bg">
+                  <VideoPlayer
+                    className="featured-video"
+                    videoId={item.trailer.split('v=')[1] || ''}
+                    isYouTube
+                  />
+                </div>
+              )}
+
               <div className="featured-overlay" />
 
-              {/* Floating content wrapper - info panel to the side */}
               <div className="featured-content-wrapper">
                 <div className="featured-info">
+
                   <div className="featured-tags">
-                    {item.isSouthIndian && (
-                      <div className="featured-tag featured-tag-south">South Indian</div>
-                    )}
+                    <div className="featured-tag featured-tag-south">
+                      South Indian
+                    </div>
                     <div className="featured-tag">Now Streaming</div>
                   </div>
 
                   <h1 className="featured-title">{item.title}</h1>
 
                   <div className="featured-meta">
-                    <span className="featured-year">{item.year}</span>
+                    <span>{item.year}</span>
                     <span className="featured-dot" />
-                    <span className="featured-rating">{item.rating}</span>
+                    <span className="featured-rating">{item.ageRating}</span>
                     <span className="featured-dot" />
-                    <span className="featured-genre">{item.genre}</span>
+                    <span>{item.genre}</span>
                   </div>
 
                   <div className="featured-desc">
-                    <p>{item.desc}</p>
+                    <p>{item.description}</p>
 
                     {expandedItems[index] && (
-                      <p className="featured-desc-more">{item.descMore}</p>
+                      <p className="featured-desc-more">
+                        {item.description}
+                      </p>
                     )}
 
                     <button
                       className="featured-more-btn"
-                      onClick={() => toggleMore(index)}>
+                      onClick={() => toggleMore(index)}
+                    >
                       {expandedItems[index] ? 'Show less' : 'More...'}
                     </button>
                   </div>
 
                   <div className="featured-buttons">
-                    <Link 
+                    <Link
                       to={`/video/${item.title}`}
-                      state={{ trailer: item.trailerUrl }}
+                      state={{ trailer: item.trailer }}
                       className="featured-btn featured-btn-primary"
                     >
-                      <PlayArrowOutlined className="featured-btn-icon" />
-                      <span>Watch Now</span>
+                      <PlayArrowOutlined />
+                      Watch Now
                     </Link>
 
                     <button className="featured-btn featured-btn-secondary">
-                      <AddToQueueOutlined className="featured-btn-icon" />
-                      <span>
-                        <span className="featured-btn-sm-hidden">Add to </span>
-                        Watchlist
-                      </span>
+                      <AddToQueueOutlined />
+                      Watchlist
                     </button>
                   </div>
+
                 </div>
               </div>
+
             </div>
           </SwiperSlide>
-        ))) : (
-          <SwiperSlide>
-            <div className="featured-slide" style={{ 
-              background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              padding: '2rem'
-            }}>
-              <div style={{ color: 'white', maxWidth: '600px' }}>
-                <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem', fontWeight: 'bold' }}>
-                  🎬 Welcome to Movies App
-                </h2>
-                <p style={{ fontSize: '1.2rem', marginBottom: '1.5rem', opacity: 0.9 }}>
-                  Featured movies are loading. Please check back soon!
-                </p>
-                <div style={{ 
-                  display: 'flex', 
-                  gap: '1rem', 
-                  justifyContent: 'center',
-                  flexWrap: 'wrap'
-                }}>
-                  <Link to="/movies" style={{
-                    background: '#667eea',
-                    color: 'white',
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: '0.5rem',
-                    textDecoration: 'none',
-                    fontWeight: 'bold',
-                    transition: 'all 0.3s ease'
-                  }}>
-                    🎥 Browse Movies
-                  </Link>
-                  <Link to="/shows" style={{
-                    background: '#f56565',
-                    color: 'white',
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: '0.5rem',
-                    textDecoration: 'none',
-                    fontWeight: 'bold',
-                    transition: 'all 0.3s ease'
-                  }}>
-                    📺 Browse Shows
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </SwiperSlide>
-        )}
+        ))}
       </Swiper>
     </section>
   );
