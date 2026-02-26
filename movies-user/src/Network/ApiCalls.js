@@ -144,11 +144,19 @@ export const fetchShows = async dispatch => {
   }
 };
 
-export const verifyEmail = async (dispatch, emailData) => {
+export const verifyEmail = async (dispatch, email) => {
+  console.log("🔍 DEBUG: Sending to backend email:", email);
+  console.log("🔍 DEBUG: Email type:", typeof email);
+  
   dispatch(verifyEmailStart());
   try {
-    const res = await publicRequest().post('/verify/email', emailData);
-    dispatch(verifyEmailSuccess(res.data.message));
+    const payload = {
+      email: email.trim().toLowerCase()
+    };
+    console.log("🔍 DEBUG: Final payload being sent:", payload);
+    
+    const res = await publicRequest().post('/verify/email', payload);
+    dispatch(verifyEmailSuccess(res.data));
     return res.data;
   } catch (error) {
     const message =

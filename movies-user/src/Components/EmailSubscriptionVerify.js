@@ -69,7 +69,7 @@ const EmailSubscriptionVerify = ({
     try {
       setEmShowVerify(false);
       setShowEmailOtp(true);
-      const res = await verifyEmail(dispatch, { email: email });
+      const res = await verifyEmail(dispatch, email);
       setOtpMessage(res);
       setOtpTimer(60);
     } catch (error) {

@@ -36,7 +36,7 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
     if (!isValidEmail(email)) return;
     setIsSending(true);
     try {
-      await verifyEmail(dispatch, { email: email });
+      await verifyEmail(dispatch, email);
       setShowOtpInput(true);
       setOtpTimer(60);
       setOtpMessage('');
