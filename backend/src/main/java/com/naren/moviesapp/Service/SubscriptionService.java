@@ -7,7 +7,6 @@ import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Repo.SubscriptionIntentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

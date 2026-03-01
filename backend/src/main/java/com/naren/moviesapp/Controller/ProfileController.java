@@ -41,13 +41,13 @@ public class ProfileController {
             @Valid @RequestBody CustomerUpdateRequest customerUpdateRequest,
             @AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Updating profile for current user: {}", userDetails.getUsername());
-        
+
         // Get current user by email
         CustomerDTO currentCustomer = customerService.getCustomerByEmail(userDetails.getUsername());
-        
+
         // Update the customer profile
         CustomerDTO updatedCustomer = customerService.updateCustomer(customerUpdateRequest, currentCustomer.id());
-        
+
         return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
     }
 
@@ -56,23 +56,23 @@ public class ProfileController {
             @Valid @RequestBody PasswordChangeRequest passwordChangeRequest,
             @AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Password change request for user: {}", userDetails.getUsername());
-        
+
         try {
             customerService.updatePasswordWithValidation(
-                userDetails.getUsername(), 
-                passwordChangeRequest.currentPassword(),
-                passwordChangeRequest.newPassword()
+                    userDetails.getUsername(),
+                    passwordChangeRequest.currentPassword(),
+                    passwordChangeRequest.newPassword()
             );
-            
+
             return ResponseEntity.ok().body(Map.of(
-                "message", "Password changed successfully",
-                "status", "success"
+                    "message", "Password changed successfully",
+                    "status", "success"
             ));
         } catch (Exception e) {
             logger.error("Password change failed for user: {}", userDetails.getUsername(), e);
             return ResponseEntity.badRequest().body(Map.of(
-                "message", e.getMessage(),
-                "status", "error"
+                    "message", e.getMessage(),
+                    "status", "error"
             ));
         }
     }

@@ -206,9 +206,9 @@ public class TmdbService {
         try {
             Map<String, Object> response = webClient.get().uri(uriBuilder -> {
                 var builder = uriBuilder.path("/discover/movie")
-                    .queryParam("page", page)
-                    .queryParam("with_original_language", "te") // Telugu
-                    .queryParam("sort_by", "popularity.desc");
+                        .queryParam("page", page)
+                        .queryParam("with_original_language", "te") // Telugu
+                        .queryParam("sort_by", "popularity.desc");
                 return builder.build();
             }).retrieve().bodyToMono(Map.class).block();
 
@@ -354,7 +354,7 @@ public class TmdbService {
                 .spokenLanguages(getSpokenLanguages(map.get("spoken_languages")))
                 .build();
     }
-    
+
     @SuppressWarnings("unchecked")
     private List<TmdbMovieDto.TmdbProductionCountryDto> getProductionCountries(Object value) {
         if (value == null) return null;
@@ -365,7 +365,7 @@ public class TmdbService {
                         .build())
                 .toList();
     }
-    
+
     @SuppressWarnings("unchecked")
     private List<TmdbMovieDto.TmdbSpokenLanguageDto> getSpokenLanguages(Object value) {
         if (value == null) return null;
@@ -472,7 +472,7 @@ public class TmdbService {
 
             movieTrailerCache.put(tmdbId, trailers);
             logger.debug("Cached trailers for movie ID: {}", tmdbId);
-            
+
             return Optional.of(trailers);
         } catch (WebClientResponseException e) {
             logger.error("Error getting movie videos: {}", e.getMessage());
@@ -504,11 +504,11 @@ public class TmdbService {
                     .block();
 
             List<TmdbVideoDto> trailers = convertToVideoDtoList((List<Map<String, Object>>) response.get("results"));
-            
+
             // Cache the result
             tvShowTrailerCache.put(tmdbId, trailers);
             logger.debug("Cached trailers for TV show ID: {}", tmdbId);
-            
+
             return Optional.of(trailers);
         } catch (WebClientResponseException e) {
             logger.error("Error getting TV show videos: {}", e.getMessage());

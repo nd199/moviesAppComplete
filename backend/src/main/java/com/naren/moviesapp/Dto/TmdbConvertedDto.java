@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TmdbConvertedDto {
-    
+
     private Long tmdbId;
     private String title;
     private String name;
@@ -39,17 +39,17 @@ public class TmdbConvertedDto {
     private List<String> productionCountries;
     private List<String> spokenLanguages;
     private String trailer; // Add trailer field
-    
+
     public static TmdbConvertedDto fromMovie(TmdbMovieDto movie, TmdbService tmdbService) {
         if (movie == null) return null;
-        
+
         String genreStr = "";
         if (movie.getGenres() != null && !movie.getGenres().isEmpty()) {
             genreStr = String.join(", ", movie.getGenres().stream()
                     .map(TmdbMovieDto.TmdbGenreDto::getName)
                     .toList());
         }
-        
+
         Integer year = null;
         if (movie.getReleaseDate() != null && movie.getReleaseDate().length() >= 4) {
             try {
@@ -58,7 +58,7 @@ public class TmdbConvertedDto {
                 // ignore
             }
         }
-        
+
         String runtimeStr = "";
         if (movie.getRuntime() != null) {
             int hours = movie.getRuntime() / 60;
@@ -69,7 +69,7 @@ public class TmdbConvertedDto {
                 runtimeStr = minutes + "m";
             }
         }
-        
+
         // Extract production countries
         List<String> prodCountries = null;
         if (movie.getProductionCountries() != null && !movie.getProductionCountries().isEmpty()) {
@@ -77,7 +77,7 @@ public class TmdbConvertedDto {
                     .map(TmdbMovieDto.TmdbProductionCountryDto::getName)
                     .toList();
         }
-        
+
         // Extract spoken languages
         List<String> langs = null;
         if (movie.getSpokenLanguages() != null && !movie.getSpokenLanguages().isEmpty()) {
@@ -85,7 +85,7 @@ public class TmdbConvertedDto {
                     .map(TmdbMovieDto.TmdbSpokenLanguageDto::getEnglishName)
                     .toList();
         }
-        
+
         // Get trailer URL
         String trailerUrl = null;
         try {
@@ -98,7 +98,7 @@ public class TmdbConvertedDto {
                         .findFirst()
                         .map(video -> "https://www.youtube.com/watch?v=" + video.getKey())
                         .orElse(null);
-                
+
                 // Debug: Log trailer info
                 System.out.println("DEBUG: Movie: " + movie.getTitle() + ", Trailers found: " + videos.size() + ", Selected trailer: " + trailerUrl);
             } else {
@@ -107,7 +107,7 @@ public class TmdbConvertedDto {
         } catch (Exception e) {
             System.out.println("DEBUG: Error fetching trailer for movie: " + movie.getTitle() + ", Error: " + e.getMessage());
         }
-        
+
         return TmdbConvertedDto.builder()
                 .tmdbId(movie.getTmdbId())
                 .title(movie.getTitle())
@@ -132,17 +132,17 @@ public class TmdbConvertedDto {
                 .trailer(trailerUrl)
                 .build();
     }
-    
+
     public static TmdbConvertedDto fromTvShow(TmdbTvShowDto tvShow, TmdbService tmdbService) {
         if (tvShow == null) return null;
-        
+
         String genreStr = "";
         if (tvShow.getGenres() != null && !tvShow.getGenres().isEmpty()) {
             genreStr = String.join(", ", tvShow.getGenres().stream()
                     .map(TmdbTvShowDto.TmdbGenreDto::getName)
                     .toList());
         }
-        
+
         Integer year = null;
         if (tvShow.getFirstAirDate() != null && tvShow.getFirstAirDate().length() >= 4) {
             try {
@@ -151,7 +151,7 @@ public class TmdbConvertedDto {
                 // ignore
             }
         }
-        
+
         String runtimeStr = "";
         if (tvShow.getEpisodeRunTime() != null && !tvShow.getEpisodeRunTime().isEmpty()) {
             Integer runtime = tvShow.getEpisodeRunTime().get(0);
@@ -165,7 +165,7 @@ public class TmdbConvertedDto {
                 }
             }
         }
-        
+
         // Get trailer URL
         String trailerUrl = null;
         try {
@@ -182,7 +182,7 @@ public class TmdbConvertedDto {
         } catch (Exception e) {
             // Ignore trailer fetch errors
         }
-        
+
         return TmdbConvertedDto.builder()
                 .tmdbId(tvShow.getTmdbId())
                 .name(tvShow.getName())

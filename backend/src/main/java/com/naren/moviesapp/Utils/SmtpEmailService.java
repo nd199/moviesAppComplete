@@ -73,4 +73,28 @@ public class SmtpEmailService implements EmailService {
             throw new EmailSendingException("Failed to send password reset email to " + toEmail, e);
         }
     }
+
+    @Override
+    public void sendInviteEmail(String toEmail, String inviteLink) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("Admin Invitation - Movies Platform");
+
+            Context context = new Context();
+            context.setVariable("inviteLink", inviteLink);
+            context.setVariable("toEmail", toEmail);
+            String htmlContent = templateEngine.process("admin-invite-mail-simple", context);
+
+            helper.setText(htmlContent, true);
+            javaMailSender.send(message);
+
+            logger.info("Admin invite email sent successfully to {}", toEmail);
+        } catch (MessagingException e) {
+            logger.error("Failed to send admin invite email to {}: {}", toEmail, e.getMessage(), e);
+            throw new EmailSendingException("Failed to send admin invite email to " + toEmail, e);
+        }
+    }
 }

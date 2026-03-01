@@ -1,5 +1,7 @@
 package com.naren.moviesapp.Auth;
 
+import com.naren.moviesapp.Dto.AdminDTO;
+import com.naren.moviesapp.Dto.AdminDTOMapper;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Admin;
@@ -32,6 +34,7 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final CustomerDTOMapper customerDTOMapper;
+    private final AdminDTOMapper adminDTOMapper;
     private final JwtUtil jwtUtil;
     private final CustomerRepository customerRepository;
     private final AdminRepository adminRepository;
@@ -56,8 +59,8 @@ public class AuthService {
                     );
 
             long authEndTime = System.currentTimeMillis();
-            logger.info("Authentication completed in {}ms for: {}", 
-                authEndTime - authStartTime, authRequest.username());
+            logger.info("Authentication completed in {}ms for: {}",
+                    authEndTime - authStartTime, authRequest.username());
 
             AppUserPrincipal principal =
                     (AppUserPrincipal) authentication.getPrincipal();
@@ -77,14 +80,14 @@ public class AuthService {
 
                 String token = generateTokenForAdmin(dbAdmin);
 
-                CustomerDTO dto = customerDTOMapper.applyFromAdmin(dbAdmin);
+                AdminDTO dto = adminDTOMapper.apply(dbAdmin);
 
                 logger.info("Admin login successful for email: {}", dbAdmin.getEmail());
-                
+
                 long totalTime = System.currentTimeMillis() - startTime;
                 logger.info("Total admin login process completed in {}ms for: {}", totalTime, dbAdmin.getEmail());
-                
-                return new AuthResponse(dto, token);
+
+                return new AdminAuthResponse(dto, token);
             }
 
             if (entity instanceof Customer customerEntity) {
@@ -111,11 +114,11 @@ public class AuthService {
                 );
 
                 logger.info("Customer login successful for email: {}", customer.getEmail());
-                
+
                 long totalTime = System.currentTimeMillis() - startTime;
                 logger.info("Total login process completed in {}ms for: {}", totalTime, customer.getEmail());
-                
-                return new AuthResponse(dto, token);
+
+                return new CustomerAuthResponse(dto, token);
             }
 
             throw new AuthenticationException("Invalid principal type", "INVALID_PRINCIPAL");

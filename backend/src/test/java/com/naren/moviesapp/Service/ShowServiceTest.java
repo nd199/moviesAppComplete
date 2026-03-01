@@ -3,7 +3,6 @@ package com.naren.moviesapp.Service;
 import com.naren.moviesapp.Entity.Show;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
-import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.ShowRegistration;
 import com.naren.moviesapp.Record.ShowUpdation;
 import com.naren.moviesapp.Repo.ShowRepository;
@@ -46,7 +45,7 @@ class ShowServiceTest {
                 "120 mins", "Drama", "Trending");
 
         when(showRepository.existsByName("testName")).thenReturn(false);
-        
+
         // Mock save to return the captured entity
         ArgumentCaptor<Show> captor = ArgumentCaptor.forClass(Show.class);
         when(showRepository.save(captor.capture())).thenAnswer(invocation -> {
@@ -54,7 +53,7 @@ class ShowServiceTest {
             show.setShow_id(1L); // Simulate DB-generated ID
             return show;
         });
-        
+
         underTest.addShow(registration);
 
         assertThat(captor.getValue().getCategory()).isEqualTo("Trending");
@@ -68,7 +67,7 @@ class ShowServiceTest {
                 "120 mins", "Drama", null);
 
         when(showRepository.existsByName("testName")).thenReturn(false);
-        
+
         // Mock save to return the captured entity
         ArgumentCaptor<Show> captor = ArgumentCaptor.forClass(Show.class);
         when(showRepository.save(captor.capture())).thenAnswer(invocation -> {
@@ -76,7 +75,7 @@ class ShowServiceTest {
             show.setShow_id(1L); // Simulate DB-generated ID
             return show;
         });
-        
+
         underTest.addShow(registration);
 
         assertThat(captor.getValue().getCategory()).isEqualTo("General");

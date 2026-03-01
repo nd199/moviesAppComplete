@@ -1,9 +1,12 @@
 package com.naren.moviesapp;
 
-import com.naren.moviesapp.Config.SuperAdminSeeder;
 import com.naren.moviesapp.Config.DemoUserSeeder;
-import com.naren.moviesapp.Entity.*;
-import com.naren.moviesapp.Repo.*;
+import com.naren.moviesapp.Config.SuperAdminSeeder;
+import com.naren.moviesapp.Entity.Role;
+import com.naren.moviesapp.Entity.RoleName;
+import com.naren.moviesapp.Entity.SubscriptionPlan;
+import com.naren.moviesapp.Repo.RoleRepository;
+import com.naren.moviesapp.Repo.SubscriptionPlanRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -35,7 +38,7 @@ public class MoviesApplication {
             demoUserSeeder.seedDemoUser();
         };
     }
-    
+
     private void createDefaultPlans(SubscriptionPlanRepository planRepository) {
         if (!planRepository.existsByPlanName("Monthly")) {
             planRepository.save(SubscriptionPlan.builder()
@@ -65,11 +68,11 @@ public class MoviesApplication {
 
     private void createRole(RoleRepository roleRepository) {
         RoleName[] roles = {
-            RoleName.ROLE_USER,
-            RoleName.ROLE_ADMIN,
-            RoleName.ROLE_SUPER_ADMIN,
-            RoleName.ROLE_CONTENT_MANAGER,
-            RoleName.ROLE_SUPPORT
+                RoleName.ROLE_USER,
+                RoleName.ROLE_ADMIN,
+                RoleName.ROLE_SUPER_ADMIN,
+                RoleName.ROLE_CONTENT_MANAGER,
+                RoleName.ROLE_SUPPORT
         };
         for (RoleName roleName : roles) {
             if (!roleRepository.existsByName(roleName)) {

@@ -1,9 +1,9 @@
 package com.naren.moviesapp.Service;
 
+import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Record.AdminRegistration;
 import com.naren.moviesapp.Record.AdminUpdateRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.Set;
 
@@ -28,4 +28,6 @@ public interface AdminServiceInterface {
     ResponseEntity<?> getAdminStats();
 
     ResponseEntity<?> toggleAdminStatus(Long adminId);
+
+    String generateInviteToken(String email, RoleName roleName);
 }

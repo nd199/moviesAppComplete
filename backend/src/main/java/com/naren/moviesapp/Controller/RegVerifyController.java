@@ -1,6 +1,5 @@
 package com.naren.moviesapp.Controller;
 
-import com.naren.moviesapp.Exception.EmailSendingException;
 import com.naren.moviesapp.Record.EmailVerificationRequest;
 import com.naren.moviesapp.Record.VerifyOtpRequest;
 import com.naren.moviesapp.Service.CustomerService;
@@ -34,7 +33,7 @@ public class RegVerifyController {
         logger.info("=== EMAIL VERIFICATION ENDPOINT CALLED ===");
         logger.info("Request received for email: {}", emailVerificationRequest.email());
         logger.info("Request body: {}", emailVerificationRequest);
-        
+
         customerService.generateAndSendMailOtp(emailVerificationRequest);
         logger.info("OTP sent successfully to email: {}", emailVerificationRequest.email());
         return ResponseEntity.ok("OTP sent to email: " + emailVerificationRequest.email());

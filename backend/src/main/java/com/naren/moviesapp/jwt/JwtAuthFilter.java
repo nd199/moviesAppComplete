@@ -41,13 +41,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // Skip JWT validation for OTP endpoints - these are public
         // Use lowercase comparison for case-insensitive matching
         String pathLower = path.toLowerCase();
-        if (pathLower.startsWith("/api/v1/verify/email") || 
-            pathLower.startsWith("/api/v1/validate/otp") ||
-            pathLower.startsWith("/verify/email") ||
-            pathLower.startsWith("/validate/otp") ||
-            // Also handle paths without api/v1 prefix (when frontend omits it)
-            pathLower.equals("/verify/email") ||
-            pathLower.equals("/validate/otp")) {
+        if (pathLower.startsWith("/api/v1/verify/email") ||
+                pathLower.startsWith("/api/v1/validate/otp") ||
+                pathLower.startsWith("/verify/email") ||
+                pathLower.startsWith("/validate/otp") ||
+                // Also handle paths without api/v1 prefix (when frontend omits it)
+                pathLower.equals("/verify/email") ||
+                pathLower.equals("/validate/otp")) {
             logger.debug("Skipping JWT filter for public OTP endpoint: {}", path);
             filterChain.doFilter(request, response);
             return;

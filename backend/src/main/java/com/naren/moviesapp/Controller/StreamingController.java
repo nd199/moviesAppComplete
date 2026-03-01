@@ -36,7 +36,7 @@ public class StreamingController {
     public ResponseEntity<?> playMovie(@PathVariable("id") Long movieId, Authentication authentication) {
         String email = authentication.getName();
         logger.info("Play movie request for movie ID: {} by user: {}", movieId, email);
-        
+
         Customer customer = customerService.getCustomerEntityByEmail(email);
 
         if (!customerService.hasActiveSubscription(customer)) {
@@ -53,7 +53,7 @@ public class StreamingController {
     public ResponseEntity<?> playShow(@PathVariable("id") Long showId, Authentication authentication) {
         String email = authentication.getName();
         logger.info("Play show request for show ID: {} by user: {}", showId, email);
-        
+
         Customer customer = customerService.getCustomerEntityByEmail(email);
 
         if (!customerService.hasActiveSubscription(customer)) {

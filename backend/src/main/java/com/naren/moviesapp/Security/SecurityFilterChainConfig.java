@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -81,7 +81,8 @@ public class SecurityFilterChainConfig {
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> {})  // Enable CORS from WebConfig
+                .cors(cors -> {
+                })  // Enable CORS from WebConfig
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -101,7 +102,9 @@ public class SecurityFilterChainConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/api/v1/ping"
+                                "/api/v1/ping",
+                                "/superadmin.html",
+                                "/setup-password.html"
                         ).permitAll()
 
                         .requestMatchers(
@@ -146,6 +149,12 @@ public class SecurityFilterChainConfig {
 
                         .requestMatchers("/api/v1/admin/create")
                         .hasAuthority("SYSTEM_CONFIG")
+
+                        .requestMatchers("/superadmin/**")
+                        .hasAuthority("SYSTEM_CONFIG")
+
+                        .requestMatchers("/set-password/**")
+                        .permitAll()
 
                         .anyRequest().authenticated()
                 )

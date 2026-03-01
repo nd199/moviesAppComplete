@@ -5,7 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -44,7 +47,7 @@ public class BrevoEmailService implements EmailService {
     public void sendOTPEmail(String toEmail, String otp) {
         logger.info("=== BREVO EMAIL SERVICE CALLED ===");
         logger.info("Starting OTP email sending process to: {}", toEmail);
-        
+
         try {
             // Check configuration
             logger.info("Checking Brevo configuration...");
@@ -58,23 +61,23 @@ public class BrevoEmailService implements EmailService {
                 logger.error("Brevo sender email is null or empty");
                 throw new EmailSendingException("Brevo sender email is not configured");
             }
-            
-            logger.info("Brevo configuration OK - API key present: {}, Sender email: {}", 
-                brevoApiKey != null ? "YES" : "NO", senderEmail);
-            
+
+            logger.info("Brevo configuration OK - API key present: {}, Sender email: {}",
+                    brevoApiKey != null ? "YES" : "NO", senderEmail);
+
             // Prepare HTML content from Thymeleaf template
             logger.debug("Processing Thymeleaf template for email: {}", toEmail);
             Context context = new Context();
             context.setVariable("otp", otp);
             context.setVariable("email", toEmail);
             String htmlContent = templateEngine.process("otp-email", context);
-            
+
             if (htmlContent == null || htmlContent.trim().isEmpty()) {
                 logger.error("=== TEMPLATE PROCESSING FAILED ===");
                 logger.error("Thymeleaf template processing returned null or empty content");
                 throw new EmailSendingException("Failed to process email template");
             }
-            
+
             logger.info("Template processed successfully, content length: {}", htmlContent.length());
 
             sendViaBrevoAPI(toEmail, "Your OTP Code", htmlContent);
@@ -104,6 +107,22 @@ public class BrevoEmailService implements EmailService {
         }
     }
 
+    @Override
+    public void sendInviteEmail(String toEmail, String inviteLink) {
+        try {
+            Context context = new Context();
+            context.setVariable("inviteLink", inviteLink);
+            context.setVariable("toEmail", toEmail);
+            String htmlContent = templateEngine.process("admin-invite-mail-simple", context);
+
+            sendViaBrevoAPI(toEmail, "Admin Invitation - Movies Platform", htmlContent);
+            logger.info("Admin invite email sent successfully to {}", toEmail);
+        } catch (Exception e) {
+            logger.error("Failed to send admin invite email to {}: {}", toEmail, e.getMessage(), e);
+            throw new EmailSendingException("Failed to send admin invite email to " + toEmail, e);
+        }
+    }
+
     private void sendViaBrevoAPI(String toEmail, String subject, String htmlContent) {
         String url = "https://api.brevo.com/v3/smtp/email";
         logger.info("=== SENDING EMAIL VIA BREVO API ===");
@@ -124,7 +143,7 @@ public class BrevoEmailService implements EmailService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("api-key", brevoApiKey);
-        
+
         logger.info("Brevo API headers configured, API key length: {}", brevoApiKey.length());
 
         // Build request body safely using Maps
@@ -133,7 +152,7 @@ public class BrevoEmailService implements EmailService {
         body.put("to", List.of(Map.of("email", toEmail)));
         body.put("subject", subject);
         body.put("htmlContent", htmlContent);
-        
+
         logger.info("Request body built, sender: {}, recipient: {}", senderEmail, toEmail);
         logger.debug("Request body: {}", body);
 
@@ -145,14 +164,14 @@ public class BrevoEmailService implements EmailService {
             logger.info("=== BREVO API RESPONSE RECEIVED ===");
             logger.info("Brevo API response status: {}", response.getStatusCode());
             logger.info("Brevo API response body: {}", response.getBody());
-            
+
             if (!response.getStatusCode().is2xxSuccessful()) {
                 logger.error("=== BREVO API RETURNED NON-2XX STATUS ===");
-                logger.error("Brevo API returned non-2xx status: {}, body: {}", 
-                    response.getStatusCode(), response.getBody());
+                logger.error("Brevo API returned non-2xx status: {}, body: {}",
+                        response.getStatusCode(), response.getBody());
                 throw new EmailSendingException("Brevo API returned status: " + response.getStatusCode());
             }
-            
+
         } catch (HttpClientErrorException e) {
             logger.error("=== BREVO API HTTP ERROR ===");
             logger.error("Brevo API call failed. Status: {}, Body: {}", e.getStatusCode(), e.getResponseBodyAsString());

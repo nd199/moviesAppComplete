@@ -1,14 +1,14 @@
 package com.naren.moviesapp.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.naren.moviesapp.Config.RolePermissionMapper;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "admin", uniqueConstraints = {

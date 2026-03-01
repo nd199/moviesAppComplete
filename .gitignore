@@ -52,6 +52,10 @@ movies-admin/node_modules/
 movies-admin/build/
 movies-admin/dist/
 movies-admin/package-lock.json
+super-admin/node_modules/
+super-admin/build/
+super-admin/dist/
+super-admin/package-lock.json
 frontendpayment/node_modules/
 frontendpayment/build/
 payment/node_modules/
@@ -62,7 +66,6 @@ payment/node_modules/
 previewConfig.json
 *.log
 *.tmp
-.DS_Store
 Thumbs.db
 *.swp
 *.swo
@@ -89,3 +92,4 @@ junit.xml
 # ===============================
 yarn.lock
 pnpm-lock.yaml
+.continueignore

@@ -3,11 +3,7 @@ package com.naren.moviesapp.Service;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Dto.CustomerStatsDTO;
-import com.naren.moviesapp.Entity.Customer;
-import com.naren.moviesapp.Entity.Movie;
-import com.naren.moviesapp.Entity.Role;
-import com.naren.moviesapp.Entity.RoleName;
-import com.naren.moviesapp.Entity.UserPlanInfo;
+import com.naren.moviesapp.Entity.*;
 import com.naren.moviesapp.Exception.*;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Record.CustomerSubscription;
@@ -22,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -92,6 +87,11 @@ public class CustomerService implements CustomerServiceInterface {
     public ResponseEntity<?> registerUser(CustomerRegistration customerRegistration, Set<String> roleNames) {
 
         logger.info("Attempting to register new user with email: {}", customerRegistration.email());
+
+        if (roleNames == null || !roleNames.equals(Set.of("ROLE_USER"))) {
+            throw new AccessDeniedException("Invalid role assignment attempted " +
+                    "during customer registration.");
+        }
 
         try {
             Customer registeredCustomer = registerCustomer(customerRegistration);
@@ -160,8 +160,8 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     private boolean containsPersonalInfo(String password, String name, String email, String phoneNumber) {
-      String passwordLower = password.toLowerCase();
-        
+        String passwordLower = password.toLowerCase();
+
         // Check name parts (3+ characters)
         if (name != null) {
             String[] nameParts = name.toLowerCase().split(" ");
@@ -172,7 +172,7 @@ public class CustomerService implements CustomerServiceInterface {
                 }
             }
         }
-        
+
         // Check email local part (before @)
         if (email != null) {
             String emailLocal = email.toLowerCase().split("@")[0];
@@ -181,7 +181,7 @@ public class CustomerService implements CustomerServiceInterface {
                         "not contain personal info [Name,Email,Phone] ");
             }
         }
-        
+
         // Check phone number sequences (4+ digits to be less strict)
         if (phoneNumber != null) {
             String phoneDigits = phoneNumber.replaceAll("\\D", "");
@@ -193,7 +193,7 @@ public class CustomerService implements CustomerServiceInterface {
                 }
             }
         }
-        
+
         return false;
     }
 
@@ -263,7 +263,7 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    
+
     @Transactional
     public void updatePassword(String email, String newPassword) {
         logger.info("Password update request for email: {}", email);

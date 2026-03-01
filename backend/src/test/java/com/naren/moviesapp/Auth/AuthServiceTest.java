@@ -25,7 +25,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -94,8 +95,10 @@ class AuthServiceTest {
         AuthResponse response =
                 underTest.login(new AuthRequest("user@codeNaren.com", "password"));
 
-        assertThat(response.customerDTO()).isEqualTo(mapped);
-        assertThat(response.token()).isEqualTo("jwt-token");
+        assertThat(response).isInstanceOf(CustomerAuthResponse.class);
+        CustomerAuthResponse customerResponse = (CustomerAuthResponse) response;
+        assertThat(customerResponse.customerDTO()).isEqualTo(mapped);
+        assertThat(customerResponse.token()).isEqualTo("jwt-token");
 
         verify(customerRepository).save(principal);
         verify(jwtUtil).issueToken(eq(mapped.email()), anySet());
@@ -121,8 +124,10 @@ class AuthServiceTest {
         AuthResponse response =
                 underTest.login(new AuthRequest("user@codeNaren.com", "password"));
 
-        assertThat(response.customerDTO()).isEqualTo(mapped);
-        assertThat(response.token()).isEqualTo("jwt-token");
+        assertThat(response).isInstanceOf(CustomerAuthResponse.class);
+        CustomerAuthResponse customerResponse = (CustomerAuthResponse) response;
+        assertThat(customerResponse.customerDTO()).isEqualTo(mapped);
+        assertThat(customerResponse.token()).isEqualTo("jwt-token");
 
         verify(customerRepository).save(principal);
     }
@@ -179,7 +184,9 @@ class AuthServiceTest {
         AuthResponse response =
                 underTest.login(new AuthRequest("superadmin@codeNaren.com", "password"));
 
-        assertThat(response.customerDTO().roles())
+        assertThat(response).isInstanceOf(CustomerAuthResponse.class);
+        CustomerAuthResponse customerResponse = (CustomerAuthResponse) response;
+        assertThat(customerResponse.customerDTO().roles())
                 .contains("ROLE_SUPER_ADMIN");
 
         verify(customerRepository).save(principal);

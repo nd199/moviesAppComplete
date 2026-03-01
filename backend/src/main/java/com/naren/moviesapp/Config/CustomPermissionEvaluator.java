@@ -12,25 +12,15 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        if (authentication == null || targetDomainObject == null || !(permission instanceof String)) {
+        if (authentication == null || !(permission instanceof String)) {
             return false;
         }
-        
-        String targetType = targetDomainObject.getClass().getSimpleName().toUpperCase();
-        String requiredPermission = permission.toString().toUpperCase();
 
-        return authentication.getAuthorities().stream()
+        String requiredPermission = permission.toString();
+        return authentication.getAuthorities()
+                .stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(auth -> {
-                    String authority = auth.toUpperCase();
-                    // Exact match
-                    if (authority.equals(requiredPermission)) {
-                        return true;
-                    }
-                    // Check if authority starts with the permission prefix
-                    String permissionPrefix = requiredPermission.replace("_READ", "").replace("_WRITE", "").replace("_DELETE", "");
-                    return authority.startsWith(permissionPrefix) || authority.contains(requiredPermission);
-                });
+                .anyMatch(grantedAuth -> grantedAuth.equals(requiredPermission));
     }
 
     @Override

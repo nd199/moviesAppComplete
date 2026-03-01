@@ -24,12 +24,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         logger.debug("Loading user by email: {}", email);
-        
+
         // First try to find admin - fetch roles eagerly
         return adminRepository.findByEmail(email)
                 .map(admin -> {
                     // Force initialize roles before closing session
-                    admin.getRoles().size(); 
+                    admin.getRoles().size();
                     logger.debug("User found in admin repository: {}", email);
                     return (UserDetails) new AppUserPrincipal(admin);
                 })

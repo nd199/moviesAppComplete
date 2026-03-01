@@ -18,9 +18,9 @@ public class TmdbVideoDto {
     private String site;
     private String type;
     private Boolean official;
-    
+
     @JsonProperty("published_at")
     private String publishedAt;
-    
+
     private Integer size;
 }

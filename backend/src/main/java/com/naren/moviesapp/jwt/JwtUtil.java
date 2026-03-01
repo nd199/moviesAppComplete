@@ -4,7 +4,6 @@ import com.naren.moviesapp.Config.RolePermissionMapper;
 import com.naren.moviesapp.Entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +12,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -35,11 +33,11 @@ public class JwtUtil {
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
-        
+
         if (keyBytes.length < 32) {
             keyBytes = java.util.Arrays.copyOf(keyBytes, 32);
         }
-        
+
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -61,12 +59,27 @@ public class JwtUtil {
     public String issueToken(String subject, Set<Role> roles) {
         Set<String> authorities = new HashSet<>();
 
-        roles.forEach(role -> {
-            authorities.add(role.getName().name());
-            RolePermissionMapper.getPermissions(role.getName())
-                    .forEach(permission -> authorities
-                            .add(permission.name()));
-        });
+        if (roles == null || roles.isEmpty()) {
+            logger.warn("No roles found for user: {}, adding default ROLE_USER", subject);
+            authorities.add("ROLE_USER");
+        } else {
+            roles.forEach(role -> {
+                if (role != null && role.getName() != null) {
+                    authorities.add(role.getName().name());
+                    try {
+                        RolePermissionMapper.getPermissions(role.getName())
+                                .forEach(permission -> authorities
+                                        .add(permission.name()));
+                    } catch (Exception e) {
+                        logger.error("Error getting permissions for role {}: {}",
+                                role.getName(), e.getMessage());
+                    }
+                } else {
+                    logger.warn("Null role found for user: {}", subject);
+                }
+            });
+        }
+
         Map<String, Object> claims = new HashMap<>();
         claims.put("authorities", authorities);
         claims.put("type", "access");
@@ -131,5 +144,9 @@ public class JwtUtil {
 
     public Date extractExpiration(String token) {
         return getClaims(token).getExpiration();
+    }
+
+    public Claims extractAllClaims(String token) {
+        return getClaims(token);
     }
 }

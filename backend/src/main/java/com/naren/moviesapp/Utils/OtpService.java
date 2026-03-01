@@ -1,6 +1,5 @@
 package com.naren.moviesapp.Utils;
 
-import com.naren.moviesapp.Exception.EmailSendingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,10 +25,10 @@ public class OtpService {
     // ===== Generate OTP for email (registration / verification) =====
     public void generateAndSendMailOtp(String email) {
         logger.info("Starting OTP generation for email: {}", email);
-        
+
         String normalizedEmail = email.toLowerCase().trim();
         String key = generateKey(normalizedEmail);
-        
+
         logger.debug("Normalized email: {}, Redis key: {}", normalizedEmail, key);
 
         try {
@@ -45,13 +44,13 @@ public class OtpService {
 
             String otp = generateOtp();
             logger.debug("Generated new OTP: {} for email: {}", otp, email);
-            
+
             redisTemplate.opsForValue().set(key, otp, OTP_EXPIRE_INTERVAL_MIN, TimeUnit.MINUTES);
             logger.debug("Stored OTP in Redis with expiration: {} minutes", OTP_EXPIRE_INTERVAL_MIN);
 
             emailService.sendOTPEmail(email, otp);
             logger.info("OTP sent successfully to email: {}", email);
-            
+
         } catch (Exception e) {
             logger.error("Error in OTP generation process for email {}: {}", email, e.getMessage(), e);
             throw e; // Re-throw to let the controller handle it
@@ -61,11 +60,11 @@ public class OtpService {
     // ===== Validate OTP =====
     public boolean validateOtp(String email, String enteredOtp) {
         logger.debug("Validating OTP for email: {}", email);
-        
+
         String normalizedEmail = email.toLowerCase().trim();
         String key = generateKey(normalizedEmail);
         String savedOtp = redisTemplate.opsForValue().get(key);
-        
+
         logger.debug("Retrieved saved OTP from Redis: {} for key: {}", savedOtp, key);
 
         if (savedOtp == null) {
@@ -74,8 +73,8 @@ public class OtpService {
         }
 
         if (!savedOtp.equals(enteredOtp)) {
-            logger.warn("OTP validation failed: Invalid OTP for email: {}. Expected: {}, Got: {}", 
-                email, savedOtp, enteredOtp);
+            logger.warn("OTP validation failed: Invalid OTP for email: {}. Expected: {}, Got: {}",
+                    email, savedOtp, enteredOtp);
             return false;
         }
 

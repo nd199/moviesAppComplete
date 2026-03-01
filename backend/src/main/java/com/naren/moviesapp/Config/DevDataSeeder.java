@@ -75,7 +75,7 @@ public class DevDataSeeder {
             for (int i = 0; i < DEMO_DATA_COUNT; i++) {
                 createRandomCustomer();
             }
-            
+
             // Always create fake movies/shows for development
             log.info("Creating fake movies and shows for development environment...");
             for (int i = 0; i < DEMO_DATA_COUNT; i++) {
@@ -89,7 +89,7 @@ public class DevDataSeeder {
 
     private void createDemoUser() {
         String demoEmail = "demo@example.com";
-        
+
         var existingUser = customerRepository.findByEmail(demoEmail);
         if (existingUser.isPresent()) {
             Customer user = existingUser.get();
@@ -103,7 +103,7 @@ public class DevDataSeeder {
         }
 
         String phoneNumber = "9999999" + String.format("%03d", RANDOM.nextInt(1000));
-        
+
         while (isPhoneNumberTaken(phoneNumber)) {
             phoneNumber = "9999999" + String.format("%03d", RANDOM.nextInt(1000));
         }
@@ -123,10 +123,10 @@ public class DevDataSeeder {
         customerRepository.save(demoUser);
         log.info("Created demo user: {} with phone: {}", demoEmail, phoneNumber);
     }
-    
+
     private boolean isPhoneNumberTaken(String phoneNumber) {
         return customerRepository.findAll().stream()
-            .anyMatch(c -> c.getPhoneNumber() != null && c.getPhoneNumber().equals(phoneNumber));
+                .anyMatch(c -> c.getPhoneNumber() != null && c.getPhoneNumber().equals(phoneNumber));
     }
 
     private void createRandomCustomer() {
@@ -162,7 +162,7 @@ public class DevDataSeeder {
         String genre1 = FAKER.book().genre();
         String genre2 = FAKER.book().genre();
         String instant = Instant.now().toString().substring(20, 24);
-        
+
         // Assign random category
         String category = MOVIE_CATEGORIES.get(RANDOM.nextInt(MOVIE_CATEGORIES.size()));
 
@@ -193,7 +193,7 @@ public class DevDataSeeder {
         String genre1 = FAKER.book().genre();
         String genre2 = FAKER.book().genre();
         String instant = Instant.now().toString().substring(20, 24);
-        
+
         // Assign random category
         String category = SHOW_CATEGORIES.get(RANDOM.nextInt(SHOW_CATEGORIES.size()));
 

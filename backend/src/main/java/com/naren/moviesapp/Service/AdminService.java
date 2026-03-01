@@ -1,5 +1,6 @@
 package com.naren.moviesapp.Service;
 
+import com.naren.moviesapp.Config.RoleHierarchyPolicy;
 import com.naren.moviesapp.Dto.AdminDTO;
 import com.naren.moviesapp.Dto.AdminDTOMapper;
 import com.naren.moviesapp.Dto.AdminStatsDTO;
@@ -12,18 +13,22 @@ import com.naren.moviesapp.Exception.PasswordInvalidException;
 import com.naren.moviesapp.Record.AdminRegistration;
 import com.naren.moviesapp.Record.AdminUpdateRequest;
 import com.naren.moviesapp.Repo.AdminRepository;
+import com.naren.moviesapp.jwt.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AdminService implements AdminServiceInterface {
@@ -33,13 +38,18 @@ public class AdminService implements AdminServiceInterface {
     private final PasswordEncoder passwordEncoder;
     private final AdminDTOMapper adminDTOMapper;
     private final RoleService roleService;
+    private final JwtUtil jwtUtil;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEncoder,
-                        AdminDTOMapper adminDTOMapper, RoleService roleService) {
+                        AdminDTOMapper adminDTOMapper, RoleService roleService, JwtUtil jwtUtil,
+                        RedisTemplate<String, String> redisTemplate) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.adminDTOMapper = adminDTOMapper;
         this.roleService = roleService;
+        this.jwtUtil = jwtUtil;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -70,12 +80,23 @@ public class AdminService implements AdminServiceInterface {
         admin.setIsEmailVerified(false);
         admin.setIsActive(true);
 
+        Authentication auth = SecurityContextHolder.getContext()
+                .getAuthentication();
+        RoleName currentRole = extractHighestRole(auth);
+
         Set<Role> roles = new HashSet<>();
         for (String roleName : roleNames) {
-            Role role = roleService.findRoleByName(RoleName.valueOf(roleName));
-            if (role == null) {
-                throw new IllegalArgumentException("Role not found: " + roleName);
+            // Clean normalization - handle both ROLE_ and non-ROLE_ formats
+            String normalizedRole = roleName.toUpperCase().startsWith("ROLE_")
+                    ? roleName.toUpperCase()
+                    : "ROLE_" + roleName.toUpperCase();
+            RoleName targetRole = RoleName.valueOf(normalizedRole);
+
+            if (!RoleHierarchyPolicy.canAssign(currentRole, targetRole)) {
+                throw new AccessDeniedException("Cannot assign role: " + targetRole);
             }
+
+            Role role = roleService.findRoleByName(targetRole);
             roles.add(role);
         }
         admin.setRoles(roles);
@@ -93,6 +114,16 @@ public class AdminService implements AdminServiceInterface {
 
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new AdminNotFoundException("Admin not found with ID: " + adminId));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        RoleName currentRole = extractHighestRole(auth);
+
+        RoleName targetRole = extractTargetRole(admin);
+
+        if (!RoleHierarchyPolicy.canModify(currentRole, targetRole)) {
+            throw new AccessDeniedException("Insufficient privilege to modify this user.");
+        }
+
 
         if (updateRequest.name() != null) {
             admin.setName(updateRequest.name());
@@ -133,6 +164,21 @@ public class AdminService implements AdminServiceInterface {
 
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new AdminNotFoundException("Admin not found with ID: " + adminId));
+
+        Authentication auth = SecurityContextHolder.getContext()
+                .getAuthentication();
+        RoleName currentRole = extractHighestRole(auth);
+        RoleName targetRole = extractTargetRole(admin);
+
+        if (!RoleHierarchyPolicy.canModify(currentRole, targetRole)) {
+            throw new AccessDeniedException("Insufficient privilege to delete this user.");
+        }
+
+        long count = roleService.findRoleByName(RoleName.ROLE_SUPER_ADMIN)
+                .getAdmins().size();
+        if (count <= 1) {
+            throw new AccessDeniedException("Cannot delete the last SuperAdmin.");
+        }
 
         adminRepository.delete(admin);
         logger.info("Successfully deleted admin with ID: {}", adminId);
@@ -217,6 +263,26 @@ public class AdminService implements AdminServiceInterface {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new AdminNotFoundException("Admin not found with ID: " + adminId));
 
+        Authentication auth = SecurityContextHolder.getContext()
+                .getAuthentication();
+        RoleName currentRole = extractHighestRole(auth);
+        RoleName targetRole = extractTargetRole(admin);
+
+        if (!RoleHierarchyPolicy.canModify(currentRole, targetRole)) {
+            throw new AccessDeniedException("Insufficient privilege to toggle this user's status.");
+        }
+
+        if (targetRole == RoleName.ROLE_SUPER_ADMIN && admin.getIsActive()) {
+            long activeSuperAdminCount = roleService.findRoleByName(RoleName.ROLE_SUPER_ADMIN)
+                    .getAdmins().stream()
+                    .filter(Admin::getIsActive)
+                    .count();
+
+            if (activeSuperAdminCount <= 1) {
+                throw new AccessDeniedException("Cannot disable the last active SuperAdmin.");
+            }
+        }
+
         admin.setIsActive(!admin.getIsActive());
         Admin updatedAdmin = adminRepository.save(admin);
 
@@ -225,4 +291,75 @@ public class AdminService implements AdminServiceInterface {
 
         return new ResponseEntity<>(adminDTOMapper.apply(updatedAdmin), HttpStatus.OK);
     }
+
+    public RoleName extractHighestRole(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new IllegalArgumentException("Authentication is required");
+        }
+
+        return auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(r -> {
+                    // Only process actual roles, not permissions
+                    // Roles are like ROLE_ADMIN, ROLE_SUPER_ADMIN
+                    // Permissions are like ROLE_MOVIE_WRITE, ROLE_USER_READ
+                    return r.equals("ROLE_USER") || r.equals("ROLE_ADMIN") || r.equals("ROLE_SUPER_ADMIN")
+                            || r.equals("ROLE_CONTENT_MANAGER") || r.equals("ROLE_SUPPORT");
+                })
+                .map(r -> {
+                    // Clean normalization - handle both ROLE_ and non-ROLE_ formats
+                    String normalizedRole = r.toUpperCase().startsWith("ROLE_")
+                            ? r.toUpperCase()
+                            : "ROLE_" + r.toUpperCase();
+                    return RoleName.valueOf(normalizedRole);
+                })
+                .max(Comparator.comparingInt(RoleHierarchyPolicy::getLevel))
+                .orElse(RoleName.ROLE_USER);
+    }
+
+    public RoleName extractTargetRole(Admin admin) {
+        return admin.getRoles().stream()
+                .map(Role::getName)
+                .max(Comparator.comparing(RoleHierarchyPolicy::getLevel))
+                .orElse(RoleName.ROLE_USER);
+    }
+
+    @Override
+    public String generateInviteToken(String email, RoleName role) {
+        logger.info("Generating invite token for email: {} with role: {}", email, role);
+
+        Map<String, Object> claims = Map.of(
+                "email", email,
+                "role", role.name(),
+                "type", "admin_invite",
+                "exp", System.currentTimeMillis() + (24 * 60 * 60 * 1000)
+        );
+
+        String token = jwtUtil.issueToken(email, claims);
+
+        redisTemplate.opsForValue().set("invite:" + token, email, 24, TimeUnit.HOURS);
+
+        return token;
+    }
+
+    public boolean validateInviteToken(String token) {
+        String email = redisTemplate.opsForValue().get("invite:" + token);
+        return email != null;
+    }
+
+    public void consumeInviteToken(String token) {
+        redisTemplate.delete("invite:" + token);
+    }
+
+    @Transactional
+    public void updateAdminPassword(String email, String newPassword) {
+        Admin admin = adminRepository.findByEmail(email)
+                .orElseThrow(() -> new AdminNotFoundException("Admin not found with email: " + email));
+
+        admin.setPassword(passwordEncoder.encode(newPassword));
+        adminRepository.save(admin);
+
+        logger.info("Password updated for admin: {}", email);
+    }
+
 }

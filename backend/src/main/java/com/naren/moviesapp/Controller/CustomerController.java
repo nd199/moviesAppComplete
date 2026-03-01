@@ -3,7 +3,6 @@ package com.naren.moviesapp.Controller;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerStatsDTO;
 import com.naren.moviesapp.Dto.ProductDTO;
-import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.Show;

@@ -13,19 +13,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Configuration
 @Profile({"prod", "production"})
 @RequiredArgsConstructor
 @Slf4j
 public class TmdbDataSeeder {
 
+    private static final int MOVIES_TO_IMPORT = 20;
+    private static final int SHOWS_TO_IMPORT = 20;
     private final TmdbService tmdbService;
     private final MovieRepository movieRepository;
     private final ShowRepository showRepository;
-    private static final int MOVIES_TO_IMPORT = 20;
-    private static final int SHOWS_TO_IMPORT = 20;
 
     @Bean
     @Transactional

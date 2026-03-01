@@ -32,6 +32,10 @@ public class RefreshTokenService {
     }
 
     public RefreshToken createRefreshToken(Customer user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
         // Delete existing refresh tokens for this user
         refreshTokenRepository.deleteByUser(user);
 

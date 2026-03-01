@@ -22,6 +22,7 @@ import static org.springframework.http.HttpStatus.*;
 @ControllerAdvice
 public class DefaultExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(DefaultExceptionHandler.class);
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiError> handleAuthenticationException(AuthenticationException e,
                                                                   HttpServletRequest request) {
@@ -102,7 +103,7 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler(ResourceAlreadyExists.class)
     public ResponseEntity<ApiError> handleResourceAlreadyExists(ResourceAlreadyExists e,
-                                                                 HttpServletRequest request) {
+                                                                HttpServletRequest request) {
         logger.warn("Resource already exists: {}", e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
@@ -116,7 +117,7 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler(AdminAlreadyExistsException.class)
     public ResponseEntity<ApiError> handleAdminAlreadyExists(AdminAlreadyExistsException e,
-                                                            HttpServletRequest request) {
+                                                             HttpServletRequest request) {
         logger.warn("Admin already exists: {}", e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
@@ -130,7 +131,7 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler(AdminNotFoundException.class)
     public ResponseEntity<ApiError> handleAdminNotFound(AdminNotFoundException e,
-                                                       HttpServletRequest request) {
+                                                        HttpServletRequest request) {
         logger.warn("Admin not found: {}", e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
@@ -144,7 +145,7 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler(PasswordInvalidException.class)
     public ResponseEntity<ApiError> handlePasswordInvalid(PasswordInvalidException e,
-                                                        HttpServletRequest request) {
+                                                          HttpServletRequest request) {
         logger.warn("Password validation failed: {}", e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
@@ -158,7 +159,7 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> handleIllegalArgument(IllegalArgumentException e,
-                                                        HttpServletRequest request) {
+                                                          HttpServletRequest request) {
         logger.warn("Invalid argument: {}", e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
@@ -172,7 +173,7 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler(RequestValidationException.class)
     public ResponseEntity<ApiError> handleRequestValidation(RequestValidationException e,
-                                                          HttpServletRequest request) {
+                                                            HttpServletRequest request) {
         logger.warn("Request validation failed: {}", e.getMessage());
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
@@ -251,7 +252,7 @@ public class DefaultExceptionHandler {
         logger.error("Exception type: {}", e.getClass().getSimpleName());
         logger.error("Exception message: {}", e.getMessage());
         logger.error("Full stack trace:", e);
-        
+
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 "Something went wrong on our side. Please try again later.",

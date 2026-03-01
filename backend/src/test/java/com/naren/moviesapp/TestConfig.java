@@ -27,13 +27,18 @@ public class TestConfig {
             public void sendPasswordResetMail(String toEmail, String token) {
                 System.out.println("Mock password reset email sent to: " + toEmail + " with token: " + token);
             }
+
+            @Override
+            public void sendInviteEmail(String toEmail, String inviteLink) {
+                System.out.println("Mock invite email sent to: " + toEmail + " with link: " + inviteLink);
+            }
         };
     }
 
     @Bean
     @Primary
-    public OtpService otpService(EmailService emailService,RedisTemplate<String, String> redisTemplate) {
-        return new OtpService(emailService,redisTemplate);
+    public OtpService otpService(EmailService emailService, RedisTemplate<String, String> redisTemplate) {
+        return new OtpService(emailService, redisTemplate);
     }
 
     @Bean

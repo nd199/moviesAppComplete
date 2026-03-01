@@ -1,8 +1,5 @@
-package com.naren.moviesapp.Controller;
+package com.naren.moviesapp.Auth;
 
-import com.naren.moviesapp.Auth.AuthRequest;
-import com.naren.moviesapp.Auth.AuthResponse;
-import com.naren.moviesapp.Auth.AuthService;
 import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Service.CustomerService;
@@ -17,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -58,13 +54,6 @@ public class AuthController {
         return customerService.registerUser(request, Set.of("ROLE_USER"));
     }
 
-    @PostMapping("/admins")
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
-    public ResponseEntity<?> registerAdmin(@Valid @RequestBody CustomerRegistration request) {
-        logger.info("Admin registration request received for email: {}", request.email());
-        return customerService.registerUser(request, Set.of("ROLE_ADMIN"));
-    }
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request,
                                    HttpServletResponse response) {
@@ -75,12 +64,20 @@ public class AuthController {
         setAuthCookies(response, authResponse);
 
         logger.info("Login successful for username: {}", request.username());
-        
+
         // Return user data with token as fallback for cookie issues
         Map<String, Object> responseBody = new java.util.HashMap<>();
-        responseBody.put("user", authResponse.customerDTO());
+
+        // Handle different response types
+        if (authResponse instanceof AdminAuthResponse adminAuth) {
+            responseBody.put("user", adminAuth.adminDTO());
+            responseBody.put("userType", "ADMIN");
+        } else if (authResponse instanceof CustomerAuthResponse customerAuth) {
+            responseBody.put("user", customerAuth.customerDTO());
+            responseBody.put("userType", "CUSTOMER");
+        }
         responseBody.put("token", authResponse.token());
-        
+
         return ResponseEntity.ok(responseBody);
     }
 
@@ -129,6 +126,8 @@ public class AuthController {
                 refreshTokenService.deleteByUser(token.getUser());
                 logger.debug("Refresh token deleted for user: {}", token.getUser().getEmail());
             }
+        } else {
+            logger.debug("No refresh token found in request (likely admin logout)");
         }
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -152,10 +151,35 @@ public class AuthController {
     }
 
     private void setAuthCookies(HttpServletResponse response, AuthResponse authResponse) {
-        RefreshToken refreshToken =
-                refreshTokenService.createRefreshToken(authResponse.customerDTO().user());
+        // Check response type and handle accordingly
+        if (authResponse instanceof CustomerAuthResponse customerAuth) {
+            // Customer login - create refresh token
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(customerAuth.customerDTO().user());
+            setCookies(response, customerAuth.token(), refreshToken.getToken());
+        } else {
+            // Admin login - only set JWT token, no refresh token needed
+            setJwtOnlyCookie(response, authResponse.token());
+        }
+    }
 
-        setCookies(response, authResponse.token(), refreshToken.getToken());
+    private void setJwtOnlyCookie(HttpServletResponse response, String jwt) {
+        boolean isProduction = activeProfile.equals("prod");
+        String domain = null;
+
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
+                .httpOnly(true)
+                .secure(isProduction)
+                .path("/")
+                .maxAge(Duration.ofMinutes(30))
+                .sameSite(isProduction ? "None" : "Lax")
+                .domain(domain)
+                .build();
+
+        logger.info("Setting JWT-only cookie for admin - Production: {}, Domain: {}, SameSite: {}",
+                isProduction, domain, isProduction ? "None" : "Lax");
+        logger.debug("JWT Cookie: {}", jwtCookie);
+
+        response.addHeader("Set-Cookie", jwtCookie.toString());
     }
 
     private void setCookies(HttpServletResponse response,
@@ -164,7 +188,7 @@ public class AuthController {
 
         boolean isProduction = activeProfile.equals("prod");
         String domain = null;
-        
+
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
                 .httpOnly(true)
                 .secure(isProduction)
@@ -183,8 +207,8 @@ public class AuthController {
                 .domain(domain)
                 .build();
 
-        logger.info("Setting auth cookies - Production: {}, Domain: {}, SameSite: {}", 
-            isProduction, domain, isProduction ? "None" : "Lax");
+        logger.info("Setting auth cookies - Production: {}, Domain: {}, SameSite: {}",
+                isProduction, domain, isProduction ? "None" : "Lax");
         logger.debug("JWT Cookie: {}", jwtCookie);
         logger.debug("Refresh Cookie: {}", refreshCookie);
 
