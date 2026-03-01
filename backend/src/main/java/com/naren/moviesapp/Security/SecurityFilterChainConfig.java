@@ -102,9 +102,14 @@ public class SecurityFilterChainConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/api/v1/ping",
                                 "/superadmin.html",
-                                "/setup-password.html"
+                                "/setup-password.html",
+                                "/api/v1/health/**",
+                                "/health/**",
+                                "/api/v1/test-data/status",
+                                "/api/v1/streaming/**",
+                                "/api/v1/subscription/status",
+                                "/api/v1/admins/health"
                         ).permitAll()
 
                         .requestMatchers(
@@ -112,8 +117,8 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/shows/**",
                                 "/api/v1/products/**",
                                 "/api/v1/about",
-                                "/api/v1/test-data/status",
-                                "/api/v1/tmdb/**"
+                                "/api/v1/tmdb/**",
+                                "/api/v1/public/**"
                         ).permitAll()
 
                         .requestMatchers(
@@ -121,12 +126,15 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/customers/currentUser",
                                 "/api/v1/subscription/confirm",
                                 "/api/v1/payments/**",
-                                "/api/v1/video/**"
+                                "/api/v1/video/**",
+                                "/api/v1/bookings/**",
+                                "/api/v1/reviews/**"
                         ).authenticated()
 
                         .requestMatchers(
                                 "/api/v1/customers/**",
-                                "/api/v1/roles/**"
+                                "/api/v1/roles/**",
+                                "/api/v1/admins/**"
                         ).hasAuthority("USER_MANAGE")
 
                         .requestMatchers("/api/v1/movies")
@@ -150,7 +158,8 @@ public class SecurityFilterChainConfig {
                         .requestMatchers("/api/v1/admin/create")
                         .hasAuthority("SYSTEM_CONFIG")
 
-                        .requestMatchers("/superadmin/**")
+                        .requestMatchers("/superadmin/**",
+                                "/system/superadmin/**")
                         .hasAuthority("SYSTEM_CONFIG")
 
                         .requestMatchers("/set-password/**")

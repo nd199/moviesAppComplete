@@ -46,7 +46,7 @@ function AppWithHealthCheck() {
         };
 
         const baseURL = getBaseURL();
-        const url = `${baseURL}/api/v1/ping`;
+        const url = baseURL.includes('/api/v1') ? `${baseURL}/ping` : `${baseURL}/api/v1/ping`;
         
         await axios.get(url, {
           timeout: 5000,
