@@ -1,896 +1,770 @@
-/* Profile Page - Enhanced Modern Design */
 :root {
-  --profile-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-  --profile-card-bg: rgba(15, 23, 42, 0.85);
-  --profile-border: rgba(148, 163, 184, 0.15);
-  --profile-accent: #f97316;
-  --profile-accent-light: #fb923c;
-  --profile-accent-glow: rgba(249, 115, 22, 0.4);
-  --profile-text: #f1f5f9;
-  --profile-text-muted: #94a3b8;
-  --profile-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-  --profile-shadow-hover: 0 25px 50px rgba(249, 115, 22, 0.25);
+--profile-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+--profile-card-bg: rgba(15, 23, 42, 0.85);
+--profile-border: rgba(148, 163, 184, 0.15);
+--profile-accent: #f97316;
+--profile-accent-light: #fb923c;
+--profile-accent-glow: rgba(249, 115, 22, 0.4);
+--profile-text: #f1f5f9;
+--profile-text-muted: #94a3b8;
+--profile-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+--profile-shadow-hover: 0 25px 50px rgba(249, 115, 22, 0.25);
 }
-
 .profileContainer {
-  width: 100%;
-  height: 100vh;
-  background: var(--profile-bg);
-  background-attachment: fixed;
-  padding: 1rem;
-  color: var(--profile-text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  box-sizing: border-box;
+width: 100%;
+height: 100vh;
+background: var(--profile-bg);
+background-attachment: fixed;
+padding: 1rem;
+color: var(--profile-text);
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+position: relative;
+overflow: hidden;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-start;
+box-sizing: border-box;
 }
-
 .profileContainer::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background:
-    radial-gradient(ellipse at 20% 20%, rgba(249, 115, 22, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(249, 115, 22, 0.05) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
+content: '';
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background:
+radial-gradient(ellipse at 20% 20%, rgba(249, 115, 22, 0.12) 0%, transparent 50%),
+radial-gradient(ellipse at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+radial-gradient(ellipse at 50% 50%, rgba(249, 115, 22, 0.05) 0%, transparent 70%);
+pointer-events: none;
+z-index: 0;
 }
-
-/* Floating particles effect */
 .profileContainer::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image:
-    radial-gradient(2px 2px at 20% 30%, rgba(249, 115, 22, 0.3) 50%, transparent 50%),
-    radial-gradient(2px 2px at 80% 70%, rgba(59, 130, 246, 0.2) 50%, transparent 50%),
-    radial-gradient(1px 1px at 40% 60%, rgba(249, 115, 22, 0.2) 50%, transparent 50%),
-    radial-gradient(1px 1px at 70% 20%, rgba(59, 130, 246, 0.2) 50%, transparent 50%);
-  background-size: 200px 200px;
-  animation: particles 20s linear infinite;
-  pointer-events: none;
-  z-index: 0;
+content: '';
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-image:
+radial-gradient(2px 2px at 20% 30%, rgba(249, 115, 22, 0.3) 50%, transparent 50%),
+radial-gradient(2px 2px at 80% 70%, rgba(59, 130, 246, 0.2) 50%, transparent 50%),
+radial-gradient(1px 1px at 40% 60%, rgba(249, 115, 22, 0.2) 50%, transparent 50%),
+radial-gradient(1px 1px at 70% 20%, rgba(59, 130, 246, 0.2) 50%, transparent 50%);
+background-size: 200px 200px;
+animation: particles 20s linear infinite;
+pointer-events: none;
+z-index: 0;
 }
-
 @keyframes particles {
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(-200px);
-  }
+0% {
+transform: translateY(0);
 }
-
+100% {
+transform: translateY(-200px);
+}
+}
 .profileTitleContainer {
-  max-width: 900px;
-  margin: 0 auto 0.5rem;
-  text-align: center;
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  font-size: 0.3rem;
-  flex-shrink: 0;
+max-width: 900px;
+margin: 0 auto 0.5rem;
+text-align: center;
+position: relative;
+z-index: 2;
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+font-size: 0.3rem;
+flex-shrink: 0;
 }
-
 .backButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid var(--profile-border);
-  color: var(--profile-text);
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 8px 12px;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  text-decoration: none;
-  margin-bottom: 10px;
-  align-self: flex-start;
-  top: 0; left: 0;
-  flex-shrink: 0;
+display: flex;
+align-items: center;
+gap: 8px;
+background: rgba(15, 23, 42, 0.6);
+border: 1px solid var(--profile-border);
+color: var(--profile-text);
+cursor: pointer;
+font-size: 14px;
+font-weight: 500;
+padding: 8px 12px;
+border-radius: 12px;
+transition: all 0.3s ease;
+backdrop-filter: blur(10px);
+text-decoration: none;
+margin-bottom: 10px;
+align-self: flex-start;
+top: 0; left: 0;
+flex-shrink: 0;
 }
-
 .backButton:hover {
-  background: rgba(249, 115, 22, 0.2);
-  border-color: var(--profile-accent);
-  color: var(--profile-accent);
-  transform: translateX(-4px);
-  box-shadow: 0 4px 20px var(--profile-accent-glow);
+background: rgba(249, 115, 22, 0.2);
+border-color: var(--profile-accent);
+color: var(--profile-accent);
+transform: translateX(-4px);
+box-shadow: 0 4px 20px var(--profile-accent-glow);
 }
-
 .backButton:active {
-  transform: translateX(-2px);
+transform: translateX(-2px);
 }
-
 .backButton .MuiSvgIcon-root {
-  font-size: 18px;
+font-size: 18px;
 }
-
 .profileTitle {
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  background: linear-gradient(135deg, var(--profile-accent) 0%, var(--profile-accent-light) 50%, #fff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 0;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  position: relative;
-  animation: titleGlow 3s ease-in-out infinite alternate;
-  align-self: center;
-  text-align: center;
-  flex-shrink: 0;
+font-size: clamp(1.5rem, 3vw, 2rem);
+background: linear-gradient(135deg, var(--profile-accent) 0%, var(--profile-accent-light) 50%, #fff 100%);
+-webkit-background-clip: text;
+background-clip: text;
+-webkit-text-fill-color: transparent;
+margin: 0;
+font-weight: 800;
+text-transform: uppercase;
+letter-spacing: 2px;
+position: relative;
+animation: titleGlow 3s ease-in-out infinite alternate;
+align-self: center;
+text-align: center;
+flex-shrink: 0;
 }
-
 @keyframes titleGlow {
-  0% {
-    filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.4));
-  }
-  100% {
-    filter: drop-shadow(0 0 25px rgba(249, 115, 22, 0.6));
-  }
+0% {
+filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.4));
 }
-
+100% {
+filter: drop-shadow(0 0 25px rgba(249, 115, 22, 0.6));
+}
+}
 .profileContentContainer {
-  max-width: 450px;
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  z-index: 2;
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
+max-width: 450px;
+width: 100%;
+margin: 0 auto;
+display: flex;
+flex-direction: column;
+align-items: center;
+position: relative;
+z-index: 2;
+flex: 1;
+overflow-y: auto;
+min-height: 0;
 }
-
-/* Profile Info Card - Left Side */
 .profileInfo {
-  background: var(--profile-card-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 1.5rem 1.5rem;
-  border: 1px solid var(--profile-border);
-  box-shadow: var(--profile-shadow);
-  position: relative;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 100%;
-  max-width: 450px;
-  box-sizing: border-box;
+background: var(--profile-card-bg);
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+border-radius: 20px;
+padding: 1.5rem 1.5rem;
+border: 1px solid var(--profile-border);
+box-shadow: var(--profile-shadow);
+position: relative;
+overflow: hidden;
+transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+width: 100%;
+max-width: 450px;
+box-sizing: border-box;
 }
-
 .profileInfo::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light), var(--profile-accent));
-  animation: shimmer 3s linear infinite;
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 4px;
+background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light), var(--profile-accent));
+animation: shimmer 3s linear infinite;
 }
-
 .profileInfo::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 70%);
-  pointer-events: none;
+content: '';
+position: absolute;
+top: -50%;
+right: -50%;
+width: 100%;
+height: 100%;
+background: radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 70%);
+pointer-events: none;
 }
-
 @keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+0% {
+transform: translateX(-100%);
 }
-
+100% {
+transform: translateX(100%);
+}
+}
 .profileInfo:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--profile-shadow-hover);
-  border-color: rgba(249, 115, 22, 0.3);
+transform: translateY(-5px);
+box-shadow: var(--profile-shadow-hover);
+border-color: rgba(249, 115, 22, 0.3);
 }
-
 .profileInfoContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  text-align: center;
-  position: relative;
-  z-index: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 1.25rem;
+text-align: center;
+position: relative;
+z-index: 1;
 }
-
-/* Profile Avatar */
 .profileInfoImg {
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid transparent;
-  background: linear-gradient(var(--profile-card-bg), var(--profile-card-bg)) padding-box,
-              linear-gradient(135deg, var(--profile-accent), var(--profile-accent-light), #fff) border-box;
-  box-shadow:
-    0 10px 30px rgba(249, 115, 22, 0.25),
-    0 0 0 2px rgba(249, 115, 22, 0.1);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
+width: 130px;
+height: 130px;
+border-radius: 50%;
+object-fit: cover;
+border: 4px solid transparent;
+background: linear-gradient(var(--profile-card-bg), var(--profile-card-bg)) padding-box,
+linear-gradient(135deg, var(--profile-accent), var(--profile-accent-light), #fff) border-box;
+box-shadow:
+0 10px 30px rgba(249, 115, 22, 0.25),
+0 0 0 2px rgba(249, 115, 22, 0.1);
+transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+position: relative;
 }
-
 .profileInfoImg:hover {
-  transform: scale(1.08) rotate(3deg);
-  box-shadow:
-    0 20px 50px rgba(249, 115, 22, 0.35),
-    0 0 0 4px rgba(249, 115, 22, 0.2),
-    0 0 30px rgba(249, 115, 22, 0.2);
+transform: scale(1.08) rotate(3deg);
+box-shadow:
+0 20px 50px rgba(249, 115, 22, 0.35),
+0 0 0 4px rgba(249, 115, 22, 0.2),
+0 0 30px rgba(249, 115, 22, 0.2);
 }
-
-/* Verified badge overlay */
 .profileInfoImgContainer {
-  position: relative;
-  display: inline-block;
+position: relative;
+display: inline-block;
 }
-
 .profileInfoName {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin: 0.5rem 0 0;
-  color: var(--profile-text);
-  text-transform: capitalize;
-  letter-spacing: 0.5px;
-  position: relative;
-  padding-bottom: 0.5rem;
+font-size: 1.3rem;
+font-weight: 700;
+margin: 0.5rem 0 0;
+color: var(--profile-text);
+text-transform: capitalize;
+letter-spacing: 0.5px;
+position: relative;
+padding-bottom: 0.5rem;
 }
-
 .profileInfoName::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light));
-  border-radius: 2px;
+content: '';
+position: absolute;
+bottom: 0;
+left: 50%;
+transform: translateX(-50%);
+width: 60px;
+height: 3px;
+background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light));
+border-radius: 2px;
 }
-
 .profileDetails {
-  width: 100%;
-  margin-top: 1.5rem;
+width: 100%;
+margin-top: 1.5rem;
 }
-
 .profileInfoTitle {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--profile-text-muted);
-  margin-bottom: 1rem;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
+display: block;
+font-size: 0.85rem;
+font-weight: 600;
+color: var(--profile-text-muted);
+margin-bottom: 1rem;
+text-align: center;
+text-transform: uppercase;
+letter-spacing: 1.5px;
 }
-
 .profileInfoItem {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  margin-bottom: 0.5rem;
-  border: 1px solid transparent;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+display: flex;
+align-items: center;
+gap: 0.75rem;
+padding: 0.75rem 1rem;
+background: rgba(15, 23, 42, 0.6);
+backdrop-filter: blur(10px);
+border-radius: 12px;
+margin-bottom: 0.5rem;
+border: 1px solid transparent;
+transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+position: relative;
+overflow: hidden;
 }
-
 .profileInfoItem::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 4px;
-  height: 100%;
-  background: linear-gradient(180deg, var(--profile-accent), var(--profile-accent-light));
-  transform: scaleY(0);
-  transition: transform 0.3s ease;
+content: '';
+position: absolute;
+left: 0;
+top: 0;
+width: 4px;
+height: 100%;
+background: linear-gradient(180deg, var(--profile-accent), var(--profile-accent-light));
+transform: scaleY(0);
+transition: transform 0.3s ease;
 }
-
 .profileInfoItem:hover {
-  background: rgba(15, 23, 42, 0.8);
-  border-color: rgba(249, 115, 22, 0.2);
-  transform: translateX(6px);
+background: rgba(15, 23, 42, 0.8);
+border-color: rgba(249, 115, 22, 0.2);
+transform: translateX(6px);
 }
-
 .profileInfoItem:hover::before {
-  transform: scaleY(1);
+transform: scaleY(1);
 }
-
 .profileInfoItem svg {
-  color: var(--profile-text-muted);
-  font-size: 1.5rem;
-  min-width: 24px;
-  transition: all 0.3s ease;
+color: var(--profile-text-muted);
+font-size: 1.5rem;
+min-width: 24px;
+transition: all 0.3s ease;
 }
-
 .profileInfoItem:hover svg {
-  color: var(--profile-accent);
-  transform: scale(1.15);
+color: var(--profile-accent);
+transform: scale(1.15);
 }
-
 .profileInfoItem span {
-  color: var(--profile-text);
-  font-weight: 500;
-  flex: 1;
-  text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
+color: var(--profile-text);
+font-weight: 500;
+flex: 1;
+text-align: left;
+overflow: hidden;
+text-overflow: ellipsis;
 }
-
 .profileInfoItem .profileInfoItemLabel {
-  font-size: 0.75rem;
-  color: var(--profile-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  min-width: 70px;
+font-size: 0.75rem;
+color: var(--profile-text-muted);
+text-transform: uppercase;
+letter-spacing: 0.5px;
+min-width: 70px;
 }
-
-/* Edit Profile Button */
 .profileUpdateButton {
-  width: 100%;
-  background: linear-gradient(135deg, var(--profile-accent), var(--profile-accent-light));
-  color: #0f172a;
-  border: none;
-  padding: 0.875rem 1.25rem;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  position: relative;
-  overflow: hidden;
-  margin-top: 1rem;
+width: 100%;
+background: linear-gradient(135deg, var(--profile-accent), var(--profile-accent-light));
+color: #0f172a;
+border: none;
+padding: 0.875rem 1.25rem;
+border-radius: 12px;
+font-size: 0.9rem;
+font-weight: 700;
+cursor: pointer;
+transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
+text-transform: uppercase;
+letter-spacing: 1px;
+position: relative;
+overflow: hidden;
+margin-top: 1rem;
 }
-
 .profileUpdateButton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s ease;
+content: '';
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+transition: left 0.6s ease;
 }
-
 .profileUpdateButton:hover::before {
-  left: 100%;
+left: 100%;
 }
-
 .profileUpdateButton:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.45);
-  background: linear-gradient(135deg, var(--profile-accent-light), var(--profile-accent));
+transform: translateY(-3px);
+box-shadow: 0 10px 30px rgba(249, 115, 22, 0.45);
+background: linear-gradient(135deg, var(--profile-accent-light), var(--profile-accent));
 }
-
-/* Edit Profile Modal */
 .profileUpdate {
-  background: var(--profile-card-bg);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border-radius: 24px;
-  padding: 1.5rem;
-  border: 1px solid var(--profile-border);
-  box-shadow:
-    0 25px 50px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(249, 115, 22, 0.1);
-  position: relative;
-  overflow: hidden;
-  animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+background: var(--profile-card-bg);
+backdrop-filter: blur(30px);
+-webkit-backdrop-filter: blur(30px);
+border-radius: 24px;
+padding: 1.5rem;
+border: 1px solid var(--profile-border);
+box-shadow:
+0 25px 50px rgba(0, 0, 0, 0.5),
+0 0 0 1px rgba(249, 115, 22, 0.1);
+position: relative;
+overflow: hidden;
+animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 @keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+from {
+opacity: 0;
+transform: translateY(20px) scale(0.95);
 }
-
+to {
+opacity: 1;
+transform: translateY(0) scale(1);
+}
+}
 .profileUpdate::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light), var(--profile-accent));
-  animation: shimmer 3s linear infinite;
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 4px;
+background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light), var(--profile-accent));
+animation: shimmer 3s linear infinite;
 }
-
 .profileUpdate::after {
-  content: '';
-  position: absolute;
-  bottom: -50%;
-  left: -50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 60%);
-  pointer-events: none;
+content: '';
+position: absolute;
+bottom: -50%;
+left: -50%;
+width: 100%;
+height: 100%;
+background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 60%);
+pointer-events: none;
 }
-
 .editProfileCloseButton {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  color: var(--profile-text-muted);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  z-index: 10;
+position: absolute;
+top: 1rem;
+right: 1rem;
+background: rgba(30, 41, 59, 0.8);
+border: 1px solid rgba(148, 163, 184, 0.2);
+color: var(--profile-text-muted);
+width: 36px;
+height: 36px;
+border-radius: 50%;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 1.25rem;
+font-weight: 500;
+transition: all 0.3s ease;
+z-index: 10;
 }
-
 .editProfileCloseButton:hover {
-  background: #ef4444;
-  border-color: #ef4444;
-  color: white;
-  transform: rotate(90deg);
+background: #ef4444;
+border-color: #ef4444;
+color: white;
+transform: rotate(90deg);
 }
-
 .profileUpdateForm {
-  display: grid;
-  grid-template-columns: 180px 1fr;
-  gap: 1rem;
-  align-items: start;
-  position: relative;
-  z-index: 1;
+display: grid;
+grid-template-columns: 180px 1fr;
+gap: 1rem;
+align-items: start;
+position: relative;
+z-index: 1;
 }
-
 .profileUpdateTitle {
-  grid-column: 1 / -1;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--profile-text);
-  margin: 0 0 0.5rem;
-  text-align: center;
-  letter-spacing: 0.5px;
+grid-column: 1 / -1;
+font-size: 1.5rem;
+font-weight: 700;
+color: var(--profile-text);
+margin: 0 0 0.5rem;
+text-align: center;
+letter-spacing: 0.5px;
 }
-
 .profileUpdateSubtitle {
-  grid-column: 1 / -1;
-  font-size: 0.9rem;
-  color: var(--profile-text-muted);
-  text-align: center;
-  margin-bottom: 1rem;
+grid-column: 1 / -1;
+font-size: 0.9rem;
+color: var(--profile-text-muted);
+text-align: center;
+margin-bottom: 1rem;
 }
-
 .profileUpdateRight {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 1rem;
 }
-
 .profileUpdateUpload {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 0.75rem;
 }
-
 .profileUpdateImg {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid transparent;
-  background: linear-gradient(var(--profile-card-bg), var(--profile-card-bg)) padding-box,
-              linear-gradient(135deg, var(--profile-accent), var(--profile-accent-light)) border-box;
-  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.2);
+width: 120px;
+height: 120px;
+border-radius: 50%;
+object-fit: cover;
+border: 3px solid transparent;
+background: linear-gradient(var(--profile-card-bg), var(--profile-card-bg)) padding-box,
+linear-gradient(135deg, var(--profile-accent), var(--profile-accent-light)) border-box;
+box-shadow: 0 8px 25px rgba(249, 115, 22, 0.2);
 }
-
 .profileUpdateLabel {
-  background: linear-gradient(135deg, var(--profile-accent), #ea580c);
-  color: #0f172a;
-  padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
+background: linear-gradient(135deg, var(--profile-accent), #ea580c);
+color: #0f172a;
+padding: 0.75rem 1.5rem;
+border-radius: 12px;
+cursor: pointer;
+font-weight: 600;
+font-size: 0.9rem;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+transition: all 0.3s ease;
 }
-
 .profileUpdateLabel:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
+transform: translateY(-2px);
+box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
 }
-
 .profileUpdateLabel svg {
-  font-size: 1.1rem;
+font-size: 1.1rem;
 }
-
 .uploadProgress {
-  width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: rgba(15, 23, 42, 0.8);
-  overflow: hidden;
+width: 100%;
+height: 6px;
+border-radius: 3px;
+background: rgba(15, 23, 42, 0.8);
+overflow: hidden;
 }
-
 .uploadProgress .MuiLinearProgress-bar {
-  background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light));
+background: linear-gradient(90deg, var(--profile-accent), var(--profile-accent-light));
 }
-
 .profileUpdateLeft {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+display: flex;
+flex-direction: column;
+gap: 0.75rem;
 }
-
 .profileUpdateItem {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+display: flex;
+flex-direction: column;
+gap: 0.35rem;
 }
-
 .profileUpdateItem label {
-  font-size: 0.85rem;
-  color: var(--profile-text-muted);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+font-size: 0.85rem;
+color: var(--profile-text-muted);
+font-weight: 500;
+text-transform: uppercase;
+letter-spacing: 0.5px;
 }
-
 .profileUpdateInput {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  color: var(--profile-text);
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  font-size: 1rem;
-  transition: all 0.25s ease;
+background: rgba(15, 23, 42, 0.8);
+border: 1px solid rgba(148, 163, 184, 0.2);
+color: var(--profile-text);
+padding: 0.75rem 1rem;
+border-radius: 12px;
+font-size: 1rem;
+transition: all 0.25s ease;
 }
-
 .profileUpdateInput:focus {
-  outline: none;
-  border-color: var(--profile-accent);
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+outline: none;
+border-color: var(--profile-accent);
+box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
 }
-
 .profileUpdateInput::placeholder {
-  color: var(--profile-text-muted);
-  opacity: 0.6;
+color: var(--profile-text-muted);
+opacity: 0.6;
 }
-
 .profileUpdateInput:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: rgba(15, 23, 42, 0.5);
+opacity: 0.5;
+cursor: not-allowed;
+background: rgba(15, 23, 42, 0.5);
 }
-
 .profileUpdateForm .profileUpdateButton {
-  grid-column: 1 / -1;
-  margin-top: 0.5rem;
+grid-column: 1 / -1;
+margin-top: 0.5rem;
 }
-
-/* Profile Update Overlay */
 .profileUpdateOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-  animation: overlayFadeIn 0.3s ease;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.7);
+backdrop-filter: blur(8px);
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 1000;
+padding: 1rem;
+animation: overlayFadeIn 0.3s ease;
 }
-
 @keyframes overlayFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+from {
+opacity: 0;
 }
-
-/* Responsive Design */
+to {
+opacity: 1;
+}
+}
 @media (max-width: 600px) {
-  .profileContainer {
-    padding: 1.5rem 1rem;
-  }
-
-  .profileInfo {
-    padding: 1.5rem 1.25rem;
-    width: 100%;
-  }
-
-  .profileInfoImg {
-    width: 90px;
-    height: 90px;
-  }
-
-  .profileInfoName {
-    font-size: 1.2rem;
-  }
-
-  .profileUpdate {
-    padding: 1.5rem;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .profileUpdateForm {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .profileUpdateRight {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .profileUpdateUpload {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .profileUpdateImg {
-    width: 80px;
-    height: 80px;
-  }
-
-  .profileInfoItem {
-    padding: 0.6rem 0.75rem;
-    gap: 0.5rem;
-  }
-
-  .profileInfoItem svg {
-    font-size: 1.1rem;
-    min-width: 20px;
-  }
+.profileContainer {
+padding: 1.5rem 1rem;
 }
-
-/* Password Form Specific Styles */
+.profileInfo {
+padding: 1.5rem 1.25rem;
+width: 100%;
+}
+.profileInfoImg {
+width: 90px;
+height: 90px;
+}
+.profileInfoName {
+font-size: 1.2rem;
+}
+.profileUpdate {
+padding: 1.5rem;
+width: 100%;
+max-width: 100%;
+}
+.profileUpdateForm {
+grid-template-columns: 1fr;
+gap: 1rem;
+}
+.profileUpdateRight {
+flex-direction: column;
+align-items: center;
+}
+.profileUpdateUpload {
+flex-direction: column;
+gap: 0.75rem;
+}
+.profileUpdateImg {
+width: 80px;
+height: 80px;
+}
+.profileInfoItem {
+padding: 0.6rem 0.75rem;
+gap: 0.5rem;
+}
+.profileInfoItem svg {
+font-size: 1.1rem;
+min-width: 20px;
+}
+}
 .profileUpdateForm .profileUpdateLeft[style*="grid-column: 1 / -1"] {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+grid-column: 1 / -1;
+display: flex;
+flex-direction: column;
+gap: 1rem;
 }
-
 .profileUpdateForm .profileUpdateLeft[style*="grid-column: 1 / -1"] .profileUpdateItem {
-  width: 100%;
+width: 100%;
 }
-
 .profileUpdateForm .profileUpdateLeft[style*="grid-column: 1 / -1"] .profileUpdateItem input {
-  width: 100%;
-  padding-right: 40px;
+width: 100%;
+padding-right: 40px;
 }
-
 .profileUpdateForm .profileUpdateLeft[style*="grid-column: 1 / -1"] .profileUpdateItem label {
-  margin-bottom: 0.5rem;
+margin-bottom: 0.5rem;
 }
-
-/* Password visibility toggle button hover effect */
 .profileUpdateForm button[style*="position: absolute"]:hover {
-  color: var(--profile-accent) !important;
-  transform: translateY(-50%) scale(1.1);
+color: var(--profile-accent) !important;
+transform: translateY(-50%) scale(1.1);
 }
-
-/* Form validation styles */
 .profileUpdateInput:invalid {
-  border-color: #ef4444;
+border-color: #ef4444;
 }
-
 .profileUpdateInput:valid {
-  border-color: #10b981;
+border-color: #10b981;
 }
-
-/* Loading state for buttons */
 .profileUpdateButton:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none !important;
+opacity: 0.7;
+cursor: not-allowed;
+transform: none !important;
 }
-
-/* Success message styling */
 .profile-success-message {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: white;
-  padding: 1rem;
-  border-radius: 12px;
-  margin-bottom: 1rem;
-  text-align: center;
-  animation: slideInDown 0.3s ease;
+background: linear-gradient(135deg, #10b981, #059669);
+color: white;
+padding: 1rem;
+border-radius: 12px;
+margin-bottom: 1rem;
+text-align: center;
+animation: slideInDown 0.3s ease;
 }
-
 @keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+from {
+opacity: 0;
+transform: translateY(-10px);
 }
-
-/* Error message styling */
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
 .error-message {
-  color: #ef4444;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  display: block;
-  animation: shake 0.3s ease;
+color: #ef4444;
+font-size: 0.75rem;
+margin-top: 0.25rem;
+display: block;
+animation: shake 0.3s ease;
 }
-
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+0%, 100% { transform: translateX(0); }
+25% { transform: translateX(-5px); }
+75% { transform: translateX(5px); }
 }
-
 .profileUpdateInput.error {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+border-color: #ef4444 !important;
+box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
 }
-
-/* Password strength indicator */
 .password-strength-indicator {
-  margin-top: 0.5rem;
+margin-top: 0.5rem;
 }
-
 .strength-bar {
-  width: 100%;
-  height: 4px;
-  background: rgba(15, 23, 42, 0.3);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 0.25rem;
+width: 100%;
+height: 4px;
+background: rgba(15, 23, 42, 0.3);
+border-radius: 2px;
+overflow: hidden;
+margin-bottom: 0.25rem;
 }
-
 .strength-fill {
-  height: 100%;
-  transition: width 0.3s ease, background-color 0.3s ease;
-  border-radius: 2px;
+height: 100%;
+transition: width 0.3s ease, background-color 0.3s ease;
+border-radius: 2px;
 }
-
 .strength-text {
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+font-size: 0.75rem;
+font-weight: 500;
+text-transform: uppercase;
+letter-spacing: 0.5px;
 }
-
-/* Form field focus with error state */
 .profileUpdateInput.error:focus {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+border-color: #ef4444 !important;
+box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
 }
-
-/* Enhanced validation feedback */
 .profileUpdateItem:has(.profileUpdateInput.error) label {
-  color: #ef4444;
+color: #ef4444;
 }
-
-/* Loading spinner for form submission */
 .profileUpdateButton.loading {
-  position: relative;
-  color: transparent !important;
+position: relative;
+color: transparent !important;
 }
-
 .profileUpdateButton.loading::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 16px;
-  height: 16px;
-  margin: -8px 0 0 -8px;
-  border: 2px solid transparent;
-  border-top-color: #0f172a;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+content: '';
+position: absolute;
+top: 50%;
+left: 50%;
+width: 16px;
+height: 16px;
+margin: -8px 0 0 -8px;
+border: 2px solid transparent;
+border-top-color: #0f172a;
+border-radius: 50%;
+animation: spin 1s linear infinite;
 }
-
-/* Disabled state for buttons */
 .profileUpdateButton.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none !important;
-  background: linear-gradient(135deg, #6b7280, #374151) !important;
+opacity: 0.6;
+cursor: not-allowed;
+transform: none !important;
+background: linear-gradient(135deg, #6b7280, #374151) !important;
 }
-
 .profileUpdateButton.disabled:hover {
-  transform: none !important;
-  box-shadow: none !important;
+transform: none !important;
+box-shadow: none !important;
 }
-
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
 }
-
-/* Phone number formatting */
 .profileUpdateInput[type="tel"] {
-  letter-spacing: 0.5px;
+letter-spacing: 0.5px;
 }
-
-/* Password requirements hint */
 .password-requirements {
-  margin-top: 0.5rem;
-  padding: 0.75rem;
-  background: rgba(15, 23, 42, 0.5);
-  border-radius: 8px;
-  border-left: 3px solid var(--profile-accent);
+margin-top: 0.5rem;
+padding: 0.75rem;
+background: rgba(15, 23, 42, 0.5);
+border-radius: 8px;
+border-left: 3px solid var(--profile-accent);
 }
-
 .password-requirements ul {
-  margin: 0;
-  padding-left: 1.2rem;
-  list-style-type: none;
+margin: 0;
+padding-left: 1.2rem;
+list-style-type: none;
 }
-
 .password-requirements li {
-  font-size: 0.7rem;
-  color: var(--profile-text-muted);
-  margin-bottom: 0.25rem;
-  position: relative;
+font-size: 0.7rem;
+color: var(--profile-text-muted);
+margin-bottom: 0.25rem;
+position: relative;
 }
-
 .password-requirements li::before {
-  content: '•';
-  position: absolute;
-  left: -1rem;
-  color: var(--profile-accent);
+content: '•';
+position: absolute;
+left: -1rem;
+color: var(--profile-accent);
 }

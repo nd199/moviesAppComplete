@@ -1,177 +1,149 @@
-/* Modern Professional Server Connection CSS */
-
 .sco-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  padding: 20px;
-  box-sizing: border-box;
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+padding: 20px;
+box-sizing: border-box;
 }
-
 .sco-content {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 48px 40px;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+background: rgba(255, 255, 255, 0.95);
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+border-radius: 20px;
+padding: 48px 40px;
+max-width: 500px;
+width: 100%;
+box-shadow:
+0 20px 25px -5px rgba(0, 0, 0, 0.1),
+0 10px 10px -5px rgba(0, 0, 0, 0.04);
+text-align: center;
+border: 1px solid rgba(255, 255, 255, 0.2);
 }
-
 .sco-image {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 32px;
+display: flex;
+justify-content: center;
+margin-bottom: 32px;
 }
-
 .sco-image div {
-  width: 100px;
-  height: 100px;
+width: 100px;
+height: 100px;
 }
-
 .sco-BH {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 16px;
-  line-height: 1.2;
-  text-align: center;
+font-size: 1.5rem;
+font-weight: 700;
+color: #1a1a1a;
+margin-bottom: 16px;
+line-height: 1.2;
+text-align: center;
 }
-
 .sco-elapsed {
-  font-size: 1.1rem;
-  color: #667eea;
-  font-weight: 600;
-  margin-bottom: 20px;
-  padding: 8px 16px;
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 8px;
-  display: inline-block;
-  animation: pulse-glow 2s ease-in-out infinite;
+font-size: 1.1rem;
+color: #667eea;
+font-weight: 600;
+margin-bottom: 20px;
+padding: 8px 16px;
+background: rgba(102, 126, 234, 0.1);
+border-radius: 8px;
+display: inline-block;
+animation: pulse-glow 2s ease-in-out infinite;
 }
-
-/* Warming details container */
 .sco-warming-details {
-  background: rgba(251, 191, 36, 0.05);
-  border: 1px solid rgba(251, 191, 36, 0.1);
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 16px;
+background: rgba(251, 191, 36, 0.05);
+border: 1px solid rgba(251, 191, 36, 0.1);
+border-radius: 12px;
+padding: 20px;
+margin-top: 16px;
 }
-
 .sco-warming-main {
-  font-size: 1rem;
-  color: #f97316;
-  font-weight: 600;
-  margin: 0 0 12px 0;
-  line-height: 1.5;
+font-size: 1rem;
+color: #f97316;
+font-weight: 600;
+margin: 0 0 12px 0;
+line-height: 1.5;
 }
-
 .sco-warming-sub {
-  font-size: 0.9rem;
-  color: #6b7280;
-  font-weight: 400;
-  margin: 0 0 16px 0;
-  line-height: 1.4;
+font-size: 0.9rem;
+color: #6b7280;
+font-weight: 400;
+margin: 0 0 16px 0;
+line-height: 1.4;
 }
-
 .sco-note {
-  font-size: 0.85rem;
-  color: #4a5568;
-  font-weight: 400;
-  margin: 0;
-  line-height: 1.4;
+font-size: 0.85rem;
+color: #4a5568;
+font-weight: 400;
+margin: 0;
+line-height: 1.4;
 }
-
 .sco-note strong {
-  color: #2d3748;
-  font-weight: 600;
+color: #2d3748;
+font-weight: 600;
 }
-
 @keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
-  }
+0%, 100% {
+box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
 }
-
+50% {
+box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+}
+}
 .sco-text {
-  font-size: 1rem;
-  color: #4a5568;
-  line-height: 1.6;
-  font-weight: 400;
+font-size: 1rem;
+color: #4a5568;
+line-height: 1.6;
+font-weight: 400;
 }
-
 .sco-text strong {
-  color: #2d3748;
-  font-weight: 600;
+color: #2d3748;
+font-weight: 600;
 }
-
 .sco-text a {
-  color: #667eea;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.2s ease;
+color: #667eea;
+text-decoration: none;
+font-weight: 600;
+transition: color 0.2s ease;
 }
-
 .sco-text a:hover {
-  color: #764ba2;
-  text-decoration: underline;
+color: #764ba2;
+text-decoration: underline;
 }
-
-/* Loading animation */
 .sco-content::after {
-  content: '';
-  display: block;
-  width: 40px;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
-  background-size: 200% 100%;
-  border-radius: 2px;
-  margin: 24px auto 0;
-  animation: loading 1.5s ease-in-out infinite;
+content: '';
+display: block;
+width: 40px;
+height: 4px;
+background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+background-size: 200% 100%;
+border-radius: 2px;
+margin: 24px auto 0;
+animation: loading 1.5s ease-in-out infinite;
 }
-
 @keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+0% { background-position: 200% 0; }
+100% { background-position: -200% 0; }
 }
-
-/* Responsive Design */
 @media (max-width: 768px) {
-  .sco-container {
-    padding: 16px;
-  }
-  
-  .sco-content {
-    padding: 40px 24px;
-  }
-  
-  .sco-BH {
-    font-size: 1.3rem;
-  }
-  
-  .sco-text {
-    font-size: 0.95rem;
-  }
+.sco-container {
+padding: 16px;
 }
-
+.sco-content {
+padding: 40px 24px;
+}
+.sco-BH {
+font-size: 1.3rem;
+}
+.sco-text {
+font-size: 0.95rem;
+}
+}
 @media (max-width: 480px) {
-  .sco-content {
-    padding: 32px 20px;
-  }
-  
-  .sco-BH {
-    font-size: 1.2rem;
-  }
+.sco-content {
+padding: 32px 20px;
+}
+.sco-BH {
+font-size: 1.2rem;
+}
 }

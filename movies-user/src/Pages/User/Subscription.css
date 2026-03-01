@@ -1,77 +1,71 @@
 .subscribe-page {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("./stars.jpg") fixed no-repeat;
-    background-size: cover;
-    justify-content: center;
-    transition: 2s all ease-in-out;
+width: 100%;
+height: 100vh;
+display: flex;
+align-items: center;
+background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("./stars.jpg") fixed no-repeat;
+background-size: cover;
+justify-content: center;
+transition: 2s all ease-in-out;
 }
-
 .subscribe-form {
-    display: flex;
-    flex-direction: column;
-    flex-basis: 100%;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 1200px;
-    max-height: 700px;
-    height: 100%;
-    margin: 0 auto;
-    border: 1px solid black;
+display: flex;
+flex-direction: column;
+flex-basis: 100%;
+align-items: center;
+justify-content: space-between;
+max-width: 1200px;
+max-height: 700px;
+height: 100%;
+margin: 0 auto;
+border: 1px solid black;
 }
-
 .sub-body {
-    width: 100%;
-    margin-top: 10px;
-    height: 100%;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 50px;
-    transition: all 0.5s ease-in-out;
+width: 100%;
+margin-top: 10px;
+height: 100%;
+padding: 20px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 50px;
+transition: all 0.5s ease-in-out;
 }
-
 .sub-body.selected {
-    justify-content: center;
-    transition: 2s all ease-in-out;
+justify-content: center;
+transition: 2s all ease-in-out;
 }
-
 .subscribePlan {
-    width: 14rem;
-    height: 3.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    flex-direction: column;
-    background: linear-gradient(135deg, #f97316, #ea580c);
-    color: #020617;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+width: 14rem;
+height: 3.5rem;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 12px;
+flex-direction: column;
+background: linear-gradient(135deg, #f97316, #ea580c);
+color: #020617;
+border: none;
+border-radius: 12px;
+cursor: pointer;
+font-size: 18px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 1px;
+transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
 }
-
 .subscribePlan:hover:not(:disabled) {
-    background: linear-gradient(135deg, #fb923c, #f97316);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(249, 115, 22, 0.5);
-    color: #020617;
-    cursor: pointer;
-    text-decoration: none;
+background: linear-gradient(135deg, #fb923c, #f97316);
+transform: translateY(-2px);
+box-shadow: 0 12px 35px rgba(249, 115, 22, 0.5);
+color: #020617;
+cursor: pointer;
+text-decoration: none;
 }
-
 .subscribePlan:disabled {
-    background: linear-gradient(135deg, #4b5563, #374151);
-    color: #9ca3af;
-    cursor: not-allowed;
-    box-shadow: none;
+background: linear-gradient(135deg, #4b5563, #374151);
+color: #9ca3af;
+cursor: not-allowed;
+box-shadow: none;
 }

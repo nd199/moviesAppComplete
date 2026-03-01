@@ -1,120 +1,105 @@
 .li-card {
-  position: relative;
-  min-width: 220px;
-  height: 330px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #141414;
-  cursor: pointer;
-  transition:
-    transform 0.35s ease,
-    box-shadow 0.35s ease;
-  transform-origin: center center;
+position: relative;
+min-width: 220px;
+height: 330px;
+border-radius: 8px;
+overflow: hidden;
+background: #141414;
+cursor: pointer;
+transition:
+transform 0.35s ease,
+box-shadow 0.35s ease;
+transform-origin: center center;
 }
-
 .li-card:hover {
-  transform: scale(1.25);
-  z-index: 50;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+transform: scale(1.25);
+z-index: 50;
+box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
 }
-
 .li-card-media {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+position: relative;
+width: 100%;
+height: 100%;
+overflow: hidden;
 }
-
 .li-card-poster {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+width: 100%;
+height: 100%;
+object-fit: cover;
+display: block;
 }
-
 .li-card-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.95) 10%,
-    rgba(0, 0, 0, 0.6) 40%,
-    transparent 70%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
+position: absolute;
+inset: 0;
+background: linear-gradient(
+to top,
+rgba(0, 0, 0, 0.95) 10%,
+rgba(0, 0, 0, 0.6) 40%,
+transparent 70%
+);
+opacity: 0;
+transition: opacity 0.3s ease;
 }
-
 .li-card:hover .li-card-overlay {
-  opacity: 1;
+opacity: 1;
 }
-
 .li-card-content {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 14px;
-  color: #fff;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.3s ease;
+position: absolute;
+bottom: 0;
+left: 0;
+right: 0;
+padding: 14px;
+color: #fff;
+opacity: 0;
+transform: translateY(20px);
+transition: all 0.3s ease;
 }
-
 .li-card:hover .li-card-content {
-  opacity: 1;
-  transform: translateY(0);
+opacity: 1;
+transform: translateY(0);
 }
-
 .li-card-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin: 0 0 6px 0;
+font-size: 0.95rem;
+font-weight: 700;
+margin: 0 0 6px 0;
 }
-
 .li-card-meta {
-  font-size: 0.75rem;
-  color: #b3b3b3;
-  margin-bottom: 8px;
+font-size: 0.75rem;
+color: #b3b3b3;
+margin-bottom: 8px;
 }
-
 .li-card-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 0 14px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 8px;
+padding: 0 14px;
 }
-
 .li-card-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  vertical-align: middle;
+width: 32px;
+height: 32px;
+border-radius: 50%;
+border: 1px solid rgba(255, 255, 255, 0.4);
+background: rgba(0, 0, 0, 0.6);
+color: #fff;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: all 0.2s ease;
+text-decoration: none;
+vertical-align: middle;
 }
-
 .li-card-btn:first-child {
-  transform: translateY(5px);
+transform: translateY(5px);
 }
-
 .li-card-btn:hover {
-  background: #fff;
-  color: #000;
-  transform: scale(1.1);
+background: #fff;
+color: #000;
+transform: scale(1.1);
 }
-
-/* Prevent layout breaking in row slider */
 .li-card-wrapper {
-  position: relative;
-  display: inline-block;
-  margin-right: 10px;
+position: relative;
+display: inline-block;
+margin-right: 10px;
 }
