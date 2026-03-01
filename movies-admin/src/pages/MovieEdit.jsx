@@ -8,7 +8,7 @@ import { fetchMovies, updateMovie } from '../services/adminApi';
 const MovieEdit = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const movieId = Number(location.pathname.split("/")[2]);
+  const movieId = Number(location.pathname.split("/")[3]);
   
   const [movie, setMovie] = useState(null);
   const [name, setName] = useState("");
@@ -77,142 +77,163 @@ const MovieEdit = () => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
       const fileURL = URL.createObjectURL(selectedFile);
-      setFile(fileURL);
+      setFile(selectedFile);
       setImageUrl(fileURL);
     }
   };
 
   if (loading) {
-    return <div className="p-5">Loading...</div>;
+    return (
+      <div className="w-full flex justify-center items-center h-64">
+        <div className="text-lg text-slate-300">Loading movie...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="p-5 bg-gray-50 rounded-lg shadow-md">
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-3xl font-bold text-gray-800" style={{ fontSize: '2rem', fontWeight: '700' }}>Edit Movie</h1>
-        <Link to="/movies/new">
-          <button 
-            className="w-20 border-none p-1 rounded-lg bg-green-600 cursor-pointer text-white text-xl mr-5"
-          >
-            Create
-          </button>
-        </Link>
-      </div>
-      <div className="flex">
-        <div className="flex-1">
-          <Chart data={[]} dataKey="Sales" title="Sales Performance" />
+    <div className="w-full">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-100">Edit Title</h1>
+          <p className="text-sm text-slate-400">Update metadata and poster artwork</p>
         </div>
-        <div className="flex-1">
-          <div className="flex items-center mb-4">
-            <img
-              src={imageUrl || "/images/REGBack.jpg"}
-              alt=""
-              className="w-24 h-24 rounded-lg object-cover mr-4"
-            />
-            <span className="text-xl font-semibold">{name}</span>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex items-center gap-2">
+          <Link to="/movies/new">
+            <button className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10">
+              Add New
+            </button>
+          </Link>
+          <button
+            onClick={() => navigate('/movies')}
+            className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10"
+            type="button"
+          >
+            Back
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/20 backdrop-blur">
+          <div className="text-lg font-semibold text-slate-100">Metadata</div>
+          <div className="mt-1 text-sm text-slate-400">Keep the catalog clean and searchable.</div>
+
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">ID</label>
+              <label className="block text-sm font-medium text-slate-300">ID</label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded"
+                className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-slate-950/40 px-3 text-sm text-slate-400"
                 value={movie?.id || ''}
                 disabled
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <label className="block text-sm font-medium text-slate-300">Type</label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded"
+                className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-slate-950/40 px-3 text-sm text-slate-400"
+                value={movie?.type || 'movies'}
+                disabled
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300">Name</label>
+              <input
+                type="text"
+                className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-slate-950/40 px-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500/50"
                 name="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Cost</label>
+              <label className="block text-sm font-medium text-slate-300">Cost</label>
               <input
                 type="number"
-                className="w-full p-2 border border-gray-300 rounded"
+                className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-slate-950/40 px-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
                 name="cost"
                 value={cost}
                 onChange={(e) => setCost(e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Genre</label>
+              <label className="block text-sm font-medium text-slate-300">Genre</label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded"
+                className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-slate-950/40 px-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500/50"
                 name="genre"
                 value={genre}
                 onChange={(e) => setGenre(e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Runtime</label>
+              <label className="block text-sm font-medium text-slate-300">Runtime</label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded"
+                className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-slate-950/40 px-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
                 name="runtime"
                 value={runtime}
                 onChange={(e) => setRuntime(e.target.value)}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-              <input
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={movie?.type || 'movies'}
-                disabled
-              />
-            </div>
           </div>
-        </div>
-      </div>
-      
-      <div className="mt-8">
-        <div className="text-lg font-semibold mb-4">Update Movie</div>
-        <form onSubmit={movieUpdateHandler} className="flex">
-          <div className="flex-1">
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+
+          <form onSubmit={movieUpdateHandler} className="mt-6 space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-slate-300">Description</label>
               <textarea
-                className="w-full p-2 border border-gray-300 rounded h-32"
+                className="mt-2 w-full resize-none rounded-lg border border-white/10 bg-slate-950/40 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
                 name="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                rows={4}
               />
             </div>
-          </div>
-          <div className="flex-col items-center justify-center ml-8">
-            <div className="flex flex-col items-center">
+
+            <div className="flex items-center justify-end">
+              <button
+                className="inline-flex h-11 items-center justify-center rounded-lg bg-gradient-to-r from-red-500 to-purple-600 px-5 text-sm font-semibold text-white shadow-lg shadow-red-500/10 hover:from-red-400 hover:to-purple-500"
+                type="submit"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/20 backdrop-blur">
+          <div className="text-lg font-semibold text-slate-100">Poster</div>
+          <div className="mt-1 text-sm text-slate-400">Artwork shown on detail and listing pages.</div>
+
+          <div className="mt-6">
+            <div className="aspect-[2/3] overflow-hidden rounded-xl border border-white/10 bg-black/30">
               <img
-                src={imageUrl || "/images/REGBack.jpg"}
-                alt=""
-                className="w-32 h-32 rounded-lg object-cover mb-4"
+                src={imageUrl || "/REGBack.jpg"}
+                alt="Poster"
+                className="h-full w-full object-cover"
               />
-              <label htmlFor="file" className="cursor-pointer">
-                <FaUpload className="text-2xl" />
+            </div>
+
+            <div className="mt-4 flex items-center justify-between rounded-xl border border-white/10 bg-black/20 p-4">
+              <div>
+                <div className="text-sm font-semibold text-slate-200">{name || movie?.title || 'Untitled'}</div>
+                <div className="mt-1 text-xs text-slate-400">Upload a new poster to replace the current one</div>
+              </div>
+              <label htmlFor="file" className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10">
+                <FaUpload />
+                Upload
               </label>
               <input
                 type="file"
                 id="file"
+                accept="image/*"
                 style={{ display: "none" }}
                 onChange={fileUploadHandler}
               />
             </div>
-            <button 
-              className="w-32 h-10 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors mt-4"
-              type="submit"
-            >
-              Update
-            </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

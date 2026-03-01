@@ -1,36 +1,30 @@
 import { NavLink } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '../hooks/redux';
-import { logout } from '../store/authSlice';
 import {
-  HomeIcon,
-  UserGroupIcon,
-  FilmIcon,
-  Cog6ToothIcon,
-  ArrowRightOnRectangleIcon,
-} from '@heroicons/react/24/outline';
+  HiHome,
+  HiUserGroup,
+  HiFilm,
+  HiCog6Tooth,
+  HiShieldCheck,
+} from 'react-icons/hi2';
 
 const Sidebar = () => {
-  const dispatch = useAppDispatch();
-  const { admin } = useAppSelector((state) => state.auth);
-
-  const handleLogout = () => {
-    dispatch(logout());
-  };
 
   const menuItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-    { name: 'Users', href: '/users', icon: UserGroupIcon },
-    { name: 'Movies', href: '/movies', icon: FilmIcon },
-    { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
+    { name: 'Dashboard', href: '/dashboard', icon: HiHome },
+    { name: 'Users', href: '/users', icon: HiUserGroup },
+    { name: 'Admins', href: '/admins', icon: HiShieldCheck },
+    { name: 'Movies', href: '/movies', icon: HiFilm },
+    { name: 'Settings', href: '/settings', icon: HiCog6Tooth },
   ];
 
   return (
-    <div className="w-64 bg-gray-900 text-white flex-shrink-0 relative">
+    <div className="w-48 fixed top-0 left-0 h-screen bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 text-white flex-shrink-0 relative border-r border-white/10 z-50">
       <div className="p-6">
-        <h1 className="text-2xl font-bold">Movies Admin</h1>
+        <h1 className="text-xl font-semibold tracking-wide">Movies Admin</h1>
+        <div className="mt-2 h-px w-full bg-gradient-to-r from-red-500/40 via-purple-500/30 to-transparent" />
       </div>
       
-      <nav className="mt-6">
+      <nav className="mt-6 overflow-y-auto pb-40">
         {menuItems.map((item) => (
           <NavLink
             key={item.name}
@@ -38,8 +32,8 @@ const Sidebar = () => {
             className={({ isActive }) =>
               `flex items-center px-6 py-3 text-sm font-medium transition-colors ${
                 isActive
-                  ? 'bg-gray-800 border-r-4 border-blue-500 text-white'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-white/10 border-r-2 border-red-500 text-white'
+                  : 'text-slate-300 hover:bg-white/5 hover:text-white'
               }`
             }
           >
@@ -48,27 +42,6 @@ const Sidebar = () => {
           </NavLink>
         ))}
       </nav>
-
-      <div className="absolute bottom-0 w-64 p-6 border-t border-gray-800">
-        <div className="flex items-center mb-4">
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium">
-              {admin?.name?.charAt(0) || 'A'}
-            </span>
-          </div>
-          <div className="ml-3">
-            <p className="text-sm font-medium">{admin?.name || 'Admin'}</p>
-            <p className="text-xs text-gray-400">{admin?.email || 'admin@example.com'}</p>
-          </div>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-colors"
-        >
-          <ArrowRightOnRectangleIcon className="mr-2 h-4 w-4" />
-          Logout
-        </button>
-      </div>
     </div>
   );
 };

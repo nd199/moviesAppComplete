@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   admin: null,
-  token: null, // Not used with cookie-based auth
+  token: null,
   isAuthenticated: !!localStorage.getItem('adminLoggedIn'),
   loading: false,
   error: null,
@@ -19,7 +19,7 @@ const authSlice = createSlice({
     loginSuccess: (state, action) => {
       state.loading = false;
       state.admin = action.payload.admin;
-      state.token = null; // Not used with cookie-based auth
+      state.token = null;
       state.isAuthenticated = true;
       state.error = null;
       localStorage.setItem('adminLoggedIn', 'true');

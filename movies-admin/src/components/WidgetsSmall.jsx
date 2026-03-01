@@ -60,21 +60,21 @@ const WidgetsSmall = () => {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div className="flex flex-col">
-                    <span className="font-semibold">{user.username}</span>
-                    <span className="font-light">
-                      {user.name || 'No Title'}
+                    <span className="font-semibold">{user.name || 'No Name'}</span>
+                    <span className="font-light text-xs text-slate-400">
+                      {user.email || 'No Email'}
                     </span>
                   </div>
                   <button 
-                    className="flex items-center border-none rounded-lg px-2.5 py-1.5 cursor-pointer gap-1"
+                    className="flex items-center border-none rounded-lg px-2.5 py-1.5 cursor-pointer gap-2"
                     style={{
                       backgroundColor: '#d3901d3f',
                       color: 'brown'
                     }}
                   >
                     <FaEye className="text-base" />
-                    <Link to={'/User/' + user.id} style={{ color: 'violet' }}>
-                      Display
+                    <Link to={`/users/edit/${user.id}`} style={{ color: '#8b5cf6' }}>
+                      View
                     </Link>
                   </button>
                 </li>

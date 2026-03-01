@@ -102,6 +102,16 @@ export const deleteMovie = async (dispatch, movieId) => {
   }
 };
 
+// ================= SUBSCRIPTIONS ================= //
+export const fetchLatestSubscriptions = async (dispatch) => {
+  try {
+    const response = await api.get('/subscription/latest');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // ================= ORDERS ================= //
 export const fetchOrders = async (dispatch) => {
   try {
@@ -114,9 +124,10 @@ export const fetchOrders = async (dispatch) => {
 
 export const fetchIncome = async (dispatch) => {
   try {
-    const response = await api.get('/api/payment/intent');
+    const response = await api.get('/payments/api/payment/intent');
     return response.data;
   } catch (error) {
+    console.error('API: fetchIncome error:', error);
     throw error;
   }
 };
@@ -125,6 +136,90 @@ export const fetchIncome = async (dispatch) => {
 export const fetchUserStats = async (dispatch) => {
   try {
     const response = await api.get('/customers/stats');
+    return response.data;
+  } catch (error) {
+    console.error('API: fetchUserStats error:', error);
+    throw error;
+  }
+};
+
+export const fetchAdmins = async (dispatch) => {
+  try {
+    const response = await api.get('/admins');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchAdminById = async (dispatch, adminId) => {
+  try {
+    const response = await api.get(`/admins/${adminId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createAdmin = async (dispatch, adminData, roles) => {
+  try {
+    const response = await api.post('/admins', adminData, {
+      params: { roles }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateAdmin = async (dispatch, adminId, adminData) => {
+  try {
+    const response = await api.put(`/admins/${adminId}`, adminData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteAdmin = async (dispatch, adminId) => {
+  try {
+    const response = await api.delete(`/admins/${adminId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const toggleAdminStatus = async (dispatch, adminId) => {
+  try {
+    const response = await api.put(`/admins/${adminId}/toggle-status`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchAdminStats = async (dispatch) => {
+  try {
+    const response = await api.get('/admins/stats');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchActiveAdmins = async (dispatch) => {
+  try {
+    const response = await api.get('/admins/active');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchAdminsByDepartment = async (dispatch, department) => {
+  try {
+    const response = await api.get(`/admins/department/${department}`);
     return response.data;
   } catch (error) {
     throw error;

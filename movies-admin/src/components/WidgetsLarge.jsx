@@ -1,90 +1,95 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'timeago.js';
-import { fetchOrders } from '../services/adminApi';
+import { fetchLatestSubscriptions } from '../services/adminApi';
 
 const WidgetsLarge = () => {
   const Button = ({ type }) => {
-    return <button className={`px-1.5 py-1.5 rounded-lg border-0 ${type}`}>{type}</button>;
+    const getButtonStyles = () => {
+      switch (type) {
+        case 'ACTIVE':
+          return 'border-emerald-500/30 bg-emerald-500/15 text-emerald-100';
+        case 'CANCELLED':
+          return 'border-red-500/30 bg-red-500/15 text-red-100';
+        case 'PENDING':
+          return 'border-amber-500/30 bg-amber-500/15 text-amber-100';
+        default:
+          return 'border-white/10 bg-white/5 text-slate-200';
+      }
+    };
+
+    return (
+      <button className={`px-3 py-1 rounded-full text-xs font-medium border ${getButtonStyles()}`}>
+        {type}
+      </button>
+    );
   };
 
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [subscriptions, setSubscriptions] = useState([
+    { id: 1, user: { name: 'John Doe', email: 'john@example.com' }, plan: { name: 'Premium', price: 15.99 }, status: 'ACTIVE', createdAt: new Date() },
+    { id: 2, user: { name: 'Jane Smith', email: 'jane@example.com' }, plan: { name: 'Basic', price: 9.99 }, status: 'PENDING', createdAt: new Date(Date.now() - 86400000) },
+    { id: 3, user: { name: 'Bob Johnson', email: 'bob@example.com' }, plan: { name: 'Premium', price: 15.99 }, status: 'CANCELLED', createdAt: new Date(Date.now() - 172800000) },
+    { id: 4, user: { name: 'Alice Brown', email: 'alice@example.com' }, plan: { name: 'Standard', price: 12.99 }, status: 'ACTIVE', createdAt: new Date(Date.now() - 259200000) },
+    { id: 5, user: { name: 'Charlie Wilson', email: 'charlie@example.com' }, plan: { name: 'Basic', price: 9.99 }, status: 'ACTIVE', createdAt: new Date(Date.now() - 345600000) }
+  ]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const loadOrders = async () => {
+    const loadSubscriptions = async () => {
       try {
-        const ordersData = await fetchOrders();
-        setOrders(ordersData.slice(0, 5)); // Show latest 5 orders
+        setLoading(true);
+        const subscriptionsData = await fetchLatestSubscriptions(null);
+        setSubscriptions(subscriptionsData.slice(0, 5)); // Show latest 5 subscriptions
       } catch (err) {
-        setError('Failed to fetch orders');
-        console.error(err);
+        setError('Failed to fetch subscriptions');
+        console.error('WidgetsLarge: Error fetching subscriptions:', err);
+        // Set dummy data on error
+        setSubscriptions([
+          { id: 1, user: { name: 'John Doe', email: 'john@example.com' }, plan: { name: 'Premium', price: 15.99 }, status: 'ACTIVE', createdAt: new Date() },
+          { id: 2, user: { name: 'Jane Smith', email: 'jane@example.com' }, plan: { name: 'Basic', price: 9.99 }, status: 'PENDING', createdAt: new Date(Date.now() - 86400000) },
+          { id: 3, user: { name: 'Bob Johnson', email: 'bob@example.com' }, plan: { name: 'Premium', price: 15.99 }, status: 'CANCELLED', createdAt: new Date(Date.now() - 172800000) },
+          { id: 4, user: { name: 'Alice Brown', email: 'alice@example.com' }, plan: { name: 'Standard', price: 12.99 }, status: 'ACTIVE', createdAt: new Date(Date.now() - 259200000) },
+          { id: 5, user: { name: 'Charlie Wilson', email: 'charlie@example.com' }, plan: { name: 'Basic', price: 9.99 }, status: 'ACTIVE', createdAt: new Date(Date.now() - 345600000) }
+        ]);
       } finally {
         setLoading(false);
       }
     };
-    loadOrders();
+    loadSubscriptions();
   }, []);
 
   if (loading) {
-    return <div className="widgetLarge">Loading...</div>;
+    return <div className="text-slate-300">Loading...</div>;
   }
 
   if (error) {
-    return <div className="widgetLarge">Error: {error.message}</div>;
+    return <div className="text-red-300">Error: {error.message}</div>;
   }
 
   return (
-    <div 
-      className="flex-2 p-5"
-      style={{
-        boxShadow: '2px 4px 58px 4px rgba(222, 137, 37, 0.29)',
-        WebkitBoxShadow: '2px 4px 58px 4px rgba(222, 137, 37, 0.29)',
-        MozBoxShadow: '2px 4px 58px 4px rgba(222, 137, 37, 0.29)'
-      }}
-    >
-      <h3 className="text-2xl font-semibold">Latest Transactions</h3>
-      <table className="w-full" style={{ borderSpacing: '20px' }}>
-        <thead>
-          <tr>
-            <th className="text-left">Customer</th>
-            <th className="text-left">Last Transaction</th>
-            <th className="text-left">Amount</th>
-            <th className="text-left">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map(order => (
-            <tr key={order._id}>
-              <td className="flex items-center font-semibold gap-1.5">
-                <img
-                  src={
-                    order.user?.image ||
-                    'https://images.unsplash.com/photo-1609741200119-b292937ea2eb?q=80&w=3027&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-                  }
-                  alt=""
-                  className="w-10 h-10 rounded-full object-contain"
-                />
-                <span>{order.user?.username}</span>
-              </td>
-              <td className="font-normal text-gray-700">{format(order.updatedAt)}</td>
-              <td className="font-normal text-gray-700">&#8377;{order.amount}</td>
-              <td>
-                <Button 
-                  type={order.status} 
-                  className={`${
-                    order.status === 'approved' 
-                      ? 'bg-green-300 text-green-800' 
-                      : order.status === 'declined'
-                      ? 'bg-red-200 text-red-800'
-                      : 'bg-orange-200 text-orange-800'
-                  }`}
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-slate-100">Latest Subscriptions</h3>
+      <div className="space-y-3">
+        {subscriptions.map(subscription => (
+          <div key={subscription.id} className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-purple-600 flex items-center justify-center">
+                <span className="text-xs font-medium text-white">
+                  {subscription.user?.name?.charAt(0) || 'U'}
+                </span>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-100">{subscription.user?.name}</p>
+                <p className="text-xs text-slate-400">{subscription.plan?.name} • {format(subscription.createdAt)}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-sm font-semibold text-slate-100">${subscription.plan?.price}</span>
+              <Button type={subscription.status} />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

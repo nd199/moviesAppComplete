@@ -46,73 +46,53 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center m-0 p-0 overflow-scroll font-['Roboto', 'sans-serif']" 
-         style={{
-           background: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("/REGBack.jpg") no-repeat center center',
-           backgroundSize: 'cover'
-         }}>
-      <div className="flex flex-col items-center justify-center bg-black bg-opacity-70 p-10 gap-5 rounded-lg shadow-lg max-w-full w-[400px] transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{
+        background: 'linear-gradient(rgba(2, 6, 23, 0.78), rgba(2, 6, 23, 0.78)), url("/REGBack.jpg") no-repeat center center',
+        backgroundSize: 'cover',
+      }}
+    >
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl shadow-black/40 backdrop-blur">
         <div className="text-center">
-          <h1 className="text-white text-2xl font-normal mb-2" style={{ fontSize: '32px', fontWeight: '400', marginBottom: '10px' }}>Welcome Admin</h1>
-          <h4 className="text-white text-lg font-light" style={{ fontSize: '18px', fontWeight: '300', marginBottom: '20px' }}>Please Login below</h4>
+          <h1 className="text-2xl font-semibold text-slate-100">Movies Admin</h1>
+          <p className="mt-2 text-sm text-slate-400">Sign in to manage your OTT platform</p>
         </div>
-        <form onSubmit={loginHandler} className="w-full flex flex-col justify-center gap-4">
-          <div className="flex flex-col w-full gap-1">
-            <label className="text-white text-lg font-semibold" style={{ fontSize: '18px', fontWeight: '600' }}>EMAIL :</label>
+
+        <form onSubmit={loginHandler} className="mt-8 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-300">Email</label>
             <input
               type="email"
-              placeholder="Cena@gmail.com"
+              placeholder="admin@domain.com"
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase())}
               required
-              className="p-2.5 border-none rounded-lg text-base transition-all duration-300"
-              style={{
-                fontSize: '17px',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                color: '#fff'
-              }}
+              className="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-950/40 px-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500/50"
             />
           </div>
-          <div className="flex flex-col w-full gap-1">
-            <label className="text-white text-lg font-semibold" style={{ fontSize: '18px', fontWeight: '600' }}>PASSWORD :</label>
+          <div>
+            <label className="block text-sm font-medium text-slate-300">Password</label>
             <input
               type="password"
-              placeholder="Password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="p-2.5 border-none rounded-lg text-base transition-all duration-300"
-              style={{
-                fontSize: '17px',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                color: '#fff'
-              }}
+              className="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-950/40 px-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
             />
           </div>
-          {error && <div className="ml-8 text-red-500 text-sm" style={{ fontSize: '15px' }}>{error}</div>}
-          <button 
-            type="submit" 
-            className="w-full py-3 text-white border-none rounded-lg text-base cursor-pointer transition-all duration-300 mt-2"
-            style={{
-              fontSize: '16px',
-              backgroundColor: '#f46e0ef9',
-              marginTop: '10px'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = 'red'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#f46e0ef9'}
+
+          {error && <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
+
+          <button
+            type="submit"
+            className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-gradient-to-r from-red-500 to-purple-600 px-4 text-sm font-semibold text-white shadow-lg shadow-red-500/10 hover:from-red-400 hover:to-purple-500 disabled:opacity-50"
             disabled={loading}
           >
-            {loading ? 'L O G G I N G . . .' : 'L O G I N'}
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        <div className="flex items-center justify-between text-white text-sm mt-5 gap-5">
-          <p className="text-sm text-white flex-1" style={{ fontSize: '15px' }}>
-            New to CN.IO? <br/> Register{" "}
-            <Link to="/register">
-              <span className="text-purple-400 hover:text-purple-300 hover:underline transition-colors cursor-pointer">here</span>
-            </Link>
-          </p>
-        </div>
         {error !== "Profile Not Found, If you are new here consider registering first, else contact us" && (
           <p className="text-white">
             Forgot Password? Click{" "}
