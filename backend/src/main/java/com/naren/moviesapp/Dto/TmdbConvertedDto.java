@@ -38,7 +38,7 @@ public class TmdbConvertedDto {
     private String imdbId;
     private List<String> productionCountries;
     private List<String> spokenLanguages;
-    private String trailer; // Add trailer field
+    private String trailer;
 
     public static TmdbConvertedDto fromMovie(TmdbMovieDto movie, TmdbService tmdbService) {
         if (movie == null) return null;
@@ -97,15 +97,11 @@ public class TmdbConvertedDto {
                         .filter(video -> "Trailer".equals(video.getType()) && "YouTube".equals(video.getSite()))
                         .findFirst()
                         .map(video -> "https://www.youtube.com/watch?v=" + video.getKey())
-                        .orElse(null);
-
-                // Debug: Log trailer info
-                System.out.println("DEBUG: Movie: " + movie.getTitle() + ", Trailers found: " + videos.size() + ", Selected trailer: " + trailerUrl);
+                .orElse(null);
             } else {
-                System.out.println("DEBUG: Movie: " + movie.getTitle() + ", No trailers found");
             }
         } catch (Exception e) {
-            System.out.println("DEBUG: Error fetching trailer for movie: " + movie.getTitle() + ", Error: " + e.getMessage());
+            // Ignore trailer fetch errors
         }
 
         return TmdbConvertedDto.builder()

@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@SuppressWarnings("unchecked")
 public class TmdbService {
 
     private static final Logger logger = LoggerFactory.getLogger(TmdbService.class);
