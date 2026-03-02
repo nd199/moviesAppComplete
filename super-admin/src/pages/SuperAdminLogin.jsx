@@ -11,6 +11,8 @@ const SuperAdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -25,7 +27,7 @@ const SuperAdminLogin = () => {
 
     try {
       // Use existing admin login endpoint
-      const response = await fetch('/api/v1/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

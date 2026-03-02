@@ -13,6 +13,8 @@ const SuperAdminInvite = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [popupData, setPopupData] = useState({ success: false, message: '' });
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -26,7 +28,7 @@ const SuperAdminInvite = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/system/superadmin/invite', {
+      const response = await fetch(`${API_BASE_URL}/system/superadmin/invite`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
