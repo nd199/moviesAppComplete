@@ -35,6 +35,10 @@ public class Role {
     @JsonIgnore
     private Set<Admin> admins = new HashSet<>();
 
+    @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
+    private Set<ContentManager> contentManagers = new HashSet<>();
+
     public Role(RoleName name) {
         this.name = name;
     }
@@ -58,6 +62,7 @@ public class Role {
                 ", name=" + name +
                 ", customers=" + customers.size() +
                 ", admins=" + admins.size() +
+                ", contentManagers=" + contentManagers.size() +
                 '}';
     }
 }
