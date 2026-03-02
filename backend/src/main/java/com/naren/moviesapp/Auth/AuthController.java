@@ -2,6 +2,7 @@ package com.naren.moviesapp.Auth;
 
 import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Record.CustomerRegistration;
+import com.naren.moviesapp.Repo.ContentManagerRepository;
 import com.naren.moviesapp.Service.CustomerService;
 import com.naren.moviesapp.Service.RefreshTokenService;
 import com.naren.moviesapp.Service.TokenBlacklistService;
@@ -32,6 +33,7 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
     private final TokenBlacklistService tokenBlacklistService;
     private final JwtUtil jwtUtil;
+    private final ContentManagerRepository contentManagerRepository;
 
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
@@ -40,12 +42,14 @@ public class AuthController {
                           CustomerService customerService,
                           RefreshTokenService refreshTokenService,
                           TokenBlacklistService tokenBlacklistService,
-                          JwtUtil jwtUtil) {
+                          JwtUtil jwtUtil,
+                          ContentManagerRepository contentManagerRepository) {
         this.authService = authService;
         this.customerService = customerService;
         this.refreshTokenService = refreshTokenService;
         this.tokenBlacklistService = tokenBlacklistService;
         this.jwtUtil = jwtUtil;
+        this.contentManagerRepository = contentManagerRepository;
     }
 
     @PostMapping("/customers")
@@ -75,6 +79,9 @@ public class AuthController {
         } else if (authResponse instanceof CustomerAuthResponse customerAuth) {
             responseBody.put("user", customerAuth.customerDTO());
             responseBody.put("userType", "CUSTOMER");
+        } else if (authResponse instanceof ContentManagerAuthResponse cmAuth) {
+            responseBody.put("user", cmAuth.contentManagerDTO());
+            responseBody.put("userType", "CONTENT_MANAGER");
         }
         responseBody.put("token", authResponse.token());
 

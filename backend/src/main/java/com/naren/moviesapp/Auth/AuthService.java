@@ -2,14 +2,17 @@ package com.naren.moviesapp.Auth;
 
 import com.naren.moviesapp.Dto.AdminDTO;
 import com.naren.moviesapp.Dto.AdminDTOMapper;
+import com.naren.moviesapp.Dto.ContentManagerDTO;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Dto.CustomerDTOMapper;
 import com.naren.moviesapp.Entity.Admin;
+import com.naren.moviesapp.Entity.ContentManager;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Exception.*;
 import com.naren.moviesapp.Repo.AdminRepository;
+import com.naren.moviesapp.Repo.ContentManagerRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Security.AppUserPrincipal;
 import com.naren.moviesapp.jwt.JwtUtil;
@@ -25,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +42,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final CustomerRepository customerRepository;
     private final AdminRepository adminRepository;
+    private final com.naren.moviesapp.Repo.ContentManagerRepository contentManagerRepository;
 
     @Transactional
     public AuthResponse login(AuthRequest authRequest) {
@@ -119,6 +124,44 @@ public class AuthService {
                 logger.info("Total login process completed in {}ms for: {}", totalTime, customer.getEmail());
 
                 return new CustomerAuthResponse(dto, token);
+            }
+
+            if (entity instanceof ContentManager contentManager) {
+                logger.debug("Content Manager login detected for email: {}", contentManager.getEmail());
+
+                com.naren.moviesapp.Entity.ContentManager cm = contentManagerRepository
+                        .findByEmail(contentManager.getEmail())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Content Manager not found")
+                        );
+
+                logger.info("Content Manager found in database: {}", cm.getEmail());
+
+                String token = jwtUtil.issueToken(
+                        cm.getEmail(),
+                        new HashSet<>(cm.getRoles())
+                );
+
+                logger.info("Content Manager login successful for email: {}", cm.getEmail());
+
+                long totalTime = System.currentTimeMillis() - startTime;
+                logger.info("Total login process completed in {}ms for: {}", totalTime, cm.getEmail());
+
+                ContentManagerDTO cmDTO = new ContentManagerDTO(
+                    cm.getId(),
+                    cm.getName(),
+                    cm.getEmail(),
+                    cm.getPhoneNumber(),
+                    cm.getDepartment(),
+                    cm.getSpecialization(),
+                    cm.getIsActive(),
+                    cm.getCreatedAt(),
+                    cm.getUpdatedAt(),
+                    cm.getImageUrl(),
+                    cm.getRoles().stream().map(role -> role.getName().name()).collect(Collectors.toSet())
+                );
+
+                return new ContentManagerAuthResponse(cmDTO, token);
             }
 
             throw new AuthenticationException("Invalid principal type", "INVALID_PRINCIPAL");
