@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/super-admin/(.*)",
+      "destination": "/super-admin/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
