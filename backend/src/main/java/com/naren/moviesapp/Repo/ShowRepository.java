@@ -54,4 +54,13 @@ public interface ShowRepository extends JpaRepository<Show, Long> {
     // Get all distinct categories using native query
     @Query("SELECT DISTINCT s.category FROM Show s WHERE s.category IS NOT NULL")
     List<String> findAllDistinctCategories();
+
+    // Content Manager queries
+    List<Show> findByContentManagerId(Long contentManagerId);
+
+    @Query("SELECT COUNT(s) FROM Show s WHERE s.contentManager.id = :contentManagerId")
+    Long countShowsByContentManagerId(Long contentManagerId);
+
+    @Query("SELECT s FROM Show s WHERE s.contentManager.id = :contentManagerId AND s.category = :category")
+    List<Show> findByContentManagerIdAndCategory(Long contentManagerId, String category);
 }

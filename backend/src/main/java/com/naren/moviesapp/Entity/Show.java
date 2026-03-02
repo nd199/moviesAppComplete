@@ -70,6 +70,12 @@ public class Show {
     @JsonBackReference
     private Customer customer;
 
+    @ManyToOne
+    @JoinColumn(name = "content_manager_id",
+            foreignKey = @ForeignKey(name = "fk_content_manager_show_id"))
+    @JsonBackReference
+    private ContentManager contentManager;
+
     @Column(nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
