@@ -239,4 +239,20 @@ public class MovieService implements MovieServiceInterface {
     public List<String> getAllDistinctCategories() {
         return movieRepository.findAllDistinctCategories();
     }
+
+    // Content Manager specific methods
+    public List<Movie> getMoviesByContentManager(Long contentManagerId) {
+        logger.debug("Fetching movies for content manager: {}", contentManagerId);
+        return movieRepository.findByContentManagerId(contentManagerId);
+    }
+
+    public Long countMoviesByContentManager(Long contentManagerId) {
+        logger.debug("Counting movies for content manager: {}", contentManagerId);
+        return movieRepository.countMoviesByContentManagerId(contentManagerId);
+    }
+
+    public List<Movie> getMoviesByContentManagerAndCategory(Long contentManagerId, String category) {
+        logger.debug("Fetching movies for content manager {} in category: {}", contentManagerId, category);
+        return movieRepository.findByContentManagerIdAndCategory(contentManagerId, category);
+    }
 }
