@@ -242,4 +242,20 @@ public class ShowService implements ShowServiceInterface {
         return showRepository.findAllDistinctCategories();
     }
 
+    // Content Manager specific methods
+    public List<Show> getShowsByContentManager(Long contentManagerId) {
+        logger.debug("Fetching shows for content manager: {}", contentManagerId);
+        return showRepository.findByContentManagerId(contentManagerId);
+    }
+
+    public Long countShowsByContentManager(Long contentManagerId) {
+        logger.debug("Counting shows for content manager: {}", contentManagerId);
+        return showRepository.countShowsByContentManagerId(contentManagerId);
+    }
+
+    public List<Show> getShowsByContentManagerAndCategory(Long contentManagerId, String category) {
+        logger.debug("Fetching shows for content manager {} in category: {}", contentManagerId, category);
+        return showRepository.findByContentManagerIdAndCategory(contentManagerId, category);
+    }
+
 }
