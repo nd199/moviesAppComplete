@@ -7,7 +7,6 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
   const maxRetries = 5;
   const canRetry = retryCount < maxRetries;
 
-  const ESTIMATED_TIME = 170; // 2 minutes 50 seconds - estimated wait time for users
   const [statusIndex, setStatusIndex] = useState(0);
 
   const statusMessages = useMemo(() => [

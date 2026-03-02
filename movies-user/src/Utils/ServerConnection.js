@@ -4,7 +4,6 @@ import Lottie from 'react-lottie';
 import { ServerConnectingOptions } from './AnimationData';
 
 const ServerConnection = () => {
-  const ESTIMATED_TIME = 170; // 2 minutes 50 seconds - estimated wait time for users
 
 
   return (
