@@ -186,4 +186,20 @@ public class BrevoEmailService implements EmailService {
             throw new EmailSendingException("Unexpected error while sending email via Brevo API: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public void sendContentManagerInviteEmail(String toEmail, String inviteLink) {
+        try {
+            Context context = new Context();
+            context.setVariable("inviteLink", inviteLink);
+            context.setVariable("toEmail", toEmail);
+            String htmlContent = templateEngine.process("content-manager-invite-mail", context);
+
+            sendViaBrevoAPI(toEmail, "Content Manager Invitation - Movies Platform", htmlContent);
+            logger.info("Content Manager invite email sent successfully to {}", toEmail);
+        } catch (Exception e) {
+            logger.error("Failed to send content manager invite email to {}: {}", toEmail, e.getMessage(), e);
+            throw new EmailSendingException("Failed to send content manager invite email to " + toEmail, e);
+        }
+    }
 }

@@ -97,4 +97,28 @@ public class SmtpEmailService implements EmailService {
             throw new EmailSendingException("Failed to send admin invite email to " + toEmail, e);
         }
     }
+
+    @Override
+    public void sendContentManagerInviteEmail(String toEmail, String inviteLink) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("Content Manager Invitation - Movies Platform");
+
+            Context context = new Context();
+            context.setVariable("inviteLink", inviteLink);
+            context.setVariable("toEmail", toEmail);
+            String htmlContent = templateEngine.process("content-manager-invite-mail", context);
+
+            helper.setText(htmlContent, true);
+            javaMailSender.send(message);
+
+            logger.info("Content Manager invite email sent successfully to {}", toEmail);
+        } catch (MessagingException e) {
+            logger.error("Failed to send content manager invite email to {}: {}", toEmail, e.getMessage(), e);
+            throw new EmailSendingException("Failed to send content manager invite email to " + toEmail, e);
+        }
+    }
 }

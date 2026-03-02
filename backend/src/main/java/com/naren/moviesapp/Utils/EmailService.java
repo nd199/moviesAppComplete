@@ -6,4 +6,6 @@ public interface EmailService {
     void sendPasswordResetMail(String toEmail, String token);
 
     void sendInviteEmail(String toEmail, String inviteLink);
+    
+    void sendContentManagerInviteEmail(String toEmail, String inviteLink);
 }
