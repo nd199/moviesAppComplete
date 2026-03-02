@@ -54,4 +54,13 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     // Get all distinct categories using native query
     @Query("SELECT DISTINCT m.category FROM Movie m WHERE m.category IS NOT NULL")
     List<String> findAllDistinctCategories();
+
+    // Content Manager queries
+    List<Movie> findByContentManagerId(Long contentManagerId);
+
+    @Query("SELECT COUNT(m) FROM Movie m WHERE m.contentManager.id = :contentManagerId")
+    Long countMoviesByContentManagerId(Long contentManagerId);
+
+    @Query("SELECT m FROM Movie m WHERE m.contentManager.id = :contentManagerId AND m.category = :category")
+    List<Movie> findByContentManagerIdAndCategory(Long contentManagerId, String category);
 }
