@@ -25,7 +25,7 @@ public class MoviesApplication {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "app.data-initialization.enabled", havingValue = "true", matchIfMissing = false)
+    @ConditionalOnProperty(name = "app.data-initialization.enabled", havingValue = "true", matchIfMissing = true)
     @Profile("!test")
     public CommandLineRunner commandLineRunner(RoleRepository roleRepository,
                                                SubscriptionPlanRepository subscriptionPlanRepository,
