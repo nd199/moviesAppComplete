@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { HiShieldExclamation, HiLockClosed, HiEnvelope } from 'react-icons/hi2';
+import { authAPI } from '../services/api';
 
 const SuperAdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -10,8 +11,6 @@ const SuperAdminLogin = () => {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,25 +25,15 @@ const SuperAdminLogin = () => {
     setLoading(true);
 
     try {
-      // Use existing admin login endpoint
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-        credentials: 'include'
-      });
+      const response = await authAPI.login(formData);
 
-      if (response.ok) {
+      if (response.status === 200) {
         toast.success('Login successful!');
         navigate('/super-admin/invite');
-      } else {
-        const error = await response.json();
-        toast.error(error.message || 'Login failed');
       }
     } catch (error) {
-      toast.error('Login failed. Please try again.');
+      const errorMessage = error.response?.data?.message || 'Login failed';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

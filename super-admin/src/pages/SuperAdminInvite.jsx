@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { HiUserPlus, HiEnvelope, HiCheckCircle, HiXCircle } from 'react-icons/hi2';
+import { authAPI, adminAPI } from '../services/api';
 
 const SuperAdminInvite = () => {
   const [formData, setFormData] = useState({
@@ -12,8 +13,6 @@ const SuperAdminInvite = () => {
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupData, setPopupData] = useState({ success: false, message: '' });
-
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,18 +27,9 @@ const SuperAdminInvite = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/system/superadmin/invite`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-        credentials: 'include'
-      });
+      const response = await adminAPI.inviteAdmin(formData);
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response.status === 200) {
         setPopupData({
           success: true,
           message: `Admin account created and invite sent to ${formData.email}`
@@ -53,13 +43,13 @@ const SuperAdminInvite = () => {
       } else {
         setPopupData({
           success: false,
-          message: data.message || 'Failed to send invite'
+          message: response.data?.message || 'Failed to send invite'
         });
       }
     } catch (error) {
       setPopupData({
         success: false,
-        message: 'Network error. Please try again.'
+        message: error.response?.data?.message || 'Network error. Please try again.'
       });
     } finally {
       setLoading(false);

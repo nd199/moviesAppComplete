@@ -1,0 +1,62 @@
+import axios from "axios";
+
+// Detect if running locally
+const isLocal = () => {
+  return window.location.hostname === 'localhost' ||
+         window.location.hostname === '127.0.0.1' ||
+         window.location.hostname === '';
+};
+
+const getBaseURL = () => {
+  // If VITE_API_URL is set AND we're not local, use it
+  if (import.meta.env.VITE_API_URL && !isLocal()) {
+    return `${import.meta.env.VITE_API_URL}`;
+  }
+  // Default to localhost for local development
+  return "http://localhost:8080";
+};
+
+const api = axios.create({
+  baseURL: getBaseURL(),
+  withCredentials: true,
+  timeout: 30000,
+});
+
+api.interceptors.request.use(
+  (config) => {
+    config.headers['X-Requested-With'] = 'XMLHttpRequest';
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response?.status === 401) {
+      if (window.location.pathname !== '/super-admin/login') {
+        window.location.href = '/super-admin/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+
+// Auth API methods
+export const authAPI = {
+  login: (credentials) => api.post('/api/v1/auth/login', credentials),
+  logout: () => api.post('/api/v1/auth/logout'),
+  // Add other auth methods as needed
+};
+
+// Admin API methods
+export const adminAPI = {
+  inviteAdmin: (adminData) => api.post('/system/superadmin/invite', adminData),
+  // Add other admin methods as needed
+};
