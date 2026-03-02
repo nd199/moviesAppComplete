@@ -1,6 +1,7 @@
 package com.naren.moviesapp.Security;
 
 import com.naren.moviesapp.Repo.AdminRepository;
+import com.naren.moviesapp.Repo.ContentManagerRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final CustomerRepository customerRepository;
     private final AdminRepository adminRepository;
+    private final ContentManagerRepository contentManagerRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -40,9 +42,16 @@ public class CustomUserDetailsService implements UserDetailsService {
                             logger.debug("User found in customer repository: {}", email);
                             return (UserDetails) new AppUserPrincipal(customer);
                         })
-                        .orElseThrow(() -> {
-                            logger.warn("User not found with email: {}", email);
-                            return new UsernameNotFoundException("User not found with email: " + email);
-                        }));
+                        .orElseGet(() -> contentManagerRepository.findByEmail(email)
+                                .map(contentManager -> {
+                                    // Force initialize roles before closing session
+                                    contentManager.getRoles().size();
+                                    logger.debug("User found in content manager repository: {}", email);
+                                    return (UserDetails) new AppUserPrincipal(contentManager);
+                                })
+                                .orElseThrow(() -> {
+                                    logger.warn("User not found with email: {}", email);
+                                    return new UsernameNotFoundException("User not found with email: " + email);
+                                })));
     }
 }

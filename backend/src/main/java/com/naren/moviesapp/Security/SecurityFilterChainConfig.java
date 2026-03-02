@@ -93,6 +93,7 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(
                                 "/api/v1/ping",
                                 "/api/v1/auth/**",
+                                "/api/v1/content-manager/**",
                                 "/api/v1/verify/email",
                                 "/api/v1/validate/Otp",
                                 "/validate/Otp",

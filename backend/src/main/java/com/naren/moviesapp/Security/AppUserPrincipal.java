@@ -2,6 +2,7 @@ package com.naren.moviesapp.Security;
 
 import com.naren.moviesapp.Config.RolePermissionMapper;
 import com.naren.moviesapp.Entity.Admin;
+import com.naren.moviesapp.Entity.ContentManager;
 import com.naren.moviesapp.Entity.Customer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,6 +45,25 @@ public class AppUserPrincipal implements UserDetails {
         this.active = customer.getIsActive();
         this.userEntity = customer;
         this.authorities = customer.getRoles()
+                .stream()
+                .flatMap(role -> {
+                    Set<GrantedAuthority> permissions = RolePermissionMapper
+                            .getPermissions(role.getName())
+                            .stream()
+                            .map(p -> new SimpleGrantedAuthority(p.name()))
+                            .collect(Collectors.toSet());
+                    permissions.add(new SimpleGrantedAuthority(role.getName().name()));
+                    return permissions.stream();
+                })
+                .collect(Collectors.toSet());
+    }
+
+    public AppUserPrincipal(ContentManager contentManager) {
+        this.username = contentManager.getEmail();
+        this.password = contentManager.getPassword();
+        this.active = contentManager.getIsActive();
+        this.userEntity = contentManager;
+        this.authorities = contentManager.getRoles()
                 .stream()
                 .flatMap(role -> {
                     Set<GrantedAuthority> permissions = RolePermissionMapper
