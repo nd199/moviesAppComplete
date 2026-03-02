@@ -8,15 +8,25 @@ const isLocal = () => {
 };
 
 const getBaseURL = () => {
+  const hostname = window.location.hostname;
+  const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
+  
+  console.log('🔍 Debug - Hostname:', hostname);
+  console.log('🔍 Debug - Is Local:', isLocalHost);
+  console.log('🔍 Debug - VITE_API_URL:', import.meta.env.VITE_API_URL);
+  
   // If VITE_API_URL is set AND we're not local, use it
-  if (import.meta.env.VITE_API_URL && !isLocal()) {
+  if (import.meta.env.VITE_API_URL && !isLocalHost) {
+    console.log('🔍 Debug - Using VITE_API_URL:', import.meta.env.VITE_API_URL);
     return `${import.meta.env.VITE_API_URL}`;
   }
   // If we're in production but no env var, use production backend
-  if (!isLocal()) {
+  if (!isLocalHost) {
+    console.log('🔍 Debug - Using production backend: https://movieticket-api.onrender.com');
     return "https://movieticket-api.onrender.com";
   }
   // Default to localhost for local development
+  console.log('🔍 Debug - Using localhost: http://localhost:8080');
   return "http://localhost:8080";
 };
 
