@@ -225,3 +225,67 @@ export const fetchAdminsByDepartment = async (dispatch, department) => {
     throw error;
   }
 };
+
+// ================= SHOWS ================= //
+export const fetchShows = async (dispatch) => {
+  try {
+    const response = await api.get('/shows');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchShowById = async (dispatch, showId) => {
+  try {
+    const response = await api.get(`/shows/${showId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createShow = async (dispatch, showData) => {
+  try {
+    const response = await api.post('/shows', showData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateShow = async (dispatch, showId, showData) => {
+  try {
+    const response = await api.put(`/shows/${showId}`, showData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteShow = async (dispatch, showId) => {
+  try {
+    const response = await api.delete(`/shows/${showId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchShowsByCategory = async (dispatch, category) => {
+  try {
+    const response = await api.get(`/shows/category/${category}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchAllCategories = async (dispatch) => {
+  try {
+    const response = await api.get('/shows/categories');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

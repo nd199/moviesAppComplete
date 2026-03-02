@@ -7,6 +7,7 @@ const SetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get('token');
+  const type = searchParams.get('type'); // "admin" or "content-manager"
   
   const [formData, setFormData] = useState({
     password: '',
@@ -83,14 +84,19 @@ const SetPassword = () => {
         body: JSON.stringify({
           token,
           password: formData.password,
-          confirmPassword: formData.confirmPassword
+          confirmPassword: formData.confirmPassword,
+          type: type || 'admin' // Default to admin for backward compatibility
         })
       });
 
       if (response.ok) {
-        toast.success('Account created successfully! Redirecting to login...');
+        const successMessage = type === 'content-manager' 
+          ? 'Content manager account created successfully! Redirecting to login...'
+          : 'Admin account created successfully! Redirecting to login...';
+        
+        toast.success(successMessage);
         setTimeout(() => {
-          navigate('/login');
+          navigate(type === 'content-manager' ? '/contentManagerLogin' : '/login');
         }, 2000);
       } else {
         const errorData = await response.json();
@@ -121,14 +127,18 @@ const SetPassword = () => {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 rounded-full flex items-center justify-center border border-white/10 bg-gradient-to-br from-red-500/30 to-purple-600/30">
+          <div className={`mx-auto h-16 w-16 rounded-full flex items-center justify-center border border-white/10 bg-gradient-to-br ${
+            type === 'content-manager' 
+              ? 'from-green-500/30 to-teal-600/30' 
+              : 'from-red-500/30 to-purple-600/30'
+          }`}>
             <HiLockClosed className="h-8 w-8 text-slate-100" />
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-slate-100">
-            Setup Your Admin Account
+            Setup Your {type === 'content-manager' ? 'Content Manager' : 'Admin'} Account
           </h2>
           <p className="mt-2 text-sm text-slate-400">
-            Create your password to access the Movies Platform administration panel
+            Create your password to access the Movies Platform {type === 'content-manager' ? 'content management' : 'administration'} panel
           </p>
         </div>
         
@@ -222,7 +232,11 @@ const SetPassword = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-red-500 to-purple-600 hover:from-red-400 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-red-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
+              className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r ${
+                type === 'content-manager' 
+                  ? 'from-green-500 to-teal-600 hover:from-green-400 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-green-500/50'
+                  : 'from-red-500 to-purple-600 hover:from-red-400 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-red-500/50'
+              } disabled:opacity-50 disabled:cursor-not-allowed transition duration-200`}
             >
               {loading ? (
                 <span className="flex items-center">
@@ -230,10 +244,10 @@ const SetPassword = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Creating Account...
+                  Creating {type === 'content-manager' ? 'Content Manager' : 'Admin'} Account...
                 </span>
               ) : (
-                'Create Account'
+                `Create ${type === 'content-manager' ? 'Content Manager' : 'Admin'} Account`
               )}
             </button>
           </form>

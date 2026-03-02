@@ -117,17 +117,13 @@ const UserList = () => {
   return (
     <div className="w-full h-full">
       <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-100">Users</h1>
-          <p className="text-sm text-slate-400">Manage your OTT platform users</p>
-        </div>
         <div className="flex items-center gap-3">
           <input
             type="text"
             placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-white/20 transition-colors"
+            className="px-4 py-2 rounded-lg border border-slate-600 bg-slate-800 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
           />
           <Link to="/users/new">
             <button
@@ -139,10 +135,10 @@ const UserList = () => {
         </div>
       </div>
 
-      <div className="h-[calc(100vh-200px)] overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-2xl shadow-black/20 backdrop-blur">
+      <div className="h-[calc(100vh-200px)] overflow-hidden rounded-2xl border border-slate-700 bg-slate-800 shadow-2xl shadow-black/20 backdrop-blur">
         <div className="h-full overflow-auto">
           <table className="w-full text-sm min-w-[1200px]">
-            <thead className={`${scrolled ? 'bg-slate-800/90' : 'bg-white/5'} text-slate-300 sticky top-0 z-10 backdrop-blur-sm transition-all duration-200`}>
+            <thead className={`${scrolled ? 'bg-slate-700' : 'bg-slate-800'} text-slate-300 sticky top-0 z-10 backdrop-blur-sm transition-all duration-200`}>
               <tr>
                 <th className="px-4 py-4 text-left font-medium">ID</th>
                 <th className="px-4 py-4 text-left font-medium">User</th>
@@ -154,9 +150,9 @@ const UserList = () => {
                 <th className="px-4 py-4 text-left font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10">
+            <tbody className="divide-y divide-slate-700">
               {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-white/5">
+                <tr key={user.id} className="hover:bg-slate-700/30">
                   <td className="px-4 py-3 text-slate-300">{user.id}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center">
@@ -166,7 +162,7 @@ const UserList = () => {
                         alt="User Avatar"
                       />
                       <div>
-                        <div className="font-semibold text-slate-100">{user.name || 'N/A'}</div>
+                        <div className="font-semibold text-white">{user.name || 'N/A'}</div>
                         <div className="text-xs text-slate-400">{user.roles?.[0]?.replace('ROLE_', '') || 'USER'}</div>
                       </div>
                     </div>
@@ -179,13 +175,13 @@ const UserList = () => {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <Link to={`/users/edit/${user.id}`}>
-                        <button className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10">
+                        <button className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600">
                           <FaEdit />
                         </button>
                       </Link>
                       <button
                         onClick={() => deleteUserHandler(user.id)}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10 text-red-200 hover:bg-red-500/20"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-600 bg-red-900/20 text-red-300 hover:bg-red-900/30"
                       >
                         <FaTrash />
                       </button>

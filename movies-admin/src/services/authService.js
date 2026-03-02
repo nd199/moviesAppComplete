@@ -1,8 +1,14 @@
 import api from './api';
+import { contentManagerApi } from './contentManagerApi';
 
 export const authService = {
   login: async (credentials) => {
     const response = await api.post('/auth/login', credentials);
+    return response.data;
+  },
+
+  contentManagerLogin: async (credentials) => {
+    const response = await contentManagerApi.login(credentials);
     return response.data;
   },
 
@@ -16,7 +22,16 @@ export const authService = {
     return response.data;
   },
 
+  getCurrentContentManager: async () => {
+    const response = await api.get('/content-manager/current');
+    return response.data;
+  },
+
   logout: async () => {
     await api.post('/auth/logout');
+  },
+
+  contentManagerLogout: async (token) => {
+    await contentManagerApi.logout(token);
   },
 };

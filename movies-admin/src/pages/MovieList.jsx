@@ -4,7 +4,6 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { fetchMovies, deleteMovie } from '../services/adminApi';
 import useSimpleScroll from '../hooks/useSimpleScroll';
-import MovieAnalyticsChart from '../components/MovieAnalyticsChart';
 
 const MovieList = () => {
   const [movies, setMovies] = useState([]);
@@ -68,17 +67,13 @@ const MovieList = () => {
   return (
     <div className="w-full h-full">
       <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-100">Movies</h1>
-          <p className="text-sm text-slate-400">Manage movies and shows in your catalog</p>
-        </div>
         <div className="flex items-center gap-3">
           <input
             type="text"
             placeholder="Search movies..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-white/20 transition-colors"
+            className="px-4 py-2 rounded-lg border border-slate-600 bg-slate-800 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
           />
           <Link to="/movies/new">
             <button
@@ -90,15 +85,10 @@ const MovieList = () => {
         </div>
       </div>
 
-      {/* Movie Analytics Section */}
-      <div className="mb-8">
-        <MovieAnalyticsChart />
-      </div>
-
-      <div className="h-[calc(100vh-200px)] overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-2xl shadow-black/20 backdrop-blur">
+      <div className="h-[calc(100vh-200px)] overflow-hidden rounded-2xl border border-slate-700 bg-slate-800 shadow-2xl shadow-black/20 backdrop-blur">
         <div className="h-full overflow-auto">
           <table className="w-full text-sm min-w-[1200px]">
-            <thead className={`${scrolled ? 'bg-slate-800/90' : 'bg-white/5'} text-slate-300 sticky top-0 z-10 backdrop-blur-sm transition-all duration-200`}>
+            <thead className={`${scrolled ? 'bg-slate-700' : 'bg-slate-800'} text-slate-300 sticky top-0 z-10 backdrop-blur-sm transition-all duration-200`}>
               <tr>
                 <th className="px-4 py-3 text-left font-medium">ID</th>
                 <th className="px-4 py-3 text-left font-medium">Title</th>
@@ -112,9 +102,9 @@ const MovieList = () => {
                 <th className="px-4 py-3 text-left font-medium">Updated</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10">
+            <tbody className="divide-y divide-slate-700">
               {filteredMovies.map((movie) => (
-                <tr key={movie.id} className="hover:bg-white/5">
+                <tr key={movie.id} className="hover:bg-slate-700/30">
                   <td className="px-4 py-3 text-slate-300">{movie.id}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center">
@@ -125,7 +115,7 @@ const MovieList = () => {
                           alt="Movie Poster"
                         />
                       )}
-                      <div className="font-semibold text-slate-100">{movie.name}</div>
+                      <div className="font-semibold text-white">{movie.name}</div>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-slate-300 max-w-xs truncate">{movie.description || 'N/A'}</td>
@@ -141,13 +131,13 @@ const MovieList = () => {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <Link to={`/movies/edit/${movie.id}`}>
-                        <button className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10">
+                        <button className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600">
                           <FaEdit />
                         </button>
                       </Link>
                       <button
                         onClick={() => deleteMovieHandler(movie.id)}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10 text-red-200 hover:bg-red-500/20"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-600 bg-red-900/20 text-red-300 hover:bg-red-900/30"
                       >
                         <FaTrash />
                       </button>

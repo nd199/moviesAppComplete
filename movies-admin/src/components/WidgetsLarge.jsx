@@ -7,13 +7,13 @@ const WidgetsLarge = () => {
     const getButtonStyles = () => {
       switch (type) {
         case 'ACTIVE':
-          return 'border-emerald-500/30 bg-emerald-500/15 text-emerald-100';
+          return 'border-emerald-500/30 bg-emerald-500/15 text-emerald-200 dark:text-emerald-100';
         case 'CANCELLED':
-          return 'border-red-500/30 bg-red-500/15 text-red-100';
+          return 'border-red-500/30 bg-red-500/15 text-red-200 dark:text-red-100';
         case 'PENDING':
-          return 'border-amber-500/30 bg-amber-500/15 text-amber-100';
+          return 'border-amber-500/30 bg-amber-500/15 text-amber-200 dark:text-amber-100';
         default:
-          return 'border-white/10 bg-white/5 text-slate-200';
+          return 'border-white/10 bg-white/5 text-slate-200 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-300';
       }
     };
 
@@ -67,11 +67,11 @@ const WidgetsLarge = () => {
   }
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-slate-100">Latest Subscriptions</h3>
+    <div className="flex-1 p-5 bg-white/5 dark:bg-slate-800/50 border border-white/10 dark:border-slate-700/50 rounded-lg shadow-lg hover:bg-white/10 dark:hover:bg-slate-700/30 transition-colors">
+      <span className="text-2xl font-semibold text-slate-100 dark:text-white">Latest Subscriptions</span>
       <div className="space-y-3">
         {subscriptions.map(subscription => (
-          <div key={subscription.id} className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+          <div key={subscription.id} className="flex items-center justify-between p-3 rounded-lg border border-white/10 dark:border-slate-700/50 bg-white/5 dark:bg-slate-700/20 hover:bg-white/10 dark:hover:bg-slate-700/30 transition-colors">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-purple-600 flex items-center justify-center">
                 <span className="text-xs font-medium text-white">
@@ -79,12 +79,12 @@ const WidgetsLarge = () => {
                 </span>
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-100">{subscription.user?.name}</p>
-                <p className="text-xs text-slate-400">{subscription.plan?.name} • {format(subscription.createdAt)}</p>
+                <p className="text-sm font-medium text-slate-100 dark:text-white">{subscription.user?.name}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-300">{subscription.plan?.name} • {format(subscription.createdAt)}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <span className="text-sm font-semibold text-slate-100">${subscription.plan?.price}</span>
+              <span className="text-sm font-semibold text-slate-100 dark:text-white">${subscription.plan?.price}</span>
               <Button type={subscription.status} />
             </div>
           </div>

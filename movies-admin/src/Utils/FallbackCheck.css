@@ -3,11 +3,9 @@ display: flex;
 justify-content: center;
 align-items: center;
 min-height: 100vh;
-background: radial-gradient(ellipse at top left, rgba(239, 68, 68, 0.12), transparent 50%),
-radial-gradient(ellipse at bottom right, rgba(168, 85, 247, 0.12), transparent 50%),
-linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+background: #000000;
 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-padding: 20px;
+padding: 0;
 box-sizing: border-box;
 position: relative;
 overflow: hidden;
@@ -25,36 +23,32 @@ animation: float 25s ease-in-out infinite reverse;
 z-index: -1;
 }
 .fallback-content {
-background: rgba(255, 255, 255, 0.08);
-backdrop-filter: blur(25px);
--webkit-backdrop-filter: blur(25px);
-border-radius: 24px;
-padding: 44px;
-max-width: 500px;
-width: 100%;
-box-shadow:
-0 32px 64px rgba(0, 0, 0, 0.4),
-0 16px 32px rgba(0, 0, 0, 0.2),
-inset 0 1px 0 rgba(255, 255, 255, 0.1);
 text-align: center;
-border: 1px solid rgba(255, 255, 255, 0.15);
-position: relative;
-overflow: hidden;
+padding: 40px;
+max-width: 900px;
+background: rgba(255, 255, 255, 0.05);
+backdrop-filter: blur(10px);
+-webkit-backdrop-filter: blur(10px);
+border-radius: 20px;
+border: 1px solid rgba(255, 255, 255, 0.1);
+box-shadow: 0 8px 32px rgba(255, 255, 255, 0.1);
 }
 
-.fallback-content::before {
-content: '';
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-height: 1px;
-background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.4), rgba(168, 85, 247, 0.4), transparent);
-animation: shimmer 3s ease-in-out infinite;
+.fallback-content-inner {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 32px;
 }
+
+.fallback-main {
+flex: 1;
+min-width: 0;
+}
+
 .fallback-image {
-width: 90px;
-height: 90px;
+width: 280px;
+height: 280px;
 margin: 0 auto 30px;
 display: flex;
 align-items: center;
@@ -80,15 +74,15 @@ font-weight: 400;
 }
 .fallback-retry-info {
 font-size: 1rem;
-color: #fef2f2;
-margin-bottom: 24px;
+color: #ffffff;
 font-weight: 600;
-background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(168, 85, 247, 0.15));
+margin-bottom: 24px;
+background: rgba(255, 255, 255, 0.05);
 padding: 12px 20px;
 border-radius: 12px;
 display: inline-block;
-border: 1px solid rgba(239, 68, 68, 0.3);
-box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2);
+border: 1px solid rgba(255, 255, 255, 0.1);
+box-shadow: 0 4px 16px rgba(255, 255, 255, 0.08);
 }
 .fallback-actions {
 margin: 24px 0;
@@ -123,37 +117,29 @@ animation: spin 1s linear infinite;
 66% { transform: translate(-20px, 20px) rotate(240deg); }
 }
 
-@keyframes shimmer {
-0% { transform: translateX(-100%); }
-100% { transform: translateX(100%); }
-}
 .fallback-max-retries {
 margin: 24px 0;
 }
 .fallback-max-text {
 font-size: 1rem;
-color: #fef2f2;
-margin-bottom: 24px;
+color: #ffffff;
 font-weight: 600;
-background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(168, 85, 247, 0.15));
+margin-bottom: 24px;
+background: rgba(255, 255, 255, 0.05);
 padding: 12px 20px;
 border-radius: 12px;
 display: inline-block;
-border: 1px solid rgba(239, 68, 68, 0.3);
-box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2);
+border: 1px solid rgba(255, 255, 255, 0.1);
+box-shadow: 0 4px 16px rgba(255, 255, 255, 0.08);
 }
 .fallback-help {
-margin-top: 36px;
-padding-top: 28px;
-border-top: 1px solid rgba(255, 255, 255, 0.12);
-background: rgba(0, 0, 0, 0.15);
-border-radius: 16px;
-margin: 36px -20px -20px -20px;
-padding: 28px 20px 20px 20px;
+text-align: left;
+flex: 0 0 280px;
+padding: 0;
 }
 .fallback-help h3 {
-font-size: 1.15rem;
-margin-bottom: 18px;
+font-size: 1rem;
+margin-bottom: 16px;
 color: #e2e8f0;
 font-weight: 600;
 }
@@ -163,13 +149,13 @@ padding: 0;
 text-align: left;
 }
 .fallback-help li {
-font-size: 0.98rem;
-margin-bottom: 14px;
+font-size: 0.9rem;
+margin-bottom: 12px;
 color: rgba(226, 232, 240, 0.85);
 display: flex;
 align-items: flex-start;
-gap: 10px;
-line-height: 1.5;
+gap: 8px;
+line-height: 1.4;
 }
 .fallback-help li::before {
 content: "✓";
@@ -177,6 +163,7 @@ color: #34d399;
 font-weight: bold;
 flex-shrink: 0;
 margin-top: 2px;
+font-size: 0.8rem;
 }
 .retry-button {
 padding: 16px 32px;
@@ -218,11 +205,19 @@ transform: translateY(0);
 }
 @media (max-width: 768px) {
 .fallback-container {
-padding: 16px;
+padding: 0;
 }
 .fallback-content {
 padding: 36px 24px;
 max-width: 480px;
+}
+.fallback-content-inner {
+flex-direction: column;
+gap: 24px;
+}
+.fallback-help {
+flex: 1;
+width: 100%;
 }
 .fallback-content-title {
 font-size: 1.8rem;
@@ -231,19 +226,15 @@ font-size: 1.8rem;
 font-size: 1rem;
 }
 .fallback-image {
-width: 100px;
-height: 100px;
+width: 280px;
+height: 280px;
 margin: 0 auto 24px;
-}
-.fallback-help {
-margin: 32px -24px -24px -24px;
-padding: 24px 24px 16px 24px;
 }
 }
 @media (max-width: 480px) {
 .fallback-content {
 padding: 28px 20px;
-margin: 10px;
+margin: 0;
 }
 .fallback-content-title {
 font-size: 1.6rem;
@@ -254,7 +245,7 @@ padding: 18px 24px;
 font-size: 1rem;
 }
 .fallback-help {
-margin: 28px -20px -20px -20px;
-padding: 20px 20px 12px 20px;
+margin: 28px 0;
+padding: 20px 0 12px 0;
 }
 }

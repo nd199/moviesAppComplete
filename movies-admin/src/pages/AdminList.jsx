@@ -66,105 +66,99 @@ const AdminList = () => {
   return (
     <div className="w-full h-full">
       <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-100">Admins</h1>
-          <p className="text-sm text-slate-400">Manage administrative access and roles</p>
-        </div>
         <Link to="/admins/new">
-          <button className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-red-500/10 hover:from-red-400 hover:to-purple-500">
+          <button className="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-slate-300 shadow-lg shadow-slate-700/10 hover:bg-slate-600">
             Create Admin
           </button>
         </Link>
       </div>
 
-      <div className="h-[calc(100vh-200px)] overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-2xl shadow-black/20 backdrop-blur">
+      <div className="h-[calc(100vh-200px)] overflow-hidden rounded-2xl border border-slate-700 bg-slate-800 shadow-2xl shadow-black/20 backdrop-blur">
         <div className="h-full overflow-auto table-scroll-container">
           <table className="w-full text-sm">
-            <thead className={`${scrolled ? 'bg-slate-800/90' : 'bg-white/5'} text-slate-300 sticky top-0 z-10 backdrop-blur-sm transition-all duration-200`}>
+            <thead className={`${scrolled ? 'bg-slate-700' : 'bg-slate-800'} text-slate-300 sticky top-0 z-10 backdrop-blur-sm transition-all duration-200`}>
               <tr>
-                <th className="px-4 py-3 text-left font-medium">ID</th>
-                <th className="px-4 py-3 text-left font-medium">Admin</th>
-                <th className="px-4 py-3 text-left font-medium">Email</th>
-                <th className="px-4 py-3 text-left font-medium">Phone</th>
-                <th className="px-4 py-3 text-left font-medium">Department</th>
-                <th className="px-4 py-3 text-left font-medium">Roles</th>
-                <th className="px-4 py-3 text-left font-medium">Access</th>
-                <th className="px-4 py-3 text-left font-medium">Status</th>
-                <th className="px-4 py-3 text-left font-medium">Actions</th>
+                <th className="px-4 py-4 text-left font-medium">ID</th>
+                <th className="px-4 py-4 text-left font-medium">Admin</th>
+                <th className="px-4 py-4 text-left font-medium">Email</th>
+                <th className="px-4 py-4 text-left font-medium">Roles</th>
+                <th className="px-4 py-4 text-left font-medium">Status</th>
+                <th className="px-4 py-4 text-left font-medium">Created</th>
+                <th className="px-4 py-4 text-left font-medium">Last Login</th>
+                <th className="px-4 py-4 text-left font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10">
+            <tbody className="divide-y divide-slate-700">
               {loading ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-10 text-center text-slate-400">
+                  <td colSpan={8} className="px-4 py-10 text-center text-slate-400">
                     Loading admins...
                   </td>
                 </tr>
               ) : admins.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-10 text-center text-slate-400">
+                  <td colSpan={8} className="px-4 py-10 text-center text-slate-400">
                     No admins found.
                   </td>
                 </tr>
               ) : (
                 admins.map((admin) => (
-                  <tr key={admin.id} className="hover:bg-white/5">
+                  <tr key={admin.id} className="hover:bg-slate-700/30">
                     <td className="px-4 py-3 text-slate-300">{admin.id}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center">
                         <img
-                          className="w-10 h-10 rounded-full object-cover mr-3 border border-white/10"
+                          className="w-10 h-10 rounded-full object-cover mr-3"
                           src={admin.imageUrl || defaultSelected}
                           alt="Admin Avatar"
                         />
                         <div>
-                          <div className="font-semibold text-slate-100">{admin.name}</div>
-                          <div className="text-xs text-slate-400">Created: {new Date(admin.createdAt).toLocaleDateString()}</div>
+                          <div className="font-semibold text-white">{admin.name}</div>
+                          <div className="text-xs text-slate-400">{admin.email}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-slate-300">{admin.email}</td>
-                    <td className="px-4 py-3 text-slate-300">{admin.phoneNumber}</td>
-                    <td className="px-4 py-3 text-slate-300">{admin.department || 'N/A'}</td>
                     <td className="px-4 py-3">
-                      <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">
-                        {getRoleNames(admin.roles)}
-                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {getRoleNames(admin.roles).split(', ').map((role, index) => (
+                          <span key={index} className="px-2 py-1 text-xs bg-blue-900/30 text-blue-300 rounded">
+                            {role}
+                          </span>
+                        ))}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="inline-flex rounded-full border border-purple-500/30 bg-purple-500/15 px-3 py-1 text-xs font-semibold text-purple-100">
-                        Level {admin.accessLevel}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${
-                          admin.isActive
-                            ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-100'
-                            : 'border-red-500/30 bg-red-500/15 text-red-100'
-                        }`}
-                      >
+                      <span className={`px-2 py-1 text-xs rounded ${
+                        admin.isActive
+                          ? 'bg-green-900/30 text-green-300'
+                          : 'bg-red-900/30 text-red-300'
+                      }`}>
                         {admin.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
+                    <td className="px-4 py-3 text-slate-300">{admin.createdAt ? new Date(admin.createdAt).toLocaleDateString() : 'N/A'}</td>
+                    <td className="px-4 py-3 text-slate-300">{admin.lastLogin ? new Date(admin.lastLogin).toLocaleDateString() : 'Never'}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <Link to={`/admins/edit/${admin.id}`}>
-                          <button className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10" title="Edit Admin">
+                          <button className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600">
                             <FaEdit />
                           </button>
                         </Link>
                         <button
                           onClick={() => toggleStatusHandler(admin.id)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
-                          title={admin.isActive ? 'Deactivate Admin' : 'Activate Admin'}
+                          className={`inline-flex h-9 w-9 items-center justify-center rounded-lg border ${
+                            admin.isActive
+                              ? 'border-amber-600 bg-amber-900/20 text-amber-300 hover:bg-amber-900/30'
+                              : 'border-green-600 bg-green-900/20 text-green-300 hover:bg-green-900/30'
+                          }`}
                         >
                           {admin.isActive ? <FaToggleOff /> : <FaToggleOn />}
                         </button>
                         <button
                           onClick={() => deleteAdminHandler(admin.id)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10 text-red-200 hover:bg-red-500/20"
-                          title="Delete Admin"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-600 bg-red-900/20 text-red-300 hover:bg-red-900/30"
                         >
                           <FaTrash />
                         </button>

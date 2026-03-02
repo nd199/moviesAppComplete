@@ -30,61 +30,53 @@ const WidgetsSmall = () => {
   }, []);
 
   return (
-    <div 
-      className="flex-1 p-5 mr-5"
-      style={{
-        boxShadow: '2px 4px 58px 4px rgba(222, 137, 37, 0.29)',
-        WebkitBoxShadow: '2px 4px 58px 4px rgba(222, 137, 37, 0.29)',
-        MozBoxShadow: '2px 4px 58px 4px rgba(222, 137, 37, 0.29)'
-      }}
+    <div
+      className="flex-1 p-5 mr-5 bg-white/5 dark:bg-slate-800/50 border border-white/10 dark:border-slate-700/50 rounded-lg shadow-lg hover:bg-white/10 dark:hover:bg-slate-700/30 transition-colors"
     >
-      <span className="text-2xl font-semibold">Newly Joined Members</span>
+      <span className="text-2xl font-semibold text-slate-100 dark:text-white">Newly Joined Members</span>
       {loading ? (
-        <div className="text-center text-red-500 mt-5">
+        <div className="text-center text-red-400 dark:text-red-300 mt-5">
           <p>Loading...</p>
         </div>
       ) : error ? (
-        <div className="text-center text-red-500 mt-5">
+        <div className="text-center text-red-400 dark:text-red-300 mt-5">
           <p>{error}</p>
         </div>
       ) : (
-        <ul className="m-0 p-0">
-          {users?.length > 0 ? (
-            users
+        users && users.filter(user => user.roles?.[0] !== 'ROLE_ADMIN').length > 0 ? (
+          <ul className="p-0 m-0 list-none">
+            {users
               ?.filter(user => user.roles?.[0] !== 'ROLE_ADMIN')
-              .map(user => (
-                <li className="flex items-center justify-between my-5" key={user.id}>
+              .slice(0, 5)
+              .map((user, index) => (
+                <li key={user.id || index} className="flex items-center justify-between my-5 mx-0">
                   <img
                     src={user?.imageUrl || defaultSelected}
                     alt=""
                     className="w-10 h-10 rounded-full object-cover"
                   />
-                  <div className="flex flex-col">
-                    <span className="font-semibold">{user.name || 'No Name'}</span>
-                    <span className="font-light text-xs text-slate-400">
+                  <div className="flex flex-col ml-4">
+                    <span className="font-semibold text-slate-100 dark:text-white">
+                      {user.name || 'No Name'}
+                    </span>
+                    <span className="text-sm text-slate-400 dark:text-slate-300">
                       {user.email || 'No Email'}
                     </span>
                   </div>
-                  <button 
-                    className="flex items-center border-none rounded-lg px-2.5 py-1.5 cursor-pointer gap-2"
-                    style={{
-                      backgroundColor: '#d3901d3f',
-                      color: 'brown'
-                    }}
-                  >
-                    <FaEye className="text-base" />
-                    <Link to={`/users/edit/${user.id}`} style={{ color: '#8b5cf6' }}>
-                      View
-                    </Link>
-                  </button>
+                  <Link to={`/users/edit/${user.id}`}>
+                    <button className="border-none p-2 rounded-lg bg-blue-600 text-white cursor-pointer hover:bg-blue-700 transition-colors">
+                      <FaEye className="text-base" />
+                      <span className="ml-2">View</span>
+                    </button>
+                  </Link>
                 </li>
-              ))
-          ) : (
-            <div className="text-center text-red-500 mt-5">
-              <p>No Users Found</p>
-            </div>
-          )}
-        </ul>
+              ))}
+          </ul>
+        ) : (
+          <div className="text-center text-red-500 mt-5">
+            <p>No Users Found</p>
+          </div>
+        )
       )}
     </div>
   );
