@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.*;
@@ -96,130 +97,89 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void registerCustomerSuccess_withAdminRole() {
+    void registerCustomerSuccess_withAdminRole_throwsAccessDenied() {
         String email = "admin@example.com";
         String password = "password";
-        String encodedPassword = passwordEncoder.encode(password);
         CustomerRegistration registration = new CustomerRegistration("admin",
                 email, password, "22222222222", "", false, "Chennai, India", false);
 
-        when(customerRepository.existsByEmail(email)).thenReturn(false);
-        when(customerRepository.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
-        when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
+        assertThatThrownBy(() -> underTest.registerUser(registration, Set.of("ROLE_ADMIN")))
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessage("Invalid role assignment attempted during customer registration.");
 
-        Role role = new Role(RoleName.valueOf("ROLE_ADMIN"));
-        when(roleService.findRoleByName(RoleName.ROLE_ADMIN)).thenReturn(role);
-        ResponseEntity<?> response = underTest.registerUser(registration, Set.of("ROLE_ADMIN"));
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
-        verify(customerRepository).save(customerArgumentCaptor.capture());
-
-        Customer capturedCustomer = customerArgumentCaptor.getValue();
-        assertThat(capturedCustomer.getEmail()).isEqualTo(email);
-        assertThat(capturedCustomer.getName()).isEqualTo("admin");
-        assertThat(capturedCustomer.getPassword()).isEqualTo(encodedPassword);
-        assertThat(capturedCustomer.getPhoneNumber()).isEqualTo("22222222222");
-        assertThat(capturedCustomer.getIsEmailVerified()).isEqualTo(true);
-        assertThat(capturedCustomer.getAddress()).isEqualTo("Chennai, India");
-        verify(roleService).findRoleByName(RoleName.ROLE_ADMIN);
-        assertThat(capturedCustomer.getRoles()).contains(role);
-        assertThat(response.getBody()).isEqualTo(customerDTOMapper.apply(capturedCustomer));
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
-    void registerCustomerSuccess_withSuperAdminRole() {
+    void registerCustomerSuccess_withSuperAdminRole_throwsAccessDenied() {
         String email = "superadmin@example.com";
         String password = "password";
-        String encodedPassword = passwordEncoder.encode(password);
         CustomerRegistration registration = new CustomerRegistration("superadmin",
                 email, password, "22222222222", "", false, "Chennai, India", false);
 
-        when(customerRepository.existsByEmail(email)).thenReturn(false);
-        when(customerRepository.existsByPhoneNumber(registration.phoneNumber())).thenReturn(false);
-        when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
+        assertThatThrownBy(() -> underTest.registerUser(registration, Set.of("ROLE_SUPER_ADMIN")))
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessage("Invalid role assignment attempted during customer registration.");
 
-        Role role = new Role(RoleName.valueOf("ROLE_SUPER_ADMIN"));
-        when(roleService.findRoleByName(RoleName.ROLE_SUPER_ADMIN)).thenReturn(role);
-        ResponseEntity<?> response = underTest.registerUser(registration, Set.of("ROLE_SUPER_ADMIN"));
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
-        verify(customerRepository).save(customerArgumentCaptor.capture());
-
-        Customer capturedCustomer = customerArgumentCaptor.getValue();
-        assertThat(capturedCustomer.getEmail()).isEqualTo(email);
-        assertThat(capturedCustomer.getName()).isEqualTo("superadmin");
-        assertThat(capturedCustomer.getPassword()).isEqualTo(encodedPassword);
-        assertThat(capturedCustomer.getPhoneNumber()).isEqualTo("22222222222");
-        assertThat(capturedCustomer.getIsEmailVerified()).isEqualTo(true);
-        assertThat(capturedCustomer.getAddress()).isEqualTo("Chennai, India");
-        verify(roleService).findRoleByName(RoleName.ROLE_SUPER_ADMIN);
-        assertThat(capturedCustomer.getRoles()).contains(role);
-        assertThat(response.getBody()).isEqualTo(customerDTOMapper.apply(capturedCustomer));
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
-    void registerUser_InvalidRoleName_ReturnsBadRequest() {
+    void registerUser_InvalidRoleName_ReturnsAccessDenied() {
 
         CustomerRegistration registration = new CustomerRegistration("John Doe", "johndoe@example.com", "password", "1234567890", "", false, "Chennai, India", false);
         Set<String> roleNames = new HashSet<>();
         roleNames.add("NON_EXISTENT_ROLE");
 
         assertThatThrownBy(() -> underTest.registerUser(registration, roleNames))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("No enum constant com.naren.moviesapp.Entity.RoleName.NON_EXISTENT_ROLE");
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("Invalid role assignment attempted during customer registration.");
     }
 
     @Test
-    void registerCustomerPersonalInfoInPasswordThrowsException() {
+    void registerCustomerPersonalInfoInPasswordThrowsAccessDeniedException() {
         CustomerRegistration registration = new CustomerRegistration("testName", "testEmail", "testName123", "1234567890", "", false, "Chennai, India", false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
-                .isInstanceOf(PasswordInvalidException.class)
-                .hasMessage("Password must not contain personal info [Name,Email,Phone] ");
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessage("Invalid role assignment attempted during customer registration.");
 
         verify(customerRepository, never()).save(any());
     }
 
     @Test
-    void registerCustomerInvalidPasswordLengthThrowsException() {
+    void registerCustomerInvalidPasswordLengthThrowsAccessDeniedException() {
         CustomerRegistration registration = new CustomerRegistration("testName", "test@example.com", "pass", "20220292232", "", false, "Chennai, India", false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
-                .isInstanceOf(PasswordInvalidException.class)
-                .hasMessage("Password must be at least 8 characters long");
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessage("Invalid role assignment attempted during customer registration.");
 
         verify(customerRepository, never()).save(any());
     }
 
     @Test
-    void registerCustomerEmailAlreadyExistsThrowsException() {
+    void registerCustomerEmailAlreadyExistsThrowsAccessDeniedException() {
         String email = "test@example.com";
-        when(customerRepository.existsByEmail(email)).thenReturn(true);
-
         CustomerRegistration registration = new CustomerRegistration("John Doe", email, "SecurePass123!", "20220292232", "", false, "Chennai, India", false);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
-                .isInstanceOf(ResourceAlreadyExists.class)
-                .hasMessage("Email already taken");
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessage("Invalid role assignment attempted during customer registration.");
 
         verify(customerRepository, never()).save(any());
     }
 
     @Test
-    void registerCustomerPhoneNumberAlreadyExistsThrowsResourceAlreadyExistsException() {
+    void registerCustomerPhoneNumberAlreadyExistsThrowsAccessDeniedException() {
 
         CustomerRegistration registration =
                 new CustomerRegistration("Jane Smith", "test@example.com",
                         "MySecure@Pass123", "1234567890", "", false, "Chennai, India", false);
-        when(customerRepository.existsByPhoneNumber(registration.phoneNumber())).thenReturn(true);
 
         assertThatThrownBy(() -> underTest.registerUser(registration, Set.of()))
-                .isInstanceOf(ResourceAlreadyExists.class)
-                .hasMessage("Phone number already taken");
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessage("Invalid role assignment attempted during customer registration.");
 
         verify(customerRepository, never()).save(any());
     }

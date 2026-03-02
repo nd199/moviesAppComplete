@@ -32,6 +32,11 @@ public class TestConfig {
             public void sendInviteEmail(String toEmail, String inviteLink) {
                 System.out.println("Mock invite email sent to: " + toEmail + " with link: " + inviteLink);
             }
+
+            @Override
+            public void sendContentManagerInviteEmail(String toEmail, String inviteLink) {
+                System.out.println("Mock content manager invite email sent to: " + toEmail + " with link: " + inviteLink);
+            }
         };
     }
 

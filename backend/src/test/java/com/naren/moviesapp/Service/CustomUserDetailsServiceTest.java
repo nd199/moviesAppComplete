@@ -2,6 +2,7 @@ package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Repo.AdminRepository;
+import com.naren.moviesapp.Repo.ContentManagerRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Security.AppUserPrincipal;
 import com.naren.moviesapp.Security.CustomUserDetailsService;
@@ -29,11 +30,14 @@ class CustomUserDetailsServiceTest {
     @Mock
     private AdminRepository adminRepository;
 
+    @Mock
+    private ContentManagerRepository contentManagerRepository;
+
     private CustomUserDetailsService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new CustomUserDetailsService(customerRepository, adminRepository);
+        underTest = new CustomUserDetailsService(customerRepository, adminRepository, contentManagerRepository);
     }
 
     @Test
