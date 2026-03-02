@@ -12,6 +12,10 @@ const getBaseURL = () => {
   if (import.meta.env.VITE_API_URL && !isLocal()) {
     return `${import.meta.env.VITE_API_URL}`;
   }
+  // If we're in production but no env var, use production backend
+  if (!isLocal()) {
+    return "https://movieticket-api.onrender.com";
+  }
   // Default to localhost for local development
   return "http://localhost:8080";
 };
