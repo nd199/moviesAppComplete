@@ -53,12 +53,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-
-// Separate API instance for public endpoints that don't require credentials
-export const publicApi = axios.create({
-  baseURL: getBaseURL(),
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});

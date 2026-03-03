@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { HiLockClosed, HiEye, HiEyeSlash, HiCheckCircle, HiExclamationTriangle } from 'react-icons/hi2';
-import api, { publicApi } from '../services/api';
+import api from '../services/api';
 
 const SetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -77,7 +77,7 @@ const SetPassword = () => {
     }
 
     try {
-      const response = await publicApi.post('/auth/set-password', {
+      const response = await api.post('/auth/set-password', {
         token,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
