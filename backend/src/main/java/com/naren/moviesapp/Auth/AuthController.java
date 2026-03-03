@@ -8,6 +8,7 @@ import com.naren.moviesapp.Service.RefreshTokenService;
 import com.naren.moviesapp.Service.TokenBlacklistService;
 import com.naren.moviesapp.jwt.JwtUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
