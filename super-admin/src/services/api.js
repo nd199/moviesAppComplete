@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// Detect if running locally
 const isLocal = () => {
   return window.location.hostname === 'localhost' ||
          window.location.hostname === '127.0.0.1' ||
@@ -15,18 +14,14 @@ const getBaseURL = () => {
   console.log('🔍 Debug - Is Local:', isLocalHost);
   console.log('🔍 Debug - VITE_API_URL:', import.meta.env.VITE_API_URL);
   
-  // If VITE_API_URL is set AND we're not local, use it
   if (import.meta.env.VITE_API_URL && !isLocalHost) {
     console.log('🔍 Debug - Using VITE_API_URL:', import.meta.env.VITE_API_URL);
     return `${import.meta.env.VITE_API_URL}`;
   }
-  // If we're in production but no env var, use production backend
   if (!isLocalHost) {
     console.log('🔍 Debug - Using production backend: https://movieticket-api.onrender.com');
     return "https://movieticket-api.onrender.com";
   }
-  // Default to localhost for local development
-  console.log('🔍 Debug - Using localhost: http://localhost:8080');
   return "http://localhost:8080";
 };
 
@@ -52,15 +47,15 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      if (window.location.pathname !== '/super-admin/login') {
+      if (window.location.pathname !== '/super-admin/login' && !error.code === 'ERR_NETWORK') {
         window.location.href = '/super-admin/login';
       }
     } else if (error.response?.status === 404) {
-      // Handle 404 errors - redirect to home page
       console.warn('API endpoint not found, redirecting to home');
-      window.location.href = '/super-admin/login';
+      if (window.location.pathname !== '/super-admin/login') {
+        window.location.href = '/super-admin/login';
+      }
     } else if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
-      // Handle network errors - these will be caught by the health check system
       console.warn('Network error detected, health check should handle this');
     }
     return Promise.reject(error);
@@ -69,15 +64,12 @@ api.interceptors.response.use(
 
 export default api;
 
-// Auth API methods
 export const authAPI = {
   login: (credentials) => api.post('/api/v1/auth/login', credentials),
   logout: () => api.post('/api/v1/auth/logout'),
-  // Add other auth methods as needed
+  checkAuth: () => api.get('/api/v1/customers/currentUser'),
 };
 
-// Admin API methods
 export const adminAPI = {
   inviteAdmin: (adminData) => api.post('/system/superadmin/invite', adminData),
-  // Add other admin methods as needed
 };

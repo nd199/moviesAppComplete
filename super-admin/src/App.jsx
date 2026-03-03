@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import SuperAdminInvite from './pages/SuperAdminInvite';
+import ProtectedRoute from './components/ProtectedRoute';
 import Fallback from './Utils/FallBackPage.jsx';
 import ServerConnection from './Utils/ServerConnection.jsx';
 
@@ -80,7 +81,14 @@ function AppWithRoutes() {
     <Router>
       <Routes>
         <Route path="/super-admin/login" element={<SuperAdminLogin />} />
-        <Route path="/super-admin/invite" element={<SuperAdminInvite />} />
+        <Route 
+          path="/super-admin/invite" 
+          element={
+            <ProtectedRoute>
+              <SuperAdminInvite />
+            </ProtectedRoute>
+          } 
+        />
         <Route path="/" element={<Navigate to="/super-admin/login" replace />} />
       </Routes>
       <Toaster position="top-right" />
