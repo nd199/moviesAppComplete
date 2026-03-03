@@ -22,10 +22,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = Cookies.get('jwt_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // Remove Authorization header since we're using HTTP-only cookies only
     config.headers['X-Requested-With'] = 'XMLHttpRequest';
     return config;
   },

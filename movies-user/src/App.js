@@ -92,13 +92,12 @@ function AppWithNavigation() {
   const [skipUserFetch, setSkipUserFetch] = useState(false);
 
   useEffect(() => {
-    // Only fetch user details if there's a JWT token
-    const token = Cookies.get('jwt_token');
-    if (!skipUserFetch && token) {
-      fetchCurrentUserDetails(dispatch);
-    } else if (!token) {
-      // If no token, set auth status to unauthenticated
-      dispatch(setAuthStatus('unauthenticated'));
+    // Always try to fetch current user - server will determine if authenticated
+    if (!skipUserFetch) {
+      fetchCurrentUserDetails(dispatch).catch(() => {
+        // If fetch fails, user is not authenticated
+        dispatch(setAuthStatus('unauthenticated'));
+      });
     }
   }, [dispatch, skipUserFetch]);
 

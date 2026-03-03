@@ -97,16 +97,8 @@ export const login = async (dispatch, userInfo) => {
     
     // Handle new response structure
     const userData = res.data?.user || res.data; // Fallback to old structure
-    const token = res.data?.token;
     
-    // Check if response contains token in body (fallback for cookie issues)
-    if (token) {
-      console.log('Login: Using token-based auth fallback');
-      // Store token in js-cookie as fallback
-      Cookies.set('jwt_token', token, { expires: 7 }); // 7 days
-    } else {
-      console.log('Login: Authentication cookies set by server');
-    }
+    console.log('Login: Authentication cookies set by server');
     
     dispatch(loginSuccess(userData));
     dispatch(setAuthStatus("authenticated"));
@@ -260,13 +252,17 @@ export const fetchCurrentUserDetails = async dispatch => {
   } catch (error) {
     const message = error.response?.data?.message || 'Failed to fetch user';
     
+    // Always set unauthenticated on any error
+    dispatch(fetchCurrentFailure({ message }));
+    dispatch(setAuthStatus('unauthenticated'));
+    
+    // Don't throw error for 401/403 - just return null
     if (error.response?.status === 401 || error.response?.status === 403) {
-      console.warn('Auth error - setting user as unauthenticated');
-      dispatch(fetchCurrentFailure({ message }));
-      return;
+      return null;
     }
     
-    dispatch(fetchCurrentFailure({ message }));
+    // Throw for other errors so they can be handled elsewhere
+    throw error;
   }
 };
 
