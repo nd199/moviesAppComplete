@@ -17,7 +17,7 @@ const Home = () => {
     const fetchUserData = async () => {
       setLoading(true);
       try {
-        await fetchCurrentUserDetails(dispatch, currentUser?.email);
+        await fetchCurrentUserDetails(dispatch);
       } catch (error) {
         console.error("Failed to fetch user:", error);
       } finally {
@@ -27,7 +27,7 @@ const Home = () => {
     };
     
     fetchUserData();
-  }, [dispatch, currentUser?.email]);
+  }, [dispatch]);
 
   return (
     <div className="home">
