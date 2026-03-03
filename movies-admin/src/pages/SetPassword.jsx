@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { HiLockClosed, HiEye, HiEyeSlash, HiCheckCircle, HiExclamationTriangle } from 'react-icons/hi2';
+import api from '../services/api';
 
 const SetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -76,20 +77,14 @@ const SetPassword = () => {
     }
 
     try {
-      const response = await fetch('/api/v1/auth/set-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          type: type || 'admin' // Default to admin for backward compatibility
-        })
+      const response = await api.post('/auth/set-password', {
+        token,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        type: type || 'admin' // Default to admin for backward compatibility
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         const successMessage = type === 'content-manager' 
           ? 'Content manager account created successfully! Redirecting to login...'
           : 'Admin account created successfully! Redirecting to login...';
@@ -98,12 +93,9 @@ const SetPassword = () => {
         setTimeout(() => {
           navigate(type === 'content-manager' ? '/contentManagerLogin' : '/login');
         }, 2000);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Failed to create account');
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      setError(error.response?.data?.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }

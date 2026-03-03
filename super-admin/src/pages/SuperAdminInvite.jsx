@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { HiUserPlus, HiEnvelope, HiCheckCircle, HiXCircle } from 'react-icons/hi2';
+import { HiUserPlus, HiEnvelope, HiCheckCircle, HiXCircle, HiSparkles, HiBuildingOffice, HiPhone, HiMapPin } from 'react-icons/hi2';
 import { authAPI, adminAPI } from '../services/api';
 
 const SuperAdminInvite = () => {
@@ -62,40 +62,57 @@ const SuperAdminInvite = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen bg-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gray-800 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gray-700 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gray-900 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse animation-delay-4000"></div>
+      </div>
+
+      <div className="relative z-10 max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-red-600 rounded-full flex items-center justify-center">
-            <HiUserPlus className="h-8 w-8 text-white" />
+          <div className="mx-auto h-20 w-20 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform duration-300">
+            <HiUserPlus className="h-10 w-10 text-white" />
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Create Admin Account
+          <h2 className="mt-8 text-4xl font-bold text-white">
+            Admin Invitation
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Create a new administrator account and send setup instructions
+          <p className="mt-3 text-lg text-gray-300">
+            Create Administrator Account
           </p>
+          <div className="mt-4 flex items-center justify-center space-x-2">
+            <HiSparkles className="h-5 w-5 text-yellow-400" />
+            <span className="text-sm text-gray-400">Invite Team Members</span>
+            <HiSparkles className="h-5 w-5 text-yellow-400" />
+          </div>
         </div>
         
-        <div className="bg-white shadow-xl rounded-lg p-8">
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
                 Full Name
               </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
-                placeholder="John Doe"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <HiUserPlus className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-600/30 bg-white/10 backdrop-blur-sm placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
+                  placeholder="John Doe"
+                />
+              </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                 Email Address
               </label>
               <div className="relative">
@@ -109,51 +126,61 @@ const SuperAdminInvite = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
-                  placeholder="admin@example.com"
+                  className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-600/30 bg-white/10 backdrop-blur-sm placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
+                  placeholder="admin@movies.com"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-300 mb-2">
                 Phone Number
               </label>
-              <input
-                id="phoneNumber"
-                name="phoneNumber"
-                type="tel"
-                required
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
-                placeholder="1234567890"
-                pattern="[0-9]{10}"
-                title="Phone number must be exactly 10 digits"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <HiPhone className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  type="tel"
+                  required
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-600/30 bg-white/10 backdrop-blur-sm placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
+                  placeholder="1234567890"
+                  pattern="[0-9]{10}"
+                  title="Phone number must be exactly 10 digits"
+                />
+              </div>
             </div>
 
             <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                Address
+              <label htmlFor="address" className="block text-sm font-medium text-gray-300 mb-2">
+                Office Address
               </label>
-              <input
-                id="address"
-                name="address"
-                type="text"
-                required
-                value={formData.address}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
-                placeholder="123 Main St, City, State"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <HiMapPin className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="address"
+                  name="address"
+                  type="text"
+                  required
+                  value={formData.address}
+                  onChange={handleChange}
+                  className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-600/30 bg-white/10 backdrop-blur-sm placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
+                  placeholder="123 Main St, City, State"
+                />
+              </div>
             </div>
 
             <div>
               <button
                 type="submit"
                 disabled={loading || !formData.name || !formData.email}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
               >
                 {loading ? (
                   <span className="flex items-center">
@@ -164,7 +191,10 @@ const SuperAdminInvite = () => {
                     Creating Admin Account...
                   </span>
                 ) : (
-                  'Create Admin Account'
+                  <span className="flex items-center">
+                    <HiBuildingOffice className="mr-2 h-5 w-5" />
+                    Create Admin Account
+                  </span>
                 )}
               </button>
             </div>
@@ -172,27 +202,31 @@ const SuperAdminInvite = () => {
         </div>
 
         {showPopup && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-              <div className="flex items-center justify-center mb-4">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 max-w-sm w-full mx-4 border border-white/20 shadow-2xl">
+              <div className="flex items-center justify-center mb-6">
                 {popupData.success ? (
-                  <HiCheckCircle className="h-12 w-12 text-green-500" />
+                  <div className="h-16 w-16 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <HiCheckCircle className="h-8 w-8 text-green-400" />
+                  </div>
                 ) : (
-                  <HiXCircle className="h-12 w-12 text-red-500" />
+                  <div className="h-16 w-16 bg-red-500/20 rounded-full flex items-center justify-center">
+                    <HiXCircle className="h-8 w-8 text-red-400" />
+                  </div>
                 )}
               </div>
               
-              <h3 className={`text-lg font-semibold text-center mb-2 ${popupData.success ? 'text-green-800' : 'text-red-800'}`}>
-                {popupData.success ? 'Success!' : 'Error!'}
+              <h3 className={`text-xl font-bold text-center mb-3 ${popupData.success ? 'text-green-400' : 'text-red-400'}`}>
+                {popupData.success ? 'Invitation Sent!' : 'Error!'}
               </h3>
               
-              <p className="text-gray-600 text-center mb-4">
+              <p className="text-gray-300 text-center mb-6 leading-relaxed">
                 {popupData.message}
               </p>
 
               <button
                 onClick={closePopup}
-                className="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition-colors"
+                className="w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-3 px-4 rounded-lg hover:from-gray-800 hover:to-black transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
               >
                 {popupData.success ? 'Send Another' : 'Try Again'}
               </button>
@@ -200,6 +234,19 @@ const SuperAdminInvite = () => {
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 0.1; }
+          50% { opacity: 0.2; }
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
   );
 };
