@@ -74,7 +74,7 @@ public class ContentManagerController {
 
     private void setJwtOnlyCookie(HttpServletResponse response, String jwt) {
         boolean isProduction = activeProfile.equals("prod");
-        String domain = null;
+        String domain = isProduction ? ".onrender.com" : null;
 
         ResponseCookie jwtCookie = ResponseCookie.from("cm_jwt_token", jwt)
                 .httpOnly(true)

@@ -171,7 +171,7 @@ public class AuthController {
 
     private void setJwtOnlyCookie(HttpServletResponse response, String jwt) {
         boolean isProduction = activeProfile.equals("prod");
-        String domain = null;
+        String domain = isProduction ? ".onrender.com" : null;
 
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
                 .httpOnly(true)
@@ -194,7 +194,7 @@ public class AuthController {
                             String refreshToken) {
 
         boolean isProduction = activeProfile.equals("prod");
-        String domain = null;
+        String domain = isProduction ? ".onrender.com" : null;
 
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
                 .httpOnly(true)
@@ -226,7 +226,7 @@ public class AuthController {
     private void clearCookies(HttpServletResponse response) {
         boolean isProduction = activeProfile.equals("prod");
 
-        String domain = null;
+        String domain = isProduction ? ".onrender.com" : null;
 
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", "")
                 .httpOnly(true)
