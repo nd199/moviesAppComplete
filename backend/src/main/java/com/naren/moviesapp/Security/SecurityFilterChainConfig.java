@@ -26,6 +26,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.io.IOException;
+
 @EnableWebSecurity
 @Configuration
 public class SecurityFilterChainConfig {
@@ -60,7 +62,35 @@ public class SecurityFilterChainConfig {
 
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
-        return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
+        return (request, response, authException) -> {
+            String uri = request.getRequestURI();
+            String method = request.getMethod();
+            String origin = request.getHeader("Origin");
+            String referer = request.getHeader("Referer");
+
+            logger.error(
+                    "401 UNAUTHORIZED from Spring Security. method={}, uri={}, origin={}, referer={}, message={}",
+                    method,
+                    uri,
+                    origin,
+                    referer,
+                    authException != null ? authException.getMessage() : null,
+                    authException
+            );
+
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            try {
+                response.getWriter().write(
+                        "{\"message\":\"Unauthorized\",\"path\":\"" + uri + "\"}"
+                );
+            } catch (IOException e) {
+                // If we can't write response, at least log the failure
+                logger.error("Failed to write 401 response body for uri={}", uri, e);
+            }
+        };
     }
 
     @Bean
