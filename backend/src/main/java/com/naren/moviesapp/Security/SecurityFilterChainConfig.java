@@ -163,7 +163,8 @@ public class SecurityFilterChainConfig {
                                 "/system/superadmin/**")
                         .hasAuthority("SYSTEM_CONFIG")
 
-                        .requestMatchers("/set-password/**")
+                        .requestMatchers("/set-password/**",
+                                "/api/v1/auth/set-password")
                         .permitAll()
 
                         .anyRequest().authenticated()
