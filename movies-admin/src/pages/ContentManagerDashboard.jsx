@@ -1,42 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { FaFilm, FaTv, FaPlus, FaEdit, FaTrash, FaSignOutAlt } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { contentManagerApi } from '../services/contentManagerApi';
-import { authService } from '../services/authService';
+import { logout } from '../store/authSlice'; // Import global logout action
 
 const ContentManagerDashboard = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch(); // Add dispatch
+  const { admin: contentManager } = useSelector((state) => state.auth); // Get user from Redux
   const [loading, setLoading] = useState(true);
-  const [contentManager, setContentManager] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [movies, setMovies] = useState([]);
   const [shows, setShows] = useState([]);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (contentManager) {
+      fetchDashboardData();
+    } else {
+      // If no user in state, redirect to login
+      navigate('/contentManagerLogin');
+    }
+  }, [contentManager]);
 
   const fetchDashboardData = async () => {
     try {
-      const contentManagerData = JSON.parse(localStorage.getItem('contentManagerUser'));
-      if (!contentManagerData) {
-        navigate('/contentManagerLogin');
-        return;
-      }
-
-      // Get content manager details
-      const cmDetails = await contentManagerApi.getContentManagerByEmail(contentManagerData.email);
-      setContentManager(cmDetails);
-
       // Get analytics
-      const analyticsData = await contentManagerApi.getContentManagerAnalytics(cmDetails.id);
+      const analyticsData = await contentManagerApi.getContentManagerAnalytics(contentManager.id);
       setAnalytics(analyticsData);
 
       // Get movies and shows
       const [moviesData, showsData] = await Promise.all([
-        contentManagerApi.getMoviesByContentManager(cmDetails.id),
-        contentManagerApi.getShowsByContentManager(cmDetails.id)
+        contentManagerApi.getMoviesByContentManager(contentManager.id),
+        contentManagerApi.getShowsByContentManager(contentManager.id)
       ]);
       
       setMovies(moviesData);
@@ -49,23 +45,10 @@ const ContentManagerDashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem('contentManagerToken');
-      await authService.contentManagerLogout(token);
-      localStorage.removeItem('contentManagerToken');
-      localStorage.removeItem('contentManagerLoggedIn');
-      localStorage.removeItem('contentManagerUser');
-      navigate('/contentManagerLogin');
-      toast.success('Logged out successfully');
-    } catch (error) {
-      console.error('Logout error:', error);
-      // Force logout even if API call fails
-      localStorage.removeItem('contentManagerToken');
-      localStorage.removeItem('contentManagerLoggedIn');
-      localStorage.removeItem('contentManagerUser');
-      navigate('/contentManagerLogin');
-    }
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/contentManagerLogin');
+    toast.success('Logged out successfully');
   };
 
   const handleDeleteMovie = async (movieId) => {

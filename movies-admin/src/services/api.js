@@ -24,19 +24,7 @@ const api = axios.create({
   },
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('jwt_token');
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+
 
 api.interceptors.response.use(
   (response) => response,
@@ -49,9 +37,6 @@ api.interceptors.response.use(
       if (window.location.pathname.includes('/contentManager')) {
         window.location.href = '/contentManagerLogin';
       } else {
-        localStorage.removeItem('adminLoggedIn');
-        localStorage.removeItem('adminUser');
-        localStorage.removeItem('jwt_token');
         window.location.href = '/login';
       }
     } else if (error.response?.status === 404) {

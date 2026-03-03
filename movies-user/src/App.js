@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router-dom";
-import { PersistGate } from "redux-persist/integration/react";
 import { fetchCurrentUserDetails } from "./Network/ApiCalls";
-import { persistor } from "./redux/store";
 import { setAuthStatus } from "./redux/userSlice";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -263,9 +261,7 @@ function AppWithNavigation() {
 function App() {
   return (
     <div className="App">
-      <PersistGate loading={null} persistor={persistor}>
-        <AppWithHealthCheck />
-      </PersistGate>
+      <AppWithHealthCheck />
     </div>
   );
 }

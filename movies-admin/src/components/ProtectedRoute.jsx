@@ -5,14 +5,7 @@ const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, admin } = useAppSelector((state) => state.auth);
   const location = useLocation();
 
-  // Check for content manager authentication in localStorage
-  const contentManagerLoggedIn = localStorage.getItem('contentManagerLoggedIn') === 'true';
-  const contentManagerUser = JSON.parse(localStorage.getItem('contentManagerUser') || '{}');
-
-  // Check if user is authenticated (admin or content manager)
-  const isUserAuthenticated = isAuthenticated || contentManagerLoggedIn;
-
-  if (!isUserAuthenticated) {
+  if (!isAuthenticated) {
     // Redirect based on the requested route
     if (location.pathname.startsWith('/contentManager')) {
       return <Navigate to="/contentManagerLogin" replace />;
@@ -38,17 +31,12 @@ const ProtectedRoute = ({ children }) => {
   const isContentManagerRoute = contentManagerRoutes.some(route => location.pathname.startsWith(route));
 
   // Check role-based access
-  if (isAdminRoute && !isAdmin && !contentManagerLoggedIn) {
+  if (isAdminRoute && !isAdmin) {
     return <Navigate to="/login" replace />;
   }
 
-  if (isContentManagerRoute && !isContentManager && !isAdmin && !contentManagerLoggedIn) {
+  if (isContentManagerRoute && !isContentManager && !isAdmin) {
     return <Navigate to="/contentManagerLogin" replace />;
-  }
-
-  // Additional check: if content manager is trying to access admin-only routes
-  if (contentManagerLoggedIn && !isAdmin && isAdminRoute) {
-    return <Navigate to="/contentManagerDashboard" replace />;
   }
 
   return children;

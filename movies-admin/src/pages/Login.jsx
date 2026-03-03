@@ -31,10 +31,8 @@ const Login = () => {
         password 
       });
       
-      // Dispatch success action with admin data
       dispatch(loginSuccess({ 
-        admin: response.user,
-        token: response.token
+        admin: response.user
       }));
       
       toast.success('Login successful!');

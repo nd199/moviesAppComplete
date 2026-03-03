@@ -83,7 +83,7 @@ public class AuthController {
             responseBody.put("user", cmAuth.contentManagerDTO());
             responseBody.put("userType", "CONTENT_MANAGER");
         }
-        responseBody.put("token", authResponse.token());
+        
 
         return ResponseEntity.ok(responseBody);
     }
