@@ -29,7 +29,7 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     private String[] getOrigins() {
-        String vercelOrigins = "https://movies-app-complete.vercel.app,https://movies-admin-one.vercel.app";
+        String vercelOrigins = "https://movies-app-complete.vercel.app,https://movies-admin-one.vercel.app,https://movies-super-admin.vercel.app";
         String localOrigins = "http://localhost:3000,http://localhost:3001,http://localhost:5173,http://localhost:5174,http://127.0.0.1:3000,http://127.0.0.1:3001,http://127.0.0.1:5173,http://127.0.0.1:5174";
 
         String allOrigins;

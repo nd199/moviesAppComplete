@@ -57,8 +57,15 @@ public class CustomerController {
 
     @GetMapping("/customers/currentUser")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        logger.info("getCurrentUser request received for user: {}", userDetails != null ? userDetails.getUsername() : "null");
+        if (userDetails == null) {
+            logger.warn("No authentication principal found - user not authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+        
         logger.debug("Fetching current user: {}", userDetails.getUsername());
         CustomerDTO customerDTO = customerService.getCustomerByEmail(userDetails.getUsername());
+        logger.info("Successfully retrieved user: {} with roles: {}", customerDTO.email(), customerDTO.roles());
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
 
