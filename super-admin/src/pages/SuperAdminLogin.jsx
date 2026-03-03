@@ -2,15 +2,16 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { HiShieldExclamation, HiLockClosed, HiEnvelope } from 'react-icons/hi2';
+import Cookies from 'js-cookie';
 import { authAPI } from '../services/api';
 
 const SuperAdminLogin = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,8 +29,13 @@ const SuperAdminLogin = () => {
       const response = await authAPI.login(formData);
 
       if (response.status === 200) {
-        // Token is handled via HTTP-only cookies set by server
-        console.log('Login successful - authentication cookies set by server');
+        const token = response.data?.token;
+        if (token) {
+          Cookies.set('jwt_token', token, { expires: 7 });
+          console.log('Login: Using token-based auth fallback');
+        } else {
+          console.log('Login: Authentication cookies set by server');
+        }
         
         toast.success('Login successful!');
         navigate('/super-admin/invite');

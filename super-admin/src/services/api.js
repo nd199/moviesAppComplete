@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const isLocal = () => {
   return window.location.hostname === 'localhost' ||
@@ -33,6 +34,10 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+    const token = Cookies.get('jwt_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     config.headers['X-Requested-With'] = 'XMLHttpRequest';
     return config;
   },
@@ -47,6 +52,7 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
+      Cookies.remove('jwt_token');
       if (window.location.pathname !== '/super-admin/login' && !error.code === 'ERR_NETWORK') {
         window.location.href = '/super-admin/login';
       }
