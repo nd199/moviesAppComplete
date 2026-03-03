@@ -49,6 +49,13 @@ api.interceptors.response.use(
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
+    } else if (error.response?.status === 404) {
+      // Handle 404 errors - redirect to home page
+      console.warn('API endpoint not found, redirecting to home');
+      window.location.href = '/';
+    } else if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+      // Handle network errors - these will be caught by the health check system
+      console.warn('Network error detected, health check should handle this');
     }
     return Promise.reject(error);
   }

@@ -1,0 +1,188 @@
+.fallback-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.fallback-content {
+  text-align: center;
+  color: white;
+  max-width: 500px;
+  padding: 2rem;
+}
+
+.fallback-content-inner {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.fallback-main {
+  margin-bottom: 2rem;
+}
+
+.fallback-image {
+  margin-bottom: 2rem;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.fallback-content-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.fallback-content-text {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.fallback-countdown {
+  font-size: 1rem;
+  color: #ffd700;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.fallback-retry-info {
+  font-size: 0.9rem;
+  color: #ffd700;
+  margin-bottom: 1.5rem;
+}
+
+.fallback-actions {
+  margin-bottom: 2rem;
+}
+
+.retry-button {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
+}
+
+.retry-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4);
+}
+
+.fallback-auto-retry-controls {
+  margin-top: 1rem;
+}
+
+.fallback-auto-retry-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.fallback-auto-retry-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.fallback-auto-retry {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.fallback-max-retries {
+  margin-bottom: 2rem;
+}
+
+.fallback-max-text {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.fallback-help {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.fallback-help h3 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.fallback-help ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fallback-help li {
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.fallback-help li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #ffd700;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .fallback-content {
+    padding: 1rem;
+  }
+  
+  .fallback-content-inner {
+    padding: 1.5rem;
+  }
+  
+  .fallback-content-title {
+    font-size: 1.5rem;
+  }
+  
+  .fallback-content-text {
+    font-size: 1rem;
+  }
+}

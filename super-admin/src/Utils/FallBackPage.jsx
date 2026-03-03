@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './FallbackCheck.css';
-import { Player } from '@lottiefiles/react-lottie-player';
-import { CheckOption } from './AnimationData';
 
 const Fallback = ({ retryCount = 0, onRetry }) => {
   const maxRetries = 5;
@@ -40,16 +38,13 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
         <div className="fallback-content-inner">
           <div className="fallback-main">
             <div className="fallback-image">
-              <Player
-                autoplay
-                loop
-                src={CheckOption.animationData}
-                style={{ height: '280px', width: '280px' }}
-              />
+              <div className="loading-spinner">
+                <div className="spinner"></div>
+              </div>
             </div>
-            <h1 className="fallback-content-title">🚀 Backend Service Unavailable</h1>
+            <h1 className="fallback-content-title">🚀 Super Admin Service Unavailable</h1>
             <p className="fallback-content-text">
-              The backend service is currently down or experiencing issues.
+              The super admin service is currently down or experiencing issues.
             </p>
 
             {canRetry && autoRetryEnabled && (

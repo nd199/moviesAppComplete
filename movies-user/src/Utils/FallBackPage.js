@@ -8,6 +8,8 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
   const canRetry = retryCount < maxRetries;
 
   const [statusIndex, setStatusIndex] = useState(0);
+  const [timeRemaining, setTimeRemaining] = useState(30);
+  const [autoRetryEnabled, setAutoRetryEnabled] = useState(true);
 
   const statusMessages = useMemo(() => [
     'Initializing container...',
@@ -25,6 +27,30 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
     return () => clearInterval(statusTimer);
   }, [statusMessages]);
 
+  useEffect(() => {
+    if (!autoRetryEnabled || !canRetry) return;
+
+    const countdownTimer = setInterval(() => {
+      setTimeRemaining((prev) => {
+        if (prev <= 1) {
+          // Time's up, trigger retry
+          const delay = Math.min(1000 * Math.pow(2, retryCount), 15000);
+          setTimeout(() => {
+            if (onRetry) {
+              onRetry();
+            } else {
+              window.location.reload();
+            }
+          }, delay);
+          return 30; // Reset for next retry cycle
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(countdownTimer);
+  }, [autoRetryEnabled, canRetry, retryCount, onRetry]);
+
   return (
     <div className="fallback-container">
       <div className="fallback-content">
@@ -41,6 +67,12 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
         <p className="fallback-elapsed">
           Estimated time: ~2 min 50 sec
         </p>
+
+        {canRetry && autoRetryEnabled && (
+          <p className="fallback-countdown">
+            Auto-retry in: {timeRemaining}s
+          </p>
+        )}
 
         {retryCount > 0 && (
           <p className="fallback-retry-info">
@@ -64,9 +96,21 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
               }}>
               Retry Now
             </button>
-            <p className="fallback-auto-retry">
-              Attempting to reconnect automatically...
-            </p>
+            <div className="fallback-auto-retry-controls">
+              <label className="fallback-auto-retry-toggle">
+                <input
+                  type="checkbox"
+                  checked={autoRetryEnabled}
+                  onChange={(e) => setAutoRetryEnabled(e.target.checked)}
+                />
+                Auto-retry every 30 seconds
+              </label>
+              {autoRetryEnabled && (
+                <p className="fallback-auto-retry">
+                  Attempting to reconnect automatically in {timeRemaining}s...
+                </p>
+              )}
+            </div>
           </div>
         ) : (
           <div className="fallback-max-retries">
