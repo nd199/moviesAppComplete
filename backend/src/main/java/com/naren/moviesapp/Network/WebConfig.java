@@ -30,15 +30,16 @@ public class WebConfig implements WebMvcConfigurer {
 
     private String[] getOrigins() {
         String vercelOrigins = "https://movies-app-complete.vercel.app,https://movies-admin-one.vercel.app,https://movies-super-admin.vercel.app";
+        String renderOrigins = "https://movieticket-api.onrender.com";
         String localOrigins = "http://localhost:3000,http://localhost:3001,http://localhost:5173,http://localhost:5174,http://127.0.0.1:3000,http://127.0.0.1:3001,http://127.0.0.1:5173,http://127.0.0.1:5174";
 
         String allOrigins;
         if (allowedOrigins == null || allowedOrigins.trim().isEmpty()) {
             // Use default origins
-            allOrigins = vercelOrigins + "," + localOrigins;
+            allOrigins = vercelOrigins + "," + renderOrigins + "," + localOrigins;
         } else {
-            // Use environment variable + Vercel origins
-            allOrigins = vercelOrigins + "," + allowedOrigins;
+            // Use environment variable + Vercel origins + Render origins
+            allOrigins = vercelOrigins + "," + renderOrigins + "," + allowedOrigins;
         }
 
         // Split comma-separated origins and trim whitespace
