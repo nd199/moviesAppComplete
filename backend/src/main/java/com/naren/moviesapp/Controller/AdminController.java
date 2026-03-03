@@ -142,7 +142,7 @@ public class AdminController {
             String setupToken = contentManagerInviteService.generateInviteToken(email, RoleName.ROLE_CONTENT_MANAGER);
 
             // Use admin frontend URL for set-password (port 5173 for dev)
-            String baseUrl = activeProfile.equals("prod") ? "https://movies-app-complete.vercel.app" : "http://localhost:5173";
+            String baseUrl = activeProfile.equals("prod") ? "https://movies-admin-one.vercel.app" : "http://localhost:5173";
             String setupLink = baseUrl + "/set-password?token=" + setupToken + "&type=content-manager";
 
             // Send email with setup link
