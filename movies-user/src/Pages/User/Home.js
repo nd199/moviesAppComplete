@@ -20,7 +20,6 @@ const Home = () => {
       } catch (error) {
         console.error("Failed to fetch user:", error);
       } finally {
-        // Add a small delay to show the skeleton animation
         setTimeout(() => setLoading(false), 500);
       }
     };
