@@ -10,7 +10,6 @@ import "./Home.css";
 const Home = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.user);
-  const currentUser = user?.currentUser;
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

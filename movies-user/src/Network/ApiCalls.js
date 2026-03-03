@@ -6,7 +6,6 @@ import {
   paymentRequest,
   springRequest,
 } from '../AxiosMethods';
-import Cookies from "js-cookie";
 import {
   fetchMoviesFailure,
   fetchMoviesStart,

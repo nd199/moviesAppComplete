@@ -4,7 +4,6 @@ import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router-d
 import { fetchCurrentUserDetails } from "./Network/ApiCalls";
 import { setAuthStatus } from "./redux/userSlice";
 import axios from "axios";
-import Cookies from "js-cookie";
 import "./App.css";
 
 import Home from "./Pages/User/Home";
