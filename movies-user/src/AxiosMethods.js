@@ -22,7 +22,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    // Remove Authorization header since we're using HTTP-only cookies only
     config.headers['X-Requested-With'] = 'XMLHttpRequest';
     return config;
   },
