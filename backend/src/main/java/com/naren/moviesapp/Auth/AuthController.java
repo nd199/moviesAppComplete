@@ -60,12 +60,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request,
-                                   HttpServletResponse response) {
+                                   HttpServletResponse response,
+                                   HttpServletRequest httpRequest) {
         logger.info("Login request received for username: {}", request.username());
 
         AuthResponse authResponse = authService.login(request);
 
-        setAuthCookies(response, authResponse);
+        setAuthCookies(response, authResponse, httpRequest);
 
         logger.info("Login successful for username: {}", request.username());
 
@@ -91,7 +92,8 @@ public class AuthController {
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(
             @CookieValue(name = "refresh_token", required = false) String refreshTokenValue,
-            HttpServletResponse response) {
+            HttpServletResponse response,
+            HttpServletRequest httpRequest) {
 
         logger.debug("Token refresh request received");
 
@@ -113,7 +115,7 @@ public class AuthController {
 
         String newJwt = authService.generateTokenForUser(refreshToken.getUser());
 
-        setCookies(response, newJwt, newRefreshToken.getToken());
+        setCookies(response, newJwt, newRefreshToken.getToken(), httpRequest);
 
         logger.info("Token refreshed successfully for user: {}", refreshToken.getUser().getEmail());
         return ResponseEntity.ok(Map.of("message", "Token refreshed"));
@@ -123,7 +125,8 @@ public class AuthController {
     public ResponseEntity<?> logout(
             @CookieValue(name = "refresh_token", required = false) String refreshToken,
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            HttpServletResponse response) {
+            HttpServletResponse response,
+            HttpServletRequest httpRequest) {
 
         logger.info("Logout request received");
 
@@ -148,7 +151,7 @@ public class AuthController {
             }
         }
 
-        clearCookies(response);
+        clearCookies(response, httpRequest);
 
         logger.info("Logout successful");
         return ResponseEntity.ok(Map.of(
@@ -157,33 +160,38 @@ public class AuthController {
         ));
     }
 
-    private void setAuthCookies(HttpServletResponse response, AuthResponse authResponse) {
+    private void setAuthCookies(HttpServletResponse response, AuthResponse authResponse, HttpServletRequest httpRequest) {
         // Check response type and handle accordingly
         if (authResponse instanceof CustomerAuthResponse customerAuth) {
             // Customer login - create refresh token
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(customerAuth.customerDTO().user());
-            setCookies(response, customerAuth.token(), refreshToken.getToken());
+            setCookies(response, customerAuth.token(), refreshToken.getToken(), httpRequest);
         } else {
             // Admin login - only set JWT token, no refresh token needed
-            setJwtOnlyCookie(response, authResponse.token());
+            setJwtOnlyCookie(response, authResponse.token(), httpRequest);
         }
     }
 
-    private void setJwtOnlyCookie(HttpServletResponse response, String jwt) {
-        boolean isProduction = activeProfile.equals("prod");
-        String domain = isProduction ? ".onrender.com" : null;
+    private boolean isProduction(HttpServletRequest request) {
+        String host = request.getServerName();
+        return host != null && (host.endsWith(".onrender.com") || host.endsWith("vercel.app"));
+    }
+
+    private void setJwtOnlyCookie(HttpServletResponse response, String jwt, HttpServletRequest request) {
+        boolean isProd = isProduction(request);
+        String domain = isProd ? ".onrender.com" : null;
 
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
                 .httpOnly(true)
-                .secure(isProduction)
+                .secure(isProd)
                 .path("/")
                 .maxAge(Duration.ofMinutes(30))
-                .sameSite(isProduction ? "None" : "Lax")
+                .sameSite(isProd ? "None" : "Lax")
                 .domain(domain)
                 .build();
 
         logger.info("Setting JWT-only cookie for admin - Production: {}, Domain: {}, SameSite: {}",
-                isProduction, domain, isProduction ? "None" : "Lax");
+                isProd, domain, isProd ? "None" : "Lax");
         logger.debug("JWT Cookie: {}", jwtCookie);
 
         response.addHeader("Set-Cookie", jwtCookie.toString());
@@ -191,31 +199,32 @@ public class AuthController {
 
     private void setCookies(HttpServletResponse response,
                             String jwt,
-                            String refreshToken) {
+                            String refreshToken,
+                            HttpServletRequest httpRequest) {
 
-        boolean isProduction = activeProfile.equals("prod");
-        String domain = isProduction ? ".onrender.com" : null;
+        boolean isProd = isProduction(httpRequest);
+        String domain = isProd ? ".onrender.com" : null;
 
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
                 .httpOnly(true)
-                .secure(isProduction)
+                .secure(isProd)
                 .path("/")
                 .maxAge(Duration.ofMinutes(30))
-                .sameSite(isProduction ? "None" : "Lax")
+                .sameSite(isProd ? "None" : "Lax")
                 .domain(domain)
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
-                .secure(isProduction)
+                .secure(isProd)
                 .path("/")
                 .maxAge(Duration.ofDays(7))
-                .sameSite(isProduction ? "None" : "Lax")
+                .sameSite(isProd ? "None" : "Lax")
                 .domain(domain)
                 .build();
 
         logger.info("Setting auth cookies - Production: {}, Domain: {}, SameSite: {}",
-                isProduction, domain, isProduction ? "None" : "Lax");
+                isProd, domain, isProd ? "None" : "Lax");
         logger.debug("JWT Cookie: {}", jwtCookie);
         logger.debug("Refresh Cookie: {}", refreshCookie);
 
@@ -223,26 +232,26 @@ public class AuthController {
         response.addHeader("Set-Cookie", refreshCookie.toString());
     }
 
-    private void clearCookies(HttpServletResponse response) {
-        boolean isProduction = activeProfile.equals("prod");
+    private void clearCookies(HttpServletResponse response, HttpServletRequest httpRequest) {
+        boolean isProd = isProduction(httpRequest);
 
-        String domain = isProduction ? ".onrender.com" : null;
+        String domain = isProd ? ".onrender.com" : null;
 
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", "")
                 .httpOnly(true)
-                .secure(isProduction)
+                .secure(isProd)
                 .path("/")
                 .maxAge(0)
-                .sameSite(isProduction ? "None" : "Lax")
+                .sameSite(isProd ? "None" : "Lax")
                 .domain(domain)
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
-                .secure(isProduction)
+                .secure(isProd)
                 .path("/")
                 .maxAge(0)
-                .sameSite(isProduction ? "None" : "Lax")
+                .sameSite(isProd ? "None" : "Lax")
                 .domain(domain)
                 .build();
 
