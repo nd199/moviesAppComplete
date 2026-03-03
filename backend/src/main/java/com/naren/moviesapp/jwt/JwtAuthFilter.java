@@ -55,15 +55,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = null;
         final String authHeader = request.getHeader("Authorization");
+        final String requestURI = request.getRequestURI();
+        
+        logger.debug("Processing request for URI: {}", requestURI);
+        logger.debug("Auth header present: {}", authHeader != null);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
+            logger.debug("Token extracted from Authorization header");
         } else {
             jakarta.servlet.http.Cookie[] cookies = request.getCookies();
+            logger.debug("Cookies present: {}", cookies != null ? cookies.length : 0);
+            
             if (cookies != null) {
                 for (jakarta.servlet.http.Cookie cookie : cookies) {
+                    logger.debug("Cookie found: {} = {}", cookie.getName(), cookie.getValue().substring(0, Math.min(10, cookie.getValue().length())) + "...");
                     if ("jwt_token".equals(cookie.getName())) {
                         token = cookie.getValue();
+                        logger.debug("Token extracted from jwt_token cookie");
                         break;
                     }
                 }
@@ -71,7 +80,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if (token == null) {
-            logger.debug("No token found in request");
+            logger.debug("No token found in request for URI: {}", requestURI);
             filterChain.doFilter(request, response);
             return;
         }

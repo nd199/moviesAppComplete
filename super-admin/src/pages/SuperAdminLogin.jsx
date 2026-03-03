@@ -28,6 +28,9 @@ const SuperAdminLogin = () => {
       const response = await authAPI.login(formData);
 
       if (response.status === 200) {
+        // Token is handled via HTTP-only cookies set by server
+        console.log('Login successful - authentication cookies set by server');
+        
         toast.success('Login successful!');
         navigate('/super-admin/invite');
       }
