@@ -180,20 +180,19 @@ public class AuthController {
 
     private void setJwtOnlyCookie(HttpServletResponse response, String jwt, HttpServletRequest request) {
         boolean isProd = isProduction(request);
-        // For production cross-domain, don't set domain to allow cookie sharing
-        String domain = null; // Allow cookie to be sent to any domain
+        String domain = isProd ? ".onrender.com" : null;
 
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
                 .httpOnly(true)
                 .secure(isProd)
                 .path("/")
                 .maxAge(Duration.ofMinutes(30))
-                .sameSite("None") // Required for cross-domain
+                .sameSite(isProd ? "None" : "Lax")
                 .domain(domain)
                 .build();
 
-        logger.info("Setting JWT-only cookie for admin - Production: {}, Domain: null, SameSite: None",
-                isProd);
+        logger.info("Setting JWT-only cookie for admin - Production: {}, Domain: {}, SameSite: {}",
+                isProd, domain, isProd ? "None" : "Lax");
         logger.debug("JWT Cookie: {}", jwtCookie);
 
         response.addHeader("Set-Cookie", jwtCookie.toString());
@@ -205,15 +204,14 @@ public class AuthController {
                             HttpServletRequest httpRequest) {
 
         boolean isProd = isProduction(httpRequest);
-        // For production cross-domain, don't set domain to allow cookie sharing
-        String domain = null; // Allow cookie to be sent to any domain
+        String domain = isProd ? ".onrender.com" : null;
 
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
                 .httpOnly(true)
                 .secure(isProd)
                 .path("/")
                 .maxAge(Duration.ofMinutes(30))
-                .sameSite("None") // Required for cross-domain
+                .sameSite(isProd ? "None" : "Lax")
                 .domain(domain)
                 .build();
 
@@ -222,12 +220,12 @@ public class AuthController {
                 .secure(isProd)
                 .path("/")
                 .maxAge(Duration.ofDays(7))
-                .sameSite("None") // Required for cross-domain
+                .sameSite(isProd ? "None" : "Lax")
                 .domain(domain)
                 .build();
 
-        logger.info("Setting auth cookies - Production: {}, Domain: null, SameSite: None",
-                isProd);
+        logger.info("Setting auth cookies - Production: {}, Domain: {}, SameSite: {}",
+                isProd, domain, isProd ? "None" : "Lax");
         logger.debug("JWT Cookie: {}", jwtCookie);
         logger.debug("Refresh Cookie: {}", refreshCookie);
 
@@ -237,15 +235,15 @@ public class AuthController {
 
     private void clearCookies(HttpServletResponse response, HttpServletRequest httpRequest) {
         boolean isProd = isProduction(httpRequest);
-        // For production cross-domain, don't set domain to allow cookie sharing
-        String domain = null; // Allow cookie to be sent to any domain
+
+        String domain = isProd ? ".onrender.com" : null;
 
         ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", "")
                 .httpOnly(true)
                 .secure(isProd)
                 .path("/")
                 .maxAge(0)
-                .sameSite("None") // Required for cross-domain
+                .sameSite(isProd ? "None" : "Lax")
                 .domain(domain)
                 .build();
 
@@ -254,7 +252,7 @@ public class AuthController {
                 .secure(isProd)
                 .path("/")
                 .maxAge(0)
-                .sameSite("None") // Required for cross-domain
+                .sameSite(isProd ? "None" : "Lax")
                 .domain(domain)
                 .build();
 
