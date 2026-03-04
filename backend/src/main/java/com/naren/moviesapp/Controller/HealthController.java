@@ -17,7 +17,7 @@ public class HealthController {
 
     private static final Logger logger = LoggerFactory.getLogger(HealthController.class);
 
-    @GetMapping("/ping")
+    @GetMapping("/health-check")
     public ResponseEntity<Map<String, Object>> ping() {
         logger.debug("Health check ping received");
 
