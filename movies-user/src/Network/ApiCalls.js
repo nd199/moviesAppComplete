@@ -281,7 +281,7 @@ export const updateFinalUserApi = finalUser =>
 
 export const markUserSubscribedApi = async () => {
   try {
-    const res = await paymentRequest().post('/payments/subscribe-success');
+    const res = await paymentRequest().post('/subscribe-success');
     return res.data;
   } catch (error) {
     console.error('Failed to mark user as subscribed:', error);
