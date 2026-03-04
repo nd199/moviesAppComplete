@@ -17,7 +17,7 @@ const getBaseURL = () => {
 const api = axios.create({
   baseURL: getBaseURL(),
   timeout: 30000,
-  withCredentials: true,
+  withCredentials: false,
 });
 
 // Request interceptor - add Authorization header

@@ -1,3 +1,4 @@
+import api from '../AxiosMethods';
 import {
   authRequest,
   passResetRequest,
@@ -281,7 +282,7 @@ export const updateFinalUserApi = finalUser =>
 
 export const markUserSubscribedApi = async () => {
   try {
-    const res = await paymentRequest().post('/subscribe-success');
+    const res = await api.post('/payments/subscribe-success');
     return res.data;
   } catch (error) {
     console.error('Failed to mark user as subscribed:', error);
