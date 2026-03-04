@@ -240,7 +240,9 @@ public class TestDataFactory {
         if (id != null) {
             refreshToken.setId(id);
         }
-        refreshToken.setUser(user != null ? user : createTestCustomer());
+        Customer customer = user != null ? user : createTestCustomer();
+        refreshToken.setUserId(customer.getId());
+        refreshToken.setUserType(UserType.CUSTOMER);
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setExpiryDate(Instant.now().plusSeconds(FAKER.number().numberBetween(604800, 2592000))); // 7 days to 30 days
         return refreshToken;

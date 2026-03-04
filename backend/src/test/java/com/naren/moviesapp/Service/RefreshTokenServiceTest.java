@@ -2,7 +2,10 @@ package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.RefreshToken;
+import com.naren.moviesapp.Entity.UserType;
 import com.naren.moviesapp.Repository.RefreshTokenRepository;
+import com.naren.moviesapp.Repo.AdminRepository;
+import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.TestData.TestDataFactory;
 import com.naren.moviesapp.jwt.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,13 +30,17 @@ class RefreshTokenServiceTest {
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
     @Mock
+    private CustomerRepository customerRepository;
+    @Mock
+    private AdminRepository adminRepository;
+    @Mock
     private JwtUtil jwtUtil;
 
     private RefreshTokenService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new RefreshTokenService(refreshTokenRepository, jwtUtil);
+        underTest = new RefreshTokenService(refreshTokenRepository, customerRepository, adminRepository, jwtUtil);
     }
 
     @Test
@@ -46,13 +53,14 @@ class RefreshTokenServiceTest {
 
         RefreshToken result = underTest.createRefreshToken(user);
 
-        verify(refreshTokenRepository).deleteByUser(user);
+        verify(refreshTokenRepository).deleteByUserIdAndUserType(user.getId(), UserType.CUSTOMER);
 
         ArgumentCaptor<RefreshToken> tokenCaptor = ArgumentCaptor.forClass(RefreshToken.class);
         verify(refreshTokenRepository).save(tokenCaptor.capture());
 
         RefreshToken capturedToken = tokenCaptor.getValue();
-        assertThat(capturedToken.getUser()).isEqualTo(user);
+        assertThat(capturedToken.getUserId()).isEqualTo(user.getId());
+        assertThat(capturedToken.getUserType()).isEqualTo(UserType.CUSTOMER);
         assertThat(capturedToken.getToken()).isNotNull();
         assertThat(capturedToken.getExpiryDate()).isAfter(Instant.now().minusSeconds(1));
     }
@@ -64,7 +72,8 @@ class RefreshTokenServiceTest {
         user.setEmail("test@example.com");
 
         RefreshToken existingToken = TestDataFactory.createTestRefreshToken();
-        existingToken.setUser(user);
+        existingToken.setUserId(user.getId());
+        existingToken.setUserType(UserType.CUSTOMER);
         existingToken.setToken(oldToken);
         existingToken.setExpiryDate(Instant.now().plus(1, java.time.temporal.ChronoUnit.DAYS));
 
@@ -80,7 +89,8 @@ class RefreshTokenServiceTest {
         verify(refreshTokenRepository).save(tokenCaptor.capture());
 
         RefreshToken capturedToken = tokenCaptor.getValue();
-        assertThat(capturedToken.getUser()).isEqualTo(user);
+        assertThat(capturedToken.getUserId()).isEqualTo(user.getId());
+        assertThat(capturedToken.getUserType()).isEqualTo(UserType.CUSTOMER);
         assertThat(capturedToken.getToken()).isNotEqualTo(oldToken);
         assertThat(capturedToken.getExpiryDate()).isAfter(Instant.now().minusSeconds(1));
     }
@@ -107,7 +117,8 @@ class RefreshTokenServiceTest {
         user.setEmail("test@example.com");
 
         RefreshToken existingToken = TestDataFactory.createTestRefreshToken();
-        existingToken.setUser(user);
+        existingToken.setUserId(user.getId());
+        existingToken.setUserType(UserType.CUSTOMER);
         existingToken.setToken(oldToken);
         existingToken.setExpiryDate(Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS));
 
@@ -129,7 +140,8 @@ class RefreshTokenServiceTest {
         user.setEmail("test@example.com");
 
         RefreshToken refreshToken = TestDataFactory.createTestRefreshToken();
-        refreshToken.setUser(user);
+        refreshToken.setUserId(user.getId());
+        refreshToken.setUserType(UserType.CUSTOMER);
         refreshToken.setToken(token);
         refreshToken.setExpiryDate(Instant.now().plus(1, java.time.temporal.ChronoUnit.DAYS));
 
@@ -148,7 +160,8 @@ class RefreshTokenServiceTest {
         user.setEmail("test@example.com");
 
         RefreshToken refreshToken = TestDataFactory.createTestRefreshToken();
-        refreshToken.setUser(user);
+        refreshToken.setUserId(user.getId());
+        refreshToken.setUserType(UserType.CUSTOMER);
         refreshToken.setToken(token);
         refreshToken.setExpiryDate(Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS));
 
@@ -178,7 +191,8 @@ class RefreshTokenServiceTest {
         user.setEmail("test@example.com");
 
         RefreshToken token = TestDataFactory.createTestRefreshToken();
-        token.setUser(user);
+        token.setUserId(user.getId());
+        token.setUserType(UserType.CUSTOMER);
         token.setExpiryDate(Instant.now().plus(1, java.time.temporal.ChronoUnit.DAYS));
 
         RefreshToken result = underTest.verifyExpiration(token);
@@ -193,7 +207,8 @@ class RefreshTokenServiceTest {
         user.setEmail("test@example.com");
 
         RefreshToken token = TestDataFactory.createTestRefreshToken();
-        token.setUser(user);
+        token.setUserId(user.getId());
+        token.setUserType(UserType.CUSTOMER);
         token.setExpiryDate(Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS));
 
         assertThatThrownBy(() -> underTest.verifyExpiration(token))
@@ -210,7 +225,8 @@ class RefreshTokenServiceTest {
         user.setEmail("test@example.com");
 
         RefreshToken refreshToken = TestDataFactory.createTestRefreshToken();
-        refreshToken.setUser(user);
+        refreshToken.setUserId(user.getId());
+        refreshToken.setUserType(UserType.CUSTOMER);
         refreshToken.setToken(token);
         refreshToken.setExpiryDate(Instant.now().plus(1, java.time.temporal.ChronoUnit.DAYS));
 
@@ -237,9 +253,9 @@ class RefreshTokenServiceTest {
         Customer user = TestDataFactory.createTestCustomer();
         user.setEmail("test@example.com");
 
-        underTest.deleteByUser(user);
+        underTest.deleteByUserIdAndUserType(user.getId(), UserType.CUSTOMER);
 
-        verify(refreshTokenRepository).deleteByUser(user);
+        verify(refreshTokenRepository).deleteByUserIdAndUserType(user.getId(), UserType.CUSTOMER);
     }
 
     @Test
@@ -249,7 +265,8 @@ class RefreshTokenServiceTest {
         user.setEmail("test@example.com");
 
         RefreshToken refreshToken = TestDataFactory.createTestRefreshToken();
-        refreshToken.setUser(user);
+        refreshToken.setUserId(user.getId());
+        refreshToken.setUserType(UserType.CUSTOMER);
         refreshToken.setToken(token);
         refreshToken.setExpiryDate(Instant.now().plus(1, java.time.temporal.ChronoUnit.DAYS));
 
@@ -280,7 +297,8 @@ class RefreshTokenServiceTest {
         user.setEmail("test@example.com");
 
         RefreshToken refreshToken = TestDataFactory.createTestRefreshToken();
-        refreshToken.setUser(user);
+        refreshToken.setUserId(user.getId());
+        refreshToken.setUserType(UserType.CUSTOMER);
         refreshToken.setToken(token);
         refreshToken.setExpiryDate(Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS));
 

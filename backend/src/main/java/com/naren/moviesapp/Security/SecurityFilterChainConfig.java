@@ -119,9 +119,12 @@ public class SecurityFilterChainConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.HEAD, "/**").permitAll()
 
                         .requestMatchers(
                                 "/api/v1/ping",
+                                "/",
+                                "/actuator/health",
                                 "/api/v1/auth/**",
                                 "/api/v1/content-manager/**",
                                 "/api/v1/verify/email",
