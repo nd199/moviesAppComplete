@@ -218,6 +218,8 @@ public class SecurityFilterChainConfig {
                                                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
                                                 "font-src 'self' https://fonts.gstatic.com; " +
                                                 "img-src 'self' data: https: https://i.ibb.co https://api.imgbb.com; " +
+                                                "media-src 'self' https: https://www.youtube.com https://jumpshare.com; " +
+                                                "frame-src 'self' https: https://www.youtube.com https://jumpshare.com; " +
                                                 "connect-src 'self' https://movies-app-complete.vercel.app https://movieticket-api.onrender.com https://movies-admin-one.vercel.app https://api.themoviedb.org https://api.imgbb.com https://fonts.googleapis.com; " +
                                                 "object-src 'none'; " +
                                                 "frame-ancestors 'none'; " +
