@@ -213,7 +213,7 @@ class RefreshTokenServiceTest {
 
         assertThatThrownBy(() -> underTest.verifyExpiration(token))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Refresh token is expired");
+                .hasMessageContaining("Refresh token was expired");
 
         verify(refreshTokenRepository).delete(token);
     }

@@ -124,6 +124,7 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(
                                 "/api/v1/ping",
                                 "/",
+                                "/error",
                                 "/actuator/health",
                                 "/api/v1/auth/**",
                                 "/api/v1/content-manager/**",

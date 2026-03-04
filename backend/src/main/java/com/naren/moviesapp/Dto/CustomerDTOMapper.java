@@ -21,11 +21,11 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                 customer.getAddress(),
                 customer.getIsRegistered(),
                 customer.getIsSubscribed(),
-                customer.getMovies(),
-                customer.getRoles().stream().map(role -> role.getName().name()).toList(),
+                null, // Don't include movies to avoid lazy loading
+                null, // Don't include roles to avoid lazy loading
                 customer.getCreatedAt(),
                 customer.getUpdatedAt(),
-                customer
+                null // Don't include customer entity to avoid circular reference
         );
 
         return customerDTO;
@@ -43,7 +43,7 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                 admin.getIsRegistered(),
                 null,
                 null,
-                admin.getRoles().stream().map(role -> role.getName().name()).toList(),
+                null, // Don't include roles to avoid lazy loading
                 admin.getCreatedAt(),
                 admin.getUpdatedAt(),
                 null
