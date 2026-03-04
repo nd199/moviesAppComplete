@@ -1,18 +1,9 @@
 package com.naren.moviesapp.Auth;
 
-import com.naren.moviesapp.Dto.AdminDTO;
-import com.naren.moviesapp.Dto.AdminDTOMapper;
-import com.naren.moviesapp.Dto.ContentManagerDTO;
-import com.naren.moviesapp.Dto.CustomerDTO;
-import com.naren.moviesapp.Dto.CustomerDTOMapper;
-import com.naren.moviesapp.Entity.Admin;
-import com.naren.moviesapp.Entity.ContentManager;
-import com.naren.moviesapp.Entity.Customer;
-import com.naren.moviesapp.Entity.Role;
-import com.naren.moviesapp.Entity.RoleName;
+import com.naren.moviesapp.Dto.*;
+import com.naren.moviesapp.Entity.*;
 import com.naren.moviesapp.Exception.*;
 import com.naren.moviesapp.Repo.AdminRepository;
-import com.naren.moviesapp.Repo.ContentManagerRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Security.AppUserPrincipal;
 import com.naren.moviesapp.jwt.JwtUtil;
@@ -92,7 +83,7 @@ public class AuthService {
                 long totalTime = System.currentTimeMillis() - startTime;
                 logger.info("Total admin login process completed in {}ms for: {}", totalTime, dbAdmin.getEmail());
 
-                return new AdminAuthResponse(dto, token);
+                return new AdminAuthResponse(dto, dbAdmin, token);
             }
 
             if (entity instanceof Customer customerEntity) {
@@ -123,7 +114,7 @@ public class AuthService {
                 long totalTime = System.currentTimeMillis() - startTime;
                 logger.info("Total login process completed in {}ms for: {}", totalTime, customer.getEmail());
 
-                return new CustomerAuthResponse(dto, token);
+                return new CustomerAuthResponse(dto, customer, token);
             }
 
             if (entity instanceof ContentManager contentManager) {
@@ -148,20 +139,20 @@ public class AuthService {
                 logger.info("Total login process completed in {}ms for: {}", totalTime, cm.getEmail());
 
                 ContentManagerDTO cmDTO = new ContentManagerDTO(
-                    cm.getId(),
-                    cm.getName(),
-                    cm.getEmail(),
-                    cm.getPhoneNumber(),
-                    cm.getDepartment(),
-                    cm.getSpecialization(),
-                    cm.getIsActive(),
-                    cm.getCreatedAt(),
-                    cm.getUpdatedAt(),
-                    cm.getImageUrl(),
-                    cm.getRoles().stream().map(role -> role.getName().name()).collect(Collectors.toSet())
+                        cm.getId(),
+                        cm.getName(),
+                        cm.getEmail(),
+                        cm.getPhoneNumber(),
+                        cm.getDepartment(),
+                        cm.getSpecialization(),
+                        cm.getIsActive(),
+                        cm.getCreatedAt(),
+                        cm.getUpdatedAt(),
+                        cm.getImageUrl(),
+                        cm.getRoles().stream().map(role -> role.getName().name()).collect(Collectors.toSet())
                 );
 
-                return new ContentManagerAuthResponse(cmDTO, token);
+                return new ContentManagerAuthResponse(cmDTO, cm, token);
             }
 
             throw new AuthenticationException("Invalid principal type", "INVALID_PRINCIPAL");
@@ -218,18 +209,26 @@ public class AuthService {
         logger.debug("Account state validation passed for customer: {}", customer.getEmail());
     }
 
-    public String generateTokenForUser(Customer user) {
+    public String generateTokenForUser(BaseUser user) {
         logger.info("Generating token for user: {}", user.getEmail());
-        CustomerDTO customerDTO = customerDTOMapper.apply(user);
+        
+        // Check user type and handle accordingly
+        if (user instanceof Customer customer) {
+            CustomerDTO customerDTO = customerDTOMapper.apply(customer);
 
-        Set<Role> roles = new HashSet<Role>();
-        for (String roleName : customerDTO.roles()) {
-            roles.add(new Role(RoleName.valueOf(roleName)));
+            Set<Role> roles = new HashSet<Role>();
+            for (String roleName : customerDTO.roles()) {
+                roles.add(new Role(RoleName.valueOf(roleName)));
+            }
+
+            return jwtUtil.issueToken(customerDTO.email(), roles);
+        } else if (user instanceof Admin admin) {
+            return generateTokenForAdmin(admin);
+        } else if (user instanceof ContentManager contentManager) {
+            return jwtUtil.issueToken(contentManager.getEmail(), contentManager.getRoles());
         }
-
-        String token = jwtUtil.issueToken(customerDTO.email(), roles);
-        logger.debug("Token generated successfully for user: {}", user.getEmail());
-        return token;
+        
+        throw new IllegalArgumentException("Unsupported user type: " + user.getClass().getSimpleName());
     }
 
     private String generateTokenForAdmin(Admin admin) {

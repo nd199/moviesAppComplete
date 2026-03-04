@@ -32,10 +32,10 @@ public class AdminController {
     @Value("${spring.profiles.active}")
     private String activeProfile;
 
-    public AdminController(AdminService adminService, 
-                         ContentManagerService contentManagerService,
-                         ContentManagerInviteService contentManagerInviteService,
-                         EmailService emailService) {
+    public AdminController(AdminService adminService,
+                           ContentManagerService contentManagerService,
+                           ContentManagerInviteService contentManagerInviteService,
+                           EmailService emailService) {
         this.adminService = adminService;
         this.contentManagerService = contentManagerService;
         this.contentManagerInviteService = contentManagerInviteService;

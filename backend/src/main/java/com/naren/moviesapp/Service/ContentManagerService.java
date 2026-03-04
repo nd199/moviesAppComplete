@@ -1,11 +1,6 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Entity.ContentManager;
-import com.naren.moviesapp.Entity.Movie;
-import com.naren.moviesapp.Entity.RefreshToken;
-import com.naren.moviesapp.Entity.Role;
-import com.naren.moviesapp.Entity.RoleName;
-import com.naren.moviesapp.Entity.Show;
+import com.naren.moviesapp.Entity.*;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.ContentManagerLogin;
@@ -37,12 +32,12 @@ public class ContentManagerService implements ContentManagerServiceInterface {
     private final RefreshTokenService refreshTokenService;
 
     public ContentManagerService(ContentManagerRepository contentManagerRepository,
-                                MovieService movieService,
-                                ShowService showService,
-                                RoleService roleService,
-                                PasswordEncoder passwordEncoder,
-                                JwtUtil jwtUtil,
-                                RefreshTokenService refreshTokenService) {
+                                 MovieService movieService,
+                                 ShowService showService,
+                                 RoleService roleService,
+                                 PasswordEncoder passwordEncoder,
+                                 JwtUtil jwtUtil,
+                                 RefreshTokenService refreshTokenService) {
         this.contentManagerRepository = contentManagerRepository;
         this.movieService = movieService;
         this.showService = showService;
@@ -55,7 +50,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
     @Override
     public String login(ContentManagerLogin login) {
         logger.info("Content manager login attempt: {}", login.email());
-        
+
         ContentManager contentManager = contentManagerRepository.findByEmail(login.email())
                 .orElseThrow(() -> {
                     logger.warn("Login failed - content manager not found: {}", login.email());
@@ -80,7 +75,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
 
     public Map<String, Object> loginWithTokens(ContentManagerLogin login) {
         logger.info("Content manager token login attempt: {}", login.email());
-        
+
         ContentManager contentManager = contentManagerRepository.findByEmail(login.email())
                 .orElseThrow(() -> {
                     logger.warn("Login failed - content manager not found: {}", login.email());
@@ -100,7 +95,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         // Generate access token
         Map<String, Object> claims = Map.of("type", "CONTENT_MANAGER");
         String accessToken = jwtUtil.issueToken(contentManager.getEmail(), claims);
-        
+
         // Create refresh token
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(contentManager);
 
@@ -263,7 +258,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
     public Movie addMovie(Movie movie, Long contentManagerId) {
         logger.info("Content manager {} adding movie: {}", contentManagerId, movie.getName());
         ContentManager contentManager = getContentManagerById(contentManagerId);
-        
+
         if (!"movies".equals(contentManager.getSpecialization()) && !"both".equals(contentManager.getSpecialization())) {
             logger.warn("Content manager {} not authorized to add movies", contentManagerId);
             throw new ResourceNotFoundException("Content manager not authorized to manage movies");
@@ -277,7 +272,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
     public void updateMovie(Long movieId, Movie movie, Long contentManagerId) {
         logger.info("Content manager {} updating movie: {}", contentManagerId, movieId);
         ContentManager contentManager = getContentManagerById(contentManagerId);
-        
+
         if (!"movies".equals(contentManager.getSpecialization()) && !"both".equals(contentManager.getSpecialization())) {
             logger.warn("Content manager {} not authorized to update movies", contentManagerId);
             throw new ResourceNotFoundException("Content manager not authorized to manage movies");
@@ -297,7 +292,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         existingMovie.setType(movie.getType());
         existingMovie.setCategory(movie.getCategory());
         existingMovie.setContentManager(contentManager);
-        
+
         // Save the updated movie
         movieService.addMovie(existingMovie);
     }
@@ -306,7 +301,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
     public void deleteMovie(Long movieId, Long contentManagerId) {
         logger.info("Content manager {} deleting movie: {}", contentManagerId, movieId);
         ContentManager contentManager = getContentManagerById(contentManagerId);
-        
+
         if (!"movies".equals(contentManager.getSpecialization()) && !"both".equals(contentManager.getSpecialization())) {
             logger.warn("Content manager {} not authorized to delete movies", contentManagerId);
             throw new ResourceNotFoundException("Content manager not authorized to manage movies");
@@ -325,7 +320,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
     public Show addShow(Show show, Long contentManagerId) {
         logger.info("Content manager {} adding show: {}", contentManagerId, show.getName());
         ContentManager contentManager = getContentManagerById(contentManagerId);
-        
+
         if (!"shows".equals(contentManager.getSpecialization()) && !"both".equals(contentManager.getSpecialization())) {
             logger.warn("Content manager {} not authorized to add shows", contentManagerId);
             throw new ResourceNotFoundException("Content manager not authorized to manage shows");
@@ -339,7 +334,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
     public void updateShow(Long showId, Show show, Long contentManagerId) {
         logger.info("Content manager {} updating show: {}", contentManagerId, showId);
         ContentManager contentManager = getContentManagerById(contentManagerId);
-        
+
         if (!"shows".equals(contentManager.getSpecialization()) && !"both".equals(contentManager.getSpecialization())) {
             logger.warn("Content manager {} not authorized to update shows", contentManagerId);
             throw new ResourceNotFoundException("Content manager not authorized to manage shows");
@@ -359,7 +354,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         existingShow.setType(show.getType());
         existingShow.setCategory(show.getCategory());
         existingShow.setContentManager(contentManager);
-        
+
         // Save the updated show
         showService.addShow(existingShow);
     }
@@ -368,7 +363,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
     public void deleteShow(Long showId, Long contentManagerId) {
         logger.info("Content manager {} deleting show: {}", contentManagerId, showId);
         ContentManager contentManager = getContentManagerById(contentManagerId);
-        
+
         if (!"shows".equals(contentManager.getSpecialization()) && !"both".equals(contentManager.getSpecialization())) {
             logger.warn("Content manager {} not authorized to delete shows", contentManagerId);
             throw new ResourceNotFoundException("Content manager not authorized to manage shows");

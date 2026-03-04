@@ -1,5 +1,6 @@
 package com.naren.moviesapp.Service;
 
+import com.naren.moviesapp.Entity.BaseUser;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Repository.RefreshTokenRepository;
@@ -31,7 +32,7 @@ public class RefreshTokenService {
         this.jwtUtil = jwtUtil;
     }
 
-    public RefreshToken createRefreshToken(Customer user) {
+    public RefreshToken createRefreshToken(BaseUser user) {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
@@ -98,7 +99,7 @@ public class RefreshTokenService {
         }
     }
 
-    public void deleteByUser(Customer user) {
+    public void deleteByUser(BaseUser user) {
         refreshTokenRepository.deleteByUser(user);
         logger.info("Deleted all refresh tokens for user: {}", user.getEmail());
     }

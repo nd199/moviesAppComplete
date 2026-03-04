@@ -11,14 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletResponse;
-import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,25 +37,27 @@ public class ContentManagerController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody ContentManagerLogin login) {
         logger.info("Content manager login request: {}", login.email());
-        
+
         Map<String, Object> result = contentManagerService.loginWithTokens(login);
-        
+
         logger.info("Content manager login successful for: {}", login.email());
         return ResponseEntity.ok(result);
     }
-        @PostMapping("/logout")
+
+    @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(@RequestBody(required = false) Map<String, String> request) {
         logger.info("Content manager logout request received");
-        
+
         String refreshToken = request != null ? request.get("refreshToken") : null;
-        
+
         if (refreshToken != null) {
             contentManagerService.logout(refreshToken);
         }
-        
+
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
-                @PostMapping("/register")
+
+    @PostMapping("/register")
     public ResponseEntity<ContentManager> register(@RequestBody ContentManagerRegistration registration) {
         logger.info("Content manager registration request: {}", registration.email());
         ContentManager contentManager = contentManagerService.register(registration);
@@ -129,8 +127,8 @@ public class ContentManagerController {
     @PutMapping("/{contentManagerId}/movies/{movieId}")
     @PreAuthorize("hasRole('CONTENT_MANAGER') and #contentManagerId == authentication.principal.id")
     public ResponseEntity<Void> updateMovie(@PathVariable("contentManagerId") Long contentManagerId,
-                                           @PathVariable("movieId") Long movieId,
-                                           @RequestBody Movie movie) {
+                                            @PathVariable("movieId") Long movieId,
+                                            @RequestBody Movie movie) {
         logger.info("Content manager {} updating movie: {}", contentManagerId, movieId);
         contentManagerService.updateMovie(movieId, movie, contentManagerId);
         return ResponseEntity.ok().build();
@@ -166,8 +164,8 @@ public class ContentManagerController {
     @PutMapping("/{contentManagerId}/shows/{showId}")
     @PreAuthorize("hasRole('CONTENT_MANAGER') and #contentManagerId == authentication.principal.id")
     public ResponseEntity<Void> updateShow(@PathVariable("contentManagerId") Long contentManagerId,
-                                          @PathVariable("showId") Long showId,
-                                          @RequestBody Show show) {
+                                           @PathVariable("showId") Long showId,
+                                           @RequestBody Show show) {
         logger.info("Content manager {} updating show: {}", contentManagerId, showId);
         contentManagerService.updateShow(showId, show, contentManagerId);
         return ResponseEntity.ok().build();
@@ -197,13 +195,13 @@ public class ContentManagerController {
         logger.debug("Fetching analytics for content manager: {}", contentManagerId);
         Long movieCount = contentManagerService.getMovieCountByContentManager(contentManagerId);
         Long showCount = contentManagerService.getShowCountByContentManager(contentManagerId);
-        
+
         Map<String, Object> analytics = Map.of(
-            "movieCount", movieCount,
-            "showCount", showCount,
-            "totalContent", movieCount + showCount
+                "movieCount", movieCount,
+                "showCount", showCount,
+                "totalContent", movieCount + showCount
         );
-        
+
         return ResponseEntity.ok(analytics);
     }
 

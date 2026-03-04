@@ -6,7 +6,6 @@ import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;
-import com.naren.moviesapp.Exception.PasswordInvalidException;
 import com.naren.moviesapp.Exception.RequestValidationException;
 import com.naren.moviesapp.Exception.ResourceAlreadyExists;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;

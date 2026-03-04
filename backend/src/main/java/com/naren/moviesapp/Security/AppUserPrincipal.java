@@ -37,7 +37,7 @@ public class AppUserPrincipal implements UserDetails {
                     return permissions.stream();
                 })
                 .collect(Collectors.toSet());
-        
+
         System.out.println("Authorities for " + username + " : " + authorities);
     }
 
@@ -58,7 +58,7 @@ public class AppUserPrincipal implements UserDetails {
                     return permissions.stream();
                 })
                 .collect(Collectors.toSet());
-        
+
         System.out.println("Authorities for " + username + " : " + authorities);
     }
 
@@ -79,7 +79,7 @@ public class AppUserPrincipal implements UserDetails {
                     return permissions.stream();
                 })
                 .collect(Collectors.toSet());
-        
+
         System.out.println("Authorities for " + username + " : " + authorities);
     }
 

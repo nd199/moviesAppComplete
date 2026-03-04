@@ -97,7 +97,7 @@ public class TmdbConvertedDto {
                         .filter(video -> "Trailer".equals(video.getType()) && "YouTube".equals(video.getSite()))
                         .findFirst()
                         .map(video -> "https://www.youtube.com/watch?v=" + video.getKey())
-                .orElse(null);
+                        .orElse(null);
             } else {
             }
         } catch (Exception e) {

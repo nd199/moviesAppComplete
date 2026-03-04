@@ -49,8 +49,8 @@ public class ContentManager extends BaseUser {
     private Set<Role> roles = new HashSet<>();
 
     public ContentManager(String name, String email, String password, String phoneNumber,
-                         Boolean isEmailVerified, Boolean isRegistered,
-                         String imageUrl, String department, String specialization, Integer accessLevel) {
+                          Boolean isEmailVerified, Boolean isRegistered,
+                          String imageUrl, String department, String specialization, Integer accessLevel) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -65,7 +65,7 @@ public class ContentManager extends BaseUser {
     }
 
     public ContentManager(String name, String email, String password, String phoneNumber,
-                         String department, String specialization) {
+                          String department, String specialization) {
         this.name = name;
         this.email = email;
         this.password = password;

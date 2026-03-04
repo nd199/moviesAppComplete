@@ -62,7 +62,7 @@ public class CustomerController {
             logger.warn("No authentication principal found - user not authenticated");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
         }
-        
+
         logger.debug("Fetching current user: {}", userDetails.getUsername());
         CustomerDTO customerDTO = customerService.getCustomerByEmail(userDetails.getUsername());
         logger.info("Successfully retrieved user: {} with roles: {}", customerDTO.email(), customerDTO.roles());

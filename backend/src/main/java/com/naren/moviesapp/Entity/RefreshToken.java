@@ -13,7 +13,7 @@ public class RefreshToken {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private Customer user;
+    private BaseUser user;
 
     @Column(nullable = false)
     private String token;
@@ -25,7 +25,7 @@ public class RefreshToken {
         this.id = UUID.randomUUID().toString();
     }
 
-    public RefreshToken(Customer user, String token, Instant expiryDate) {
+    public RefreshToken(BaseUser user, String token, Instant expiryDate) {
         this();
         this.user = user;
         this.token = token;
@@ -41,11 +41,11 @@ public class RefreshToken {
         this.id = id;
     }
 
-    public Customer getUser() {
+    public BaseUser getUser() {
         return user;
     }
 
-    public void setUser(Customer user) {
+    public void setUser(BaseUser user) {
         this.user = user;
     }
 

@@ -21,10 +21,10 @@ public class SetPasswordController {
     private final ContentManagerInviteService contentManagerInviteService;
     private final ContentManagerService contentManagerService;
 
-    public SetPasswordController(AdminInviteService inviteService, 
-                                AdminService adminService,
-                                ContentManagerInviteService contentManagerInviteService,
-                                ContentManagerService contentManagerService) {
+    public SetPasswordController(AdminInviteService inviteService,
+                                 AdminService adminService,
+                                 ContentManagerInviteService contentManagerInviteService,
+                                 ContentManagerService contentManagerService) {
         this.inviteService = inviteService;
         this.adminService = adminService;
         this.contentManagerInviteService = contentManagerInviteService;

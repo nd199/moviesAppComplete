@@ -1,4 +1,7 @@
 package com.naren.moviesapp.Auth;
+
+import com.naren.moviesapp.Entity.BaseUser;
+import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Repo.ContentManagerRepository;
@@ -7,18 +10,16 @@ import com.naren.moviesapp.Service.RefreshTokenService;
 import com.naren.moviesapp.Service.TokenBlacklistService;
 import com.naren.moviesapp.jwt.JwtUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.time.Duration;
+
 import java.util.Map;
 import java.util.Set;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @Tag(name = "Authentication", description = "Authentication & Authorization APIs")
@@ -32,6 +33,7 @@ public class AuthController {
     private final ContentManagerRepository contentManagerRepository;
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
+
     public AuthController(AuthService authService,
                           CustomerService customerService,
                           RefreshTokenService refreshTokenService,
@@ -45,24 +47,26 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
         this.contentManagerRepository = contentManagerRepository;
     }
+
     @PostMapping("/customers")
     public ResponseEntity<?> registerCustomer(@Valid @RequestBody CustomerRegistration request) {
         logger.info("Customer registration request received for email: {}", request.email());
         return customerService.registerUser(request, Set.of("ROLE_USER"));
     }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request) {
         logger.info("Login request received for username: {}", request.username());
         AuthResponse authResponse = authService.login(request);
         // Generate access token and refresh token
-        String accessToken = jwtUtil.generateTokenForUser(authResponse.getUser());
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(authResponse.getUser());
+        String accessToken = authService.generateTokenForUser((BaseUser) authResponse.getUser());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken((BaseUser) authResponse.getUser());
         logger.info("Login successful for username: {}", request.username());
         // Return tokens and user data in response body
         Map<String, Object> responseBody = new java.util.HashMap<>();
         responseBody.put("accessToken", accessToken);
         responseBody.put("refreshToken", refreshToken.getToken());
-        
+
         // Handle different response types
         if (authResponse instanceof AdminAuthResponse adminAuth) {
             responseBody.put("user", adminAuth.adminDTO());
@@ -76,11 +80,12 @@ public class AuthController {
         }
         return ResponseEntity.ok(responseBody);
     }
+
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
         logger.debug("Token refresh request received");
         String refreshTokenValue = request.get("refreshToken");
-        
+
         if (refreshTokenValue == null) {
             logger.warn("Refresh token missing in request");
             return ResponseEntity.badRequest().body("Refresh token missing");
@@ -93,16 +98,17 @@ public class AuthController {
         refreshTokenService.deleteByUser(refreshToken.getUser());
         RefreshToken newRefreshToken =
                 refreshTokenService.createRefreshToken(refreshToken.getUser());
-        String newAccessToken = jwtUtil.generateTokenForUser(refreshToken.getUser());
+        String newAccessToken = authService.generateTokenForUser(refreshToken.getUser());
         logger.info("Token refreshed successfully for user: {}", refreshToken.getUser().getEmail());
         return ResponseEntity.ok(Map.of(
-            "accessToken", newAccessToken,
-            "refreshToken", newRefreshToken.getToken()
+                "accessToken", newAccessToken,
+                "refreshToken", newRefreshToken.getToken()
         ));
     }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody(required = false) Map<String, String> request,
-                                   @RequestHeader(value = "Authorization", required = false) String authHeader) {
+                                    @RequestHeader(value = "Authorization", required = false) String authHeader) {
         logger.info("Logout request received");
         String refreshToken = request != null ? request.get("refreshToken") : null;
         if (refreshToken != null) {

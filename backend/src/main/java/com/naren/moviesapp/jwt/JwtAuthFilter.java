@@ -58,7 +58,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = null;
         final String authHeader = request.getHeader("Authorization");
         final String requestURI = request.getRequestURI();
-        
+
         logger.debug("Processing request for URI: {}", requestURI);
         logger.debug("Auth header present: {}", authHeader != null);
 
