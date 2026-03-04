@@ -125,13 +125,11 @@ const List = ({ title, type = 'local' }) => {
   };
 
   const items = getItems();
-  console.log(`Items for ${title} (${type}):`, items);
 
   // For TMDB items, map the fields to match the ListItem format
   const formatTmdbItem = (item) => {
     if (type === 'tmdb-movies' || type === 'tmdb-shows' || type === 'tmdb-popular' || type === 'tmdb-top-rated' || 
         type === 'tmdb-now-playing' || type === 'tmdb-upcoming' || type === 'tmdb-popular-shows' || type === 'tmdb-top-rated-shows') {
-      console.log(`Formatting item: ${item.title || item.name}, trailer:`, item.trailer);
       return {
         id: item.tmdbId,
         name: item.title || item.name,
