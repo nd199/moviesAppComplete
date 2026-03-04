@@ -153,8 +153,8 @@ public class SecurityFilterChainConfig {
                         ).permitAll()
 
                         .requestMatchers(
-                                "/api/v1/profile/**",
                                 "/api/v1/customers/currentUser",
+                                "/api/v1/profile/**",
                                 "/api/v1/subscription/confirm",
                                 "/api/v1/payments/**",
                                 "/api/v1/video/**",
@@ -168,22 +168,28 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/admins/**"
                         ).hasAuthority("USER_MANAGE")
 
-                        .requestMatchers("/api/v1/movies")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/movies/**")
+                        .permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/v1/movies/**")
                         .hasAuthority("MOVIE_WRITE")
 
-                        .requestMatchers("/api/v1/shows")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/movies/**")
                         .hasAuthority("MOVIE_WRITE")
 
-                        .requestMatchers("/api/v1/movies/**")
-                        .hasAuthority("MOVIE_WRITE")
-
-                        .requestMatchers("/api/v1/shows/**")
-                        .hasAuthority("MOVIE_WRITE")
-
-                        .requestMatchers("/api/v1/movies/**")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/movies/**")
                         .hasAuthority("MOVIE_DELETE")
 
-                        .requestMatchers("/api/v1/shows/**")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/shows/**")
+                        .permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/v1/shows/**")
+                        .hasAuthority("MOVIE_WRITE")
+
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/shows/**")
+                        .hasAuthority("MOVIE_WRITE")
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/shows/**")
                         .hasAuthority("MOVIE_DELETE")
 
                         .requestMatchers("/api/v1/admin/create")

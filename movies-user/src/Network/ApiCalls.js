@@ -243,7 +243,6 @@ export const fetchUsers = async dispatch => {
 export const fetchCurrentUserDetails = async dispatch => {
   dispatch(fetchCurrentStart());
   try {
-    // API endpoint: /customers/currentUser - verified correct spelling
     const res = await userRequest().get(`/customers/currentUser`, {
       withCredentials: true
     });

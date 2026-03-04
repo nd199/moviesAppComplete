@@ -37,6 +37,8 @@ public class AppUserPrincipal implements UserDetails {
                     return permissions.stream();
                 })
                 .collect(Collectors.toSet());
+        
+        System.out.println("Authorities for " + username + " : " + authorities);
     }
 
     public AppUserPrincipal(Customer customer) {
@@ -56,6 +58,8 @@ public class AppUserPrincipal implements UserDetails {
                     return permissions.stream();
                 })
                 .collect(Collectors.toSet());
+        
+        System.out.println("Authorities for " + username + " : " + authorities);
     }
 
     public AppUserPrincipal(ContentManager contentManager) {
@@ -75,6 +79,8 @@ public class AppUserPrincipal implements UserDetails {
                     return permissions.stream();
                 })
                 .collect(Collectors.toSet());
+        
+        System.out.println("Authorities for " + username + " : " + authorities);
     }
 
     public Object getUserEntity() {
