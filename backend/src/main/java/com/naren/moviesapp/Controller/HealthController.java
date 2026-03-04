@@ -20,7 +20,7 @@ public class HealthController {
     @GetMapping("/ping")
     public ResponseEntity<Map<String, Object>> ping() {
         logger.debug("Health check ping received");
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
         response.put("timestamp", Instant.now().toString());
@@ -39,7 +39,7 @@ public class HealthController {
         response.put("timestamp", Instant.now().toString());
         response.put("service", "movieOttApplication");
         response.put("version", "1.0.0");
-        response.put("database", "UP"); // Basic check - could be enhanced
+        response.put("database", "UP");
         response.put("components", Map.of(
             "database", Map.of("status", "UP"),
             "jwt", Map.of("status", "UP"),

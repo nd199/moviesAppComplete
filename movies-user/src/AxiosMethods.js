@@ -17,6 +17,7 @@ const getBaseURL = () => {
 const api = axios.create({
   baseURL: getBaseURL(),
   timeout: 30000,
+  withCredentials: true,
 });
 
 // Request interceptor - add Authorization header
@@ -101,6 +102,7 @@ export const authRequest = () => {
   return axios.create({
     baseURL: getBaseURL(),
     timeout: 30000,
+    withCredentials: true,
   });
 };
 export const passResetRequest = () => {
@@ -108,6 +110,7 @@ export const passResetRequest = () => {
   return axios.create({
     baseURL: baseURL,
     timeout: 30000,
+    withCredentials: true,
   });
 };
 export const publicRequest = () => api;
@@ -116,6 +119,7 @@ export const paymentRequest = () => {
   return axios.create({
     baseURL: baseURL,
     timeout: 30000,
+    withCredentials: true,
   });
 };
 export const springRequest = () => {
@@ -123,6 +127,7 @@ export const springRequest = () => {
   return axios.create({
     baseURL: baseURL,
     timeout: 30000,
+    withCredentials: true,
   });
 };
 
