@@ -20,7 +20,7 @@ const Success = () => {
 
     const markUserAsSubscribed = async () => {
       try {
-        const response = await markUserSubscribedApi(currentUser.email);
+        const response = await markUserSubscribedApi();
         
         if (response.data) {
           dispatch(updateUserSuccess(response.data));

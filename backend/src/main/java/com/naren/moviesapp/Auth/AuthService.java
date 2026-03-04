@@ -101,9 +101,6 @@ public class AuthService {
 
                 validateAccountState(customer);
 
-                customer.setIsSubscribed(true);
-                customerRepository.save(customer);
-
                 CustomerDTO dto = customerDTOMapper.apply(customer);
 
                 String token = jwtUtil.issueToken(

@@ -58,7 +58,7 @@ const PaymentCheckout = () => {
       await updateFinalUserApi(finalUser);
       console.log('PaymentCheckout - Backend user updated');
 
-      const subscriptionResponse = await markUserSubscribedApi(finalUser.email);
+      const subscriptionResponse = await markUserSubscribedApi();
       console.log('PaymentCheckout - Backend subscription response:', subscriptionResponse);
 
       if (subscriptionResponse.data) {
