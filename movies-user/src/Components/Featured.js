@@ -22,7 +22,6 @@ const Featured = () => {
       try {
         const response = await publicRequest().get('/tmdb/south-indian/movies?page=1');
         const movies = response.data.results?.slice(0, 10) || [];
-        console.log(`Fetched ${response.data.results?.length || 0} South Indian movies, showing ${movies.length}`);
         setFeaturedData(movies);
       } catch (error) {
         console.error('Failed to load featured movies:', error);

@@ -32,8 +32,6 @@ const List = ({ title, type = 'local' }) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        console.log(`Fetching data for type: ${type}`);
-        
         if (type === 'local') {
           // Fetch local movies and shows
           await Promise.all([
@@ -48,39 +46,27 @@ const List = ({ title, type = 'local' }) => {
           await fetchTmdbTrendingShows(dispatch);
         } else if (type === 'tmdb-popular') {
           // Fetch TMDB popular movies
-          console.log('Fetching popular movies...');
           const results = await fetchTmdbPopularMovies(dispatch);
-          console.log('Popular movies results:', results);
           setPopularMovies(results);
         } else if (type === 'tmdb-top-rated') {
           // Fetch TMDB top rated movies
-          console.log('Fetching top rated movies...');
           const results = await fetchTmdbTopRatedMovies(dispatch);
-          console.log('Top rated movies results:', results);
           setTopRatedMovies(results);
         } else if (type === 'tmdb-now-playing') {
           // Fetch TMDB now playing movies
-          console.log('Fetching now playing movies...');
           const results = await fetchTmdbNowPlayingMovies(dispatch);
-          console.log('Now playing movies results:', results);
           setNowPlayingMovies(results);
         } else if (type === 'tmdb-upcoming') {
           // Fetch TMDB upcoming movies
-          console.log('Fetching upcoming movies...');
           const results = await fetchTmdbUpcomingMovies(dispatch);
-          console.log('Upcoming movies results:', results);
           setUpcomingMovies(results);
         } else if (type === 'tmdb-popular-shows') {
           // Fetch TMDB popular TV shows
-          console.log('Fetching popular shows...');
           const results = await fetchTmdbPopularShows(dispatch);
-          console.log('Popular shows results:', results);
           setPopularShows(results);
         } else if (type === 'tmdb-top-rated-shows') {
           // Fetch TMDB top rated TV shows
-          console.log('Fetching top rated shows...');
           const results = await fetchTmdbTopRatedShows(dispatch);
-          console.log('Top rated shows results:', results);
           setTopRatedShows(results);
         }
       } catch (error) {

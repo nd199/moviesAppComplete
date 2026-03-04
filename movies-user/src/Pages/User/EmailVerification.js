@@ -28,21 +28,14 @@ const EmailVerification = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Selected Plan Redux:", selectedPlan);
-    console.log("Plan from route state:", location.state?.plan);
-    console.log("Final plan being used:", plan);
-    
     if (!isVerified) return;
 
     if (!plan) {
-      console.warn("No selected plan found. Redirecting to subscription.");
       navigate("/subscription");
       return;
     }
 
     const userId = currentUser?.id || currentUser?.email || email;
-    
-    console.log('EmailVerification - Attempting redirect to:', `/payment/${userId}`);
     
     setTimeout(() => {
       try {

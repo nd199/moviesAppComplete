@@ -61,7 +61,6 @@ export const register = async (dispatch, customerInfo) => {
     const res = await authRequest().post('/auth/customers', customerInfo);
     
     // Token is handled via Authorization header, no cookies needed
-    console.log('Register: User registered successfully');
     
     dispatch(registerSuccess(res.data));
     dispatch(setAuthStatus("authenticated"));
@@ -102,8 +101,6 @@ export const login = async (dispatch, userInfo) => {
     setAccessToken(accessToken);
     setRefreshToken(refreshToken);
     
-    console.log('Login: Tokens stored successfully');
-    
     dispatch(loginSuccess(user));
     dispatch(setAuthStatus("authenticated"));
   } catch (error) {
@@ -141,15 +138,11 @@ export const fetchShows = async dispatch => {
 };
 
 export const verifyEmail = async (dispatch, email) => {
-  console.log("🔍 DEBUG: Sending to backend email:", email);
-  console.log("🔍 DEBUG: Email type:", typeof email);
-  
   dispatch(verifyEmailStart());
   try {
     const payload = {
       email: email.trim().toLowerCase()
     };
-    console.log("🔍 DEBUG: Final payload being sent:", payload);
     
     const res = await publicRequest().post('/verify/email', payload);
     dispatch(verifyEmailSuccess(res.data));
@@ -278,17 +271,17 @@ export const updatePasswordAndPushToLoginPage = async (dispatch, data) => {
 };
 
 export const savePaymentApi = payload =>
-  paymentRequest.post('/payments/submitPayment', payload);
+  paymentRequest().post('/payments/submitPayment', payload);
 
 export const getPaymentDetailsApi = email =>
-  paymentRequest.get(`/payments/paymentDetails?email=${email}`);
+  paymentRequest().get(`/payments/paymentDetails?email=${email}`);
 
 export const updateFinalUserApi = finalUser =>
-  paymentRequest.post('/payments/updateFinalUser', { finalUser });
+  paymentRequest().post('/payments/updateFinalUser', { finalUser });
 
 export const markUserSubscribedApi = async (email) => {
   try {
-    const res = await paymentRequest.post('/payments/subscribe-success', null, {
+    const res = await paymentRequest().post('/payments/subscribe-success', null, {
       params: { email }
     });
     return res.data;

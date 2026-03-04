@@ -27,10 +27,6 @@ const PaymentCheckout = () => {
     phoneNumber: "",
   };
 
-  console.log('PaymentCheckout - Plan:', plan);
-  console.log('PaymentCheckout - User:', user);
-  console.log('PaymentCheckout - UserId:', userId);
-
   const handleSubmit = async (values, { setSubmitting }) => {
     const transactionId = uuid();
     
@@ -41,13 +37,6 @@ const PaymentCheckout = () => {
     };
 
     try {
-      console.log('PaymentCheckout - Submitting payment to backend:', {
-        finalUser,
-        finalPlan: plan,
-        paymentMethod: "card",
-        transactionId
-      });
-
       const paymentPayload = {
         finalPayment: {
           finalUser: {
@@ -62,7 +51,6 @@ const PaymentCheckout = () => {
         }
       };
 
-      console.log('PaymentCheckout - Sending to backend:', paymentPayload);
       
       const paymentResponse = await dispatch(savePayment(paymentPayload)).unwrap();
       console.log('PaymentCheckout - Backend payment response:', paymentResponse);

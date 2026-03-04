@@ -49,7 +49,6 @@ function AppWithHealthCheck() {
 
         const baseURL = getBaseURL();
         const url = `${baseURL}/api/v1/ping`;
-        console.log('Health check URL:', url); // Debug log
         
         await axios.get(url, {
           timeout: 5000,
@@ -145,14 +144,6 @@ function AppWithNavigation() {
     const isAdmin = currentUser?.roles?.includes("ROLE_ADMIN");
     const isSubscribed = currentUser?.isSubscribed;
 
-    console.log('ProtectedRoute - Debug:', {
-      authStatus,
-      currentUser,
-      isAdmin,
-      isSubscribed,
-      requiredRole
-    });
-
     if (authStatus === "loading") {
       return (
         <div style={{ padding: "20px", textAlign: "center", color: "white" }}>
@@ -162,21 +153,16 @@ function AppWithNavigation() {
     }
 
     if (authStatus === "unauthenticated") {
-      console.log('ProtectedRoute - Redirecting to login (unauthenticated)');
       return <Navigate to="/login" replace />;
     }
 
     if (requiredRole === "admin" && !isAdmin) {
-      console.log('ProtectedRoute - Redirecting to home (not admin)');
       return <Navigate to="/" replace />;
     }
 
     if (requiredRole === "subscribed" && !isSubscribed) {
-      console.log('ProtectedRoute - Redirecting to subscription (not subscribed)');
       return <Navigate to="/subscription" replace />;
     }
-
-    console.log('ProtectedRoute - Access granted');
     return children;
   };
 

@@ -20,21 +20,15 @@ const Success = () => {
 
     const markUserAsSubscribed = async () => {
       try {
-        console.log('Success - Calling backend to mark user as subscribed:', currentUser.email);
-        
         const response = await markUserSubscribedApi(currentUser.email);
-        console.log('Success - Backend response:', response);
         
         if (response.data) {
-          console.log('Success - Updating Redux with backend user data:', response.data);
           dispatch(updateUserSuccess(response.data));
         }
         
         setUpdated(true);
-        
-        console.log('Success: User marked as subscribed in backend and Redux');
       } catch (error) {
-        console.error('Success - Failed to mark user as subscribed:', error);
+        console.error('Failed to mark user as subscribed:', error);
         setUpdated(true);
       }
     };
@@ -44,7 +38,6 @@ const Success = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      console.log('Success: Redirecting to home page');
       navigate("/");
     }, 5000); 
     
