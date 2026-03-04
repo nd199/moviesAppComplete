@@ -18,6 +18,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -204,6 +205,23 @@ public class SecurityFilterChainConfig {
                         .permitAll()
 
                         .anyRequest().authenticated()
+                )
+
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives(
+                                        "default-src 'self'; " +
+                                        "script-src 'self'; " +
+                                        "style-src 'self' 'unsafe-inline'; " +
+                                        "img-src 'self' data: https:; " +
+                                        "connect-src 'self' https://movies-app-complete.vercel.app https://movieticket-api.onrender.com https://movies-admin-one.vercel.app https://api.themoviedb.org; " +
+                                        "object-src 'none'; " +
+                                        "frame-ancestors 'none'; " +
+                                        "base-uri 'self';"
+                                )
+                        )
+                        .xssProtection(HeadersConfigurer.XXssConfig::disable)
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
                 )
 
                 .authenticationProvider(authenticationProvider)

@@ -4,6 +4,7 @@ import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router-d
 import { fetchCurrentUserDetails } from "./Network/ApiCalls";
 import { setAuthStatus } from "./redux/userSlice";
 import axios from "axios";
+import { getRefreshToken, setAccessToken, clearAuth } from "./authStore";
 import "./App.css";
 
 import Home from "./Pages/User/Home";
@@ -91,14 +92,38 @@ function AppWithNavigation() {
   const [skipUserFetch, setSkipUserFetch] = useState(false);
 
   useEffect(() => {
-    // Always try to fetch current user - server will determine if authenticated
-    if (!skipUserFetch) {
+    // Try to refresh token on app startup if refresh token exists
+    const refreshToken = getRefreshToken();
+    
+    if (refreshToken) {
+      axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/v1/auth/refresh-token`, {
+        refreshToken
+      })
+      .then(res => {
+        setAccessToken(res.data.accessToken);
+        
+        // Update refresh token if rotation is enabled
+        if (res.data.refreshToken) {
+          localStorage.setItem("refreshToken", res.data.refreshToken);
+        }
+        
+        // Now fetch current user details
+        fetchCurrentUserDetails(dispatch).catch(() => {
+          dispatch(setAuthStatus('unauthenticated'));
+        });
+      })
+      .catch(() => {
+        // Refresh token invalid, clear auth and set unauthenticated
+        clearAuth();
+        dispatch(setAuthStatus('unauthenticated'));
+      });
+    } else {
+      // No refresh token, try fetching user (will fail if not authenticated)
       fetchCurrentUserDetails(dispatch).catch(() => {
-        // If fetch fails, user is not authenticated
         dispatch(setAuthStatus('unauthenticated'));
       });
     }
-  }, [dispatch, skipUserFetch]);
+  }, [dispatch]);
 
   // Listen for payment success to skip next fetch
   useEffect(() => {

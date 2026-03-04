@@ -65,20 +65,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
             logger.debug("Token extracted from Authorization header");
-        } else {
-            jakarta.servlet.http.Cookie[] cookies = request.getCookies();
-            logger.debug("Cookies present: {}", cookies != null ? cookies.length : 0);
-            
-            if (cookies != null) {
-                for (jakarta.servlet.http.Cookie cookie : cookies) {
-                    logger.debug("Cookie found: {} = {}", cookie.getName(), cookie.getValue().substring(0, Math.min(10, cookie.getValue().length())) + "...");
-                    if ("jwt_token".equals(cookie.getName())) {
-                        token = cookie.getValue();
-                        logger.debug("Token extracted from jwt_token cookie");
-                        break;
-                    }
-                }
-            }
         }
 
         if (token == null) {

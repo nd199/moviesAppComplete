@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { getRefreshToken, setAccessToken, clearAuth } from './authStore';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import SuperAdminInvite from './pages/SuperAdminInvite';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -77,6 +78,44 @@ function AppWithHealthCheck() {
 }
 
 function AppWithRoutes() {
+  useEffect(() => {
+    // Try to refresh token on app startup if refresh token exists
+    const refreshToken = getRefreshToken();
+    
+    if (refreshToken) {
+      const isLocal = () => {
+        return (
+          window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1' ||
+          window.location.hostname === ''
+        );
+      };
+
+      const getBaseURL = () => {
+        if (import.meta.env.VITE_API_URL && !isLocal()) {
+          return import.meta.env.VITE_API_URL;
+        }
+        return 'http://localhost:8080';
+      };
+      
+      axios.post(`${getBaseURL()}/api/v1/auth/refresh-token`, {
+        refreshToken
+      })
+      .then(res => {
+        setAccessToken(res.data.accessToken);
+        
+        // Update refresh token if rotation is enabled
+        if (res.data.refreshToken) {
+          localStorage.setItem("refreshToken", res.data.refreshToken);
+        }
+      })
+      .catch(() => {
+        // Refresh token invalid, clear auth
+        clearAuth();
+      });
+    }
+  }, []);
+
   return (
     <Router>
       <Routes>

@@ -2,6 +2,7 @@ package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Entity.ContentManager;
 import com.naren.moviesapp.Entity.Movie;
+import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Entity.Show;
@@ -33,19 +34,22 @@ public class ContentManagerService implements ContentManagerServiceInterface {
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
 
     public ContentManagerService(ContentManagerRepository contentManagerRepository,
                                 MovieService movieService,
                                 ShowService showService,
                                 RoleService roleService,
                                 PasswordEncoder passwordEncoder,
-                                JwtUtil jwtUtil) {
+                                JwtUtil jwtUtil,
+                                RefreshTokenService refreshTokenService) {
         this.contentManagerRepository = contentManagerRepository;
         this.movieService = movieService;
         this.showService = showService;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @Override
@@ -72,6 +76,56 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         String token = jwtUtil.issueToken(contentManager.getEmail(), claims);
         logger.info("Content manager logged in successfully: {}", login.email());
         return token;
+    }
+
+    public Map<String, Object> loginWithTokens(ContentManagerLogin login) {
+        logger.info("Content manager token login attempt: {}", login.email());
+        
+        ContentManager contentManager = contentManagerRepository.findByEmail(login.email())
+                .orElseThrow(() -> {
+                    logger.warn("Login failed - content manager not found: {}", login.email());
+                    return new ResourceNotFoundException("Content manager not found with email: " + login.email());
+                });
+
+        if (!passwordEncoder.matches(login.password(), contentManager.getPassword())) {
+            logger.warn("Login failed - invalid password for: {}", login.email());
+            throw new ResourceNotFoundException("Invalid credentials");
+        }
+
+        if (!contentManager.getIsActive()) {
+            logger.warn("Login failed - content manager is inactive: {}", login.email());
+            throw new ResourceNotFoundException("Account is inactive");
+        }
+
+        // Generate access token
+        Map<String, Object> claims = Map.of("type", "CONTENT_MANAGER");
+        String accessToken = jwtUtil.issueToken(contentManager.getEmail(), claims);
+        
+        // Create refresh token
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(contentManager);
+
+        // Build user data
+        Map<String, Object> userMap = new java.util.HashMap<>();
+        userMap.put("id", contentManager.getId());
+        userMap.put("name", contentManager.getName());
+        userMap.put("email", contentManager.getEmail());
+        userMap.put("phoneNumber", contentManager.getPhoneNumber());
+        userMap.put("department", contentManager.getDepartment());
+        userMap.put("specialization", contentManager.getSpecialization());
+        userMap.put("isActive", contentManager.getIsActive());
+        userMap.put("createdAt", contentManager.getCreatedAt());
+        userMap.put("updatedAt", contentManager.getUpdatedAt());
+        userMap.put("imageUrl", contentManager.getImageUrl());
+        userMap.put("roles", contentManager.getRoles().stream().map(role -> role.getName().name()).toList());
+
+        Map<String, Object> result = new java.util.HashMap<>();
+        result.put("accessToken", accessToken);
+        result.put("refreshToken", refreshToken.getToken());
+        result.put("user", userMap);
+        result.put("userType", "CONTENT_MANAGER");
+
+        logger.info("Content manager token login successful: {}", login.email());
+        return result;
     }
 
     @Override

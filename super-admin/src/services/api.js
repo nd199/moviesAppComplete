@@ -1,5 +1,5 @@
 import axios from "axios";
-import Cookies from "js-cookie";
+import { getAccessToken, setAccessToken, getRefreshToken, clearAuth } from "../authStore";
 
 const isLocal = () => {
   return window.location.hostname === 'localhost' ||
@@ -28,13 +28,13 @@ const getBaseURL = () => {
 
 const api = axios.create({
   baseURL: getBaseURL(),
-  withCredentials: true,
   timeout: 30000,
 });
 
+// Request interceptor - add Authorization header
 api.interceptors.request.use(
   (config) => {
-    const token = Cookies.get('jwt_token');
+    const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -46,17 +46,51 @@ api.interceptors.request.use(
   }
 );
 
+// Response interceptor - handle token refresh
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response?.status === 401) {
-      Cookies.remove('jwt_token');
-      if (window.location.pathname !== '/super-admin/login' && !error.code === 'ERR_NETWORK') {
-        window.location.href = '/super-admin/login';
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const refreshToken = getRefreshToken();
+
+      if (!refreshToken) {
+        clearAuth();
+        if (window.location.pathname !== '/super-admin/login' && !error.code === 'ERR_NETWORK') {
+          window.location.href = '/super-admin/login';
+        }
+        return Promise.reject(error);
       }
-    } else if (error.response?.status === 404) {
+
+      try {
+        const res = await axios.post(`${getBaseURL()}/api/v1/auth/refresh-token`, {
+          refreshToken
+        });
+
+        const newAccessToken = res.data.accessToken;
+        setAccessToken(newAccessToken);
+
+        // Update refresh token if rotation is enabled
+        if (res.data.refreshToken) {
+          localStorage.setItem("refreshToken", res.data.refreshToken);
+        }
+
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return api(originalRequest);
+
+      } catch (refreshError) {
+        clearAuth();
+        if (window.location.pathname !== '/super-admin/login') {
+          window.location.href = '/super-admin/login';
+        }
+        return Promise.reject(refreshError);
+      }
+    }
+
+    if (error.response?.status === 404) {
       console.warn('API endpoint not found, redirecting to home');
       if (window.location.pathname !== '/super-admin/login') {
         window.location.href = '/super-admin/login';
@@ -71,8 +105,25 @@ api.interceptors.response.use(
 export default api;
 
 export const authAPI = {
-  login: (credentials) => api.post('/api/v1/auth/login', credentials),
-  logout: () => api.post('/api/v1/auth/logout'),
+  login: async (credentials) => {
+    const response = await api.post('/api/v1/auth/login', credentials);
+    const { accessToken, refreshToken, user } = response.data;
+    
+    // Store tokens
+    setAccessToken(accessToken);
+    setRefreshToken(refreshToken);
+    
+    return response.data;
+  },
+  logout: async () => {
+    try {
+      const refreshToken = getRefreshToken();
+      await api.post('/api/v1/auth/logout', refreshToken ? { refreshToken } : {});
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    clearAuth();
+  },
   checkAuth: () => api.get('/api/v1/customers/currentUser'),
 };
 

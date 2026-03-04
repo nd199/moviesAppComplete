@@ -8,6 +8,7 @@ import {
   BrowserRouter as Router,
   Routes,
 } from 'react-router-dom';
+import { getRefreshToken, setAccessToken, clearAuth } from './authStore';
 import Fallback from './Utils/FallBackPage.jsx';
 import ServerConnection from './Utils/ServerConnection.jsx';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -162,6 +163,32 @@ function AppWithRoutes() {
 }
 
 function App() {
+  useEffect(() => {
+    // Try to refresh token on app startup if refresh token exists
+    const refreshToken = getRefreshToken();
+    
+    if (refreshToken) {
+      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const apiURL = baseURL.endsWith('/api/v1') ? baseURL : `${baseURL}/api/v1`;
+      
+      axios.post(`${apiURL}/auth/refresh-token`, {
+        refreshToken
+      })
+      .then(res => {
+        setAccessToken(res.data.accessToken);
+        
+        // Update refresh token if rotation is enabled
+        if (res.data.refreshToken) {
+          localStorage.setItem("refreshToken", res.data.refreshToken);
+        }
+      })
+      .catch(() => {
+        // Refresh token invalid, clear auth
+        clearAuth();
+      });
+    }
+  }, []);
+
   return (
     <Provider store={store}>
       <Router>

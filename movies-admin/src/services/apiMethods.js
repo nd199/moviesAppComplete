@@ -1,5 +1,5 @@
 import axios from "axios";
-import Cookies from "js-cookie";
+import { getAccessToken } from '../authStore';
 
 // Detect if running locally
 const isLocal = () => {
@@ -19,19 +19,16 @@ const getBaseURL = () => {
 
 const api = axios.create({
   baseURL: getBaseURL(),
-  withCredentials: true,
   timeout: 30000,
 });
 
 api.interceptors.request.use(
   (config) => {
-    // Try to get token from js-cookie first (fallback for cookie issues)
-    const token = Cookies.get('jwt_token');
+    // Get token from authStore
+    const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    // For HTTP-only cookies, we don't need to manually add the token
-    // The browser will automatically include cookies with withCredentials: true
     config.headers['X-Requested-With'] = 'XMLHttpRequest';
     return config;
   },
@@ -59,7 +56,6 @@ export const adminRequest = () => api;
 export const authRequest = () => {
   return axios.create({
     baseURL: getBaseURL(),
-    withCredentials: true,
     timeout: 30000,
   });
 };
@@ -67,14 +63,12 @@ export const publicRequest = () => api;
 export const showRequest = () => {
   return axios.create({
     baseURL: `${getBaseURL()}/api/v1/shows`,
-    withCredentials: true,
     timeout: 30000,
   });
 };
 export const contentManagerRequest = () => {
   return axios.create({
     baseURL: `${getBaseURL()}/api/v1/content-managers`,
-    withCredentials: true,
     timeout: 30000,
   });
 };

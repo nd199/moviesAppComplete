@@ -6,6 +6,7 @@ import {
   paymentRequest,
   springRequest,
 } from '../AxiosMethods';
+import { setAccessToken, setRefreshToken } from '../authStore';
 import {
   fetchMoviesFailure,
   fetchMoviesStart,
@@ -59,8 +60,8 @@ export const register = async (dispatch, customerInfo) => {
   try {
     const res = await authRequest().post('/auth/customers', customerInfo);
     
-    // Token is handled via HTTP-only cookies, no need to store in JS cookies
-    console.log('Register: Authentication cookies set by server');
+    // Token is handled via Authorization header, no cookies needed
+    console.log('Register: User registered successfully');
     
     dispatch(registerSuccess(res.data));
     dispatch(setAuthStatus("authenticated"));
@@ -94,12 +95,16 @@ export const login = async (dispatch, userInfo) => {
   try {
     const res = await authRequest().post('/auth/login', userInfo);
     
-    // Handle new response structure
-    const userData = res.data?.user || res.data; // Fallback to old structure
+    // Extract tokens from response body
+    const { accessToken, refreshToken, user } = res.data;
     
-    console.log('Login: Authentication cookies set by server');
+    // Store tokens
+    setAccessToken(accessToken);
+    setRefreshToken(refreshToken);
     
-    dispatch(loginSuccess(userData));
+    console.log('Login: Tokens stored successfully');
+    
+    dispatch(loginSuccess(user));
     dispatch(setAuthStatus("authenticated"));
   } catch (error) {
     const message =
@@ -201,9 +206,7 @@ export const updateProfileById = async (dispatch, userUpdateInfo, id) => {
 export const getCurrentUserProfile = async dispatch => {
   dispatch(fetchCurrentStart());
   try {
-    const res = await userRequest().get(`/profile/current`, {
-      withCredentials: true
-    });
+    const res = await userRequest().get(`/profile/current`);
     dispatch(fetchCurrentSuccess(res.data));
     return res.data;
   } catch (error) {
@@ -243,9 +246,7 @@ export const fetchUsers = async dispatch => {
 export const fetchCurrentUserDetails = async dispatch => {
   dispatch(fetchCurrentStart());
   try {
-    const res = await userRequest().get(`/customers/currentUser`, {
-      withCredentials: true
-    });
+    const res = await userRequest().get(`/customers/currentUser`);
     dispatch(fetchCurrentSuccess(res.data));
     return res.data;
   } catch (error) {

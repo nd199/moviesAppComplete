@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getAccessToken, setAccessToken, getRefreshToken, clearAuth } from '../authStore';
 
 const isLocal = () => {
   return window.location.hostname === 'localhost' ||
@@ -18,28 +19,79 @@ const getBaseURL = () => {
 const api = axios.create({
   baseURL: getBaseURL(),
   timeout: 10000,
-  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
+// Request interceptor - add Authorization header
+api.interceptors.request.use(
+  (config) => {
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-
+// Response interceptor - handle token refresh
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
       // Do not force redirect during invite set-password flow; show the real error on screen.
       if (window.location.pathname.startsWith('/set-password')) {
         return Promise.reject(error);
       }
-      if (window.location.pathname.includes('/contentManager')) {
-        window.location.href = '/contentManagerLogin';
-      } else {
-        window.location.href = '/login';
+
+      const refreshToken = getRefreshToken();
+
+      if (!refreshToken) {
+        clearAuth();
+        if (window.location.pathname.includes('/contentManager')) {
+          window.location.href = '/contentManagerLogin';
+        } else {
+          window.location.href = '/login';
+        }
+        return Promise.reject(error);
       }
-    } else if (error.response?.status === 404) {
+
+      try {
+        const res = await axios.post(`${getBaseURL()}/auth/refresh-token`, {
+          refreshToken
+        });
+
+        const newAccessToken = res.data.accessToken;
+        setAccessToken(newAccessToken);
+
+        // Update refresh token if rotation is enabled
+        if (res.data.refreshToken) {
+          localStorage.setItem("refreshToken", res.data.refreshToken);
+        }
+
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return api(originalRequest);
+
+      } catch (refreshError) {
+        clearAuth();
+        if (window.location.pathname.includes('/contentManager')) {
+          window.location.href = '/contentManagerLogin';
+        } else {
+          window.location.href = '/login';
+        }
+        return Promise.reject(refreshError);
+      }
+    }
+
+    if (error.response?.status === 404) {
       console.warn('API endpoint not found, redirecting to home');
       window.location.href = '/';
     } else if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {

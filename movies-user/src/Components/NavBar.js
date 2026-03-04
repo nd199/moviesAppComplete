@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../redux/userSlice";
 import api from "../AxiosMethods";
+import { clearAuth, getRefreshToken } from "../authStore";
 import popcornAnimation from "../Utils/animations/popcorn.json";
 import "./NavBar.css";
 
@@ -40,11 +41,13 @@ const NavBar = () => {
 
   const handleLogout = useCallback(async () => {
     try {
-      await api.post('/auth/logout');
+      const refreshToken = getRefreshToken();
+      await api.post('/auth/logout', refreshToken ? { refreshToken } : {});
     } catch (error) {
       console.error('Logout error:', error);
     }
     
+    clearAuth();
     dispatch(logout());
     navigate("/login");
     closeDropdown();

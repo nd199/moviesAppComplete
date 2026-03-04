@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { HiShieldExclamation, HiLockClosed, HiEnvelope, HiSparkles, HiServer } from 'react-icons/hi2';
-import Cookies from 'js-cookie';
 import { authAPI } from '../services/api';
 
 const SuperAdminLogin = () => {
@@ -29,14 +28,7 @@ const SuperAdminLogin = () => {
       const response = await authAPI.login(formData);
 
       if (response.status === 200) {
-        const token = response.data?.token;
-        if (token) {
-          Cookies.set('jwt_token', token, { expires: 7 });
-          console.log('Login: Using token-based auth fallback');
-        } else {
-          console.log('Login: Authentication cookies set by server');
-        }
-        
+        console.log('Login: Authentication successful');
         toast.success('Login successful!');
         navigate('/super-admin/invite');
       }

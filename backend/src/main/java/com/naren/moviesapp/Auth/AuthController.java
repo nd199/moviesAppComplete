@@ -1,5 +1,4 @@
 package com.naren.moviesapp.Auth;
-
 import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Repo.ContentManagerRepository;
@@ -17,28 +16,22 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
-
 @RestController
 @RequestMapping("/api/v1/auth")
 @Tag(name = "Authentication", description = "Authentication & Authorization APIs")
 public class AuthController {
-
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-
     private final AuthService authService;
     private final CustomerService customerService;
     private final RefreshTokenService refreshTokenService;
     private final TokenBlacklistService tokenBlacklistService;
     private final JwtUtil jwtUtil;
     private final ContentManagerRepository contentManagerRepository;
-
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
-
     public AuthController(AuthService authService,
                           CustomerService customerService,
                           RefreshTokenService refreshTokenService,
@@ -52,28 +45,24 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
         this.contentManagerRepository = contentManagerRepository;
     }
-
     @PostMapping("/customers")
     public ResponseEntity<?> registerCustomer(@Valid @RequestBody CustomerRegistration request) {
         logger.info("Customer registration request received for email: {}", request.email());
         return customerService.registerUser(request, Set.of("ROLE_USER"));
     }
-
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request,
-                                   HttpServletResponse response,
-                                   HttpServletRequest httpRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request) {
         logger.info("Login request received for username: {}", request.username());
-
         AuthResponse authResponse = authService.login(request);
-
-        setAuthCookies(response, authResponse, httpRequest);
-
+        // Generate access token and refresh token
+        String accessToken = jwtUtil.generateTokenForUser(authResponse.getUser());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(authResponse.getUser());
         logger.info("Login successful for username: {}", request.username());
-
-        // Return user data with token as fallback for cookie issues
+        // Return tokens and user data in response body
         Map<String, Object> responseBody = new java.util.HashMap<>();
-
+        responseBody.put("accessToken", accessToken);
+        responseBody.put("refreshToken", refreshToken.getToken());
+        
         // Handle different response types
         if (authResponse instanceof AdminAuthResponse adminAuth) {
             responseBody.put("user", adminAuth.adminDTO());
@@ -85,52 +74,37 @@ public class AuthController {
             responseBody.put("user", cmAuth.contentManagerDTO());
             responseBody.put("userType", "CONTENT_MANAGER");
         }
-        
-
         return ResponseEntity.ok(responseBody);
     }
-
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(
-            @CookieValue(name = "refresh_token", required = false) String refreshTokenValue,
-            HttpServletResponse response,
-            HttpServletRequest httpRequest) {
-
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
         logger.debug("Token refresh request received");
-
+        String refreshTokenValue = request.get("refreshToken");
+        
         if (refreshTokenValue == null) {
             logger.warn("Refresh token missing in request");
             return ResponseEntity.badRequest().body("Refresh token missing");
         }
-
         RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenValue);
-
         if (refreshToken == null || refreshToken.isExpired()) {
             logger.warn("Invalid or expired refresh token");
             return ResponseEntity.status(401).body("Invalid or expired refresh token");
         }
-
         refreshTokenService.deleteByUser(refreshToken.getUser());
         RefreshToken newRefreshToken =
                 refreshTokenService.createRefreshToken(refreshToken.getUser());
-
-        String newJwt = authService.generateTokenForUser(refreshToken.getUser());
-
-        setCookies(response, newJwt, newRefreshToken.getToken(), httpRequest);
-
+        String newAccessToken = jwtUtil.generateTokenForUser(refreshToken.getUser());
         logger.info("Token refreshed successfully for user: {}", refreshToken.getUser().getEmail());
-        return ResponseEntity.ok(Map.of("message", "Token refreshed"));
+        return ResponseEntity.ok(Map.of(
+            "accessToken", newAccessToken,
+            "refreshToken", newRefreshToken.getToken()
+        ));
     }
-
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(
-            @CookieValue(name = "refresh_token", required = false) String refreshToken,
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
-            HttpServletResponse response,
-            HttpServletRequest httpRequest) {
-
+    public ResponseEntity<?> logout(@RequestBody(required = false) Map<String, String> request,
+                                   @RequestHeader(value = "Authorization", required = false) String authHeader) {
         logger.info("Logout request received");
-
+        String refreshToken = request != null ? request.get("refreshToken") : null;
         if (refreshToken != null) {
             RefreshToken token = refreshTokenService.findByToken(refreshToken);
             if (token != null) {
@@ -140,7 +114,6 @@ public class AuthController {
         } else {
             logger.debug("No refresh token found in request (likely admin logout)");
         }
-
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             try {
                 String jwt = authHeader.substring(7);
@@ -151,114 +124,10 @@ public class AuthController {
                 logger.warn("Failed to blacklist JWT token during logout: {}", e.getMessage());
             }
         }
-
-        clearCookies(response, httpRequest);
-
         logger.info("Logout successful");
         return ResponseEntity.ok(Map.of(
                 "message", "Logged out successfully",
                 "status", "success"
         ));
-    }
-
-    private void setAuthCookies(HttpServletResponse response, AuthResponse authResponse, HttpServletRequest httpRequest) {
-        // Check response type and handle accordingly
-        if (authResponse instanceof CustomerAuthResponse customerAuth) {
-            // Customer login - create refresh token
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(customerAuth.customerDTO().user());
-            setCookies(response, customerAuth.token(), refreshToken.getToken(), httpRequest);
-        } else {
-            // Admin login - only set JWT token, no refresh token needed
-            setJwtOnlyCookie(response, authResponse.token(), httpRequest);
-        }
-    }
-
-    private boolean isProduction(HttpServletRequest request) {
-        String host = request.getServerName();
-        return host != null && (host.endsWith(".onrender.com") || host.endsWith("vercel.app"));
-    }
-
-    private void setJwtOnlyCookie(HttpServletResponse response, String jwt, HttpServletRequest request) {
-        boolean isProd = isProduction(request);
-        // For production cross-domain, don't set domain to allow cookie sharing
-        String domain = null; // Allow cookie to be sent to any domain
-
-        ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
-                .httpOnly(true)
-                .secure(isProd)
-                .path("/")
-                .maxAge(Duration.ofMinutes(30))
-                .sameSite("None") // Required for cross-domain
-                .domain(domain)
-                .build();
-
-        logger.info("Setting JWT-only cookie for admin - Production: {}, Domain: null, SameSite: None",
-                isProd);
-        logger.debug("JWT Cookie: {}", jwtCookie);
-
-        response.addHeader("Set-Cookie", jwtCookie.toString());
-    }
-
-    private void setCookies(HttpServletResponse response,
-                            String jwt,
-                            String refreshToken,
-                            HttpServletRequest httpRequest) {
-
-        boolean isProd = isProduction(httpRequest);
-        // For production cross-domain, don't set domain to allow cookie sharing
-        String domain = null; // Allow cookie to be sent to any domain
-
-        ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", jwt)
-                .httpOnly(true)
-                .secure(isProd)
-                .path("/")
-                .maxAge(Duration.ofMinutes(30))
-                .sameSite("None") // Required for cross-domain
-                .domain(domain)
-                .build();
-
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true)
-                .secure(isProd)
-                .path("/")
-                .maxAge(Duration.ofDays(7))
-                .sameSite("None") // Required for cross-domain
-                .domain(domain)
-                .build();
-
-        logger.info("Setting auth cookies - Production: {}, Domain: null, SameSite: None",
-                isProd);
-        logger.debug("JWT Cookie: {}", jwtCookie);
-        logger.debug("Refresh Cookie: {}", refreshCookie);
-
-        response.addHeader("Set-Cookie", jwtCookie.toString());
-        response.addHeader("Set-Cookie", refreshCookie.toString());
-    }
-
-    private void clearCookies(HttpServletResponse response, HttpServletRequest httpRequest) {
-        boolean isProd = isProduction(httpRequest);
-
-        String domain = isProd ? ".onrender.com" : null;
-
-        ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", "")
-                .httpOnly(true)
-                .secure(isProd)
-                .path("/")
-                .maxAge(0)
-                .sameSite("None") // Required for cross-domain
-                .domain(domain)
-                .build();
-
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "")
-                .httpOnly(true)
-                .secure(isProd)
-                .path("/")
-                .maxAge(0)
-                .sameSite("None") // Required for cross-domain
-                .domain(domain)
-                .build();
-
-        response.addHeader("Set-Cookie", jwtCookie.toString());
-        response.addHeader("Set-Cookie", refreshCookie.toString());
     }
 }

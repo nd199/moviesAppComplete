@@ -4,6 +4,13 @@ export const contentManagerApi = {
   // Authentication
   login: async (credentials) => {
     const response = await api.post('/content-manager/login', credentials);
+    const { accessToken, refreshToken, user } = response.data;
+    
+    // Store tokens
+    const { setAccessToken, setRefreshToken } = await import('../authStore');
+    setAccessToken(accessToken);
+    setRefreshToken(refreshToken);
+    
     return response.data;
   },
 
@@ -12,12 +19,8 @@ export const contentManagerApi = {
     return response.data;
   },
 
-  logout: async (token) => {
-    const response = await api.post('/content-manager/logout', {}, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+  logout: async () => {
+    const response = await api.post('/content-manager/logout');
     return response.data;
   },
 

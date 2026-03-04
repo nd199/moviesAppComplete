@@ -44,7 +44,7 @@ const userSlice = createSlice({
       state.isFetching = false;
       state.currentUser = {
         ...action.payload,
-        token: 'cookie-auth', // Placeholder for cookie-based auth
+        token: 'token-auth', // Token-based authentication
       };
     },
     registerFailure: (state, action) => {
@@ -62,7 +62,7 @@ const userSlice = createSlice({
       state.error = false;
       state.currentUser = {
         ...action.payload,
-        token: 'cookie-auth', // Placeholder for cookie-based auth
+        token: 'token-auth', // Token-based authentication
       };
     },
     loginFailure: (state, action) => {

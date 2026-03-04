@@ -39,70 +39,31 @@ public class ContentManagerController {
 
     // Authentication endpoints
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody ContentManagerLogin login, 
-                                                   HttpServletResponse response) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody ContentManagerLogin login) {
         logger.info("Content manager login request: {}", login.email());
-        String token = contentManagerService.login(login);
         
-        // Set JWT cookie like admin login
-        setJwtOnlyCookie(response, token);
+        Map<String, Object> result = contentManagerService.loginWithTokens(login);
         
-        // Return user data like admin login
-        ContentManager cm = contentManagerService.getContentManagerByEmail(login.email());
-        Map<String, Object> responseBody = new HashMap<>();
-        
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("id", cm.getId());
-        userMap.put("name", cm.getName());
-        userMap.put("email", cm.getEmail());
-        userMap.put("phoneNumber", cm.getPhoneNumber());
-        userMap.put("department", cm.getDepartment());
-        userMap.put("specialization", cm.getSpecialization());
-        userMap.put("isActive", cm.getIsActive());
-        userMap.put("createdAt", cm.getCreatedAt());
-        userMap.put("updatedAt", cm.getUpdatedAt());
-        userMap.put("imageUrl", cm.getImageUrl());
-        userMap.put("roles", cm.getRoles().stream().map(role -> role.getName().name()).toList());
-        
-        responseBody.put("user", userMap);
-        responseBody.put("userType", "CONTENT_MANAGER");
-        responseBody.put("token", token);
-        responseBody.put("type", "Bearer");
-        
-        return ResponseEntity.ok(responseBody);
+        logger.info("Content manager login successful for: {}", login.email());
+        return ResponseEntity.ok(result);
     }
-
-    private void setJwtOnlyCookie(HttpServletResponse response, String jwt) {
-        boolean isProduction = activeProfile.equals("prod");
-        String domain = isProduction ? ".onrender.com" : null;
-
-        ResponseCookie jwtCookie = ResponseCookie.from("cm_jwt_token", jwt)
-                .httpOnly(true)
-                .secure(isProduction)
-                .path("/")
-                .maxAge(Duration.ofMinutes(30))
-                .sameSite(isProduction ? "None" : "Lax")
-                .domain(domain)
-                .build();
-
-        logger.info("Setting JWT cookie for content manager - Production: {}, Domain: {}, SameSite: {}",
-                isProduction, domain, isProduction ? "None" : "Lax");
-
-        response.addHeader("Set-Cookie", jwtCookie.toString());
+        @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout(@RequestBody(required = false) Map<String, String> request) {
+        logger.info("Content manager logout request received");
+        
+        String refreshToken = request != null ? request.get("refreshToken") : null;
+        
+        if (refreshToken != null) {
+            contentManagerService.logout(refreshToken);
+        }
+        
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
-
-    @PostMapping("/register")
+                @PostMapping("/register")
     public ResponseEntity<ContentManager> register(@RequestBody ContentManagerRegistration registration) {
         logger.info("Content manager registration request: {}", registration.email());
         ContentManager contentManager = contentManagerService.register(registration);
         return new ResponseEntity<>(contentManager, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
-        logger.info("Content manager logout request");
-        contentManagerService.logout(token);
-        return ResponseEntity.ok().build();
     }
 
     // Content Manager CRUD endpoints

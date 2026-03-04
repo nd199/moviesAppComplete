@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getAccessToken, setAccessToken, getRefreshToken, clearAuth } from "./authStore";
 
 const isLocal = () => {
   return window.location.hostname === 'localhost' ||
@@ -15,16 +16,62 @@ const getBaseURL = () => {
 
 const api = axios.create({
   baseURL: getBaseURL(),
-  withCredentials: true,
   timeout: 30000,
 });
 
+// Request interceptor - add Authorization header
 api.interceptors.request.use(
   (config) => {
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     config.headers['X-Requested-With'] = 'XMLHttpRequest';
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor - handle token refresh
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const refreshToken = getRefreshToken();
+
+      if (!refreshToken) {
+        clearAuth();
+        return Promise.reject(error);
+      }
+
+      try {
+        const res = await axios.post(`${getBaseURL()}/auth/refresh-token`, {
+          refreshToken
+        });
+
+        const newAccessToken = res.data.accessToken;
+        setAccessToken(newAccessToken);
+
+        // Update refresh token if rotation is enabled
+        if (res.data.refreshToken) {
+          localStorage.setItem("refreshToken", res.data.refreshToken);
+        }
+
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return api(originalRequest);
+
+      } catch (refreshError) {
+        clearAuth();
+        return Promise.reject(refreshError);
+      }
+    }
+
     return Promise.reject(error);
   }
 );
@@ -53,7 +100,6 @@ export const userRequest = () => api;
 export const authRequest = () => {
   return axios.create({
     baseURL: getBaseURL(),
-    withCredentials: true,
     timeout: 30000,
   });
 };
@@ -61,7 +107,6 @@ export const passResetRequest = () => {
   const baseURL = isLocal() ? "http://localhost:8080/api/password-reset" : `${process.env.REACT_APP_API_URL}/password-reset`;
   return axios.create({
     baseURL: baseURL,
-    withCredentials: true,
     timeout: 30000,
   });
 };
@@ -70,7 +115,6 @@ export const paymentRequest = () => {
   const baseURL = isLocal() ? "http://localhost:8080/api/v1/payments" : `${process.env.REACT_APP_API_URL}/api/v1/payments`;
   return axios.create({
     baseURL: baseURL,
-    withCredentials: true,
     timeout: 30000,
   });
 };
@@ -78,7 +122,6 @@ export const springRequest = () => {
   const baseURL = isLocal() ? "http://localhost:8080" : process.env.REACT_APP_API_URL;
   return axios.create({
     baseURL: baseURL,
-    withCredentials: true,
     timeout: 30000,
   });
 };
