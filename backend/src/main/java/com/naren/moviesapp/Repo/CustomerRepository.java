@@ -14,6 +14,9 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     Optional<Customer> findByEmail(String email);
 
+    @Query("SELECT c FROM Customer c LEFT JOIN FETCH c.roles WHERE c.email = :email")
+    Optional<Customer> findByEmailWithRoles(String email);
+
     Optional<Customer> getCustomerByPhoneNumber(String phoneNumber);
 
     @Query(name = "getCustomerBy", nativeQuery = true,

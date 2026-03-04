@@ -204,11 +204,10 @@ class AuthServiceTest {
                 principal.getAddress(),
                 principal.getIsRegistered(),
                 principal.getIsSubscribed(),
-                List.of(),
-                List.of(role),
+                List.of(role), // roles - keep this
                 LocalDateTime.now(),
-                LocalDateTime.now(),
-                principal
+                LocalDateTime.now()
+                // Removed: List.of(), principal (old fields)
         );
     }
 }

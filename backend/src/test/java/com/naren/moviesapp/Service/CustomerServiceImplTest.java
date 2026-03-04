@@ -36,8 +36,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CustomerServiceImplTest {
 
-    private final CustomerDTOMapper customerDTOMapper = new CustomerDTOMapper();
-
     @Mock
     private CustomerRepository customerRepository;
     @Mock
@@ -48,18 +46,18 @@ class CustomerServiceImplTest {
     private JwtUtil jwtUtil;
     @Mock
     private MovieRepository movieRepository;
-
-    private CustomerService underTest;
-
     @Mock
     private OtpService otpService;
 
+    private CustomerDTOMapper customerDTOMapper;
+    private CustomerService underTest;
+
     @BeforeEach
     void setUp() {
+        customerDTOMapper = new CustomerDTOMapper(customerRepository);
         underTest = new CustomerService(
                 customerRepository, passwordEncoder, customerDTOMapper, roleService,
                 movieRepository, jwtUtil, otpService);
-
     }
 
     @Test

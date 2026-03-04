@@ -2,16 +2,33 @@ package com.naren.moviesapp.Dto;
 
 import com.naren.moviesapp.Entity.Admin;
 import com.naren.moviesapp.Entity.Customer;
+import com.naren.moviesapp.Entity.RoleName;
+import com.naren.moviesapp.Repo.CustomerRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
+import java.util.List;
 
 @Service
 public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
+    
+    private final CustomerRepository customerRepository;
+    
+    public CustomerDTOMapper(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
     @Override
     public CustomerDTO apply(Customer customer) {
+        // Fetch roles with JOIN FETCH to avoid lazy loading
+        Customer customerWithRoles = customerRepository.findByEmailWithRoles(customer.getEmail())
+                .orElse(customer); // Fallback to original customer if query fails
 
-        CustomerDTO customerDTO = new CustomerDTO(
+        List<String> roleNames = customerWithRoles.getRoles().stream()
+                .map(role -> role.getName().name())
+                .toList();
+
+        return new CustomerDTO(
                 customer.getId(),
                 customer.getName(),
                 customer.getEmail(),
@@ -21,17 +38,17 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                 customer.getAddress(),
                 customer.getIsRegistered(),
                 customer.getIsSubscribed(),
-                null, // Don't include movies to avoid lazy loading
-                null, // Don't include roles to avoid lazy loading
+                roleNames, // Properly loaded roles
                 customer.getCreatedAt(),
-                customer.getUpdatedAt(),
-                null // Don't include customer entity to avoid circular reference
+                customer.getUpdatedAt()
         );
-
-        return customerDTO;
     }
 
     public CustomerDTO applyFromAdmin(Admin admin) {
+        List<String> roleNames = admin.getRoles().stream()
+                .map(role -> role.getName().name())
+                .toList();
+
         return new CustomerDTO(
                 admin.getId(),
                 admin.getName(),
@@ -41,12 +58,10 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                 admin.getIsEmailVerified(),
                 admin.getAddress(),
                 admin.getIsRegistered(),
-                null,
-                null,
-                null, // Don't include roles to avoid lazy loading
+                null, // Admin doesn't have subscription
+                roleNames, // Admin roles
                 admin.getCreatedAt(),
-                admin.getUpdatedAt(),
-                null
+                admin.getUpdatedAt()
         );
     }
 }

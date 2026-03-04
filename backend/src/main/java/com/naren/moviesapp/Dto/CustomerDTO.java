@@ -1,8 +1,5 @@
 package com.naren.moviesapp.Dto;
 
-import com.naren.moviesapp.Entity.Customer;
-import com.naren.moviesapp.Entity.Movie;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,10 +13,10 @@ public record CustomerDTO(
         String address,
         Boolean isRegistered,
         Boolean isSubscribed,
-        List<Movie> movies,
-        List<String> roles,
+        List<String> roles,  // Keep roles - needed by frontend and AuthService
         LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        Customer user
+        LocalDateTime updatedAt
+        // Removed: List<Movie> movies (never used)
+        // Removed: Customer user (circular reference)
 ) {
 }
