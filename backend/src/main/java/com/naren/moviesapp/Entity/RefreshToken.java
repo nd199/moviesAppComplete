@@ -11,9 +11,12 @@ public class RefreshToken {
     @Id
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private BaseUser user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "user_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
 
     @Column(nullable = false)
     private String token;
@@ -25,9 +28,10 @@ public class RefreshToken {
         this.id = UUID.randomUUID().toString();
     }
 
-    public RefreshToken(BaseUser user, String token, Instant expiryDate) {
+    public RefreshToken(Long userId, UserType userType, String token, Instant expiryDate) {
         this();
-        this.user = user;
+        this.userId = userId;
+        this.userType = userType;
         this.token = token;
         this.expiryDate = expiryDate;
     }
@@ -41,12 +45,20 @@ public class RefreshToken {
         this.id = id;
     }
 
-    public BaseUser getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(BaseUser user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
     public String getToken() {

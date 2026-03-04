@@ -1,8 +1,12 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Entity.BaseUser;
+import com.naren.moviesapp.Entity.Admin;
+import com.naren.moviesapp.Entity.ContentManager;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.RefreshToken;
+import com.naren.moviesapp.Entity.UserType;
+import com.naren.moviesapp.Repo.AdminRepository;
+import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repository.RefreshTokenRepository;
 import com.naren.moviesapp.jwt.JwtUtil;
 import org.slf4j.Logger;
@@ -18,36 +22,51 @@ import java.util.UUID;
 @Service
 @Transactional
 public class RefreshTokenService {
-
     private static final Logger logger = LoggerFactory.getLogger(RefreshTokenService.class);
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final CustomerRepository customerRepository;
+    private final AdminRepository adminRepository;
     private final JwtUtil jwtUtil;
 
     @Value("${jwt.refresh-expiration-days:7}")
     private long refreshExpirationDays;
 
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, JwtUtil jwtUtil) {
+    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, 
+                              CustomerRepository customerRepository,
+                              AdminRepository adminRepository,
+                              JwtUtil jwtUtil) {
         this.refreshTokenRepository = refreshTokenRepository;
+        this.customerRepository = customerRepository;
+        this.adminRepository = adminRepository;
         this.jwtUtil = jwtUtil;
     }
 
-    public RefreshToken createRefreshToken(BaseUser user) {
-        if (user == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        }
+    public RefreshToken createRefreshToken(Customer customer) {
+        return createRefreshTokenInternal(customer.getId(), UserType.CUSTOMER);
+    }
 
+    public RefreshToken createRefreshToken(Admin admin) {
+        return createRefreshTokenInternal(admin.getId(), UserType.ADMIN);
+    }
+
+    public RefreshToken createRefreshToken(ContentManager contentManager) {
+        return createRefreshTokenInternal(contentManager.getId(), UserType.ADMIN);
+    }
+
+    private RefreshToken createRefreshTokenInternal(Long userId, UserType userType) {
         // Delete existing refresh tokens for this user
-        refreshTokenRepository.deleteByUser(user);
+        deleteByUserIdAndUserType(userId, userType);
 
         RefreshToken refreshToken = new RefreshToken(
-                user,
+                userId,
+                userType,
                 UUID.randomUUID().toString(),
                 Instant.now().plus(refreshExpirationDays, ChronoUnit.DAYS)
         );
 
         refreshToken = refreshTokenRepository.save(refreshToken);
-        logger.info("Created new refresh token for user: {}", user.getEmail());
+        logger.info("Created new refresh token for user: {} {}", userType, userId);
 
         return refreshToken;
     }
@@ -63,7 +82,8 @@ public class RefreshTokenService {
 
         // Create new refresh token
         RefreshToken newRefreshToken = new RefreshToken(
-                existingToken.getUser(),
+                existingToken.getUserId(),
+                existingToken.getUserType(),
                 UUID.randomUUID().toString(),
                 Instant.now().plus(refreshExpirationDays, ChronoUnit.DAYS)
         );
@@ -72,7 +92,7 @@ public class RefreshTokenService {
         refreshTokenRepository.delete(existingToken);
 
         newRefreshToken = refreshTokenRepository.save(newRefreshToken);
-        logger.info("Rotated refresh token for user: {}", existingToken.getUser().getEmail());
+        logger.info("Rotated refresh token for user: {} {}", existingToken.getUserType(), existingToken.getUserId());
 
         return newRefreshToken;
     }
@@ -83,14 +103,6 @@ public class RefreshTokenService {
                 .orElse(null);
     }
 
-    public RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.isExpired()) {
-            refreshTokenRepository.delete(token);
-            throw new RuntimeException("Refresh token is expired");
-        }
-        return token;
-    }
-
     public void deleteRefreshToken(String token) {
         RefreshToken refreshToken = findByToken(token);
         if (refreshToken != null) {
@@ -99,9 +111,9 @@ public class RefreshTokenService {
         }
     }
 
-    public void deleteByUser(BaseUser user) {
-        refreshTokenRepository.deleteByUser(user);
-        logger.info("Deleted all refresh tokens for user: {}", user.getEmail());
+    public void deleteByUserIdAndUserType(Long userId, UserType userType) {
+        refreshTokenRepository.deleteByUserIdAndUserType(userId, userType);
+        logger.info("Deleted all refresh tokens for user: {} {}", userType, userId);
     }
 
     public boolean isValidRefreshToken(String token) {
@@ -111,9 +123,40 @@ public class RefreshTokenService {
                 verifyExpiration(refreshToken);
                 return true;
             }
+            return false;
         } catch (Exception e) {
-            logger.warn("Invalid refresh token: {}", e.getMessage());
+            return false;
         }
-        return false;
+    }
+
+    public RefreshToken verifyExpiration(RefreshToken token) {
+        if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+            refreshTokenRepository.delete(token);
+            throw new RuntimeException(token.getToken() + " Refresh token was expired. Please make a new signin request");
+        }
+        return token;
+    }
+
+    public String generateTokenFromRefreshToken(String refreshTokenValue) {
+        RefreshToken refreshToken = findByToken(refreshTokenValue);
+        if (refreshToken == null) {
+            throw new RuntimeException("Refresh token not found");
+        }
+
+        verifyExpiration(refreshToken);
+
+        // Load user based on type and generate token
+        if (UserType.ADMIN.equals(refreshToken.getUserType())) {
+            Admin admin = adminRepository.findById(refreshToken.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Admin not found"));
+            return jwtUtil.issueToken(admin.getEmail(), admin.getRoles());
+        } else if (UserType.CUSTOMER.equals(refreshToken.getUserType())) {
+            Customer customer = customerRepository.findById(refreshToken.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+            // For customer, we need to convert roles properly
+            return jwtUtil.issueToken(customer.getEmail(), customer.getRoles());
+        }
+
+        throw new RuntimeException("Unknown user type: " + refreshToken.getUserType());
     }
 }

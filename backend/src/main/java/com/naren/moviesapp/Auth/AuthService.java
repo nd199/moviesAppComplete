@@ -6,6 +6,7 @@ import com.naren.moviesapp.Exception.*;
 import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Security.AppUserPrincipal;
+import com.naren.moviesapp.Service.RefreshTokenService;
 import com.naren.moviesapp.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ public class AuthService {
     private final CustomerRepository customerRepository;
     private final AdminRepository adminRepository;
     private final com.naren.moviesapp.Repo.ContentManagerRepository contentManagerRepository;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public AuthResponse login(AuthRequest authRequest) {
@@ -209,11 +211,22 @@ public class AuthService {
         logger.debug("Account state validation passed for customer: {}", customer.getEmail());
     }
 
-    public String generateTokenForUser(BaseUser user) {
-        logger.info("Generating token for user: {}", user.getEmail());
-        
-        // Check user type and handle accordingly
-        if (user instanceof Customer customer) {
+    public String generateTokenFromRefreshToken(String refreshTokenValue) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenValue);
+        if (refreshToken == null) {
+            throw new RuntimeException("Refresh token not found");
+        }
+
+        refreshTokenService.verifyExpiration(refreshToken);
+
+        // Load user based on type and generate token
+        if (UserType.ADMIN.equals(refreshToken.getUserType())) {
+            Admin admin = adminRepository.findById(refreshToken.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Admin not found"));
+            return generateTokenForAdmin(admin);
+        } else if (UserType.CUSTOMER.equals(refreshToken.getUserType())) {
+            Customer customer = customerRepository.findById(refreshToken.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
             CustomerDTO customerDTO = customerDTOMapper.apply(customer);
 
             Set<Role> roles = new HashSet<Role>();
@@ -222,16 +235,29 @@ public class AuthService {
             }
 
             return jwtUtil.issueToken(customerDTO.email(), roles);
-        } else if (user instanceof Admin admin) {
-            return generateTokenForAdmin(admin);
-        } else if (user instanceof ContentManager contentManager) {
-            return jwtUtil.issueToken(contentManager.getEmail(), contentManager.getRoles());
         }
-        
-        throw new IllegalArgumentException("Unsupported user type: " + user.getClass().getSimpleName());
+
+        throw new RuntimeException("Unknown user type: " + refreshToken.getUserType());
     }
 
-    private String generateTokenForAdmin(Admin admin) {
+    public String generateTokenForCustomer(Customer customer) {
+        logger.info("Generating token for customer: {}", customer.getEmail());
+        CustomerDTO customerDTO = customerDTOMapper.apply(customer);
+
+        Set<Role> roles = new HashSet<Role>();
+        for (String roleName : customerDTO.roles()) {
+            roles.add(new Role(RoleName.valueOf(roleName)));
+        }
+
+        return jwtUtil.issueToken(customerDTO.email(), roles);
+    }
+
+    public String generateTokenForContentManager(ContentManager contentManager) {
+        logger.info("Generating token for content manager: {}", contentManager.getEmail());
+        return jwtUtil.issueToken(contentManager.getEmail(), contentManager.getRoles());
+    }
+
+    public String generateTokenForAdmin(Admin admin) {
         logger.debug("Generating token for admin: {}", admin.getEmail());
         Set<Role> roles = new HashSet<>(admin.getRoles());
         return jwtUtil.issueToken(admin.getEmail(), roles);

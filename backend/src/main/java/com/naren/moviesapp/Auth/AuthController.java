@@ -1,6 +1,5 @@
 package com.naren.moviesapp.Auth;
 
-import com.naren.moviesapp.Entity.BaseUser;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Record.CustomerRegistration;
@@ -58,9 +57,24 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request) {
         logger.info("Login request received for username: {}", request.username());
         AuthResponse authResponse = authService.login(request);
-        // Generate access token and refresh token
-        String accessToken = authService.generateTokenForUser((BaseUser) authResponse.getUser());
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken((BaseUser) authResponse.getUser());
+        
+        // Generate access token and refresh token based on user type
+        String accessToken;
+        RefreshToken refreshToken;
+        
+        if (authResponse instanceof AdminAuthResponse adminAuth) {
+            accessToken = authService.generateTokenForAdmin(adminAuth.admin());
+            refreshToken = refreshTokenService.createRefreshToken(adminAuth.admin());
+        } else if (authResponse instanceof CustomerAuthResponse customerAuth) {
+            accessToken = authService.generateTokenForCustomer(customerAuth.customer());
+            refreshToken = refreshTokenService.createRefreshToken(customerAuth.customer());
+        } else if (authResponse instanceof ContentManagerAuthResponse cmAuth) {
+            accessToken = authService.generateTokenForContentManager(cmAuth.contentManager());
+            refreshToken = refreshTokenService.createRefreshToken(cmAuth.contentManager());
+        } else {
+            throw new RuntimeException("Unknown auth response type");
+        }
+        
         logger.info("Login successful for username: {}", request.username());
         // Return tokens and user data in response body
         Map<String, Object> responseBody = new java.util.HashMap<>();
@@ -90,19 +104,24 @@ public class AuthController {
             logger.warn("Refresh token missing in request");
             return ResponseEntity.badRequest().body("Refresh token missing");
         }
+        
         RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenValue);
         if (refreshToken == null || refreshToken.isExpired()) {
             logger.warn("Invalid or expired refresh token");
             return ResponseEntity.status(401).body("Invalid or expired refresh token");
         }
-        refreshTokenService.deleteByUser(refreshToken.getUser());
-        RefreshToken newRefreshToken =
-                refreshTokenService.createRefreshToken(refreshToken.getUser());
-        String newAccessToken = authService.generateTokenForUser(refreshToken.getUser());
-        logger.info("Token refreshed successfully for user: {}", refreshToken.getUser().getEmail());
+        
+        // Delete old refresh token and create new one
+        refreshTokenService.deleteByUserIdAndUserType(refreshToken.getUserId(), refreshToken.getUserType());
+        RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(refreshTokenValue);
+        
+        // Generate new access token
+        String newAccessToken = authService.generateTokenFromRefreshToken(refreshTokenValue);
+        
+        logger.info("Token refreshed successfully for user: {} {}", refreshToken.getUserType(), refreshToken.getUserId());
         return ResponseEntity.ok(Map.of(
-                "accessToken", newAccessToken,
-                "refreshToken", newRefreshToken.getToken()
+            "accessToken", newAccessToken,
+            "refreshToken", newRefreshToken.getToken()
         ));
     }
 
@@ -114,8 +133,8 @@ public class AuthController {
         if (refreshToken != null) {
             RefreshToken token = refreshTokenService.findByToken(refreshToken);
             if (token != null) {
-                refreshTokenService.deleteByUser(token.getUser());
-                logger.debug("Refresh token deleted for user: {}", token.getUser().getEmail());
+                refreshTokenService.deleteByUserIdAndUserType(token.getUserId(), token.getUserType());
+                logger.debug("Refresh token deleted for user: {} {}", token.getUserType(), token.getUserId());
             }
         } else {
             logger.debug("No refresh token found in request (likely admin logout)");

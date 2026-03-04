@@ -211,9 +211,10 @@ public class SecurityFilterChainConfig {
                                 .policyDirectives(
                                         "default-src 'self'; " +
                                                 "script-src 'self'; " +
-                                                "style-src 'self' 'unsafe-inline'; " +
-                                                "img-src 'self' data: https:; " +
-                                                "connect-src 'self' https://movies-app-complete.vercel.app https://movieticket-api.onrender.com https://movies-admin-one.vercel.app https://api.themoviedb.org; " +
+                                                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+                                                "font-src 'self' https://fonts.gstatic.com; " +
+                                                "img-src 'self' data: https: https://i.ibb.co; " +
+                                                "connect-src 'self' https://movies-app-complete.vercel.app https://movieticket-api.onrender.com https://movies-admin-one.vercel.app https://api.themoviedb.org https://api.imgbb.com; " +
                                                 "object-src 'none'; " +
                                                 "frame-ancestors 'none'; " +
                                                 "base-uri 'self';"

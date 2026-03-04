@@ -96,7 +96,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         Map<String, Object> claims = Map.of("type", "CONTENT_MANAGER");
         String accessToken = jwtUtil.issueToken(contentManager.getEmail(), claims);
 
-        // Create refresh token
+        // Create refresh token (ContentManager uses Admin token system)
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(contentManager);
 
         // Build user data
