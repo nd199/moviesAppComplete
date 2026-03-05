@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserSuccess } from "../../redux/userSlice";
-import { markUserSubscribedApi } from "../../Network/ApiCalls";
+import { markUserAsSubscribed } from "../../Network/ApiCalls";
 
 const Success = () => {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const Success = () => {
 
     const markUserAsSubscribed = async () => {
       try {
-        const response = await markUserSubscribedApi();
+        const response = await markUserAsSubscribed();
         
         if (response.data) {
           dispatch(updateUserSuccess(response.data));
@@ -28,7 +28,6 @@ const Success = () => {
         
         setUpdated(true);
       } catch (error) {
-        console.error('Failed to mark user as subscribed:', error);
         setUpdated(true);
       }
     };
@@ -118,7 +117,6 @@ const Success = () => {
           
           <button 
             onClick={() => {
-              console.log('Success: Manual redirect triggered');
               navigate("/");
             }}
             style={{
@@ -148,7 +146,6 @@ const Success = () => {
           
           <button 
             onClick={() => {
-              console.log('Success: Manual redirect triggered (no payment data)');
               navigate("/");
             }}
             style={{

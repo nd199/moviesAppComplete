@@ -9,14 +9,13 @@ export const getAccessToken = () => accessToken;
 
 export const clearAuth = () => {
   accessToken = null;
-  localStorage.removeItem("refreshToken");
+  localStorage.removeItem('refreshToken');
 };
 
-// Refresh token management in localStorage
 export const setRefreshToken = (token) => {
-  localStorage.setItem("refreshToken", token);
+  localStorage.setItem('refreshToken', token);
 };
 
 export const getRefreshToken = () => {
-  return localStorage.getItem("refreshToken");
+  return localStorage.getItem('refreshToken');
 };

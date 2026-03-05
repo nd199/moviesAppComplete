@@ -101,7 +101,6 @@ function AppWithNavigation() {
       .then(res => {
         setAccessToken(res.data.accessToken);
         
-        // Update refresh token if rotation is enabled
         if (res.data.refreshToken) {
           localStorage.setItem("refreshToken", res.data.refreshToken);
         }

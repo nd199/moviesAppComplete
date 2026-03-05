@@ -18,7 +18,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { uploadToImgBB } from '../../ImgBB';
 import {
   changePassword,
-  fetchUsers,
   updateProfile,
 } from '../../Network/ApiCalls';
 import {

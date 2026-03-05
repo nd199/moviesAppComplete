@@ -8,7 +8,7 @@ import {
   savePayment,
 } from "../../redux/PaymentRedux";
 import { updateUserSuccess } from "../../redux/userSlice";
-import { updateFinalUserApi, markUserSubscribedApi } from "../../Network/ApiCalls";
+import { updateFinalUserApi, markUserAsSubscribed } from "../../Network/ApiCalls";
 import "./PaymentCheckout.css";
 
 const PaymentCheckout = () => {
@@ -53,16 +53,12 @@ const PaymentCheckout = () => {
 
       
       const paymentResponse = await dispatch(savePayment(paymentPayload)).unwrap();
-      console.log('PaymentCheckout - Backend payment response:', paymentResponse);
 
       await updateFinalUserApi(finalUser);
-      console.log('PaymentCheckout - Backend user updated');
 
-      const subscriptionResponse = await markUserSubscribedApi();
-      console.log('PaymentCheckout - Backend subscription response:', subscriptionResponse);
+      const subscriptionResponse = await markUserAsSubscribed();
 
       if (subscriptionResponse.data) {
-        console.log('PaymentCheckout - Updating Redux with backend subscription data:', subscriptionResponse.data);
         dispatch(updateUserSuccess(subscriptionResponse.data));
       } else {
         const updatedUser = {
@@ -70,7 +66,6 @@ const PaymentCheckout = () => {
           ...finalUser,
           isSubscribed: true
         };
-        console.log('PaymentCheckout - Updating Redux user to subscribed (fallback):', updatedUser);
         dispatch(updateUserSuccess(updatedUser));
       }
       
@@ -93,10 +88,8 @@ const PaymentCheckout = () => {
       });
 
     } catch (err) {
-      console.error('PaymentCheckout - Backend payment failed, trying fallback:', err);
       
       try {
-        console.log('PaymentCheckout - Using mock payment fallback');
         
         await new Promise(resolve => setTimeout(resolve, 2000));
         
@@ -107,14 +100,10 @@ const PaymentCheckout = () => {
           user: finalUser
         };
 
-        console.log('PaymentCheckout - Mock payment fallback successful:', mockResponse);
-
         try {
-          const fallbackSubscriptionResponse = await markUserSubscribedApi(finalUser.email);
-          console.log('PaymentCheckout - Fallback backend subscription response:', fallbackSubscriptionResponse);
+          const fallbackSubscriptionResponse = await markUserAsSubscribed(finalUser.email);
           
           if (fallbackSubscriptionResponse.data) {
-            console.log('PaymentCheckout - Updating Redux with fallback backend data:', fallbackSubscriptionResponse.data);
             dispatch(updateUserSuccess(fallbackSubscriptionResponse.data));
           } else {
             const updatedUser = {
@@ -122,11 +111,9 @@ const PaymentCheckout = () => {
               ...finalUser,
               isSubscribed: true
             };
-            console.log('PaymentCheckout - Updating Redux user to subscribed (manual fallback):', updatedUser);
             dispatch(updateUserSuccess(updatedUser));
           }
         } catch (subscriptionError) {
-          console.error('PaymentCheckout - Even fallback subscription failed:', subscriptionError);
           // Final fallback to manual Redux update
           const updatedUser = {
             ...currentUser,
@@ -138,7 +125,6 @@ const PaymentCheckout = () => {
         
         if (window.paymentSuccess) {
           window.paymentSuccess();
-          console.log('PaymentCheckout - Called payment success handler (fallback)');
         }
         
         const finalFallbackUser = {
@@ -155,7 +141,6 @@ const PaymentCheckout = () => {
         });
         
       } catch (fallbackErr) {
-        console.error('PaymentCheckout - Even fallback failed:', fallbackErr);
         
         if (err.includes('plan not found') || err.includes('Subscription plan not found')) {
           alert('Payment failed: Selected plan is not available. Please choose a different plan.');
