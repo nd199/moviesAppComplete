@@ -107,13 +107,32 @@ export default api;
 
 export const authAPI = {
   login: async (credentials) => {
+    console.log("🔐 authAPI.login called with credentials:", { email: credentials.email });
     const response = await api.post('/api/v1/auth/login', credentials);
+    console.log("📡 Backend response received:", {
+      status: response.status,
+      hasData: !!response.data,
+      hasAccessToken: !!response.data?.accessToken,
+      hasRefreshToken: !!response.data?.refreshToken,
+      hasUser: !!response.data?.user,
+      userType: response.data?.userType
+    });
+
     const { accessToken, refreshToken, user } = response.data;
-    
-    // Store tokens
+    console.log("🔑 Extracted tokens:", {
+      accessTokenLength: accessToken?.length || 0,
+      refreshTokenLength: refreshToken?.length || 0,
+      hasUser: !!user
+    });
+
+    console.log("💾 Storing tokens...");
     setAccessToken(accessToken);
     setRefreshToken(refreshToken);
-    
+    console.log("✅ Tokens stored. Current state:", {
+      accessTokenStored: !!getAccessToken(),
+      refreshTokenStored: !!getRefreshToken()
+    });
+
     return response.data;
   },
   logout: async () => {

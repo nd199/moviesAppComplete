@@ -119,13 +119,21 @@ function AppWithRoutes() {
   return (
     <Router>
       <Routes>
-        <Route path="/super-admin/login" element={<SuperAdminLogin />} />
+        <Route path="/super-admin/login" element={
+          <>
+            {console.log("🎯 Rendering login route")}
+            <SuperAdminLogin />
+          </>
+        } />
         <Route 
           path="/super-admin/invite" 
           element={
-            <ProtectedRoute>
-              <SuperAdminInvite />
-            </ProtectedRoute>
+            <>
+              {console.log("🎯 Rendering invite route with ProtectedRoute")}
+              <ProtectedRoute>
+                <SuperAdminInvite />
+              </ProtectedRoute>
+            </>
           } 
         />
         <Route path="/" element={<Navigate to="/super-admin/login" replace />} />

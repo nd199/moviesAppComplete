@@ -23,18 +23,28 @@ const SuperAdminLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("🚀 Login handleSubmit called");
+    console.log("📝 Form data:", formData);
     setLoading(true);
 
     try {
+      console.log("📡 Calling authAPI.login...");
       await authAPI.login(formData);
+      console.log("✅ authAPI.login successful");
 
+      console.log("🎯 Showing success toast");
       toast.success("Login successful!");
+
+      console.log("🧭 Navigating to /super-admin/invite...");
       navigate("/super-admin/invite");
 
     } catch (error) {
+      console.error("❌ Login failed:", error);
       const errorMessage = error.response?.data?.message || 'Login failed';
+      console.log("🔴 Showing error toast:", errorMessage);
       toast.error(errorMessage);
     } finally {
+      console.log("⏹️ Setting loading to false");
       setLoading(false);
     }
   };
