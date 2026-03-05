@@ -31,7 +31,9 @@ const SuperAdminLogin = () => {
 
       if (data?.user) {
         setAccessToken(data.accessToken);
-        setRefreshToken(data.refreshToken);
+        if (data.refreshToken) {
+          setRefreshToken(data.refreshToken);
+        }
 
         console.log('Login successful');
         toast.success('Login successful!');

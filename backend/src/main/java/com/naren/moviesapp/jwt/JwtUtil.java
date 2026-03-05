@@ -2,6 +2,7 @@ package com.naren.moviesapp.jwt;
 
 import com.naren.moviesapp.Config.RolePermissionMapper;
 import com.naren.moviesapp.Entity.Role;
+import com.naren.moviesapp.Entity.RoleName;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -28,8 +29,11 @@ public class JwtUtil {
     @Value("${jwt.issuer:codeNaren.com}")
     private String jwtIssuer;
 
-    @Value("${jwt.expiration-minutes:30}")
+    @Value("${jwt.expiration-minutes:15}")
     private long jwtExpirationMinutes;
+
+    @Value("${jwt.superadmin-expiration-minutes:5}")
+    private long superadminExpirationMinutes;
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
@@ -148,5 +152,29 @@ public class JwtUtil {
 
     public Claims extractAllClaims(String token) {
         return getClaims(token);
+    }
+
+    public String issueTokenWithRoleExpiration(String subject, Set<Role> roles) {
+        // Check if user has superadmin role for shorter expiration
+        boolean isSuperAdmin = roles != null && roles.stream()
+                .anyMatch(role -> role.getName() == RoleName.ROLE_SUPER_ADMIN);
+        
+        long expirationMinutes = isSuperAdmin ? superadminExpirationMinutes : jwtExpirationMinutes;
+
+        logger.debug("Token expiration set to {} minutes for user {} (superadmin: {})", 
+                    expirationMinutes, subject, isSuperAdmin);
+
+        Map<String, Object> enhancedClaims = new HashMap<>();
+        enhancedClaims.put("jti", UUID.randomUUID().toString());
+        enhancedClaims.put("iat", System.currentTimeMillis() / 1000);
+
+        return Jwts.builder()
+                .claims(enhancedClaims)
+                .subject(subject)
+                .issuer(jwtIssuer)
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plus(expirationMinutes, ChronoUnit.MINUTES)))
+                .signWith(getSigningKey())
+                .compact();
     }
 }

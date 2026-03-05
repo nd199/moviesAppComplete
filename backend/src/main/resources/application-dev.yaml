@@ -54,8 +54,9 @@ spring:
 jwt:
   secret: ${JWT_SECRET:bXlTdXBlclNlY3JldEtleUZvckpXVFRva2VuR2VuZXJhdGlvblRoYXQaXNMZWFzdDI1NkJpdHNMb25n}
   issuer: ${JWT_ISSUER:codeNaren.com}
-  expiration-minutes: ${JWT_EXPIRATION_MINUTES:30}
+  expiration-minutes: ${JWT_EXPIRATION_MINUTES:15}
   refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:7}
+  superadmin-expiration-minutes: ${JWT_SUPERADMIN_EXPIRATION:5}
 
 app:
   data-initialization:

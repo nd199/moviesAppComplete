@@ -63,7 +63,8 @@ public class AuthController {
 
         if (authResponse instanceof AdminAuthResponse adminAuth) {
             accessToken = authService.generateTokenForAdmin(adminAuth.admin());
-            refreshToken = refreshTokenService.createRefreshToken(adminAuth.admin());
+            // Superadmin: no refresh token for maximum security - must login again
+            refreshToken = null;
         } else if (authResponse instanceof CustomerAuthResponse customerAuth) {
             accessToken = authService.generateTokenForCustomer(customerAuth.customer());
             refreshToken = refreshTokenService.createRefreshToken(customerAuth.customer());
@@ -78,7 +79,7 @@ public class AuthController {
         // Return tokens and user data in response body
         Map<String, Object> responseBody = new java.util.HashMap<>();
         responseBody.put("accessToken", accessToken);
-        responseBody.put("refreshToken", refreshToken.getToken());
+        responseBody.put("refreshToken", refreshToken != null ? refreshToken.getToken() : null);
 
         // Handle different response types
         if (authResponse instanceof AdminAuthResponse adminAuth) {
