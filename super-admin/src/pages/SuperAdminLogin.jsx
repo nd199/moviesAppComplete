@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { HiShieldExclamation, HiLockClosed, HiEnvelope, HiSparkles, HiServer } from 'react-icons/hi2';
 import { authAPI } from '../services/api';
+import { setAccessToken, setRefreshToken } from '../authStore';
 
 const SuperAdminLogin = () => {
   const navigate = useNavigate();
@@ -26,9 +27,13 @@ const SuperAdminLogin = () => {
 
     try {
       const response = await authAPI.login(formData);
+      const data = response.data;
 
-      if (response && response.user) {
-        console.log('Login: Authentication successful');
+      if (data?.user) {
+        setAccessToken(data.accessToken);
+        setRefreshToken(data.refreshToken);
+
+        console.log('Login successful');
         toast.success('Login successful!');
         navigate('/super-admin/invite');
       }
