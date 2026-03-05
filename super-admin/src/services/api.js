@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getAccessToken, setAccessToken, getRefreshToken, clearAuth } from "../authStore";
+import { getAccessToken, getRefreshToken, setAccessToken, setRefreshToken, clearAuth } from "../authStore";
 
 const isLocal = () => {
   return window.location.hostname === 'localhost' ||
