@@ -2,18 +2,17 @@ package com.naren.moviesapp.Dto;
 
 import com.naren.moviesapp.Entity.Admin;
 import com.naren.moviesapp.Entity.Customer;
-import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.function.Function;
 import java.util.List;
+import java.util.function.Function;
 
 @Service
 public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
-    
+
     private final CustomerRepository customerRepository;
-    
+
     public CustomerDTOMapper(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
     }

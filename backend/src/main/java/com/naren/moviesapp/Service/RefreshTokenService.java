@@ -1,10 +1,6 @@
 package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Entity.Admin;
-import com.naren.moviesapp.Entity.ContentManager;
-import com.naren.moviesapp.Entity.Customer;
-import com.naren.moviesapp.Entity.RefreshToken;
-import com.naren.moviesapp.Entity.UserType;
+import com.naren.moviesapp.Entity.*;
 import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repository.RefreshTokenRepository;
@@ -32,10 +28,10 @@ public class RefreshTokenService {
     @Value("${jwt.refresh-expiration-days:7}")
     private long refreshExpirationDays;
 
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, 
-                              CustomerRepository customerRepository,
-                              AdminRepository adminRepository,
-                              JwtUtil jwtUtil) {
+    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository,
+                               CustomerRepository customerRepository,
+                               AdminRepository adminRepository,
+                               JwtUtil jwtUtil) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.customerRepository = customerRepository;
         this.adminRepository = adminRepository;

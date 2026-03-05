@@ -1,6 +1,5 @@
 package com.naren.moviesapp.Auth;
 
-import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Repo.ContentManagerRepository;
@@ -57,11 +56,11 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request) {
         logger.info("Login request received for username: {}", request.username());
         AuthResponse authResponse = authService.login(request);
-        
+
         // Generate access token and refresh token based on user type
         String accessToken;
         RefreshToken refreshToken;
-        
+
         if (authResponse instanceof AdminAuthResponse adminAuth) {
             accessToken = authService.generateTokenForAdmin(adminAuth.admin());
             refreshToken = refreshTokenService.createRefreshToken(adminAuth.admin());
@@ -74,7 +73,7 @@ public class AuthController {
         } else {
             throw new RuntimeException("Unknown auth response type");
         }
-        
+
         logger.info("Login successful for username: {}", request.username());
         // Return tokens and user data in response body
         Map<String, Object> responseBody = new java.util.HashMap<>();
@@ -104,24 +103,24 @@ public class AuthController {
             logger.warn("Refresh token missing in request");
             return ResponseEntity.badRequest().body("Refresh token missing");
         }
-        
+
         RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenValue);
         if (refreshToken == null || refreshToken.isExpired()) {
             logger.warn("Invalid or expired refresh token");
             return ResponseEntity.status(401).body("Invalid or expired refresh token");
         }
-        
+
         // Delete old refresh token and create new one
         refreshTokenService.deleteByUserIdAndUserType(refreshToken.getUserId(), refreshToken.getUserType());
         RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(refreshTokenValue);
-        
+
         // Generate new access token
         String newAccessToken = authService.generateTokenFromRefreshToken(refreshTokenValue);
-        
+
         logger.info("Token refreshed successfully for user: {} {}", refreshToken.getUserType(), refreshToken.getUserId());
         return ResponseEntity.ok(Map.of(
-            "accessToken", newAccessToken,
-            "refreshToken", newRefreshToken.getToken()
+                "accessToken", newAccessToken,
+                "refreshToken", newRefreshToken.getToken()
         ));
     }
 
