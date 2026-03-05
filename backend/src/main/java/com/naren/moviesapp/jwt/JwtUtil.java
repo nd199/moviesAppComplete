@@ -155,7 +155,6 @@ public class JwtUtil {
     }
 
     public String issueTokenWithRoleExpiration(String subject, Set<Role> roles) {
-        // Check if user has superadmin role for shorter expiration
         boolean isSuperAdmin = roles != null && roles.stream()
                 .anyMatch(role -> role.getName() == RoleName.ROLE_SUPER_ADMIN);
         

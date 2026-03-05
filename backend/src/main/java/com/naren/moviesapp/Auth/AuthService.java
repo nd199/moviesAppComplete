@@ -257,6 +257,6 @@ public class AuthService {
     public String generateTokenForAdmin(Admin admin) {
         logger.debug("Generating token for admin: {}", admin.getEmail());
         Set<Role> roles = new HashSet<>(admin.getRoles());
-        return jwtUtil.issueToken(admin.getEmail(), roles);
+        return jwtUtil.issueTokenWithRoleExpiration(admin.getEmail(), roles);
     }
 }
