@@ -27,14 +27,14 @@ const SuperAdminLogin = () => {
 
     try {
       const data = await authAPI.login(formData);
-      
+
       console.log("Login data:", data);
 
-      if (data?.user) {
+      if (data?.accessToken) {
         toast.success("Login successful!");
         navigate("/super-admin/invite");
       } else {
-        toast.error("Login failed: Invalid response");
+        toast.error("Login failed");
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed';
