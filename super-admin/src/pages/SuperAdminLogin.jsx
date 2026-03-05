@@ -26,26 +26,15 @@ const SuperAdminLogin = () => {
     setLoading(true);
 
     try {
-      const response = await authAPI.login(formData);
-      const data = response.data;
+      const data = await authAPI.login(formData);
       
-      console.log('🔍 Full response:', response);
-      console.log('🔍 Response data:', data);
-      console.log('🔍 Has user:', !!data?.user);
-      console.log('🔍 Has accessToken:', !!data?.accessToken);
+      console.log("Login data:", data);
 
       if (data?.user) {
-        setAccessToken(data.accessToken);
-        if (data.refreshToken) {
-          setRefreshToken(data.refreshToken);
-        }
-
-        console.log('✅ Login successful, navigating...');
-        toast.success('Login successful!');
-        navigate('/super-admin/invite');
+        toast.success("Login successful!");
+        navigate("/super-admin/invite");
       } else {
-        console.error('❌ No user data in response');
-        toast.error('Login failed: Invalid response');
+        toast.error("Login failed: Invalid response");
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed';
