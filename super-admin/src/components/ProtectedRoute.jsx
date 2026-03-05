@@ -1,10 +1,11 @@
-import { getAccessToken } from '../authStore';
+import { getAccessToken, getRefreshToken } from '../authStore';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children }) => {
-  const token = getAccessToken();
+  const accessToken = getAccessToken();
+  const refreshToken = getRefreshToken();
 
-  if (!token) {
+  if (!accessToken && !refreshToken) {
     return <Navigate to="/super-admin/login" replace />;
   }
 
