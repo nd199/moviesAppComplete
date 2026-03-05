@@ -27,7 +27,7 @@ const SuperAdminLogin = () => {
     try {
       const response = await authAPI.login(formData);
 
-      if (response.status === 200) {
+      if (response && response.user) {
         console.log('Login: Authentication successful');
         toast.success('Login successful!');
         navigate('/super-admin/invite');
