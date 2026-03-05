@@ -60,7 +60,7 @@ api.interceptors.response.use(
 
       if (!refreshToken) {
         clearAuth();
-        if (window.location.pathname !== '/super-admin/login' && !error.code === 'ERR_NETWORK') {
+        if (window.location.pathname !== '/super-admin/login' && error.code !== 'ERR_NETWORK') {
           window.location.href = '/super-admin/login';
         }
         return Promise.reject(error);
