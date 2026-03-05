@@ -38,7 +38,7 @@ class CustomerServiceImplTest {
 
     @Mock
     private CustomerRepository customerRepository;
-w    @Mock
+    @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
     private RoleService roleService;
