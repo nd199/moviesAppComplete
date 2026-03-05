@@ -107,7 +107,7 @@ export default api;
 
 export const authAPI = {
   login: async (credentials) => {
-    const response = await api.post('/auth/login', credentials);
+    const response = await api.post('/api/v1/auth/login', credentials);
     const { accessToken, refreshToken, user } = response.data;
     
     // Store tokens
@@ -129,5 +129,5 @@ export const authAPI = {
 };
 
 export const adminAPI = {
-  inviteAdmin: (adminData) => api.post('/system/superadmin/invite', adminData),
+  inviteAdmin: (adminData) => api.post('/api/v1/system/superadmin/invite', adminData),
 };
