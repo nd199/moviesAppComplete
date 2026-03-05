@@ -19,11 +19,8 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
 
     @Override
     public CustomerDTO apply(Customer customer) {
-        // Fetch roles with JOIN FETCH to avoid lazy loading
-        Customer customerWithRoles = customerRepository.findByEmailWithRoles(customer.getEmail())
-                .orElse(customer); // Fallback to original customer if query fails
-
-        List<String> roleNames = customerWithRoles.getRoles().stream()
+        // Use the customer object directly - roles should already be loaded by the caller
+        List<String> roleNames = customer.getRoles().stream()
                 .map(role -> role.getName().name())
                 .toList();
 

@@ -92,7 +92,7 @@ public class AuthService {
                 logger.debug("Customer login detected for email: {}", customerEntity.getEmail());
 
                 Customer customer = customerRepository
-                        .findByEmail(customerEntity.getEmail())
+                        .findByEmailWithRoles(customerEntity.getEmail())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("User not found")
                         );

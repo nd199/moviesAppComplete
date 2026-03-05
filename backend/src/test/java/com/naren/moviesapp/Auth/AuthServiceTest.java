@@ -84,7 +84,7 @@ class AuthServiceTest {
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
                 .thenReturn(userPrincipal);
-        when(customerRepository.findByEmail(principal.getEmail()))
+        when(customerRepository.findByEmailWithRoles(principal.getEmail()))
                 .thenReturn(java.util.Optional.of(principal));
 
         CustomerDTO mapped = buildDTO("ROLE_USER");
@@ -100,7 +100,6 @@ class AuthServiceTest {
         assertThat(customerResponse.customerDTO()).isEqualTo(mapped);
         assertThat(customerResponse.token()).isEqualTo("jwt-token");
 
-        verify(customerRepository).save(principal);
         verify(jwtUtil).issueToken(eq(mapped.email()), anySet());
     }
 
@@ -113,7 +112,7 @@ class AuthServiceTest {
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
                 .thenReturn(userPrincipal);
-        when(customerRepository.findByEmail(principal.getEmail()))
+        when(customerRepository.findByEmailWithRoles(principal.getEmail()))
                 .thenReturn(java.util.Optional.of(principal));
 
         CustomerDTO mapped = buildDTO("ROLE_ADMIN");
@@ -128,8 +127,6 @@ class AuthServiceTest {
         CustomerAuthResponse customerResponse = (CustomerAuthResponse) response;
         assertThat(customerResponse.customerDTO()).isEqualTo(mapped);
         assertThat(customerResponse.token()).isEqualTo("jwt-token");
-
-        verify(customerRepository).save(principal);
     }
 
     @Test
@@ -139,7 +136,7 @@ class AuthServiceTest {
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
                 .thenReturn(userPrincipal);
-        when(customerRepository.findByEmail(principal.getEmail()))
+        when(customerRepository.findByEmailWithRoles(principal.getEmail()))
                 .thenReturn(java.util.Optional.empty());
 
         assertThatThrownBy(() ->
@@ -173,7 +170,7 @@ class AuthServiceTest {
                 .thenReturn(authentication);
         when(authentication.getPrincipal())
                 .thenReturn(userPrincipal);
-        when(customerRepository.findByEmail(principal.getEmail()))
+        when(customerRepository.findByEmailWithRoles(principal.getEmail()))
                 .thenReturn(java.util.Optional.of(principal));
 
         CustomerDTO mapped = buildDTO("ROLE_SUPER_ADMIN");
@@ -189,7 +186,6 @@ class AuthServiceTest {
         assertThat(customerResponse.customerDTO().roles())
                 .contains("ROLE_SUPER_ADMIN");
 
-        verify(customerRepository).save(principal);
         verify(jwtUtil).issueToken(eq(mapped.email()), anySet());
     }
 
