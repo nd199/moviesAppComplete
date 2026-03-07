@@ -57,9 +57,7 @@ const SuperAdminDashboard = () => {
               Invite Admin
             </button>
           </div>
-
         </div>
-
       </div>
     </div>
   );
