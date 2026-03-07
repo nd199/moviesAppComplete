@@ -35,8 +35,8 @@ const SuperAdminLogin = () => {
       console.log("🎯 Showing success toast");
       toast.success("Login successful!");
 
-      console.log("🧭 Navigating to /super-admin/invite...");
-      navigate("/super-admin/invite");
+      console.log("🧭 Navigating to /super-admin/dashboard...");
+      navigate("/super-admin/dashboard");
 
     } catch (error) {
       console.error("❌ Login failed:", error);

@@ -4,6 +4,7 @@ import { HiUserPlus, HiEnvelope, HiCheckCircle, HiXCircle, HiSparkles, HiBuildin
 import { authAPI, adminAPI } from '../services/api';
 
 const SuperAdminInvite = () => {
+  console.log("🎯 SuperAdminInvite component rendered");
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,12 +28,13 @@ const SuperAdminInvite = () => {
     setLoading(true);
 
     try {
+      console.log("📧 Sending admin invite to:", formData.email);
       const response = await adminAPI.inviteAdmin(formData);
 
       if (response.status === 200) {
         setPopupData({
           success: true,
-          message: `Admin account created and invite sent to ${formData.email}`
+          message: `Admin invitation sent successfully to ${formData.email}! They will receive an email with setup instructions.`
         });
         setFormData({
           name: '',

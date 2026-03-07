@@ -5,6 +5,7 @@ import axios from 'axios';
 import { getRefreshToken, setAccessToken, clearAuth } from './authStore';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import SuperAdminInvite from './pages/SuperAdminInvite';
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Fallback from './Utils/FallBackPage.jsx';
 import ServerConnection from './Utils/ServerConnection.jsx';
@@ -125,6 +126,17 @@ function AppWithRoutes() {
             <SuperAdminLogin />
           </>
         } />
+        <Route 
+          path="/super-admin/dashboard" 
+          element={
+            <>
+              {console.log("🎯 Rendering dashboard route with ProtectedRoute")}
+              <ProtectedRoute>
+                <SuperAdminDashboard />
+              </ProtectedRoute>
+            </>
+          } 
+        />
         <Route 
           path="/super-admin/invite" 
           element={

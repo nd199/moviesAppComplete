@@ -47,15 +47,7 @@ public class SuperAdminController {
                 return ResponseEntity.badRequest().body(Map.of("message", "Name and valid email are required"));
             }
 
-            // Create admin account immediately with temporary password
-            String tempPassword = "TempPass123!" + System.currentTimeMillis();
-            AdminRegistration registration = new AdminRegistration(
-                    name, email, tempPassword, phoneNumber, address, "General", 1
-            );
-
-            adminService.registerAdmin(registration, Set.of("ROLE_ADMIN"));
-
-            // Generate setup token for password change
+            // Generate invite token for existing admin
             String setupToken = inviteService.generateInviteToken(email, RoleName.ROLE_ADMIN);
 
             // Use admin frontend URL for set-password (port 5173 for dev)
@@ -66,10 +58,10 @@ public class SuperAdminController {
             emailService.sendInviteEmail(email, setupLink);
 
             return ResponseEntity.ok(Map.of(
-                    "message", "Admin account created and invite sent to " + email
+                    "message", "Admin invite sent to " + email
             ));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Failed to create admin: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("message", "Failed to send admin invite: " + e.getMessage()));
         }
     }
 
