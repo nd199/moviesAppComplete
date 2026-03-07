@@ -126,29 +126,15 @@ function AppWithRoutes() {
             <SuperAdminLogin />
           </>
         } />
-        <Route 
-          path="/super-admin/dashboard" 
-          element={
-            <>
-              {console.log("🎯 Rendering dashboard route with ProtectedRoute")}
-              <ProtectedRoute>
-                <SuperAdminDashboard />
-              </ProtectedRoute>
-            </>
-          } 
-        />
-        <Route 
-          path="/super-admin/invite" 
-          element={
-            <>
-              {console.log("🎯 Rendering invite route with ProtectedRoute")}
-              <ProtectedRoute>
-                <SuperAdminInvite />
-              </ProtectedRoute>
-            </>
-          } 
-        />
-        <Route path="/" element={<Navigate to="/super-admin/login" replace />} />
+        <Route path="/super-admin/invite" element={
+          <>
+            {console.log("🎯 Rendering invite route with ProtectedRoute")}
+            <ProtectedRoute>
+              <SuperAdminInvite />
+            </ProtectedRoute>
+          </>
+        } />
+        <Route path="/" element={<Navigate to="/super-admin/invite" replace />} />
       </Routes>
       <Toaster position="top-right" />
     </Router>

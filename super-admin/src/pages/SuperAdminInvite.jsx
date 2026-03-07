@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { HiUserPlus, HiEnvelope, HiCheckCircle, HiXCircle, HiSparkles, HiBuildingOffice, HiPhone, HiMapPin } from 'react-icons/hi2';
+import { HiUserPlus, HiEnvelope, HiCheckCircle, HiXCircle, HiSparkles, HiBuildingOffice, HiPhone, HiMapPin, HiClock } from 'react-icons/hi2';
 import { authAPI, adminAPI } from '../services/api';
 
 const SuperAdminInvite = () => {
@@ -14,6 +14,30 @@ const SuperAdminInvite = () => {
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupData, setPopupData] = useState({ success: false, message: '' });
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          // Auto logout when timer reaches 0
+          authAPI.logout();
+          window.location.href = '/super-admin/login';
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,6 +98,20 @@ const SuperAdminInvite = () => {
 
       <div className="relative z-10 max-w-md w-full space-y-8">
         <div className="text-center">
+          {/* Session Timer */}
+          <div className="mb-6 flex items-center justify-center">
+            <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg border ${
+              timeLeft <= 60 
+                ? 'bg-red-500/20 border-red-500/50' 
+                : 'bg-yellow-500/20 border-yellow-500/50'
+            }`}>
+              <HiClock className={`h-5 w-5 ${timeLeft <= 60 ? 'text-red-400' : 'text-yellow-400'}`} />
+              <span className={`font-mono font-bold ${timeLeft <= 60 ? 'text-red-400' : 'text-yellow-400'}`}>
+                Session: {formatTime(timeLeft)}
+              </span>
+            </div>
+          </div>
+          
           <div className="mx-auto h-20 w-20 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform duration-300">
             <HiUserPlus className="h-10 w-10 text-white" />
           </div>
