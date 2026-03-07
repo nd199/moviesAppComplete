@@ -58,6 +58,8 @@ const SuperAdminDashboard = () => {
             </button>
           </div>
 
+        </div>
+
       </div>
     </div>
   );
