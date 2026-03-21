@@ -145,8 +145,8 @@ export const validateOtp = async (dispatch, otp, email) => {
   dispatch(validateOtpStart());
   try {
     const res = await userRequest().post('/validate/otp', { 
-      otp: otp, 
-      email: email 
+      customerEmail: email, 
+      enteredOTP: otp 
     });
     dispatch(validateOtpSuccess(res.data));
     return res.data;
