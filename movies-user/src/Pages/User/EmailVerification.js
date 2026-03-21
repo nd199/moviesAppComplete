@@ -22,7 +22,7 @@ const EmailVerification = () => {
   }, []);
 
   const handleEmailVerified = useCallback((verified) => {
-    console.log('[EmailVerification] handleEmailVerified called with:', verified);
+    // console.log('[EmailVerification] handleEmailVerified called with:', verified);
     setIsVerified(verified);
   }, []);
 
@@ -31,33 +31,33 @@ const EmailVerification = () => {
   }, []);
 
   useEffect(() => {
-    console.log('[EmailVerification] isVerified:', isVerified);
-    console.log('[EmailVerification] location.state:', location.state);
-    console.log('[EmailVerification] selectedPlan:', selectedPlan);
-    console.log('[EmailVerification] selectedPlan?.selectedPlan:', selectedPlan?.selectedPlan);
-    console.log('[EmailVerification] currentUser:', currentUser);
-    console.log('[EmailVerification] email:', email);
+    // console.log('[EmailVerification] isVerified:', isVerified);
+    // console.log('[EmailVerification] location.state:', location.state);
+    // console.log('[EmailVerification] selectedPlan:', selectedPlan);
+    // console.log('[EmailVerification] selectedPlan?.selectedPlan:', selectedPlan?.selectedPlan);
+    // console.log('[EmailVerification] currentUser:', currentUser);
+    // console.log('[EmailVerification] email:', email);
 
     if (!isVerified) {
-      console.log('[EmailVerification] Email not verified yet, returning...');
+      // console.log('[EmailVerification] Email not verified yet, returning...');
       return;
     }
 
     // Get the plan - from location state or Redux store
     const planData = location.state?.plan || selectedPlan?.selectedPlan;
-    console.log('[EmailVerification] planData:', planData);
+    // console.log('[EmailVerification] planData:', planData);
     
     // If no plan is available, redirect to subscription page to select one
     // Do NOT redirect to home - always go to subscription if no plan
     if (!planData) {
-      console.log('[EmailVerification] No plan found, redirecting to /subscription');
+      // console.log('[EmailVerification] No plan found, redirecting to /subscription');
       navigate("/subscription", { replace: true });
       return;
     }
 
     // User is verified and we have a plan - navigate to payment
     const userId = currentUser?.id || currentUser?.email || email;
-    console.log('[EmailVerification] User verified, plan found. Redirecting to /payment/' + userId);
+    // console.log('[EmailVerification] User verified, plan found. Redirecting to /payment/' + userId);
     
     // Navigate directly to payment page
     navigate(`/payment/${userId}`, {

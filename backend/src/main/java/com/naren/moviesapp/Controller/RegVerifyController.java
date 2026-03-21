@@ -102,8 +102,17 @@ public class RegVerifyController {
     // OTP validation for subscription - separate endpoint
     @PostMapping("/api/v1/validate/otp/subscription")
     public ResponseEntity<?> verifySubscriptionOtp(@RequestBody VerifyOtpRequest request) {
+        // Support both old format (email, otp) and new format (customerEmail, enteredOTP)
         String email = request.customerEmail() != null ? request.customerEmail().trim().toLowerCase() : null;
         String enteredOtp = request.enteredOTP() != null ? request.enteredOTP().trim() : null;
+        
+        // Fallback to old field names for backward compatibility
+        if (email == null && request.email() != null) {
+            email = request.email().trim().toLowerCase();
+        }
+        if (enteredOtp == null && request.otp() != null) {
+            enteredOtp = request.otp().trim();
+        }
 
         logger.debug("Verifying subscription OTP for email: '{}' OTP: '{}'", email, enteredOtp);
 
@@ -137,8 +146,17 @@ public class RegVerifyController {
 
     @PostMapping(value = {"/api/v1/validate/Otp", "/validate/Otp", "/validate/otp", "/api/v1/validate/otp"})
     public ResponseEntity<?> verifyEmailOtp(@RequestBody VerifyOtpRequest request) {
+        // Support both old format (email, otp) and new format (customerEmail, enteredOTP)
         String email = request.customerEmail() != null ? request.customerEmail().trim().toLowerCase() : null;
         String enteredOtp = request.enteredOTP() != null ? request.enteredOTP().trim() : null;
+        
+        // Fallback to old field names for backward compatibility
+        if (email == null && request.email() != null) {
+            email = request.email().trim().toLowerCase();
+        }
+        if (enteredOtp == null && request.otp() != null) {
+            enteredOtp = request.otp().trim();
+        }
 
         logger.debug("Verifying OTP for email: '{}' OTP: '{}'", email, enteredOtp);
 

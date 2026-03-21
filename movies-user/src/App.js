@@ -241,10 +241,10 @@ function ProtectedRoute({
   const currentUser = useSelector(state => state.user.currentUser);
 
   // Debug logging
-  console.log('[ProtectedRoute] authStatus:', authStatus);
-  console.log('[ProtectedRoute] currentUser:', currentUser);
-  console.log('[ProtectedRoute] isSubscribed:', currentUser?.isSubscribed);
-  console.log('[ProtectedRoute] requireSubscription:', requireSubscription);
+  // console.log('[ProtectedRoute] authStatus:', authStatus);
+  // console.log('[ProtectedRoute] currentUser:', currentUser);
+  // console.log('[ProtectedRoute] isSubscribed:', currentUser?.isSubscribed);
+  // console.log('[ProtectedRoute] requireSubscription:', requireSubscription);
 
   // Show loading while checking auth
   if (authStatus === 'loading') {

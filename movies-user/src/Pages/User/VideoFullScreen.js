@@ -12,9 +12,9 @@ const VideoFullScreen = () => {
   const [movieTitle, setMovieTitle] = useState("");
   
   // Debug logging
-  console.log('[VideoFullScreen] id:', id);
-  console.log('[VideoFullScreen] location.state:', location.state);
-  console.log('[VideoFullScreen] trailerFromState:', location.state?.trailer);
+  // console.log('[VideoFullScreen] id:', id);
+  // console.log('[VideoFullScreen] location.state:', location.state);
+  // console.log('[VideoFullScreen] trailerFromState:', location.state?.trailer);
 
   // Get trailer from location state (passed from ColListItem)
   const trailerFromState = location.state?.trailer;
