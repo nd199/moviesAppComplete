@@ -126,10 +126,16 @@ public class JwtUtil {
             Claims claims = getClaims(token);
 
             String type = claims.get("type", String.class);
+            String subject = claims.getSubject();
+            String issuer = claims.getIssuer();
+            boolean expired = isTokenExpired(claims);
+            
+            logger.debug("Token validation - subject: {}, userName: {}, type: {}, issuer: {}, expired: {}", 
+                subject, userName, type, issuer, expired);
 
-            return claims.getSubject().equals(userName)
-                    && !isTokenExpired(claims)
-                    && jwtIssuer.equals(claims.getIssuer())
+            return subject.equals(userName)
+                    && !expired
+                    && jwtIssuer.equals(issuer)
                     && "access".equals(type);
         } catch (Exception e) {
             logger.error("JWT validation failed: {}", e.getMessage());

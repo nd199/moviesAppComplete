@@ -56,11 +56,11 @@ public class CustomerIT extends AbstractIntegrationTest {
         boolean isEmailVerified = true;
         String address = "Chennai, India";
 
-        new CustomerRegistration(customerName, customerEmail, password, customerPhone, "", isEmailVerified, address, false);
+        new CustomerRegistration(customerName, customerEmail, password, customerPhone, "", isEmailVerified, address);
 
         String adminName = "IM ADMIN" + FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".1123131213") + "@codeNaren.com";
-        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, "", isEmailVerified, address, false);
+        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, customerPhone, "", isEmailVerified, address);
     }
 
     private void createRoleIfNotExists() {
@@ -182,8 +182,8 @@ public class CustomerIT extends AbstractIntegrationTest {
         boolean isEmailVerified = false;
         String address = "Chennai, India";
 
-        new CustomerRegistration(customerName1, email1, password, phone1, "", isEmailVerified, address, false);
-        CustomerRegistration customer2 = new CustomerRegistration(customerName2, email2, password, phone2, "", isEmailVerified, address, false);
+        new CustomerRegistration(customerName1, email1, password, phone1, "", isEmailVerified, address);
+        CustomerRegistration customer2 = new CustomerRegistration(customerName2, email2, password, phone2, "", isEmailVerified, address);
 
         registerCustomerAndGetToken(customer2);
         String adminToken = registerAdminAndGetToken();
@@ -239,9 +239,9 @@ public class CustomerIT extends AbstractIntegrationTest {
         String address = "Chennai, India";
 
         new CustomerRegistration(adminName, adminEmail, password,
-                adminPhone, "", isEmailVerified, address, false);
+                adminPhone, "", isEmailVerified, address);
         CustomerRegistration customerReg = new CustomerRegistration(customerName, customerEmail,
-                password, customerPhone, "", isEmailVerified, address, false);
+                password, customerPhone, "", isEmailVerified, address);
 
         // Register admin and customer
         String adminToken = registerAdminAndGetToken();
@@ -272,8 +272,7 @@ public class CustomerIT extends AbstractIntegrationTest {
                 customerReg.email(),
                 customerReg.phoneNumber(),
                 "", customerReg.isEmailVerified(),
-                customerReg.address(),
-                false);
+                customerReg.address());
 
         // Update customer
         webTestClient.put()
@@ -305,7 +304,6 @@ public class CustomerIT extends AbstractIntegrationTest {
         assertThat(updatedCustomerDTO.name()).isEqualTo(updateRequest.name());
         assertThat(updatedCustomerDTO.email()).isEqualTo(updateRequest.email());
         assertThat(updatedCustomerDTO.address()).isEqualTo(updateRequest.address());
-        assertThat(updatedCustomerDTO.isRegistered()).isEqualTo(updateRequest.isRegistered());
         assertThat(updatedCustomerDTO.createdAt()).isNotNull();
     }
 
@@ -320,7 +318,7 @@ public class CustomerIT extends AbstractIntegrationTest {
         String address = "Chennai, India";
 
         new CustomerRegistration(adminName,
-                adminEmail, password, adminPhone, "", isEmailVerified, address, false);
+                adminEmail, password, adminPhone, "", isEmailVerified, address);
 
         String adminToken = registerAdminAndGetToken();
 
@@ -377,7 +375,7 @@ public class CustomerIT extends AbstractIntegrationTest {
         String superAdminEmail = superAdminName.replace(" ", ".") + "@codeNaren.com";
         CustomerRegistration superAdminRegistration = new CustomerRegistration(
                 superAdminName, superAdminEmail, FAKER.internet().password(8, 12),
-                FAKER.phoneNumber().subscriberNumber(9), "", false, "Chennai, India", false);
+                FAKER.phoneNumber().subscriberNumber(9), "", false, "Chennai, India");
 
         String superAdminToken = registerSuperAdminAndGetToken(superAdminRegistration);
 

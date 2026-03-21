@@ -67,7 +67,6 @@ class AuthServiceTest {
         principal.setImageUrl("");
         principal.setIsEmailVerified(true);
         principal.setAddress("Chennai, India");
-        principal.setIsRegistered(true);
         principal.setIsSubscribed(false);
         principal.setPassword("encodedPassword");
         principal.setRoles(Set.of(new Role(RoleName.ROLE_USER)));
@@ -162,7 +161,6 @@ class AuthServiceTest {
     void login_superAdmin_canLoginWithoutVerificationOrRegistration() {
 
         principal.setIsEmailVerified(false);
-        principal.setIsRegistered(false);
         principal.setIsSubscribed(true);
         principal.setRoles(Set.of(new Role(RoleName.ROLE_SUPER_ADMIN)));
 
@@ -198,7 +196,6 @@ class AuthServiceTest {
                 principal.getImageUrl(),
                 principal.getIsEmailVerified(),
                 principal.getAddress(),
-                principal.getIsRegistered(),
                 principal.getIsSubscribed(),
                 List.of(role), // roles - keep this
                 LocalDateTime.now(),

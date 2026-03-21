@@ -21,7 +21,7 @@ app:
     email: superadmin@movies.com
     password: ChangeMe123!
   tmdb:
-    api-key: ${TMDB_API_KEY:eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YjIxODI1MjJkNzI5Njk4YWY2ZTgwMzQxNDBlNWQwOSIsIm5iZiI6MTc3MTY3MjAwMS4yMjIwMDAxLCJzdWIiOiI2OTk5OTFjMWJjZDU2NTAxOTljNTk5ZGMiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.HvztG-XaYtv2K7i339C1lv7-97vsKROYiDZRNoxGiWg}
+    api-key: ${TMDB_API_KEY:eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YjU5NDJmY2FjYmQzYmMxYTA2ZDNjYTA2NTY4MjE5YiIsIm5iZiI6MTc3NDA2MzU4NC4zMTgsInN1YiI6IjY5YmUwZmUwMzZjZTBlZTllMzdiYjE3OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Lq2GXazXhhcYhoAnjOXkprWJhVUjcZc0LPRnz_CLddM}
     base-url: https://api.themoviedb.org/3
     image-base-url: https://image.tmdb.org/t/p
 

@@ -1,12 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router-dom";
-import { fetchCurrentUserDetails } from "./Network/ApiCalls";
-import { setAuthStatus } from "./redux/userSlice";
 import axios from "axios";
-import { getRefreshToken, setAccessToken, clearAuth } from "./authStore";
 import "./App.css";
 
+// Redux actions
+import { setAuthStatus, setTokens, logout } from "./redux/userSlice";
+import { fetchCurrentUserDetails } from "./Network/ApiCalls";
+
+// Auth store
+import { getRefreshToken, getAccessToken, clearAuth, setAccessToken, setRefreshToken } from "./authStore";
+
+// Pages
 import Home from "./Pages/User/Home";
 import LoginForm from "./Pages/User/LoginForm";
 import RegistrationForm from "./Pages/User/RegistrationForm";
@@ -17,49 +22,50 @@ import AboutUs from "./Pages/User/AboutUs";
 import Movies from "./Pages/User/Movies";
 import Shows from "./Pages/User/Shows";
 import Profile from "./Pages/User/Profile";
-
 import PaymentCheckout from "./Pages/Payment/PaymentCheckout";
 import Success from "./Pages/Payment/Success";
 
+// Utils
 import Fallback from "./Utils/FallBackPage";
 import ServerConnection from "./Utils/ServerConnection";
+
+// ============================================
+// CONFIGURATION
+// ============================================
+
+const isLocal = () => {
+  const hostname = window.location.hostname;
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
+};
+
+const getBaseURL = () => {
+  if (process.env.REACT_APP_API_URL && !isLocal()) {
+    return process.env.REACT_APP_API_URL;
+  }
+  return "http://localhost:8080";
+};
+
+const API_URL = getBaseURL();
+
+// ============================================
+// HEALTH CHECK COMPONENT
+// ============================================
 
 function AppWithHealthCheck() {
   const [serverStatus, setServerStatus] = useState('checking');
   const [retryCount, setRetryCount] = useState(0);
 
+  const checkServerHealth = useCallback(async () => {
+    try {
+      await axios.get(`${API_URL}/api/v1/ping`, { timeout: 5000 });
+      setServerStatus('up');
+    } catch (error) {
+      console.warn('Backend health check failed:', error.message);
+      setServerStatus('down');
+    }
+  }, []);
+
   useEffect(() => {
-    const checkServerHealth = async () => {
-      try {
-        // Use same environment detection as AxiosMethods
-        const isLocal = () => {
-          return window.location.hostname === 'localhost' || 
-                 window.location.hostname === '127.0.0.1' || 
-                 window.location.hostname === '';
-        };
-
-        const getBaseURL = () => {
-          // If REACT_APP_API_URL is set AND we're not local, use it
-          if (process.env.REACT_APP_API_URL && !isLocal()) {
-            return process.env.REACT_APP_API_URL;
-          }
-          // Default to localhost for local development
-          return "http://localhost:8080";
-        };
-
-        const baseURL = getBaseURL();
-        const url = `${baseURL}/api/v1/ping`;
-        
-        await axios.get(url, {
-          timeout: 5000,
-        });
-        setServerStatus('up');
-      } catch (error) {
-        console.warn('Backend health check failed:', error.message);
-        setServerStatus('down');
-      }
-    };
-
     checkServerHealth();
 
     let retryInterval;
@@ -73,7 +79,7 @@ function AppWithHealthCheck() {
     return () => {
       if (retryInterval) clearInterval(retryInterval);
     };
-  }, [serverStatus, retryCount]);
+  }, [serverStatus, retryCount, checkServerHealth]);
 
   if (serverStatus === 'checking') {
     return <ServerConnection />;
@@ -86,97 +92,105 @@ function AppWithHealthCheck() {
   return <AppWithNavigation />;
 }
 
+// ============================================
+// MAIN APP COMPONENT
+// ============================================
+
 function AppWithNavigation() {
   const dispatch = useDispatch();
-  const [skipUserFetch, setSkipUserFetch] = useState(false);
+  const authStatus = useSelector(state => state.user.authStatus);
+  const currentUser = useSelector(state => state.user.currentUser);
 
+  // Initialize auth state on mount
   useEffect(() => {
-    // Try to refresh token on app startup if refresh token exists
-    const refreshToken = getRefreshToken();
-    
-    if (refreshToken) {
-      axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/v1/auth/refresh-token`, {
-        refreshToken
-      })
-      .then(res => {
-        setAccessToken(res.data.accessToken);
-        
-        if (res.data.refreshToken) {
-          localStorage.setItem("refreshToken", res.data.refreshToken);
+    const initializeAuth = async () => {
+      const refreshToken = getRefreshToken();
+      const accessToken = getAccessToken();
+
+      // If we have a refresh token, try to get new access token
+      if (refreshToken) {
+        try {
+          const response = await axios.post(
+            `${API_URL}/api/v1/auth/refresh-token`, 
+            { refreshToken },
+            { headers: { 'Content-Type': 'application/json' } }
+          );
+          
+          const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
+          
+          // Update tokens
+          setAccessToken(newAccessToken);
+          if (newRefreshToken) {
+            setRefreshToken(newRefreshToken);
+          }
+          
+          // Update Redux state
+          dispatch(setTokens({ accessToken: newAccessToken, refreshToken: newRefreshToken }));
+          dispatch(setAuthStatus('authenticated'));
+          
+          // Fetch user details
+          await fetchCurrentUserDetails(dispatch);
+        } catch (error) {
+          // Token refresh failed - clear everything
+          console.log('Token refresh failed:', error.message);
+          clearAuth();
+          dispatch(logout());
         }
-        
-        // Now fetch current user details
-        fetchCurrentUserDetails(dispatch).catch(() => {
-          dispatch(setAuthStatus('unauthenticated'));
-        });
-      })
-      .catch(() => {
-        // Refresh token invalid, clear auth and set unauthenticated
-        clearAuth();
+      } 
+      // If we only have access token (less common), try to use it
+      else if (accessToken) {
+        dispatch(setAuthStatus('authenticated'));
+        try {
+          await fetchCurrentUserDetails(dispatch);
+        } catch (error) {
+          // Access token is invalid - clear auth
+          console.log('Access token invalid:', error.message);
+          clearAuth();
+          dispatch(logout());
+        }
+      } 
+      // No tokens at all
+      else {
         dispatch(setAuthStatus('unauthenticated'));
-      });
-    } else {
-      // No refresh token, try fetching user (will fail if not authenticated)
-      fetchCurrentUserDetails(dispatch).catch(() => {
-        dispatch(setAuthStatus('unauthenticated'));
-      });
-    }
-  }, [dispatch]);
-
-  // Listen for payment success to skip next fetch
-  useEffect(() => {
-    const handlePaymentSuccess = () => {
-      setSkipUserFetch(true);
-      setTimeout(() => setSkipUserFetch(false), 10000);
+      }
     };
 
-    window.paymentSuccess = handlePaymentSuccess;
+    // Small delay to ensure store is ready
+    const timer = setTimeout(initializeAuth, 100);
+    return () => clearTimeout(timer);
+  }, [dispatch]);
+
+  // Handle payment success callback
+  useEffect(() => {
+    window.paymentSuccess = () => {
+      // Refresh user data after payment success
+      fetchCurrentUserDetails(dispatch);
+    };
     
     return () => {
       window.paymentSuccess = null;
     };
-  }, []);
-
-  const ProtectedRoute = ({ children, requiredRole }) => {
-    const authStatus = useSelector(state => state.user.authStatus);
-    const currentUser = useSelector(state => state.user.currentUser);
-    const isAdmin = currentUser?.roles?.includes("ROLE_ADMIN");
-    const isSubscribed = currentUser?.isSubscribed;
-
-    if (authStatus === "loading") {
-      return (
-        <div style={{ padding: "20px", textAlign: "center", color: "white" }}>
-          Checking authentication...
-        </div>
-      );
-    }
-
-    if (authStatus === "unauthenticated") {
-      return <Navigate to="/login" replace />;
-    }
-
-    if (requiredRole === "admin" && !isAdmin) {
-      return <Navigate to="/" replace />;
-    }
-
-    if (requiredRole === "subscribed" && !isSubscribed) {
-      return <Navigate to="/subscription" replace />;
-    }
-    return children;
-  };
+  }, [dispatch]);
 
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
         <Route path="/server-status" element={<ServerConnection />} />
         <Route path="/fallback" element={<Fallback />} />
-
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegistrationForm />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/shows" element={<Shows />} />
+        <Route path="/email-verification" element={<EmailVerification />} />
+        <Route path="/payment" element={<PaymentCheckout />} />
+        <Route path="/payment/success" element={<Success />} />
+        <Route path="/payment/:userId" element={<PaymentCheckout />} />
+        <Route path="/success" element={<Success />} />
+
+        {/* Protected Routes - Require Authentication */}
         <Route
           path="/profile"
           element={
@@ -186,92 +200,86 @@ function AppWithNavigation() {
           }
         />
 
+        {/* Protected Routes - Require Subscription */}
         <Route
           path="/subscription"
           element={
-            <ProtectedRoute>
-              <Subscription />
-            </ProtectedRoute>
+            <Subscription />
           }
         />
-        <Route
-          path="/email-verification"
+
+        <Route 
+          path="/video/:id" 
           element={
-            <ProtectedRoute>
-              <EmailVerification />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/video/:id"
-          element={
-            <ProtectedRoute requiredRole="subscribed">
+            <ProtectedRoute requireSubscription redirectToRegister>
               <VideoFullScreen />
             </ProtectedRoute>
-          }
+          } 
         />
 
-        {/* Admin routes should be handled separately or removed for user app */}
+        {/* Redirects */}
         <Route path="/admin/login" element={<Navigate to="/" replace />} />
         <Route path="/registerAdmin" element={<Navigate to="/" replace />} />
-        <Route
-          path="/admin"
-          element={<Navigate to="/" replace />}
-        />
-        <Route
-          path="/admin/users"
-          element={<Navigate to="/" replace />}
-        />
-        <Route
-          path="/admin/users/:id"
-          element={<Navigate to="/" replace />}
-        />
-        <Route
-          path="/admin/users/new"
-          element={<Navigate to="/" replace />}
-        />
-        <Route
-          path="/admin/products"
-          element={<Navigate to="/" replace />}
-        />
-        <Route
-          path="/admin/products/:id"
-          element={<Navigate to="/" replace />}
-        />
-        <Route
-          path="/admin/products/new"
-          element={<Navigate to="/" replace />}
-        />
 
-        <Route
-          path="/payment/:userId"
-          element={
-            <ProtectedRoute>
-              <PaymentCheckout />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/payment/success"
-          element={
-            <ProtectedRoute>
-              <Success />
-            </ProtectedRoute>
-          }
-        />
-
+        {/* Catch all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
 }
 
-function App() {
-  return (
-    <div className="App">
-      <AppWithHealthCheck />
-    </div>
-  );
+// ============================================
+// PROTECTED ROUTE COMPONENT
+// ============================================
+
+function ProtectedRoute({ 
+  children, 
+  requireSubscription = false,
+  redirectToRegister = false 
+}) {
+  const authStatus = useSelector(state => state.user.authStatus);
+  const currentUser = useSelector(state => state.user.currentUser);
+
+  // Debug logging
+  console.log('[ProtectedRoute] authStatus:', authStatus);
+  console.log('[ProtectedRoute] currentUser:', currentUser);
+  console.log('[ProtectedRoute] isSubscribed:', currentUser?.isSubscribed);
+  console.log('[ProtectedRoute] requireSubscription:', requireSubscription);
+
+  // Show loading while checking auth
+  if (authStatus === 'loading') {
+    return (
+      <div style={{ padding: "20px", textAlign: "center", color: "white" }}>
+        Loading...
+      </div>
+    );
+  }
+
+  // Not authenticated - redirect to login or register
+  if (authStatus !== 'authenticated') {
+    return (
+      <Navigate 
+        to={redirectToRegister ? "/register" : "/login"} 
+        replace 
+      />
+    );
+  }
+
+  // Check for admin role
+  const isAdmin = currentUser?.roles?.includes("ROLE_ADMIN");
+  
+  // If require subscription but user is admin, allow access
+  if (requireSubscription && isAdmin) {
+    return children;
+  }
+
+  // If require subscription but user is not subscribed
+  if (requireSubscription && !currentUser?.isSubscribed) {
+    // Redirect to subscription page if not subscribed
+    return <Navigate to="/subscription" replace />;
+  }
+
+  return children;
 }
 
-export default App;
+export default AppWithHealthCheck;

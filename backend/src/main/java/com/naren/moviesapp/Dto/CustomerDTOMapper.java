@@ -32,7 +32,6 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                 customer.getImageUrl(),
                 customer.getIsEmailVerified(),
                 customer.getAddress(),
-                customer.getIsRegistered(),
                 customer.getIsSubscribed(),
                 roleNames, // Properly loaded roles
                 customer.getCreatedAt(),
@@ -53,7 +52,6 @@ public class CustomerDTOMapper implements Function<Customer, CustomerDTO> {
                 admin.getImageUrl(),
                 admin.getIsEmailVerified(),
                 admin.getAddress(),
-                admin.getIsRegistered(),
                 null, // Admin doesn't have subscription
                 roleNames, // Admin roles
                 admin.getCreatedAt(),

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 public record EmailVerificationRequest(
         @NotBlank(message = "Email is required")
         @Email(message = "Invalid email format")
-        String email
+        String email,
+        Boolean checkUserExists
 ) {
 }

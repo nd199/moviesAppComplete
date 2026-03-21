@@ -1,6 +1,9 @@
 package com.naren.moviesapp.jwt;
 
 import com.naren.moviesapp.Service.TokenBlacklistService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -36,7 +40,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        logger.debug("JWT FILTER EXECUTING: {}", path);
+        logger.info("JWT FILTER EXECUTING: {}", path);
 
         // Skip JWT validation for OTP endpoints - these are public
         // Use lowercase comparison for case-insensitive matching
@@ -49,8 +53,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 pathLower.startsWith("/set-password") ||
                 // Also handle paths without api/v1 prefix (when frontend omits it)
                 pathLower.equals("/verify/email") ||
-                pathLower.equals("/validate/otp")) {
-            logger.debug("Skipping JWT filter for public endpoint: {}", path);
+                pathLower.equals("/validate/otp") ||
+                // Subscription-specific endpoints
+                pathLower.contains("subscription")) {
+            logger.info("SKIPPING JWT FILTER - PUBLIC ENDPOINT: {}", path);
             filterChain.doFilter(request, response);
             return;
         }
@@ -61,10 +67,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         logger.debug("Processing request for URI: {}", requestURI);
         logger.debug("Auth header present: {}", authHeader != null);
+        logger.debug("Auth header value: {}", authHeader);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            logger.debug("Token extracted from Authorization header");
+            logger.debug("Token extracted from Authorization header: {}", token.substring(0, Math.min(20, token.length())));
         }
 
         if (token == null) {
@@ -79,27 +86,42 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String userName = jwtUtil.getSubject(token);
-        logger.debug("Extracted username from token: {}", userName);
+        String userName;
+        try {
+            userName = jwtUtil.getSubject(token);
+            logger.debug("Extracted username from token: {}", userName);
+        } catch (ExpiredJwtException e) {
+            logger.debug("JWT token is expired for URI: {}. Continuing without authentication.", requestURI);
+            filterChain.doFilter(request, response);
+            return;
+        } catch (MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            logger.debug("Invalid JWT token for URI: {}. Continuing without authentication. Error: {}", requestURI, e.getMessage());
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-            logger.debug("Loaded user details for: {}", userName);
+            try {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+                logger.debug("Loaded user details for: {}", userName);
 
-            boolean valid = jwtUtil.isTokenValid(token, userDetails.getUsername());
-            logger.debug("Token validation result: {}", valid);
+                boolean valid = jwtUtil.isTokenValid(token, userDetails.getUsername());
+                logger.debug("Token validation result: {} for user: {}", valid, userName);
 
-            if (valid) {
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, null, jwtUtil.getAuthorities(token)
-                        );
-                authenticationToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                if (valid) {
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, jwtUtil.getAuthorities(token)
+                            );
+                    authenticationToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
 
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                logger.debug("Authentication set in security context for: {}", userName);
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    logger.debug("Authentication set in security context for: {}", userName);
+                }
+            } catch (UsernameNotFoundException e) {
+                logger.debug("User not found for token: {}. Continuing without authentication.", userName);
             }
         }
 

@@ -1,4 +1,4 @@
-package com.naren.moviesapp.Service;
+  package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Dto.TmdbMovieDto;
 import com.naren.moviesapp.Dto.TmdbSearchResponse;
@@ -11,10 +11,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 
 @Service
 @SuppressWarnings("unchecked")
@@ -35,7 +40,26 @@ public class TmdbService {
         this.apiKey = apiKey;
         this.baseUrl = baseUrl;
         this.imageBaseUrl = imageBaseUrl;
-        this.webClient = WebClient.builder().baseUrl(baseUrl).defaultHeader("Authorization", "Bearer " + apiKey).build();
+        
+        // Create connection provider with timeouts
+        ConnectionProvider connectionProvider = ConnectionProvider.builder("tmdb-pool")
+                .maxConnections(50)
+                .maxIdleTime(Duration.ofSeconds(30))
+                .maxLifeTime(Duration.ofMinutes(5))
+                .pendingAcquireTimeout(Duration.ofSeconds(30))
+                .build();
+        
+        // Create HTTP client with timeouts and TLS configuration
+        HttpClient httpClient = HttpClient.create(connectionProvider)
+                .responseTimeout(Duration.ofSeconds(30))
+                .secure();
+        
+        // TMDB API uses Bearer token (Read Access Token v4) in Authorization header
+        this.webClient = WebClient.builder()
+                .baseUrl(baseUrl)
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .defaultHeader("Authorization", "Bearer " + apiKey)
+                .build();
     }
 
     public Optional<TmdbSearchResponse<TmdbMovieDto>> searchMovies(String query, int page) {
@@ -45,7 +69,7 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/search/movie").queryParam("query", query).queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/search/movie").queryParam("query", query).queryParam("page", page).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToMovieSearchResponse(response));
         } catch (WebClientResponseException e) {
@@ -61,7 +85,7 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/search/tv").queryParam("query", query).queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/search/tv").queryParam("query", query).queryParam("page", page).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToTvShowSearchResponse(response));
         } catch (WebClientResponseException e) {
@@ -77,7 +101,7 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/movie/" + tmdbId).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/movie/" + tmdbId).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToMovieDto(response));
         } catch (WebClientResponseException e) {
@@ -93,7 +117,7 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/tv/" + tmdbId).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/tv/" + tmdbId).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToTvShowDto(response));
         } catch (WebClientResponseException e) {
@@ -109,7 +133,7 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/trending/movie/day").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/trending/movie/day").queryParam("page", page).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToMovieSearchResponse(response));
         } catch (WebClientResponseException e) {
@@ -125,7 +149,7 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/movie/top_rated").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/movie/top_rated").queryParam("page", page).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToMovieSearchResponse(response));
         } catch (WebClientResponseException e) {
@@ -141,7 +165,7 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/movie/now_playing").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/movie/now_playing").queryParam("page", page).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToMovieSearchResponse(response));
         } catch (WebClientResponseException e) {
@@ -157,7 +181,7 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/movie/upcoming").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/movie/upcoming").queryParam("page", page).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToMovieSearchResponse(response));
         } catch (WebClientResponseException e) {
@@ -173,7 +197,7 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/tv/popular").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/tv/popular").queryParam("page", page).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToTvShowSearchResponse(response));
         } catch (WebClientResponseException e) {
@@ -189,7 +213,7 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/tv/top_rated").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/tv/top_rated").queryParam("page", page).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToTvShowSearchResponse(response));
         } catch (WebClientResponseException e) {
@@ -209,7 +233,8 @@ public class TmdbService {
                 var builder = uriBuilder.path("/discover/movie")
                         .queryParam("page", page)
                         .queryParam("with_original_language", "te") // Telugu
-                        .queryParam("sort_by", "popularity.desc");
+                        .queryParam("sort_by", "popularity.desc")
+                        .queryParam("api_key", apiKey);
                 return builder.build();
             }).retrieve().bodyToMono(Map.class).block();
 
@@ -227,7 +252,7 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/trending/tv/day").queryParam("page", page).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/trending/tv/day").queryParam("page", page).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToTvShowSearchResponse(response));
         } catch (WebClientResponseException e) {
@@ -244,7 +269,7 @@ public class TmdbService {
 
         try {
             Map<String, Object> response = webClient.get().uri(uriBuilder -> {
-                var builder = uriBuilder.path("/discover/movie").queryParam("page", page);
+                var builder = uriBuilder.path("/discover/movie").queryParam("page", page).queryParam("api_key", apiKey);
 
                 if (sortBy != null && !sortBy.isBlank()) {
                     builder.queryParam("sort_by", sortBy);
@@ -274,7 +299,7 @@ public class TmdbService {
 
         try {
             Map<String, Object> response = webClient.get().uri(uriBuilder -> {
-                var builder = uriBuilder.path("/discover/tv").queryParam("page", page);
+                var builder = uriBuilder.path("/discover/tv").queryParam("page", page).queryParam("api_key", apiKey);
 
                 if (sortBy != null && !sortBy.isBlank()) {
                     builder.queryParam("sort_by", sortBy);
@@ -464,6 +489,7 @@ public class TmdbService {
             Map<String, Object> response = webClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/movie/" + tmdbId + "/videos")
+                            .queryParam("api_key", apiKey)
                             .build())
                     .retrieve()
                     .bodyToMono(Map.class)
@@ -499,6 +525,7 @@ public class TmdbService {
             Map<String, Object> response = webClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/tv/" + tmdbId + "/videos")
+                            .queryParam("api_key", apiKey)
                             .build())
                     .retrieve()
                     .bodyToMono(Map.class)

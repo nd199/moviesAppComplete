@@ -60,7 +60,9 @@ public class AuthController {
         // Generate access token and refresh token based on user type
         String accessToken;
         RefreshToken refreshToken;
-
+        // Use the normalized email from the request for token generation to ensure consistency
+        String normalizedEmail = request.username().toLowerCase().trim();
+        
         if (authResponse instanceof AdminAuthResponse adminAuth) {
             accessToken = authService.generateTokenForAdmin(adminAuth.admin());
             // Superadmin: no refresh token for maximum security - must login again

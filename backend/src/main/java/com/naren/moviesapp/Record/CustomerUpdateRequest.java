@@ -23,8 +23,6 @@ public record CustomerUpdateRequest(
         Boolean isEmailVerified,
 
         @Size(max = 200, message = "Address must not exceed 200 characters")
-        String address,
-
-        Boolean isRegistered
+        String address
 ) {
 }

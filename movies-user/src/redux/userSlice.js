@@ -8,6 +8,8 @@ const initialState = {
   error: false,
   errorMessage: null,
   successMessage: null,
+  accessToken: null,
+  refreshToken: null,
 };
 
 const userSlice = createSlice({
@@ -24,6 +26,17 @@ const userSlice = createSlice({
       state.currentUser = null;
       state.users = [];
       state.authStatus = "unauthenticated";
+      state.accessToken = null;
+      state.refreshToken = null;
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    },
+
+    setTokens: (state, action) => {
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
+      localStorage.setItem('accessToken', action.payload.accessToken);
+      localStorage.setItem('refreshToken', action.payload.refreshToken);
     },
 
     setAuthStatus: (state, action) => {
@@ -180,6 +193,7 @@ const userSlice = createSlice({
 export const {
   resetErrorMessage,
   logout,
+  setTokens,
 
   registerStart,
   registerSuccess,

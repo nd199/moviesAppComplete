@@ -58,7 +58,7 @@ public class PaymentIT extends AbstractIntegrationTest {
 
         String adminName = "IM ADMIN " + FAKER.name().fullName();
         String adminEmail = adminName.replace(" ", ".") + RANDOM.nextInt(1000) + "@codeNaren.com";
-        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, phone, "", isEmailVerified, address, false);
+        adminRegistration = new CustomerRegistration(adminName, adminEmail, password, phone, "", isEmailVerified, address);
     }
 
     private void createRoleIfNotExists() {

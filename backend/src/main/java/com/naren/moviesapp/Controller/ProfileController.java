@@ -1,8 +1,10 @@
 package com.naren.moviesapp.Controller;
 
+import com.naren.moviesapp.Dto.AdminDTO;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Record.CustomerUpdateRequest;
 import com.naren.moviesapp.Record.PasswordChangeRequest;
+import com.naren.moviesapp.Service.AdminService;
 import com.naren.moviesapp.Service.CustomerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,16 +26,34 @@ public class ProfileController {
     private static final Logger logger = LoggerFactory.getLogger(ProfileController.class);
 
     private final CustomerService customerService;
+    private final AdminService adminService;
 
-    public ProfileController(CustomerService customerService) {
+    public ProfileController(CustomerService customerService, AdminService adminService) {
         this.customerService = customerService;
+        this.adminService = adminService;
     }
 
     @GetMapping("/current")
-    public ResponseEntity<CustomerDTO> getCurrentUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> getCurrentUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
         logger.debug("Fetching current user profile: {}", userDetails.getUsername());
-        CustomerDTO customerDTO = customerService.getCustomerByEmail(userDetails.getUsername());
-        return new ResponseEntity<>(customerDTO, HttpStatus.OK);
+        String username = userDetails.getUsername();
+        
+        // First try to find as Customer
+        try {
+            CustomerDTO customerDTO = customerService.getCustomerByEmail(username);
+            return new ResponseEntity<>(customerDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            // If not found as customer, try as Admin
+            logger.debug("User {} not found as customer, trying as admin", username);
+            try {
+                ResponseEntity<?> adminResponse = adminService.getAdminByEmail(username);
+                return adminResponse;
+            } catch (Exception ex) {
+                logger.error("User {} not found in either customer or admin tables", username);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "User not found"));
+            }
+        }
     }
 
     @PutMapping("/current")

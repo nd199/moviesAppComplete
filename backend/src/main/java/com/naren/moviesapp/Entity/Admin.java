@@ -49,7 +49,7 @@ public class Admin extends BaseUser {
     private Set<Role> roles = new HashSet<>();
 
     public Admin(Long id, String name, String email, String password, String phoneNumber,
-                 Boolean isEmailVerified, String address, Boolean isRegistered,
+                 Boolean isEmailVerified, String address,
                  Set<Role> roles, String department, Integer accessLevel, Boolean isActive) {
         this.id = id;
         this.name = name;
@@ -58,7 +58,6 @@ public class Admin extends BaseUser {
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
         this.address = address;
-        this.isRegistered = isRegistered;
         this.roles = roles;
         this.department = department;
         this.accessLevel = accessLevel;
@@ -66,7 +65,7 @@ public class Admin extends BaseUser {
     }
 
     public Admin(String name, String email, String password, String phoneNumber,
-                 Boolean isEmailVerified, Boolean isRegistered,
+                 Boolean isEmailVerified,
                  String address, String department, Integer accessLevel) {
         this.name = name;
         this.email = email;
@@ -74,7 +73,6 @@ public class Admin extends BaseUser {
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
         this.address = address;
-        this.isRegistered = isRegistered;
         this.department = department;
         this.accessLevel = accessLevel;
         this.isActive = true;
@@ -82,7 +80,7 @@ public class Admin extends BaseUser {
 
     public Admin(String name, String email, String password,
                  String phoneNumber, String imageUrl, Boolean isEmailVerified,
-                 String address, Boolean isRegistered,
+                 String address,
                  String department, Integer accessLevel) {
         this.name = name;
         this.email = email;
@@ -91,7 +89,6 @@ public class Admin extends BaseUser {
         this.imageUrl = imageUrl;
         this.isEmailVerified = isEmailVerified;
         this.address = address;
-        this.isRegistered = isRegistered;
         this.department = department;
         this.accessLevel = accessLevel;
         this.isActive = true;
@@ -107,7 +104,6 @@ public class Admin extends BaseUser {
                 ", imageUrl='" + imageUrl + '\'' +
                 ", isEmailVerified=" + isEmailVerified +
                 ", address='" + address + '\'' +
-                ", isRegistered=" + isRegistered +
                 ", department='" + department + '\'' +
                 ", accessLevel=" + accessLevel +
                 ", isActive=" + isActive +

@@ -40,7 +40,7 @@ public class Customer extends BaseUser {
     @JsonIgnore
     private List<Movie> movies = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "customers_roles",
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"),
@@ -54,7 +54,7 @@ public class Customer extends BaseUser {
     @JsonIgnore
     private UserPlanInfo userPlanInfo;
 
-    public Customer(Long id, String name, String email, String password, String phoneNumber, Boolean isEmailVerified, String address, Boolean isRegistered, List<Movie> movies, Set<Role> roles, Boolean isSubscribed) {
+    public Customer(Long id, String name, String email, String password, String phoneNumber, Boolean isEmailVerified, String address, List<Movie> movies, Set<Role> roles, Boolean isSubscribed) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -62,13 +62,12 @@ public class Customer extends BaseUser {
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
         this.address = address;
-        this.isRegistered = isRegistered;
         this.movies = movies;
         this.roles = roles;
         this.isSubscribed = isSubscribed;
     }
 
-    public Customer(Long id, String name, String email, String password, String phoneNumber, Boolean isEmailVerified, Boolean isRegistered, String address, Boolean isSubscribed) {
+    public Customer(Long id, String name, String email, String password, String phoneNumber, Boolean isEmailVerified, String address, Boolean isSubscribed) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -76,12 +75,11 @@ public class Customer extends BaseUser {
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
         this.address = address;
-        this.isRegistered = isRegistered;
         this.isSubscribed = isSubscribed;
 
     }
 
-    public Customer(Long id, String name, String email, String password, String phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isRegistered, Boolean isSubscribed) {
+    public Customer(Long id, String name, String email, String password, String phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isSubscribed) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -90,24 +88,22 @@ public class Customer extends BaseUser {
         this.imageUrl = imageUrl;
         this.isEmailVerified = isEmailVerified;
         this.address = address;
-        this.isRegistered = isRegistered;
         this.isSubscribed = isSubscribed;
 
     }
 
-    public Customer(String name, String email, String password, String phoneNumber, Boolean isEmailVerified, Boolean isRegistered, String address, Boolean isSubscribed) {
+    public Customer(String name, String email, String password, String phoneNumber, Boolean isEmailVerified, String address, Boolean isSubscribed) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.isEmailVerified = isEmailVerified;
         this.address = address;
-        this.isRegistered = isRegistered;
         this.isSubscribed = isSubscribed;
     }
 
     public Customer(String name, String email, String password,
-                    String phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isRegistered, Boolean isSubscribed) {
+                    String phoneNumber, String imageUrl, Boolean isEmailVerified, String address, Boolean isSubscribed) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -115,7 +111,6 @@ public class Customer extends BaseUser {
         this.imageUrl = imageUrl;
         this.isEmailVerified = isEmailVerified;
         this.address = address;
-        this.isRegistered = isRegistered;
         this.isSubscribed = isSubscribed;
     }
 
@@ -130,7 +125,6 @@ public class Customer extends BaseUser {
                 ", imageUrl='" + imageUrl + '\'' +
                 ", isEmailVerified=" + isEmailVerified +
                 ", address='" + address + '\'' +
-                ", isRegistered=" + isRegistered +
                 ", isSubscribed=" + isSubscribed +
                 ", movies=" + movies +
                 ", roles=" + roles +

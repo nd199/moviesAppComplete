@@ -129,6 +129,7 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/auth/**",
                                 "/api/v1/content-manager/**",
                                 "/api/v1/verify/email",
+                                "/api/v1/verify/email/exists",
                                 "/api/v1/validate/Otp",
                                 "/validate/Otp",
                                 "/api/v1/validate/otp",
@@ -144,7 +145,9 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/test-data/status",
                                 "/api/v1/streaming/**",
                                 "/api/v1/subscription/status",
-                                "/api/v1/admins/health"
+                                "/api/v1/admins/health",
+                                "/api/v1/verify/email/subscription",
+                                "/api/v1/validate/otp/subscription"
                         ).permitAll()
 
                         .requestMatchers(

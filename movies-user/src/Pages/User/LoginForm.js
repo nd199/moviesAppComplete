@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { forgotPasswordRequest, login } from "../../Network/ApiCalls";
@@ -36,9 +36,15 @@ const LoginForm = () => {
     try {
       const result = await login(dispatch, { username: normalizedEmail, password });
       console.log('Login successful, user data:', result);
+      
+      // Check user type and subscription status
+      const userType = result?.userType;
+      const isSubscribed = result?.user?.isSubscribed;
+      
       setPopupMessage("Login successful! Redirecting...");
       setShowPopup(true);
       setTimeout(() => {
+        // All users go to home page after login
         navigate("/", { replace: true });
       }, 1000);
     } catch (err) {

@@ -94,7 +94,6 @@ public class DevDataSeeder {
         if (existingUser.isPresent()) {
             Customer user = existingUser.get();
             user.setIsEmailVerified(true);
-            user.setIsRegistered(true);
             user.setIsActive(true);
             user.setIsSubscribed(true);
             customerRepository.save(user);
@@ -118,7 +117,6 @@ public class DevDataSeeder {
         demoUser.setIsActive(true);
         demoUser.setIsSubscribed(true);
         demoUser.setIsEmailVerified(true);
-        demoUser.setIsRegistered(true);
 
         customerRepository.save(demoUser);
         log.info("Created demo user: {} with phone: {}", demoEmail, phoneNumber);

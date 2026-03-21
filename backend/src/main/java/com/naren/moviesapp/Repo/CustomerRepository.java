@@ -3,6 +3,7 @@ package com.naren.moviesapp.Repo;
 import com.naren.moviesapp.Entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,10 +13,11 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     boolean existsByPhoneNumber(String phoneNumber);
 
-    Optional<Customer> findByEmail(String email);
+    @Query("SELECT c FROM Customer c WHERE LOWER(c.email) = LOWER(:email)")
+    Optional<Customer> findByEmail(@Param("email") String email);
 
-    @Query("SELECT c FROM Customer c LEFT JOIN FETCH c.roles WHERE c.email = :email")
-    Optional<Customer> findByEmailWithRoles(String email);
+    @Query("SELECT c FROM Customer c LEFT JOIN FETCH c.roles WHERE LOWER(c.email) = LOWER(:email)")
+    Optional<Customer> findByEmailWithRoles(@Param("email") String email);
 
     Optional<Customer> getCustomerByPhoneNumber(String phoneNumber);
 

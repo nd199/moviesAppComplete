@@ -54,7 +54,6 @@ public class DemoUserSeeder {
             demoUser.setPhoneNumber(phoneNumber);
             demoUser.setAddress("123 Demo Street");
             demoUser.setIsEmailVerified(true);
-            demoUser.setIsRegistered(true);
             demoUser.setIsSubscribed(true);
             demoUser.setIsActive(true);
             demoUser.addRole(userRole);
@@ -63,7 +62,6 @@ public class DemoUserSeeder {
             log.info("Created demo user: {} with phone: {}", demoEmail, phoneNumber);
         } else {
             existingDemoUser.setIsEmailVerified(true);
-            existingDemoUser.setIsRegistered(true);
             existingDemoUser.setIsSubscribed(true);
             existingDemoUser.setIsActive(true);
             existingDemoUser.setPassword(passwordEncoder.encode(demoPassword));

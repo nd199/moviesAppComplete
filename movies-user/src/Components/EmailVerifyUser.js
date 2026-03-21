@@ -8,7 +8,7 @@ import CrossMark from '../Utils/animations/CrossMark.json';
 import TickMark from '../Utils/animations/TickMark.json';
 import './EmailVerifyUser.css';
 
-const EmailVerifyUser = ({ onEmailVerified }) => {
+const EmailVerifyUser = ({ onEmailVerified, isForSubscription = false }) => {
   const [email, setEmail] = useState('');
   const [showVerifyBtn, setShowVerifyBtn] = useState(false);
   const [otp, setOtp] = useState('');
@@ -35,17 +35,42 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
   const handleSendOtp = async () => {
     if (!isValidEmail(email)) return;
     setIsSending(true);
+    setOtpMessage('');
+    setShowOtpInput(false);
+    
     try {
-      await verifyEmail(dispatch, email);
-      setShowOtpInput(true);
-      setOtpTimer(60);
-      setOtpMessage('');
+      // For subscription verification (isForSubscription=true), pass checkUserExists=false
+      // For registration verification, pass checkUserExists=true (default)
+      const checkUserExists = !isForSubscription;
+      const response = await verifyEmail(dispatch, email, checkUserExists);
+      
+      // Only check if email already exists when checkUserExists is true
+      if (checkUserExists && response?.exists === true) {
+        setOtpMessage('Email already registered. Please login instead.');
+        setShowOtpInput(false);
+        setShowVerifyBtn(false);
+        setIsEmailDisabled(true);
+      } else {
+        // Show OTP input
+        setShowOtpInput(true);
+        setOtpTimer(60);
+        setOtpMessage('');
+      }
     } catch (err) {
-      console.error(err);
-      setOtpMessage('Failed to send OTP');
+      console.error('Error in handleSendOtp:', err);
+      // Check if it's a 409 conflict error - email already exists
+      if (err.response?.status === 409) {
+        setOtpMessage(err.response.data.message || 'Email already registered. Please login instead.');
+        setShowOtpInput(false);
+        setShowVerifyBtn(false);
+        setIsEmailDisabled(true);
+      } else {
+        // Network or other error
+        setOtpMessage('Failed to send OTP. Try again.');
+        setShowVerifyBtn(true);
+      }
     } finally {
       setIsSending(false);
-      setShowVerifyBtn(false);
     }
   };
 
@@ -53,19 +78,17 @@ const EmailVerifyUser = ({ onEmailVerified }) => {
     if (!isValidOtp(otp)) return;
     setIsVerifying(true);
     try {
-      const res = await validateOtp(dispatch, {
-        customerEmail: email,
-        enteredOTP: otp,
-      });
-      setOtpMessage(res);
-      if (res === 'OTP verified successfully') {
+      const res = await validateOtp(dispatch, otp, email);
+      setOtpMessage(res || 'OTP verified successfully');
+      if (res?.includes('success')) {
         setIsEmailDisabled(true);
         setShowOtpInput(false);
         onEmailVerified(email);
       }
     } catch (err) {
       console.error(err);
-      setOtpMessage('Invalid OTP or OTP expired');
+      const errorMsg = err?.response?.data?.message || 'Invalid OTP or OTP expired';
+      setOtpMessage(errorMsg);
       onEmailVerified(false);
     } finally {
       setIsVerifying(false);

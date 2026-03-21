@@ -42,7 +42,6 @@ public class SuperAdminSeeder {
             superAdmin.setPhoneNumber("0000000000");
             superAdmin.setAddress("System Default");
             superAdmin.setIsEmailVerified(true);
-            superAdmin.setIsRegistered(true);
             superAdmin.setIsSubscribed(false);
             superAdmin.addRole(superRole);
             customerRepository.save(superAdmin);

@@ -11,7 +11,6 @@ public record CustomerDTO(
         String imageUrl,
         Boolean isEmailVerified,
         String address,
-        Boolean isRegistered,
         Boolean isSubscribed,
         List<String> roles,  // Keep roles - needed by frontend and AuthService
         LocalDateTime createdAt,

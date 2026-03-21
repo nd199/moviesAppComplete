@@ -103,8 +103,11 @@ public class AuthService {
 
                 CustomerDTO dto = customerDTOMapper.apply(customer);
 
+                // Normalize email to lowercase to match frontend login normalization
+                String normalizedEmail = dto.email() != null ? dto.email().toLowerCase().trim() : dto.email();
+                
                 String token = jwtUtil.issueToken(
-                        dto.email(),
+                        normalizedEmail,
                         new HashSet<>(customer.getRoles())
                 );
 
@@ -199,10 +202,12 @@ public class AuthService {
             );
         }
 
-        if (!isSuperAdmin && !Boolean.TRUE.equals(customer.getIsRegistered())) {
-            logger.warn("Account validation failed for {}: Account not registered", customer.getEmail());
+        // Account is considered registered if the customer record exists and is active
+        // isRegistered was redundant - a user is either in the system or not
+        if (!isSuperAdmin && !Boolean.TRUE.equals(customer.getIsActive())) {
+            logger.warn("Account validation failed for {}: Account is not active", customer.getEmail());
             throw new AccountNotRegisteredException(
-                    "Account registration incomplete."
+                    "Account is not active."
             );
         }
         logger.debug("Account state validation passed for customer: {}", customer.getEmail());
@@ -240,23 +245,29 @@ public class AuthService {
     public String generateTokenForCustomer(Customer customer) {
         logger.info("Generating token for customer: {}", customer.getEmail());
         CustomerDTO customerDTO = customerDTOMapper.apply(customer);
+        // Normalize email to lowercase for consistent token subject
+        String normalizedEmail = customerDTO.email() != null ? customerDTO.email().toLowerCase().trim() : customerDTO.email();
 
         Set<Role> roles = new HashSet<Role>();
         for (String roleName : customerDTO.roles()) {
             roles.add(new Role(RoleName.valueOf(roleName)));
         }
 
-        return jwtUtil.issueToken(customerDTO.email(), roles);
+        return jwtUtil.issueToken(normalizedEmail, roles);
     }
 
     public String generateTokenForContentManager(ContentManager contentManager) {
         logger.info("Generating token for content manager: {}", contentManager.getEmail());
-        return jwtUtil.issueToken(contentManager.getEmail(), contentManager.getRoles());
+        // Normalize email to lowercase for consistent token subject
+        String normalizedEmail = contentManager.getEmail() != null ? contentManager.getEmail().toLowerCase().trim() : contentManager.getEmail();
+        return jwtUtil.issueToken(normalizedEmail, contentManager.getRoles());
     }
 
     public String generateTokenForAdmin(Admin admin) {
-        logger.debug("Generating token for admin: {}", admin.getEmail());
+        logger.info("Generating token for admin: {}", admin.getEmail());
+        // Normalize email to lowercase for consistent token subject
+        String normalizedEmail = admin.getEmail() != null ? admin.getEmail().toLowerCase().trim() : admin.getEmail();
         Set<Role> roles = new HashSet<>(admin.getRoles());
-        return jwtUtil.issueTokenWithRoleExpiration(admin.getEmail(), roles);
+        return jwtUtil.issueTokenWithRoleExpiration(normalizedEmail, roles);
     }
 }

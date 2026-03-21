@@ -15,9 +15,10 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
 
     boolean existsByPhoneNumber(String phoneNumber);
 
-    Optional<Admin> findByEmail(String email);
+    @Query("SELECT a FROM Admin a WHERE LOWER(a.email) = LOWER(:email)")
+    Optional<Admin> findByEmail(@Param("email") String email);
 
-    @Query("SELECT a FROM Admin a LEFT JOIN FETCH a.roles WHERE a.email = :email")
+    @Query("SELECT a FROM Admin a LEFT JOIN FETCH a.roles WHERE LOWER(a.email) = LOWER(:email)")
     Optional<Admin> findByEmailWithRoles(@Param("email") String email);
 
     Optional<Admin> getAdminByPhoneNumber(String phoneNumber);

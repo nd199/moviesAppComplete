@@ -19,6 +19,7 @@ import { uploadToImgBB } from '../../ImgBB';
 import {
   changePassword,
   updateProfile,
+  fetchUsers,
 } from '../../Network/ApiCalls';
 import {
   formatPhoneNumber,

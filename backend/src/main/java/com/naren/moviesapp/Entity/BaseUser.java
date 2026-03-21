@@ -30,9 +30,6 @@ public abstract class BaseUser {
     @Column(nullable = false)
     protected Boolean isEmailVerified = false;
 
-    @Column(nullable = false)
-    protected Boolean isRegistered = false;
-
     @Column(name = "is_active", nullable = false)
     protected Boolean isActive = true;
 

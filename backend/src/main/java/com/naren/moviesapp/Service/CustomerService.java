@@ -109,7 +109,6 @@ public class CustomerService implements CustomerServiceInterface {
 
             roles.forEach(registeredCustomer::addRole);
             registeredCustomer.setIsEmailVerified(true);
-            registeredCustomer.setIsRegistered(true);
             registeredCustomer.setImageUrl(customerRegistration.imageUrl());
             customerRepository.save(registeredCustomer);
 
@@ -149,7 +148,7 @@ public class CustomerService implements CustomerServiceInterface {
                 customerRegistration.email().toLowerCase(),
                 passwordEncoder.encode(customerRegistration.password()),
                 customerRegistration.phoneNumber(),
-                "", false, customerRegistration.address(), false, false);
+                "", false, customerRegistration.address(), false);
     }
 
     private boolean validatePassword(String password, String name, String email, String phoneNumber) {
@@ -415,7 +414,7 @@ public class CustomerService implements CustomerServiceInterface {
 
     @Override
     public CustomerDTO getCustomerByEmail(String email) {
-        return customerRepository.findByEmail(email).map((customerDTOMapper))
+        return customerRepository.findByEmailWithRoles(email).map((customerDTOMapper))
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
                                 "Could not find customer by email " + email)
@@ -505,5 +504,9 @@ public class CustomerService implements CustomerServiceInterface {
     public boolean hasActiveSubscription(String email) {
         Customer customer = customerRepository.findByEmail(email).orElse(null);
         return hasActiveSubscription(customer);
+    }
+
+    public boolean existsByEmail(String email) {
+        return customerRepository.existsByEmail(email);
     }
 }

@@ -18,7 +18,12 @@ const PaymentCheckout = () => {
   const location = useLocation();
   const currentUser = useSelector((state) => state?.user?.currentUser);
   
+  console.log('[PaymentCheckout] userId:', userId);
+  console.log('[PaymentCheckout] location.state:', location.state);
+  console.log('[PaymentCheckout] currentUser:', currentUser);
+  
   const plan = location.state?.plan;
+  console.log('[PaymentCheckout] plan:', plan);
   
   const user = currentUser || {
     email: userId,

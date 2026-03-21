@@ -109,7 +109,9 @@ function AppWithRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/contentManagerLogin" element={<ContentManagerLogin />} />
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      {/* Dashboard is now public - accessible without login */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={<Dashboard />} />
 
       {/* Admin Routes */}
       <Route
@@ -119,7 +121,6 @@ function AppWithRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/users" element={<UserList />} />
         <Route path="/users/new" element={<NewUser />} />
         <Route path="/users/edit/:id" element={<UserEdit />} />

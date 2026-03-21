@@ -1,9 +1,11 @@
-import {
-  authRequest,
-  passResetRequest,
-  userRequest,
-  paymentRequest,
-} from '../AxiosMethods';
+/**
+ * API Calls - All network requests to the backend
+ * Organized by functionality with proper error handling
+ */
+
+import { userRequest, publicRequest, passResetRequest, paymentRequest } from '../AxiosMethods';
+import { setAccessToken, setRefreshToken } from '../authStore';
+import { setTokens } from '../redux/userSlice';
 import {
   fetchTmdbTrendingMoviesStart,
   fetchTmdbTrendingMoviesSuccess,
@@ -43,19 +45,55 @@ import {
   verifyEmailSuccess,
 } from '../redux/userSlice';
 
+// ============================================
+// AUTHENTICATION API
+// ============================================
+
 export const register = async (dispatch, customerInfo) => {
   dispatch(registerStart());
   try {
-    const res = await authRequest().post('/auth/customers', customerInfo);
+    const res = await userRequest().post('/auth/customers', customerInfo);
     dispatch(registerSuccess(res.data));
     dispatch(setAuthStatus("authenticated"));
+    return res.data;
   } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      'Failed to Register. Try again.';
+    const message = error.response?.data?.message || error.response?.data?.error || 'Failed to Register. Try again.';
     dispatch(registerFailure({ message }));
     throw error;
+  }
+};
+
+export const login = async (dispatch, userInfo) => {
+  dispatch(loginStart());
+  try {
+    const res = await userRequest().post('/auth/login', userInfo);
+    const { accessToken, refreshToken } = res.data;
+    
+    // Store tokens
+    setAccessToken(accessToken);
+    setRefreshToken(refreshToken);
+    dispatch(setTokens({ accessToken, refreshToken }));
+    
+    dispatch(loginSuccess(res.data));
+    dispatch(setAuthStatus("authenticated"));
+    
+    return res.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.response?.data?.error || 'Invalid credentials';
+    dispatch(loginFailure({ message }));
+    throw error;
+  }
+};
+
+export const logout = async (dispatch) => {
+  try {
+    await userRequest().post('/auth/logout');
+  } catch (error) {
+    // Ignore logout errors
+  } finally {
+    setAccessToken(null);
+    setRefreshToken(null);
+    dispatch(setAuthStatus("unauthenticated"));
   }
 };
 
@@ -64,135 +102,74 @@ export const forgotPasswordRequest = async (dispatch, email) => {
   try {
     const res = await passResetRequest.post('/request', { email });
     dispatch(forgotPasswordSuccess(res.data));
+    return res.data;
   } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      'Account not found with this email';
+    const message = error.response?.data?.message || error.response?.data?.error || 'Account not found with this email';
     dispatch(forgotPasswordFailure({ message }));
     throw error;
   }
 };
 
-export const login = async (dispatch, userInfo) => {
-  dispatch(loginStart());
-  try {
-    const res = await authRequest().post('/auth/login', userInfo);
-    const { user } = res.data;
-    dispatch(loginSuccess(user));
-    dispatch(setAuthStatus("authenticated"));
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      'Invalid email or password';
-    dispatch(loginFailure({ message }));
-    throw error;
-  }
-};
-
-
-export const verifyEmail = async (dispatch, email) => {
+export const verifyEmail = async (dispatch, email, checkUserExists = true) => {
   dispatch(verifyEmailStart());
   try {
-    const payload = {
-      email: email.trim().toLowerCase()
-    };
-    
-    const res = await userRequest().post('/verify/email', payload);
+    const res = await userRequest().post('/verify/email', { email, checkUserExists });
     dispatch(verifyEmailSuccess(res.data));
     return res.data;
   } catch (error) {
-    const message =
-      error.response?.data?.message || 'Email verification failed';
+    // Preserve the error response for the component to handle
+    const message = error.response?.data?.message || error.response?.data?.error || 'Failed to verify email';
     dispatch(verifyEmailFailure({ message }));
+    // Re-throw with the original error to preserve response data
     throw error;
   }
 };
 
-export const validateOtp = async (dispatch, validateInfo) => {
+// Separate API for subscription email verification - uses dedicated subscription endpoint
+export const verifySubscriptionEmail = async (dispatch, email) => {
+  dispatch(verifyEmailStart());
+  try {
+    const res = await userRequest().post('/verify/email/subscription', { email });
+    dispatch(verifyEmailSuccess(res.data));
+    return res.data;
+  } catch (error) {
+    // Preserve the error response for the component to handle
+    const message = error.response?.data?.message || error.response?.data?.error || 'Failed to verify email for subscription';
+    dispatch(verifyEmailFailure({ message }));
+    // Re-throw with the original error to preserve response data
+    throw error;
+  }
+};
+
+export const validateOtp = async (dispatch, otp, email) => {
   dispatch(validateOtpStart());
   try {
-    const res = await userRequest().post('/validate/otp', validateInfo);
+    const res = await userRequest().post('/validate/otp', { 
+      otp: otp, 
+      email: email 
+    });
     dispatch(validateOtpSuccess(res.data));
     return res.data;
   } catch (error) {
-    const message = error.response?.data?.message || 'Invalid or expired OTP';
+    const message = error.response?.data?.message || error.response?.data?.error || 'Invalid OTP';
     dispatch(validateOtpFailure({ message }));
     throw error;
   }
 };
 
-export const updateProfile = async (dispatch, userUpdateInfo) => {
-  dispatch(updateUserStart());
+// Separate API for subscription OTP validation
+export const validateSubscriptionOtp = async (dispatch, otp, email) => {
+  dispatch(validateOtpStart());
   try {
-    const res = await userRequest().put('/profile/current', userUpdateInfo);
-    dispatch(updateUserSuccess(res.data));
-    return { success: true, data: res.data };
-  } catch (error) {
-    const message = error.response?.data?.message || 'Profile update failed';
-    dispatch(updateUserFailure({ message }));
-    return { success: false, error: message };
-  }
-};
-
-export const updateProfileById = async (dispatch, userUpdateInfo, id) => {
-  dispatch(updateUserStart());
-  try {
-    const res = await userRequest().put(`/profile/${id}`, userUpdateInfo);
-    dispatch(updateUserSuccess(res.data));
-    return { success: true, data: res.data };
-  } catch (error) {
-    const message = error.response?.data?.message || 'Profile update failed';
-    dispatch(updateUserFailure({ message }));
-    return { success: false, error: message };
-  }
-};
-
-export const getCurrentUserProfile = async dispatch => {
-  dispatch(fetchCurrentStart());
-  try {
-    const res = await userRequest().get('/profile/current');
-    dispatch(fetchCurrentSuccess(res.data));
+    const res = await userRequest().post('/validate/otp/subscription', { 
+      customerEmail: email, 
+      enteredOTP: otp 
+    });
+    dispatch(validateOtpSuccess(res.data));
     return res.data;
   } catch (error) {
-    const message = error.response?.data?.message || 'Failed to fetch user profile';
-    
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      dispatch(fetchCurrentFailure({ message }));
-      return;
-    }
-    
-    dispatch(fetchCurrentFailure({ message }));
-  }
-};
-
-export const changePassword = async (dispatch, passwordData) => {
-  try {
-    const res = await userRequest().put('/profile/current/password', passwordData);
-    return { success: true, data: res.data };
-  } catch (error) {
-    const message = error.response?.data?.message || 'Password change failed';
-    return { success: false, error: message };
-  }
-};
-
-
-export const fetchCurrentUserDetails = async dispatch => {
-  dispatch(fetchCurrentStart());
-  try {
-    const res = await userRequest().get('/customers/currentUser');
-    dispatch(fetchCurrentSuccess(res.data));
-    return res.data;
-  } catch (error) {
-    const message = error.response?.data?.message || 'Failed to fetch user';
-    dispatch(fetchCurrentFailure({ message }));
-    dispatch(setAuthStatus('unauthenticated'));
-    
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      return null;
-    }
-    
+    const message = error.response?.data || error.response?.data?.error || 'Invalid OTP';
+    dispatch(validateOtpFailure({ message }));
     throw error;
   }
 };
@@ -202,30 +179,102 @@ export const updatePasswordAndPushToLoginPage = async (dispatch, data) => {
   try {
     const res = await passResetRequest.post('/reset', data);
     dispatch(updatePassPushSuccess(res.data));
+    return res.data;
   } catch (error) {
     const message = error.response?.data?.message || 'Password reset failed';
     dispatch(updatePassPushFailure({ message }));
+    throw error;
   }
 };
 
-export const savePaymentApi = payload =>
-  paymentRequest().post('/submitPayment', payload);
+// ============================================
+// USER API
+// ============================================
 
-export const getPaymentDetailsApi = email =>
-  paymentRequest().get(`/paymentDetails?email=${email}`);
-
-export const updateFinalUserApi = finalUser =>
-  paymentRequest().post('/updateFinalUser', { finalUser });
-
-export const markUserAsSubscribed = async () => {
+export const fetchCurrentUserDetails = async (dispatch) => {
+  dispatch(fetchCurrentStart());
   try {
-    const res = await userRequest().post('/subscribe-success');
+    const res = await userRequest().get('/profile/current');
+    dispatch(fetchCurrentSuccess(res.data));
+    return res.data;
+  } catch (error) {
+    const message = error.response?.data?.message || 'Failed to fetch user';
+    dispatch(fetchCurrentFailure({ message }));
+    dispatch(setAuthStatus('unauthenticated'));
+    throw error;
+  }
+};
+
+export const updateProfile = async (dispatch, userData) => {
+  dispatch(updateUserStart());
+  try {
+    const res = await userRequest().put('/profile/current', userData);
+    dispatch(updateUserSuccess(res.data));
+    return res.data;
+  } catch (error) {
+    const message = error.response?.data?.message || 'Failed to update profile';
+    dispatch(updateUserFailure({ message }));
+    throw error;
+  }
+};
+
+export const changePassword = async (dispatch, passwordData) => {
+  try {
+    const res = await userRequest().post('/auth/change-password', passwordData);
     return res.data;
   } catch (error) {
     throw error;
   }
 };
 
+export const updateUser = async (id, customer) => {
+  try {
+    const res = await userRequest().put(`/customers/${id}`, customer);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteUser = async (id) => {
+  try {
+    await userRequest().delete(`/customers/${id}`);
+    return { success: true };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchUsers = async () => {
+  try {
+    const res = await userRequest().get('/admin/users');
+    return res.data || [];
+  } catch (error) {
+    return [];
+  }
+};
+
+// ============================================
+// CONTENT API (Movies & Shows)
+// ============================================
+
+export const fetchMovies = async () => {
+  try {
+    const res = await userRequest().get('/movies');
+    return res.data || [];
+  } catch (error) {
+    return [];
+  }
+};
+
+export const fetchShows = async () => {
+  try {
+    const res = await userRequest().get('/shows');
+    return res.data || [];
+  } catch (error) {
+    return [];
+  }
+};
 
 export const fetchProducts = async () => {
   try {
@@ -254,7 +303,7 @@ export const updateProduct = async (id, type, product) => {
   }
 };
 
-export const addProduct = async product => {
+export const addProduct = async (product) => {
   try {
     const res = await userRequest().post('/products', product);
     return res.data;
@@ -263,29 +312,14 @@ export const addProduct = async product => {
   }
 };
 
-export const updateUser = async (id, customer) => {
-  try {
-    const res = await userRequest().put(`/customers/${id}`, customer);
-    return res.data;
-  } catch (error) {
-    throw error;
-  }
-};
+// ============================================
+// TMDB API (Public - No Auth Required)
+// ============================================
 
-export const deleteUser = async id => {
-  try {
-    await userRequest().delete(`/customers/${id}`);
-    return { success: true };
-  } catch (error) {
-    throw error;
-  }
-};
-
-// TMDB API Calls
-export const fetchTmdbTrendingMovies = async dispatch => {
+export const fetchTmdbTrendingMovies = async (dispatch) => {
   dispatch(fetchTmdbTrendingMoviesStart());
   try {
-    const res = await userRequest().get('/tmdb/trending/movies');
+    const res = await publicRequest().get('/tmdb/trending/movies');
     const results = res.data?.results || [];
     dispatch(fetchTmdbTrendingMoviesSuccess(results));
     return results;
@@ -296,10 +330,10 @@ export const fetchTmdbTrendingMovies = async dispatch => {
   }
 };
 
-export const fetchTmdbTrendingShows = async dispatch => {
+export const fetchTmdbTrendingShows = async (dispatch) => {
   dispatch(fetchTmdbTrendingShowsStart());
   try {
-    const res = await userRequest().get('/tmdb/trending/shows');
+    const res = await publicRequest().get('/tmdb/trending/shows');
     const results = res.data?.results || [];
     dispatch(fetchTmdbTrendingShowsSuccess(results));
     return results;
@@ -310,10 +344,73 @@ export const fetchTmdbTrendingShows = async dispatch => {
   }
 };
 
+export const fetchTmdbPopularMovies = async () => {
+  try {
+    const res = await publicRequest().get('/tmdb/discover/movies?sort_by=popularity.desc&vote_count.gte=1000');
+    return res.data?.results || [];
+  } catch (error) {
+    return [];
+  }
+};
+
+export const fetchTmdbTopRatedMovies = async () => {
+  try {
+    const res = await publicRequest().get('/tmdb/top-rated/movies');
+    return res.data?.results || [];
+  } catch (error) {
+    return [];
+  }
+};
+
+export const fetchTmdbNowPlayingMovies = async () => {
+  try {
+    const res = await publicRequest().get('/tmdb/now-playing/movies');
+    return res.data?.results || [];
+  } catch (error) {
+    return [];
+  }
+};
+
+export const fetchTmdbUpcomingMovies = async () => {
+  try {
+    const res = await publicRequest().get('/tmdb/upcoming/movies');
+    return res.data?.results || [];
+  } catch (error) {
+    return [];
+  }
+};
+
+export const fetchTmdbPopularShows = async () => {
+  try {
+    const res = await publicRequest().get('/tmdb/popular/shows');
+    return res.data?.results || [];
+  } catch (error) {
+    return [];
+  }
+};
+
+export const fetchTmdbTopRatedShows = async () => {
+  try {
+    const res = await publicRequest().get('/tmdb/top-rated/shows');
+    return res.data?.results || [];
+  } catch (error) {
+    return [];
+  }
+};
+
+export const fetchTmdbSouthIndianMovies = async () => {
+  try {
+    const res = await publicRequest().get('/tmdb/south-indian/movies');
+    return res.data?.results || [];
+  } catch (error) {
+    return [];
+  }
+};
+
 export const searchTmdbMovies = async (dispatch, query, page = 1) => {
   dispatch(fetchTmdbSearchResultsStart());
   try {
-    const res = await userRequest().get(`/tmdb/search/movies?query=${encodeURIComponent(query)}&page=${page}`);
+    const res = await publicRequest().get(`/tmdb/search/movies?query=${encodeURIComponent(query)}&page=${page}`);
     const results = res.data?.results || [];
     dispatch(fetchTmdbSearchResultsSuccess(results));
     return results;
@@ -327,7 +424,7 @@ export const searchTmdbMovies = async (dispatch, query, page = 1) => {
 export const searchTmdbShows = async (dispatch, query, page = 1) => {
   dispatch(fetchTmdbSearchResultsStart());
   try {
-    const res = await userRequest().get(`/tmdb/search/shows?query=${encodeURIComponent(query)}&page=${page}`);
+    const res = await publicRequest().get(`/tmdb/search/shows?query=${encodeURIComponent(query)}&page=${page}`);
     const results = res.data?.results || [];
     dispatch(fetchTmdbSearchResultsSuccess(results));
     return results;
@@ -338,7 +435,8 @@ export const searchTmdbShows = async (dispatch, query, page = 1) => {
   }
 };
 
-export const syncTmdbMovie = async tmdbId => {
+// Sync TMDB content (requires auth)
+export const syncTmdbMovie = async (tmdbId) => {
   try {
     const res = await userRequest().post(`/tmdb/sync/movie/${tmdbId}`);
     return { success: true, data: res.data };
@@ -347,90 +445,145 @@ export const syncTmdbMovie = async tmdbId => {
   }
 };
 
-export const fetchTmdbMovieDetails = async movieName => {
+export const syncTmdbTvShow = async (tmdbId) => {
   try {
-    const searchRes = await userRequest().get(`/tmdb/search/movies?query=${encodeURIComponent(movieName)}&page=1`);
-    const results = searchRes.data?.results || [];
-    
-    if (results.length === 0) {
-      return null;
-    }
-    
-    const tmdbId = results[0].tmdbId;
-    const detailsRes = await userRequest().get(`/tmdb/movie/${tmdbId}`);
-    return detailsRes.data;
+    const res = await userRequest().post(`/tmdb/sync/tv/${tmdbId}`);
+    return { success: true, data: res.data };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchTmdbMovieDetails = async (tmdbId) => {
+  try {
+    const res = await publicRequest().get(`/tmdb/movie/${tmdbId}`);
+    return res.data;
   } catch (error) {
     return null;
   }
 };
 
-export const fetchTmdbPopularMovies = async () => {
+export const fetchTmdbTvShowDetails = async (tmdbId) => {
   try {
-    const res = await userRequest().get('/tmdb/discover/movies?sort_by=popularity.desc&vote_count.gte=1000');
-    return res.data?.results || [];
+    const res = await publicRequest().get(`/tmdb/tv/${tmdbId}`);
+    return res.data;
+  } catch (error) {
+    return null;
+  }
+};
+
+// ============================================
+// PAYMENT API
+// ============================================
+
+export const savePaymentApi = (payload) => paymentRequest().post('/submitPayment', payload);
+
+export const getPaymentDetailsApi = (email) => paymentRequest().get(`/paymentDetails?email=${email}`);
+
+export const updateFinalUserApi = (finalUser) => paymentRequest().post('/updateFinalUser', { finalUser });
+
+export const markUserAsSubscribed = async () => {
+  try {
+    const res = await userRequest().post('/payments/subscribe-success');
+    // Backend returns { message, data: { userData } } - extract data
+    return res.data?.data || res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const pingSpringApi = async (email) => {
+  try {
+    await userRequest().post('/payments/ping', { email });
+  } catch (error) {
+    // Silently fail
+  }
+};
+
+// ============================================
+// SUBSCRIPTION API
+// ============================================
+
+export const getSubscriptionPlans = async () => {
+  try {
+    const res = await userRequest().get('/subscription/plans');
+    return res.data || [];
   } catch (error) {
     return [];
   }
 };
 
-export const fetchTmdbTopRatedMovies = async () => {
+export const getCurrentSubscription = async () => {
   try {
-    const res = await userRequest().get('/tmdb/top-rated/movies');
-    return res.data?.results || [];
+    const res = await userRequest().get('/subscription/current');
+    return res.data;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const createSubscriptionIntent = async (planId) => {
+  try {
+    const res = await userRequest().post('/subscription/intent/', { planId });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// ============================================
+// STREAMING API
+// ============================================
+
+export const getMovieStreamUrl = async (movieId) => {
+  try {
+    const res = await userRequest().get(`/streaming/movie/${movieId}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getShowStreamUrl = async (showId, season, episode) => {
+  try {
+    const res = await userRequest().get(`/streaming/show/${showId}/season/${season}/episode/${episode}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getWatchHistory = async () => {
+  try {
+    const res = await userRequest().get('/streaming/history');
+    return res.data || [];
   } catch (error) {
     return [];
   }
 };
 
-export const fetchTmdbNowPlayingMovies = async () => {
+export const addToWatchlist = async (contentId, contentType) => {
   try {
-    const res = await userRequest().get('/tmdb/now-playing/movies');
-    return res.data?.results || [];
+    const res = await userRequest().post('/streaming/watchlist', { contentId, contentType });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getWatchlist = async () => {
+  try {
+    const res = await userRequest().get('/streaming/watchlist');
+    return res.data || [];
   } catch (error) {
     return [];
   }
 };
 
-export const fetchTmdbUpcomingMovies = async () => {
+export const removeFromWatchlist = async (contentId) => {
   try {
-    const res = await userRequest().get('/tmdb/upcoming/movies');
-    return res.data?.results || [];
-  } catch (error) {
-    return [];
-  }
-};
-
-export const fetchTmdbPopularShows = async () => {
-  try {
-    const res = await userRequest().get('/tmdb/popular/shows');
-    return res.data?.results || [];
-  } catch (error) {
-    return [];
-  }
-};
-
-export const fetchTmdbTopRatedShows = async () => {
-  try {
-    const res = await userRequest().get('/tmdb/top-rated/shows');
-    return res.data?.results || [];
-  } catch (error) {
-    return [];
-  }
-};
-
-export const fetchTmdbSouthIndianMovies = async () => {
-  try {
-    const res = await userRequest().get('/tmdb/south-indian/movies');
-    return res.data?.results || [];
-  } catch (error) {
-    return [];
-  }
-};
-
-export const syncTmdbTvShow = async tmdbId => {
-  try {
-    const res = await userRequest().post(`/tmdb/sync/tv/${tmdbId}`);
-    return { success: true, data: res.data };
+    await userRequest().delete(`/streaming/watchlist/${contentId}`);
+    return { success: true };
   } catch (error) {
     throw error;
   }

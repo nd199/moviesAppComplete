@@ -2,7 +2,7 @@ import { Send } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import Lottie from 'react-lottie';
 import { useDispatch, useSelector } from 'react-redux';
-import { validateOtp, verifyEmail } from '../Network/ApiCalls';
+import { validateSubscriptionOtp, verifySubscriptionEmail } from '../Network/ApiCalls';
 import { resetErrorMessage } from '../redux/userSlice';
 import CrossMark from '../Utils/animations/CrossMark.json';
 import TickMark from '../Utils/animations/TickMark.json';
@@ -69,7 +69,8 @@ const EmailSubscriptionVerify = ({
     try {
       setEmShowVerify(false);
       setShowEmailOtp(true);
-      const res = await verifyEmail(dispatch, email);
+      // Use subscription-specific endpoint - doesn't check if user exists
+      const res = await verifySubscriptionEmail(dispatch, email);
       setOtpMessage(res);
       setOtpTimer(60);
     } catch (error) {
@@ -95,8 +96,7 @@ const EmailSubscriptionVerify = ({
 
     try {
       setIsVerifyingOtp(true);
-      const validateInfo = { customerEmail: email, enteredOTP: mailOtp };
-      const res = await validateOtp(dispatch, validateInfo);
+      const res = await validateSubscriptionOtp(dispatch, mailOtp, email);
       setOtpMessage(res);
       setShowEmailOtp(false);
       setShowSuccessErrorMessage('');
