@@ -116,8 +116,12 @@ const List = ({ title, type = 'local' }) => {
   const formatTmdbItem = (item) => {
     if (type === 'tmdb-movies' || type === 'tmdb-shows' || type === 'tmdb-popular' || type === 'tmdb-top-rated' || 
         type === 'tmdb-now-playing' || type === 'tmdb-upcoming' || type === 'tmdb-popular-shows' || type === 'tmdb-top-rated-shows') {
+      // Determine mediaType based on type
+      const isShow = type === 'tmdb-shows' || type === 'tmdb-popular-shows' || type === 'tmdb-top-rated-shows';
+      const mediaType = isShow ? 'tv' : 'movie';
       return {
         id: item.tmdbId,
+        tmdbId: item.tmdbId,
         name: item.title || item.name,
         desc: item.description,
         year: item.year,
@@ -127,6 +131,7 @@ const List = ({ title, type = 'local' }) => {
         genre: item.genre,
         poster: item.poster,
         trailer: item.trailer,
+        mediaType: mediaType,
       };
     }
     return item;
@@ -179,6 +184,7 @@ const List = ({ title, type = 'local' }) => {
               <SwiperSlide key={item.id || item.tmdbId || idx} className="row-slide">
                 <ListItem
                   id={formattedItem.id}
+                  tmdbId={formattedItem.tmdbId}
                   name={formattedItem.name}
                   desc={formattedItem.desc}
                   year={formattedItem.year}
@@ -188,6 +194,7 @@ const List = ({ title, type = 'local' }) => {
                   genre={formattedItem.genre}
                   poster={formattedItem.poster}
                   trailer={formattedItem.trailer}
+                  mediaType={formattedItem.mediaType}
                 />
               </SwiperSlide>
             );

@@ -302,6 +302,16 @@ export const notificationAPI = {
   updateNotificationSettings: (settings) => api.put('/notifications/settings', settings),
 };
 
+// Watchlist API
+export const watchlistAPI = {
+  addToWatchlist: (watchlistData) => api.post('/watchlist', watchlistData),
+  getWatchlist: () => api.get('/watchlist'),
+  getWatchlistPaginated: (page = 0, size = 20) => api.get('/watchlist/paginated', { params: { page, size } }),
+  removeFromWatchlist: (tmdbId, mediaType) => api.delete(`/watchlist/${tmdbId}/${mediaType}`),
+  checkInWatchlist: (tmdbId, mediaType) => api.get(`/watchlist/check/${tmdbId}/${mediaType}`),
+  getWatchlistCount: () => api.get('/watchlist/count'),
+};
+
 // Admin API
 export const adminAPI = {
   getAllUsers: () => api.get('/admin/users'),

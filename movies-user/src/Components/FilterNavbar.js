@@ -1,3 +1,4 @@
+import { Search } from '@mui/icons-material';
 import './FilterNavbar.css';
 
 const FilterNavbar = ({
@@ -43,6 +44,7 @@ const FilterNavbar = ({
         <div className="filter-item search-field">
           <label>Search</label>
           <div className="search-input-wrapper">
+            <Search className="search-icon" />
             <input
               type="text"
               placeholder="Search movies & shows..."

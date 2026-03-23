@@ -1,4 +1,4 @@
-import { AddToQueueOutlined, PlayArrowOutlined } from '@mui/icons-material';
+import { PlayArrowOutlined } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -11,6 +11,7 @@ import './Featured.css';
 import VideoPlayer from './VideoPlayer';
 import { FeaturedSkeleton } from './GlobalLoader';
 import { publicRequest } from '../AxiosMethods';
+import WatchlistButton from './WatchlistButton';
 
 const Featured = () => {
   const [featuredData, setFeaturedData] = useState([]);
@@ -130,10 +131,14 @@ const Featured = () => {
                       Watch Now
                     </Link>
 
-                    <button className="featured-btn featured-btn-secondary">
-                      <AddToQueueOutlined />
-                      Watchlist
-                    </button>
+                    <WatchlistButton
+                      tmdbId={item.tmdbId}
+                      mediaType="movie"
+                      title={item.title}
+                      posterPath={item.poster}
+                      className="featured-btn featured-btn-secondary"
+                      showLabel={true}
+                    />
                   </div>
 
                 </div>

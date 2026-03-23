@@ -1,0 +1,139 @@
+.watchlist-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+
+.watchlist-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.watchlist-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.watchlist-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.watchlist-btn-active {
+  background: rgba(76, 175, 80, 0.3);
+  border: 1px solid rgba(76, 175, 80, 0.5);
+}
+
+.watchlist-btn-active:hover:not(:disabled) {
+  background: rgba(76, 175, 80, 0.4);
+}
+
+.watchlist-btn-loading {
+  pointer-events: none;
+}
+
+.watchlist-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.watchlist-label {
+  white-space: nowrap;
+}
+
+/* Size variants */
+.watchlist-btn-small {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.watchlist-btn-small .watchlist-icon {
+  font-size: 16px;
+}
+
+.watchlist-btn-large {
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+.watchlist-btn-large .watchlist-icon {
+  font-size: 22px;
+}
+
+/* Spinner animation */
+.watchlist-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: watchlist-spin 0.8s linear infinite;
+}
+
+@keyframes watchlist-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Card button variant - matches li-card-btn styling */
+.watchlist-btn-card {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+}
+
+.watchlist-btn-card:hover:not(:disabled) {
+  background: #fff !important;
+  color: #000 !important;
+  transform: scale(1.1) !important;
+}
+
+.watchlist-btn-card .watchlist-icon {
+  font-size: 18px !important;
+}
+
+.watchlist-btn-card .watchlist-label {
+  display: none !important;
+}
+
+.watchlist-btn-card.watchlist-btn-active {
+  background: rgba(76, 175, 80, 0.8) !important;
+  border-color: rgba(76, 175, 80, 0.8) !important;
+}
+
+.watchlist-btn-card.watchlist-btn-active:hover:not(:disabled) {
+  background: #4caf50 !important;
+  color: #fff !important;
+}
+
+/* Col list item button variant */
+.watchlist-btn-col-action {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+}
+
+.watchlist-btn-col-action:hover:not(:disabled) {
+  transform: scale(1.1) translateY(-2px) !important;
+}

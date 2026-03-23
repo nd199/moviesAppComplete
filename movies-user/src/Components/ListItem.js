@@ -1,10 +1,10 @@
 import {
-  Add,
   PlayArrow,
   ThumbDownOutlined,
   ThumbUpAltOutlined,
 } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import WatchlistButton from './WatchlistButton';
 import './ListItem.css';
 
 const ListItem = ({
@@ -13,7 +13,9 @@ const ListItem = ({
   rating,
   poster,
   id,
+  tmdbId,
   trailer,
+  mediaType,
 }) => {
   return (
     <div className="li-card-wrapper">
@@ -44,9 +46,21 @@ const ListItem = ({
               >
                 <PlayArrow fontSize="small" />
               </Link>
-              <button className="li-card-btn">
-                <Add fontSize="small" />
-              </button>
+              {tmdbId && mediaType ? (
+                <WatchlistButton
+                  tmdbId={tmdbId}
+                  mediaType={mediaType}
+                  title={name}
+                  posterPath={poster}
+                  size="small"
+                  showLabel={false}
+                  className="li-card-btn watchlist-btn-card"
+                />
+              ) : (
+                <button className="li-card-btn" disabled>
+                  <PlayArrow fontSize="small" />
+                </button>
+              )}
               <button className="li-card-btn">
                 <ThumbUpAltOutlined fontSize="small" />
               </button>

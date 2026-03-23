@@ -32,7 +32,7 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
 
     const countdownTimer = setInterval(() => {
       setTimeRemaining((prev) => {
-        if (prev <= 1) {
+        if (prev <= 0) {
           // Time's up, trigger retry
           const delay = Math.min(1000 * Math.pow(2, retryCount), 15000);
           setTimeout(() => {
@@ -65,7 +65,7 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
           {statusMessages[statusIndex]}
         </p>
         <p className="fallback-elapsed">
-          Estimated time: ~2 min 50 sec
+          Estimated time: 3 min 0 sec
         </p>
 
         {canRetry && autoRetryEnabled && (

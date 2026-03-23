@@ -1,5 +1,4 @@
 import {
-  Add,
   PlayArrow,
   ThumbDownOutlined,
   ThumbUpAltOutlined,
@@ -7,6 +6,7 @@ import {
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Col-ListItem.css';
+import WatchlistButton from './WatchlistButton';
 
 const ColListItem = ({
   name,
@@ -19,6 +19,8 @@ const ColListItem = ({
   genre,
   trailer,
   className = '',
+  tmdbId,
+  mediaType = 'movie',
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -53,9 +55,6 @@ const ColListItem = ({
           className="col-card-poster"
           loading="lazy"
         />
-        {isHovered && (
-          <div className="col-card-badge">TRAILER</div>
-        )}
       </div>
 
       <div className="col-card-body">
@@ -94,9 +93,15 @@ const ColListItem = ({
             >
               <PlayArrow />
             </Link>
-            <div className="col-card-action">
-              <Add />
-            </div>
+            <WatchlistButton
+              tmdbId={tmdbId}
+              mediaType={mediaType}
+              title={name}
+              posterPath={img}
+              size="small"
+              showLabel={false}
+              className="col-card-action"
+            />
             <div className="col-card-action">
               <ThumbUpAltOutlined />
             </div>

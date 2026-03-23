@@ -1,6 +1,5 @@
 import Lottie from "react-lottie";
 import Footer from "../../Components/Footer";
-import NavBar from "../../Components/NavBar";
 import {
   AboutUsOptions,
   AccessOptions,
@@ -17,7 +16,6 @@ import "./AboutUs.css";
 const AboutUs = () => {
   return (
     <div className="about-page">
-      <NavBar />
       <main className="about-main">
         <section className="about-hero-section">
           <div className="about-hero-content">

@@ -2,11 +2,13 @@ import { ArrowBack } from "@mui/icons-material";
 import { Link, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { fetchTmdbMovieDetails } from "../../Network/ApiCalls";
+import { useSearchParams } from 'react-router-dom';
 import "./VideoFullScreen.css";
 
 const VideoFullScreen = () => {
   const { id } = useParams();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [videoSrc, setVideoSrc] = useState("");
   const [loading, setLoading] = useState(true);
   const [movieTitle, setMovieTitle] = useState("");
@@ -19,11 +21,22 @@ const VideoFullScreen = () => {
   // Get trailer from location state (passed from ColListItem)
   const trailerFromState = location.state?.trailer;
   
+  // Get trailer from URL parameter (passed from Watchlist)
+  const trailerFromParams = searchParams.get('trailer');
+  
   useEffect(() => {
     const fetchTrailer = async () => {
       setLoading(true);
       
-      // If we have a trailer from state, use it
+      // If we have a trailer from URL parameter (from Watchlist), use it
+      if (trailerFromParams) {
+        setVideoSrc(trailerFromParams);
+        setMovieTitle(id);
+        setLoading(false);
+        return;
+      }
+      
+      // If we have a trailer from state (from ColListItem), use it
       if (trailerFromState) {
         setVideoSrc(trailerFromState);
         setMovieTitle(id);
@@ -48,7 +61,7 @@ const VideoFullScreen = () => {
     };
     
     fetchTrailer();
-  }, [id, trailerFromState]);
+  }, [id, trailerFromState, trailerFromParams]);
   
   // Convert YouTube URL to embed format if needed
   let finalVideoSrc = videoSrc;

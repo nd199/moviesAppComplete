@@ -1,9 +1,9 @@
+import { Movie, SearchOff } from '@mui/icons-material';
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ColListItem from "../../Components/Col-ListItem";
 import FilterNavbar from "../../Components/FilterNavbar";
 import Footer from "../../Components/Footer";
-import NavBar from "../../Components/NavBar";
 import { fetchTmdbTrendingMovies, searchTmdbMovies } from "../../Network/ApiCalls";
 import "./Movies.css";
 
@@ -83,7 +83,6 @@ const Movies = () => {
 
   return (
     <div className="moviesPage">
-      <NavBar />
       <div className="movieContainer">
         <h1>Movies</h1>
         <FilterNavbar
@@ -124,10 +123,13 @@ const Movies = () => {
                 genre={movie.genre}
                 trailer={movie.trailer}
                 className="card"
+                tmdbId={movie.tmdbId}
+                mediaType="movie"
               />
             ))
           ) : (
             <div className="empty-state">
+              <SearchOff className="empty-state-icon" />
               <h3>{searchQuery ? 'No movies found' : 'No movies match your filters'}</h3>
               <p>
                 {searchQuery 

@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import Featured from "../../Components/Featured";
 import Footer from "../../Components/Footer";
 import List from "../../Components/List";
-import NavBar from "../../Components/NavBar";
 import { fetchCurrentUserDetails } from "../../Network/ApiCalls";
 import "./Home.css";
 
@@ -36,7 +35,6 @@ const Home = () => {
 
   return (
     <div className="home">
-      <NavBar />
       <div className="main">
         <Featured loading={loading} />
         <List title={"Trending Movies"} type="tmdb-movies" />

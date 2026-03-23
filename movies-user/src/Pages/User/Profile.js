@@ -62,7 +62,7 @@ const Profile = () => {
 
   // Handle back navigation
   const handleBack = () => {
-    navigate(-1); // Go back to previous page
+    navigate(-1);
   };
 
   // Track original values for change detection
@@ -106,8 +106,7 @@ const Profile = () => {
     try {
       let updatedImageUrl = imageUrl;
       if (avatar) {
-        const url = await uploadToImgBB(avatar, setUploadProgress);
-        updatedImageUrl = url;
+        updatedImageUrl = await uploadToImgBB(avatar, setUploadProgress);
       }
 
       const result = await updateProfile(

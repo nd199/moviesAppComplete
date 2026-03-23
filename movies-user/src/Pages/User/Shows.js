@@ -1,9 +1,9 @@
+import { SearchOff } from '@mui/icons-material';
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ColListItem from "../../Components/Col-ListItem";
 import FilterNavbar from "../../Components/FilterNavbar";
 import Footer from "../../Components/Footer";
-import NavBar from "../../Components/NavBar";
 import { fetchTmdbTrendingShows, searchTmdbShows } from "../../Network/ApiCalls";
 import "./Shows.css";
 
@@ -83,7 +83,6 @@ const Shows = () => {
 
   return (
     <div className="showsPage">
-      <NavBar />
       <div className="showContainer">
         <h1>TV Shows</h1>
         <FilterNavbar
@@ -123,10 +122,13 @@ const Shows = () => {
                 genre={show.genre}
                 trailer={show.trailer}
                 className="card"
+                tmdbId={show.tmdbId}
+                mediaType="tv"
               />
             ))
           ) : (
             <div className="empty-state">
+              <SearchOff className="empty-state-icon" />
               <h3>{searchQuery ? 'No TV shows found' : 'No shows match your filters'}</h3>
               <p>
                 {searchQuery 

@@ -21,7 +21,11 @@ import VideoFullScreen from "./Pages/User/VideoFullScreen";
 import AboutUs from "./Pages/User/AboutUs";
 import Movies from "./Pages/User/Movies";
 import Shows from "./Pages/User/Shows";
+import Watchlist from "./Pages/User/Watchlist";
 import Profile from "./Pages/User/Profile";
+import NavBar from "./Components/NavBar";
+import Sidebar from "./Components/Sidebar";
+
 import PaymentCheckout from "./Pages/Payment/PaymentCheckout";
 import Success from "./Pages/Payment/Success";
 
@@ -100,6 +104,7 @@ function AppWithNavigation() {
   const dispatch = useDispatch();
   const authStatus = useSelector(state => state.user.authStatus);
   const currentUser = useSelector(state => state.user.currentUser);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Initialize auth state on mount
   useEffect(() => {
@@ -174,6 +179,8 @@ function AppWithNavigation() {
 
   return (
     <Router>
+      <NavBar onMenuClick={() => setSidebarOpen(true)} />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <Routes>
         {/* Public Routes */}
         <Route path="/server-status" element={<ServerConnection />} />
@@ -184,6 +191,16 @@ function AppWithNavigation() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/shows" element={<Shows />} />
+
+        {/* Protected Routes - Require Authentication */}
+        <Route
+          path="/watchlist"
+          element={
+            <ProtectedRoute>
+              <Watchlist />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/email-verification" element={<EmailVerification />} />
         <Route path="/payment" element={<PaymentCheckout />} />
         <Route path="/payment/success" element={<Success />} />

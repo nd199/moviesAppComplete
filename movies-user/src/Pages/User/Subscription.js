@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import PlanCard from '../../Components/PlanCard';
 import './Subscription.css';
-import NavBar from '../../Components/NavBar';
 import Footer from '../../Components/Footer';
 import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
@@ -38,7 +37,6 @@ const Subscription = () => {
 
     return (
         <>
-            <NavBar/>
             <div className="subscribe-page">
                 <div className="subscribe-form">
                     <h2>Choose a Plan</h2>
