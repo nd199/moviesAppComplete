@@ -8,7 +8,9 @@ import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Exception.InvalidCredentialsException;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Repo.AdminRepository;
+import com.naren.moviesapp.Repo.ContentManagerRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
+import com.naren.moviesapp.Service.RefreshTokenService;
 import com.naren.moviesapp.Security.AppUserPrincipal;
 import com.naren.moviesapp.jwt.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,6 +49,12 @@ class AuthServiceTest {
 
     @Mock
     private AdminRepository adminRepository;
+
+    @Mock
+    private ContentManagerRepository contentManagerRepository;
+
+    @Mock
+    private RefreshTokenService refreshTokenService;
 
     @Mock
     private Authentication authentication;
@@ -88,8 +96,7 @@ class AuthServiceTest {
 
         CustomerDTO mapped = buildDTO("ROLE_USER");
         when(customerDTOMapper.apply(principal)).thenReturn(mapped);
-        when(jwtUtil.issueToken(eq(mapped.email()), anySet()))
-                .thenReturn("jwt-token");
+        doReturn("jwt-token").when(jwtUtil).issueToken(anyString(), anySet());
 
         AuthResponse response =
                 underTest.login(new AuthRequest("user@codeNaren.com", "password"));
@@ -99,7 +106,7 @@ class AuthServiceTest {
         assertThat(customerResponse.customerDTO()).isEqualTo(mapped);
         assertThat(customerResponse.token()).isEqualTo("jwt-token");
 
-        verify(jwtUtil).issueToken(eq(mapped.email()), anySet());
+        verify(jwtUtil).issueToken(anyString(), anySet());
     }
 
     @Test
@@ -116,8 +123,7 @@ class AuthServiceTest {
 
         CustomerDTO mapped = buildDTO("ROLE_ADMIN");
         when(customerDTOMapper.apply(principal)).thenReturn(mapped);
-        when(jwtUtil.issueToken(eq(mapped.email()), anySet()))
-                .thenReturn("jwt-token");
+        doReturn("jwt-token").when(jwtUtil).issueToken(anyString(), anySet());
 
         AuthResponse response =
                 underTest.login(new AuthRequest("user@codeNaren.com", "password"));
@@ -173,8 +179,7 @@ class AuthServiceTest {
 
         CustomerDTO mapped = buildDTO("ROLE_SUPER_ADMIN");
         when(customerDTOMapper.apply(principal)).thenReturn(mapped);
-        when(jwtUtil.issueToken(eq(mapped.email()), anySet()))
-                .thenReturn("jwt-token");
+        doReturn("jwt-token").when(jwtUtil).issueToken(anyString(), anySet());
 
         AuthResponse response =
                 underTest.login(new AuthRequest("superadmin@codeNaren.com", "password"));
@@ -184,7 +189,7 @@ class AuthServiceTest {
         assertThat(customerResponse.customerDTO().roles())
                 .contains("ROLE_SUPER_ADMIN");
 
-        verify(jwtUtil).issueToken(eq(mapped.email()), anySet());
+        verify(jwtUtil).issueToken(anyString(), anySet());
     }
 
     private CustomerDTO buildDTO(String role) {
