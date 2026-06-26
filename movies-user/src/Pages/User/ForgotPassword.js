@@ -59,6 +59,7 @@ const ForgotPassword = () => {
           nav("/Login");
         } catch (err) {
           setError("Failed to update password. Please try again.");
+        }
       }
     } catch (error) {
       console.error(error);
