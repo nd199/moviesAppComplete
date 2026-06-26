@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.12</version>
+        <version>3.4.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -69,6 +69,8 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
         </dependency>
+
+        <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -91,6 +93,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
+            <version>11.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -102,7 +105,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.42</version>  <!-- Latest version -->
+            <version>1.18.36</version>  <!-- Latest stable version -->
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -139,7 +142,6 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
-
         <!--ThymeLeaf -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -150,7 +152,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.2.0</version>
+            <version>2.6.0</version>
         </dependency>
 
         <!-- WebClient for TMDB API calls -->
@@ -307,7 +309,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>9.22.3</version>
+                <version>10.12.0</version>
                 <configuration>
                     <url>jdbc:postgresql://localhost:5332/movieott</url>
                     <user>codeNaren</user>
