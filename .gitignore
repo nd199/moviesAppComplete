@@ -92,4 +92,5 @@ junit.xml
 # ===============================
 yarn.lock
 pnpm-lock.yaml
-.continueignore
+.continueignore.env
+.env
