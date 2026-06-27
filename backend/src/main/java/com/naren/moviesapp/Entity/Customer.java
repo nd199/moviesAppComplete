@@ -13,7 +13,7 @@ import java.util.*;
 import static jakarta.persistence.CascadeType.*;
 
 @Entity
-@Table(name = "Customer", uniqueConstraints = {
+@Table(name = "customer", uniqueConstraints = {
         @UniqueConstraint(name = "email_id_unique", columnNames = "email"),
         @UniqueConstraint(name = "phone_number_unique", columnNames = "phone_number")
 })
