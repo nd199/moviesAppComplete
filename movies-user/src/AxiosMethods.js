@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { store } from './redux/store';
-import { getAccessToken as getAuthStoreToken, getRefreshToken as getAuthStoreRefreshToken, clearAuth, setAccessToken as setAuthStoreAccessToken, setRefreshToken as setAuthStoreRefreshToken } from './authStore';
 
 // ============================================
 // CONFIGURATION
@@ -23,8 +22,13 @@ const getApiBaseUrl = () => `${getBaseUrl()}/api/v1`;
 
 const getAccessToken = () => {
   try {
-    // Get from authStore (primary in-memory source)
-    return getAuthStoreToken() || null;
+    // Check localStorage first (most reliable)
+    const localToken = localStorage.getItem('accessToken');
+    if (localToken) return localToken;
+    
+    // Fallback to Redux store
+    const state = store.getState();
+    return state?.user?.accessToken || null;
   } catch (e) {
     console.error('Error getting access token:', e);
     return null;
@@ -33,8 +37,7 @@ const getAccessToken = () => {
 
 const getRefreshToken = () => {
   try {
-    // Get from authStore (primary in-memory source)
-    return getAuthStoreRefreshToken() || null;
+    return localStorage.getItem('refreshToken');
   } catch (e) {
     console.error('Error getting refresh token:', e);
     return null;
@@ -42,14 +45,13 @@ const getRefreshToken = () => {
 };
 
 const clearTokens = () => {
-  // Clear tokens via authStore
-  clearAuth();
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
 };
 
 const setTokens = (accessToken, refreshToken) => {
-  // Set tokens via authStore
-  if (accessToken) setAuthStoreAccessToken(accessToken);
-  if (refreshToken) setAuthStoreRefreshToken(refreshToken);
+  if (accessToken) localStorage.setItem('accessToken', accessToken);
+  if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
 };
 
 // ============================================
