@@ -6,7 +6,7 @@ server:
 spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5332/movieott}
-    username: ${DB_USERNAME:codeNaren}
+    username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:password}
 
   flyway:

@@ -16,7 +16,7 @@ public class AbstractTestContainers {
     protected static final PostgreSQLContainer<?> postgresContainer =
             new PostgreSQLContainer<>("postgres:15-alpine")
                     .withDatabaseName("movieott")
-                    .withUsername("codeNaren")
+                    .withUsername("postgres")
                     .withPassword("password")
                     .withReuse(false);
 
