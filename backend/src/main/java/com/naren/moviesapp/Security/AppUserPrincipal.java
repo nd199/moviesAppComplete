@@ -4,6 +4,8 @@ import com.naren.moviesapp.Config.RolePermissionMapper;
 import com.naren.moviesapp.Entity.Admin;
 import com.naren.moviesapp.Entity.ContentManager;
 import com.naren.moviesapp.Entity.Customer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +15,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AppUserPrincipal implements UserDetails {
+
+    private static final Logger log = LoggerFactory.getLogger(AppUserPrincipal.class);
 
     private final String username, password;
     private final boolean active;
@@ -38,7 +42,7 @@ public class AppUserPrincipal implements UserDetails {
                 })
                 .collect(Collectors.toSet());
 
-        System.out.println("Authorities for " + username + " : " + authorities);
+        log.info("Authorities for {} : {}", username, authorities);
     }
 
     public AppUserPrincipal(Customer customer) {
@@ -59,7 +63,7 @@ public class AppUserPrincipal implements UserDetails {
                 })
                 .collect(Collectors.toSet());
 
-        System.out.println("Authorities for " + username + " : " + authorities);
+        log.info("Authorities for {} : {}", username, authorities);
     }
 
     public AppUserPrincipal(ContentManager contentManager) {
@@ -80,7 +84,7 @@ public class AppUserPrincipal implements UserDetails {
                 })
                 .collect(Collectors.toSet());
 
-        System.out.println("Authorities for " + username + " : " + authorities);
+        log.info("Authorities for {} : {}", username, authorities);
     }
 
     public Object getUserEntity() {

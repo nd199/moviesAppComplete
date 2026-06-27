@@ -31,10 +31,10 @@ spring:
     web-application-type: servlet
 
   mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
+    host: ${MAIL_HOST}
     port: ${MAIL_PORT:587}
-    username: codenaren@gmail.com
-    password: wmuwmbikdmvrinly
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -65,9 +65,9 @@ app:
     email: ${APP_DEMO_EMAIL:demo@moviesapp.com}
     password: ${APP_DEMO_PASSWORD:Demo1234567}
   brevo:
-    api-key: ${BREVO_API_KEY:REMOVED_BREVO_KEY}
+    api-key: ${BREVO_API_KEY}
     sender:
-      email: ${BREVO_SENDER_EMAIL:codenaren@gmail.com}
+      email: ${BREVO_SENDER_EMAIL}
       name: ${BREVO_SENDER_NAME:MoviesApp}
 logging:
   level:
