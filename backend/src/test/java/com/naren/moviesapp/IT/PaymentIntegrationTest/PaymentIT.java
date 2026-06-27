@@ -1,6 +1,6 @@
 package com.naren.moviesapp.IT.PaymentIntegrationTest;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 import com.naren.moviesapp.AbstractIntegrationTest;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;

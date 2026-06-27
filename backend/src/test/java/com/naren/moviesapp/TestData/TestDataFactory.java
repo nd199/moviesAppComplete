@@ -1,6 +1,6 @@
 package com.naren.moviesapp.TestData;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 import com.naren.moviesapp.Entity.*;
 import com.naren.moviesapp.Record.*;
 

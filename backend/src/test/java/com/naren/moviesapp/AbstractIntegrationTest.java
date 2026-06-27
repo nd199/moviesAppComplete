@@ -1,12 +1,14 @@
 package com.naren.moviesapp;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 import org.flywaydb.core.Flyway;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.Map;
 
 @Testcontainers(disabledWithoutDocker = true)
 public abstract class AbstractIntegrationTest {
@@ -26,12 +28,13 @@ public abstract class AbstractIntegrationTest {
 
         Flyway flyway = Flyway
                 .configure()
-                .dataSource(postgresContainer.getJdbcUrl(),
-                        postgresContainer.getUsername(),
-                        postgresContainer.getPassword()
-                )
-                .cleanDisabled(true)
-                .validateMigrationNaming(false)
+                .configuration(Map.of(
+                        "url", postgresContainer.getJdbcUrl(),
+                        "user", postgresContainer.getUsername(),
+                        "password", postgresContainer.getPassword(),
+                        "cleanDisabled", "true",
+                        "validateMigrationNaming", "false"
+                ))
                 .load();
         flyway.migrate();
     }

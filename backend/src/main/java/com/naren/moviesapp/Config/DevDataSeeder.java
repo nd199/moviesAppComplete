@@ -1,6 +1,6 @@
 package com.naren.moviesapp.Config;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Show;

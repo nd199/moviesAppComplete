@@ -1,6 +1,6 @@
 package com.naren.moviesapp.IT.CustomerIntegrationTest;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 import com.naren.moviesapp.AbstractIntegrationTest;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Entity.Movie;

@@ -1,6 +1,6 @@
 package com.naren.moviesapp;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
