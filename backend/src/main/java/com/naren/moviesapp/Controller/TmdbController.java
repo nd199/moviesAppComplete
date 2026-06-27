@@ -804,4 +804,42 @@ public class TmdbController {
                 "totalResults", videos.size()
         ));
     }
+
+    /**
+     * Refresh movie trailer cache
+     */
+    @PostMapping("/cache/refresh/movie/{tmdbId}")
+    public ResponseEntity<?> refreshMovieTrailerCache(@PathVariable Long tmdbId) {
+        logger.info("Received request to refresh movie trailer cache for ID: {}", tmdbId);
+        tmdbService.refreshMovieTrailerCache(tmdbId);
+        return ResponseEntity.ok(Map.of(
+                "message", "Movie trailer cache refreshed successfully",
+                "tmdbId", tmdbId
+        ));
+    }
+
+    /**
+     * Refresh TV show trailer cache
+     */
+    @PostMapping("/cache/refresh/show/{tmdbId}")
+    public ResponseEntity<?> refreshTvShowTrailerCache(@PathVariable Long tmdbId) {
+        logger.info("Received request to refresh TV show trailer cache for ID: {}", tmdbId);
+        tmdbService.refreshTvShowTrailerCache(tmdbId);
+        return ResponseEntity.ok(Map.of(
+                "message", "TV show trailer cache refreshed successfully",
+                "tmdbId", tmdbId
+        ));
+    }
+
+    /**
+     * Clear all trailer caches
+     */
+    @PostMapping("/cache/clear")
+    public ResponseEntity<?> clearAllTrailerCaches() {
+        logger.info("Received request to clear all trailer caches");
+        tmdbService.clearAllTrailerCaches();
+        return ResponseEntity.ok(Map.of(
+                "message", "All trailer caches cleared successfully"
+        ));
+    }
 }
