@@ -43,10 +43,7 @@ const isLocal = () => {
 };
 
 const getBaseURL = () => {
-  if (process.env.REACT_APP_API_URL && !isLocal()) {
-    return process.env.REACT_APP_API_URL;
-  }
-  return "http://localhost:8080";
+  return process.env.REACT_APP_API_URL || 'http://localhost:8080';
 };
 
 const API_URL = getBaseURL();

@@ -11,10 +11,7 @@ const isLocal = () => {
 };
 
 const getBaseUrl = () => {
-  if (process.env.REACT_APP_API_URL && !isLocal()) {
-    return process.env.REACT_APP_API_URL;
-  }
-  return 'http://localhost:8080';
+  return process.env.REACT_APP_API_URL || 'http://localhost:8080';
 };
 
 const getApiBaseUrl = () => `${getBaseUrl()}/api/v1`;
@@ -149,9 +146,7 @@ publicApi.interceptors.response.use(
 // ============================================
 
 const passResetApi = axios.create({
-  baseURL: isLocal() 
-    ? 'http://localhost:8080/api/password-reset' 
-    : `${process.env.REACT_APP_API_URL}/password-reset`,
+  baseURL: `${getBaseUrl()}/api/password-reset`,
   timeout: 30000,
   withCredentials: true,
 });
@@ -161,9 +156,7 @@ const passResetApi = axios.create({
 // ============================================
 
 const paymentApi = axios.create({
-  baseURL: isLocal()
-    ? 'http://localhost:8080/api/v1/payments'
-    : `${process.env.REACT_APP_API_URL}/api/v1/payments`,
+  baseURL: `${getApiBaseUrl()}/payments`,
   timeout: 30000,
   withCredentials: true,
 });
@@ -173,7 +166,7 @@ const paymentApi = axios.create({
 // ============================================
 
 const springApi = axios.create({
-  baseURL: isLocal() ? 'http://localhost:8080' : process.env.REACT_APP_API_URL,
+  baseURL: getBaseUrl(),
   timeout: 30000,
   withCredentials: true,
 });
