@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS watchlist_items (
     poster_path VARCHAR(500),
     media_type VARCHAR(50) NOT NULL,
     added_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_watchlist_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
+    CONSTRAINT fk_watchlist_customer FOREIGN KEY (customer_id) REFERENCES "Customer"(id) ON DELETE CASCADE,
     CONSTRAINT uq_watchlist_customer_tmdb UNIQUE (customer_id, tmdb_id, media_type)
 );
 
