@@ -11,6 +11,7 @@ import FilterNavbar from '../../Components/FilterNavbar';
 import WatchlistButton from '../../Components/WatchlistButton';
 import { watchlistAPI } from '../../AxiosMethods';
 import { fetchTmdbMovieDetails, fetchTmdbTvShowDetails } from '../../Network/ApiCalls';
+import GlobalLoader from '../../Components/GlobalLoader';
 import './Watchlist.css';
 
 const Watchlist = () => {
@@ -138,24 +139,23 @@ const Watchlist = () => {
 
   if (loading) {
     return (
-      <div className="watchlist-page">
-        <FilterNavbar
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          genre={genre}
-          setGenre={setGenre}
-          year={year}
-          setYear={setYear}
-          rating={rating}
-          setRating={setRating}
-        />
-        <div className="watchlist-loading">
-          <div className="loading-spinner"></div>
-          <p>Loading your watchlist...</p>
+      <>
+        <GlobalLoader open={true} message="Loading your watchlist..." />
+        <div className="watchlist-page">
+          <FilterNavbar
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            genre={genre}
+            setGenre={setGenre}
+            year={year}
+            setYear={setYear}
+            rating={rating}
+            setRating={setRating}
+          />
         </div>
-      </div>
+      </>
     );
   }
 

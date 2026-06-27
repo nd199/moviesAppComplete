@@ -92,12 +92,17 @@ public class TmdbConvertedDto {
             var videosOpt = tmdbService.getMovieVideos(movie.getTmdbId());
             if (videosOpt.isPresent() && !videosOpt.get().isEmpty()) {
                 List<TmdbVideoDto> videos = videosOpt.get();
-                // Find first trailer (type "Trailer" and site "YouTube")
+                // First try to find a trailer (type "Trailer" and site "YouTube")
                 trailerUrl = videos.stream()
                         .filter(video -> "Trailer".equals(video.getType()) && "YouTube".equals(video.getSite()))
                         .findFirst()
                         .map(video -> "https://www.youtube.com/watch?v=" + video.getKey())
-                        .orElse(null);
+                        // Fallback to teaser if no trailer found
+                        .orElseGet(() -> videos.stream()
+                                .filter(video -> "Teaser".equals(video.getType()) && "YouTube".equals(video.getSite()))
+                                .findFirst()
+                                .map(video -> "https://www.youtube.com/watch?v=" + video.getKey())
+                                .orElse(null));
             } else {
             }
         } catch (Exception e) {
@@ -168,12 +173,17 @@ public class TmdbConvertedDto {
             var videosOpt = tmdbService.getTvShowVideos(tvShow.getTmdbId());
             if (videosOpt.isPresent() && !videosOpt.get().isEmpty()) {
                 List<TmdbVideoDto> videos = videosOpt.get();
-                // Find first trailer (type "Trailer" and site "YouTube")
+                // First try to find a trailer (type "Trailer" and site "YouTube")
                 trailerUrl = videos.stream()
                         .filter(video -> "Trailer".equals(video.getType()) && "YouTube".equals(video.getSite()))
                         .findFirst()
                         .map(video -> "https://www.youtube.com/watch?v=" + video.getKey())
-                        .orElse(null);
+                        // Fallback to teaser if no trailer found
+                        .orElseGet(() -> videos.stream()
+                                .filter(video -> "Teaser".equals(video.getType()) && "YouTube".equals(video.getSite()))
+                                .findFirst()
+                                .map(video -> "https://www.youtube.com/watch?v=" + video.getKey())
+                                .orElse(null));
             }
         } catch (Exception e) {
             // Ignore trailer fetch errors

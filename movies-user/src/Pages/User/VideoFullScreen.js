@@ -3,6 +3,7 @@ import { Link, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { fetchTmdbMovieDetails } from "../../Network/ApiCalls";
 import { useSearchParams } from 'react-router-dom';
+import GlobalLoader from "../../Components/GlobalLoader";
 import "./VideoFullScreen.css";
 
 const VideoFullScreen = () => {
@@ -75,18 +76,17 @@ const VideoFullScreen = () => {
   
   if (loading) {
     return (
-      <div className="videoFS">
-        <div className="video-nav">
-          <Link to={"/"} className="video-back-btn">
-            <ArrowBack />
-            <span>Back to Home</span>
-          </Link>
+      <>
+        <GlobalLoader open={true} message="Loading trailer..." />
+        <div className="videoFS">
+          <div className="video-nav">
+            <Link to={"/"} className="video-back-btn">
+              <ArrowBack />
+              <span>Back to Home</span>
+            </Link>
+          </div>
         </div>
-        <div className="video-loading">
-          <div className="loading-spinner"></div>
-          <p>Loading trailer...</p>
-        </div>
-      </div>
+      </>
     );
   }
   

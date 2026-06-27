@@ -4,6 +4,7 @@ import { VisibilityOutlined } from '@mui/icons-material';
 import { userRequest } from '../AxiosMethods';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import GlobalLoader from './GlobalLoader';
 
 const WidgetsSmall = () => {
   const usersState = useSelector(state => state?.user?.users);
@@ -34,50 +35,49 @@ const WidgetsSmall = () => {
   }, []);
 
   return (
-    <div className="widgetSmall">
-      <span className="wsTitle">Newly Joined Members</span>
-      {loading ? (
-        <div className="loading">
-          <p>Loading...</p>
-        </div>
-      ) : error ? (
-        <div className="error">
-          <p>{error}</p>
-        </div>
-      ) : (
-        <ul className="wsList">
-          {users?.length > 0 ? (
-            users
-              ?.filter(user => user.roles[0] !== 'ROLE_ADMIN')
-              .map(user => (
-                <li className="wsListItem" key={user.id}>
-                  <img
-                    src={user?.imageUrl || defaultSelected}
-                    alt=""
-                    className="wsImage"
-                  />
-                  <div className="wsUser">
-                    <span className="wsUsername">{user.username}</span>
-                    <span className="wsUserTitle">
-                      {user.name || 'No Title'}
-                    </span>
-                  </div>
-                  <button className="wsButton">
-                    <VisibilityOutlined className="ws-icon" />
-                    <Link to={'/User/' + user.id} style={{ color: 'violet' }}>
-                      Display
-                    </Link>
-                  </button>
-                </li>
-              ))
-          ) : (
-            <div className="loading">
-              <p>No Users Found</p>
-            </div>
-          )}
-        </ul>
-      )}
-    </div>
+    <>
+      {loading && <GlobalLoader open={true} message="Loading members..." />}
+      <div className="widgetSmall">
+        <span className="wsTitle">Newly Joined Members</span>
+        {error ? (
+          <div className="error">
+            <p>{error}</p>
+          </div>
+        ) : (
+          <ul className="wsList">
+            {users?.length > 0 ? (
+              users
+                ?.filter(user => user.roles[0] !== 'ROLE_ADMIN')
+                .map(user => (
+                  <li className="wsListItem" key={user.id}>
+                    <img
+                      src={user?.imageUrl || defaultSelected}
+                      alt=""
+                      className="wsImage"
+                    />
+                    <div className="wsUser">
+                      <span className="wsUsername">{user.username}</span>
+                      <span className="wsUserTitle">
+                        {user.name || 'No Title'}
+                      </span>
+                    </div>
+                    <button className="wsButton">
+                      <VisibilityOutlined className="ws-icon" />
+                      <Link to={'/User/' + user.id} style={{ color: 'violet' }}>
+                        Display
+                      </Link>
+                    </button>
+                  </li>
+                ))
+            ) : (
+              <div className="loading">
+                <p>No Users Found</p>
+              </div>
+            )}
+          </ul>
+        )}
+      </div>
+    </>
   );
 };
 
