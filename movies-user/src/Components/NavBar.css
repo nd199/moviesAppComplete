@@ -13,7 +13,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 80px;
+  height: 65px;
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
   z-index: 1000;
@@ -22,7 +22,7 @@
 .navbar.scrolled {
   background: var(--bg-primary);
   box-shadow: var(--shadow);
-  height: 70px;
+  height: 60px;
 }
 .nav-container {
   max-width: 1400px;
@@ -286,10 +286,10 @@
 }
 @media (max-width: 900px) {
   .navbar {
-    height: 70px;
+    height: 60px;
   }
   .navbar.scrolled {
-    height: 65px;
+    height: 55px;
   }
   .nav-container {
     padding: 0 1rem;
