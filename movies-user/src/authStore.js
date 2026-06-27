@@ -1,25 +1,22 @@
 /**
- * Auth Store - Token management with localStorage persistence
+ * Auth Store - Token management with in-memory storage
  * This module handles JWT token storage and retrieval independently of Redux
+ * Tokens are primarily stored via HTTP-only cookies for security
  */
 
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 
-// Initialize token from localStorage on load
-let accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+// Initialize token from memory
+let accessToken = null;
+let refreshToken = null;
 
 /**
- * Set access token in both memory and localStorage
+ * Set access token in memory
  * @param {string|null} token - The access token to store
  */
 export const setAccessToken = (token) => {
   accessToken = token;
-  if (token) {
-    localStorage.setItem(ACCESS_TOKEN_KEY, token);
-  } else {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-  }
 };
 
 /**
@@ -29,31 +26,26 @@ export const setAccessToken = (token) => {
 export const getAccessToken = () => accessToken;
 
 /**
- * Get refresh token from localStorage
+ * Get refresh token from memory
  * @returns {string|null} The refresh token
  */
-export const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);
+export const getRefreshToken = () => refreshToken;
 
 /**
- * Set refresh token in localStorage
+ * Set refresh token in memory
  * @param {string|null} token - The refresh token to store
  */
 export const setRefreshToken = (token) => {
-  if (token) {
-    localStorage.setItem(REFRESH_TOKEN_KEY, token);
-  } else {
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-  }
+  refreshToken = token;
 };
 
 /**
- * Clear all authentication tokens
+ * Clear all authentication tokens from memory
  * Used on logout or when tokens become invalid
  */
 export const clearAuth = () => {
   accessToken = null;
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  refreshToken = null;
 };
 
 /**
@@ -61,7 +53,7 @@ export const clearAuth = () => {
  * @returns {boolean} True if tokens exist
  */
 export const hasTokens = () => {
-  return !!(accessToken || localStorage.getItem(REFRESH_TOKEN_KEY));
+  return !!(accessToken || refreshToken);
 };
 
 /**

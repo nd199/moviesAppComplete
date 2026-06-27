@@ -28,15 +28,11 @@ const userSlice = createSlice({
       state.authStatus = "unauthenticated";
       state.accessToken = null;
       state.refreshToken = null;
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
     },
 
     setTokens: (state, action) => {
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
-      localStorage.setItem('accessToken', action.payload.accessToken);
-      localStorage.setItem('refreshToken', action.payload.refreshToken);
     },
 
     setAuthStatus: (state, action) => {

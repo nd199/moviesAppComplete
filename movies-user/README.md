@@ -49,7 +49,8 @@ npm start
 
 ## 🔧 Environment Variables
 
-Create a `.env` file based on `.env.example`:
+### Local Development
+Create a `.env` file in the project root:
 
 ```env
 REACT_APP_API_URL=http://localhost:8080
@@ -58,6 +59,12 @@ REACT_APP_ENABLE_ANALYTICS=false
 REACT_APP_COOKIE_SECURE=false
 REACT_APP_COOKIE_SAME_SITE=lax
 ```
+
+### Vercel Deployment
+Set the following environment variable in your Vercel project settings:
+- `REACT_APP_API_URL` - Your production backend API URL (e.g., `https://your-backend-domain.com`)
+
+The `vercel.json` configuration automatically maps this variable during the build process.
 
 ## 📜 Available Scripts
 

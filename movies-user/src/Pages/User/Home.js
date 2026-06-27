@@ -13,20 +13,15 @@ const Home = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      // Only try to fetch user if there's a token in localStorage
-      const hasToken = localStorage.getItem('accessToken');
-      
-      if (hasToken) {
-        setLoading(true);
-        try {
-          await fetchCurrentUserDetails(dispatch);
-        } catch (error) {
-          console.error("Failed to fetch user:", error);
-        } finally {
-          setTimeout(() => setLoading(false), 500);
-        }
-      } else {
-        setLoading(false);
+      // Try to fetch user if authenticated (cookies will handle auth)
+      setLoading(true);
+      try {
+        await fetchCurrentUserDetails(dispatch);
+      } catch (error) {
+        // User might not be authenticated, that's okay
+        console.error("Failed to fetch user:", error);
+      } finally {
+        setTimeout(() => setLoading(false), 500);
       }
     };
     
