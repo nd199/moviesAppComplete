@@ -44,7 +44,5 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/moviesAppComplete
-            git pull origin main
             docker compose pull
             docker compose up -d --build
