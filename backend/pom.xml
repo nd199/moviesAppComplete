@@ -229,7 +229,7 @@
                         </platforms>
                     </from>
                     <to>
-                        <image>docker.io/codenaren23/movies-api</image>
+                        <image>docker.io/codenaren23/movieticket-api</image>
                         <tags>
                             <tag>latest</tag>
                         </tags>
