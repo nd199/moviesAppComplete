@@ -32,9 +32,7 @@ services:
     restart: unless-stopped
 
   app:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: codenaren23/movies-api:latest
     container_name: movie-api
     depends_on:
       db:

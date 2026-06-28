@@ -30,8 +30,8 @@ jobs:
       - name: Build and Push Docker image
         run: |
           cd backend
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/movieticket-api:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/movieticket-api:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/movies-api:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/movies-api:latest
 
   deploy:
     needs: build

@@ -10,9 +10,9 @@
     </parent>
 
     <groupId>com.naren</groupId>
-    <artifactId>movieOttApplication</artifactId>
+    <artifactId>movies-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>movieOttApplication</name>
+    <name>movies-api</name>
     <properties>
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
