@@ -18,10 +18,10 @@ app:
   data-initialization:
     enabled: ${DATA_INITIALIZATION_ENABLED:true}
   superadmin:
-    email: superadmin@movies.com
-    password: ChangeMe123!
+    email: ${SUPER_ADMIN_EMAIL}
+    password: ${SUPER_ADMIN_PASSWORD}
   tmdb:
-    api-key: ${TMDB_API_KEY:eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YjU5NDJmY2FjYmQzYmMxYTA2ZDNjYTA2NTY4MjE5YiIsIm5iZiI6MTc3NDA2MzU4NC4zMTgsInN1YiI6IjY5YmUwZmUwMzZjZTBlZTllMzdiYjE3OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Lq2GXazXhhcYhoAnjOXkprWJhVUjcZc0LPRnz_CLddM}
+    api-key: ${TMDB_API_KEY}
     base-url: https://api.themoviedb.org/3
     image-base-url: https://image.tmdb.org/t/p
 

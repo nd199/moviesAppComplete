@@ -29,8 +29,8 @@ app:
     email: ${SUPER_ADMIN_EMAIL}
     password: ${SUPER_ADMIN_PASSWORD}
   demo:
-    email: demo@example.com
-    password: Demo123456
+    email: ${APP_DEMO_EMAIL}
+    password: ${APP_DEMO_PASSWORD}
 
   brevo:
     api-key: ${BREVO_API_KEY}

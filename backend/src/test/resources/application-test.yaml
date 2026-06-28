@@ -24,8 +24,8 @@ spring:
       port: 6379
 
 jwt:
-  secret: testSecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLongForTesting
-  issuer: test.com
+  secret: ${JWT_SECRET:testSecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLongForTesting}
+  issuer: ${JWT_ISSUER:test.com}
   expiration-minutes: 30
   refresh-expiration-days: 7
 

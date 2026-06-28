@@ -5,9 +5,9 @@ server:
 
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5332/movieott}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:password}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   flyway:
     enabled: true
@@ -54,8 +54,8 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
 
-jwt:
-  secret: ${JWT_SECRET:bXlTdXBlclNlY3JldEtleUZvckpXVFRva2VuR2VuZXJhdGlvblRoYXQaXNMZWFzdDI1NkJpdHNMb25n}
+  jwt:
+  secret: ${JWT_SECRET}
   issuer: ${JWT_ISSUER:codeNaren.com}
   expiration-minutes: ${JWT_EXPIRATION_MINUTES:15}
   refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:7}
@@ -65,8 +65,8 @@ app:
   data-initialization:
     enabled: ${APP_DATA_INITIALIZATION_ENABLED:true}
   demo:
-    email: ${APP_DEMO_EMAIL:demo@moviesapp.com}
-    password: ${APP_DEMO_PASSWORD:Demo1234567}
+    email: ${APP_DEMO_EMAIL}
+    password: ${APP_DEMO_PASSWORD}
   brevo:
     api-key: ${BREVO_API_KEY}
     sender:
