@@ -32,11 +32,10 @@ services:
     restart: unless-stopped
 
   app:
-    container_name: movie-api
     build:
       context: ./backend
       dockerfile: Dockerfile
-
+    container_name: movie-api
     depends_on:
       db:
         condition: service_healthy
