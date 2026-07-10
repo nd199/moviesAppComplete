@@ -181,3 +181,17 @@
     margin-right: 6px;
   }
 }
+
+/* Touch device - show content always */
+@media (hover: none) and (pointer: coarse) {
+  .li-card-content {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .li-card-overlay {
+    opacity: 1;
+  }
+  .li-card:hover {
+    transform: none;
+  }
+}
