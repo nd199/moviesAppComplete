@@ -269,6 +269,7 @@
 
 @media (max-width: 480px) {
   .showContainerContent {
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
     padding: 8px;
     border-radius: 12px;
