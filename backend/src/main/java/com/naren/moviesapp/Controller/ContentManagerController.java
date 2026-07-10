@@ -33,7 +33,7 @@ public class ContentManagerController {
         this.contentManagerService = contentManagerService;
     }
 
-    // Authentication endpoints
+    // Authentication endpoint-s
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody ContentManagerLogin login) {
         logger.info("Content manager login request: {}", login.email());
