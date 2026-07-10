@@ -181,32 +181,6 @@
   background: transparent;
   border: 2px solid #374151;
 }
-@media (max-width: 960px) {
-  .featured-skeleton-grid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-  .featured-skeleton {
-    min-height: auto;
-    padding: 4rem 4vw 3rem;
-  }
-}
-@media (max-width: 640px) {
-  .skeleton-card {
-    flex: 0 0 160px;
-  }
-  .skeleton-card .skeleton-image {
-    height: 220px;
-  }
-  .skeleton-title-large {
-    height: 36px;
-  }
-  .skeleton-button,
-  .skeleton-button-outline {
-    width: 120px;
-    height: 42px;
-  }
-}
 
 @keyframes ring-pulse {
   0%, 100% {
@@ -240,5 +214,133 @@
   }
   100% {
     background-position: -200% 0;
+  }
+}
+
+@media (max-width: 960px) {
+  .featured-skeleton-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .featured-skeleton {
+    min-height: auto;
+    padding: 4rem 4vw 3rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .skeleton-header {
+    padding: 0 4vw;
+  }
+  .skeleton-grid {
+    gap: 1rem;
+    padding: 0 4vw;
+  }
+  .skeleton-card {
+    flex: 0 0 160px;
+  }
+  .skeleton-card .skeleton-image {
+    height: 220px;
+    border-radius: 10px;
+  }
+  .skeleton-title {
+    width: 120px;
+    height: 22px;
+  }
+  .skeleton-title-large {
+    height: 36px;
+  }
+  .skeleton-title-text {
+    height: 16px;
+  }
+  .skeleton-meta {
+    height: 12px;
+  }
+  .skeleton-tag {
+    width: 100px;
+    height: 24px;
+  }
+  .skeleton-meta-item {
+    width: 50px;
+    height: 16px;
+  }
+  .skeleton-button,
+  .skeleton-button-outline {
+    width: 120px;
+    height: 42px;
+  }
+  .featured-skeleton {
+    padding: 3rem 4vw 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .loader-ring::before {
+    width: 60px;
+    height: 60px;
+  }
+  .loader-message {
+    font-size: 0.9rem;
+  }
+  .skeleton-header {
+    padding: 0 3vw;
+    margin-bottom: 1rem;
+  }
+  .skeleton-grid {
+    gap: 0.75rem;
+    padding: 0 3vw;
+  }
+  .skeleton-card {
+    flex: 0 0 140px;
+  }
+  .skeleton-card .skeleton-image {
+    height: 190px;
+    border-radius: 8px;
+  }
+  .skeleton-title {
+    width: 100px;
+    height: 20px;
+  }
+  .skeleton-title-large {
+    width: 70%;
+    height: 30px;
+  }
+  .skeleton-title-text {
+    height: 14px;
+  }
+  .skeleton-meta {
+    height: 10px;
+  }
+  .skeleton-tag {
+    width: 80px;
+    height: 20px;
+  }
+  .skeleton-meta-item {
+    width: 40px;
+    height: 14px;
+  }
+  .skeleton-meta-row {
+    gap: 0.5rem;
+  }
+  .skeleton-desc {
+    height: 16px;
+  }
+  .skeleton-desc-short {
+    height: 16px;
+  }
+  .skeleton-button,
+  .skeleton-button-outline {
+    width: 100px;
+    height: 36px;
+    border-radius: 999px;
+  }
+  .skeleton-buttons {
+    gap: 0.75rem;
+  }
+  .featured-skeleton {
+    padding: 2rem 3vw 1.5rem;
+  }
+  .featured-skeleton-video {
+    border-radius: 12px;
   }
 }

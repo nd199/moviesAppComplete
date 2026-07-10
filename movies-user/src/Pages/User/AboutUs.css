@@ -249,6 +249,7 @@
   position: relative;
   z-index: 1;
 }
+
 @media (max-width: 1024px) {
   .about-hero-section {
     grid-template-columns: 1fr;
@@ -263,10 +264,37 @@
   .about-hero-content {
     animation: slideInUp 1s ease-out;
   }
+  .about-hero-desc {
+    max-width: 100%;
+  }
 }
+
 @media (max-width: 768px) {
   .about-main {
-    padding: 3rem 1.5rem;
+    padding: 4rem 1.5rem;
+  }
+  .about-hero-section {
+    gap: 2rem;
+    margin-bottom: 4rem;
+    padding: 2rem 0;
+  }
+  .about-hero-title {
+    font-size: clamp(2.5rem, 8vw, 3.5rem);
+  }
+  .about-hero-desc {
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  .about-features-section {
+    margin-bottom: 4rem;
+  }
+  .about-section-title {
+    font-size: clamp(2rem, 6vw, 2.5rem);
+    margin-bottom: 3rem;
+  }
+  .about-section-title::after {
+    width: 80px;
+    height: 3px;
   }
   .about-features-grid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -274,45 +302,83 @@
   }
   .about-feature-card {
     padding: 2rem 1.5rem;
-  }
-  .about-commitment-section {
-    padding: 3rem 2rem;
-  }
-  .about-hero-title {
-    font-size: clamp(3rem, 8vw, 4rem);
-  }
-  .about-hero-desc {
-    font-size: 1.2rem;
-  }
-  .about-section-title {
-    font-size: clamp(2.2rem, 6vw, 3rem);
-  }
-}
-@media (max-width: 480px) {
-  .about-main {
-    padding: 2rem 1rem;
-  }
-  .about-hero-title {
-    font-size: 2.5rem;
-  }
-  .about-hero-desc {
-    font-size: 1.1rem;
-  }
-  .about-section-title {
-    font-size: 2rem;
-  }
-  .about-feature-card {
-    padding: 1.8rem 1.5rem;
+    border-radius: 16px;
   }
   .about-feature-icon {
     width: 80px;
     height: 80px;
   }
+  .about-feature-card h3 {
+    font-size: 1.2rem;
+  }
+  .about-feature-card p {
+    font-size: 0.9rem;
+  }
   .about-commitment-section {
-    padding: 2.5rem 1.5rem;
+    padding: 3rem 2rem;
+    border-radius: 20px;
   }
   .about-commitment-text {
     font-size: 1.2rem;
+    line-height: 1.7;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-main {
+    padding: 3rem 1rem;
+  }
+  .about-hero-section {
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    padding: 1.5rem 0;
+  }
+  .about-hero-title {
+    font-size: 2rem;
+    line-height: 1.15;
+  }
+  .about-hero-desc {
+    font-size: 1rem;
+  }
+  .about-features-section {
+    margin-bottom: 3rem;
+  }
+  .about-section-title {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .about-section-title::after {
+    width: 60px;
+    height: 2px;
+    bottom: -10px;
+  }
+  .about-features-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .about-feature-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: 14px;
+  }
+  .about-feature-icon {
+    width: 70px;
+    height: 70px;
+  }
+  .about-feature-card h3 {
+    font-size: 1.1rem;
+  }
+  .about-feature-card p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .about-commitment-section {
+    padding: 2rem 1.25rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+  }
+  .about-commitment-text {
+    font-size: 1rem;
+    line-height: 1.6;
   }
 }
 

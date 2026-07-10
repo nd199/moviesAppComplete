@@ -273,18 +273,39 @@
 .col-card:hover .col-card-media::after {
   opacity: 1;
 }
+
 @media (max-width: 768px) {
   .col-card {
-    height: 100px;
+    min-height: 100px;
+    height: auto;
     padding: var(--space-3);
     gap: var(--space-3);
+    flex-direction: row;
+    max-width: 100%;
+  }
+  .col-card:hover {
+    transform: translateY(-4px);
   }
   .col-card-media {
-    width: 60px;
-    height: 80px;
+    width: 80px;
+    height: 100px;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+  }
+  .col-card:hover .col-card-media {
+    transform: none;
+  }
+  .col-card-body {
+    flex: 1;
+    min-width: 0;
+    transform: none;
   }
   .col-card-title {
     font-size: 0.85rem;
+    white-space: normal;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .col-card-meta-row {
     font-size: 0.75rem;
@@ -293,25 +314,71 @@
     font-size: 0.7rem;
     -webkit-line-clamp: 1;
   }
-  .col-card:hover {
-    transform: translateY(-4px);
+  .col-card-badge {
+    opacity: 1;
+    font-size: 0.55rem;
+    padding: 2px 5px;
+  }
+  .col-card-audio-toggle {
+    opacity: 1;
+    width: 20px;
+    height: 20px;
+    font-size: 0.6rem;
+  }
+  .col-card-genres {
+    display: none;
+  }
+  .col-card-actions {
+    display: flex;
+    position: relative;
+    bottom: auto;
+    right: auto;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    backdrop-filter: none;
+    border: none;
+    transform: none;
+  }
+  .col-card-action {
+    width: 26px;
+    height: 26px;
+  }
+  .col-card::before {
+    width: 3px;
   }
 }
+
 @media (max-width: 480px) {
   .col-card {
-    height: 90px;
     padding: var(--space-2);
     gap: var(--space-2);
   }
   .col-card-media {
-    width: 50px;
-    height: 70px;
+    width: 60px;
+    height: 80px;
+    border-radius: var(--radius-sm);
   }
   .col-card-title {
     font-size: 0.8rem;
   }
   .col-card-meta-row {
     gap: var(--space-2);
-    font-size: 0.7rem;
+    font-size: 0.65rem;
+  }
+  .col-card-overview {
+    display: none;
+  }
+  .col-card-chip {
+    font-size: 0.55rem;
+    padding: 1px 4px;
+  }
+  .col-card-badge {
+    font-size: 0.5rem;
+    padding: 1px 4px;
+  }
+  .col-card-action {
+    width: 24px;
+    height: 24px;
   }
 }

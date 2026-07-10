@@ -289,24 +289,62 @@
   }
 
   .watchlist-card-play {
-    width: 44px;
-    height: 44px;
-    font-size: 22px;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .watchlist-card-info {
+    padding: 10px;
+  }
+
+  .watchlist-card-title {
+    font-size: 13px;
+    margin-bottom: 6px;
   }
 }
 
 @media (max-width: 480px) {
+  .watchlist-page {
+    padding-top: 65px;
+  }
+
   .watchlist-container {
     padding: 12px;
   }
 
-  .watchlist-header h1 {
+  .watchlist-header {
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+  }
+
+  .watchlist-header-icon {
     font-size: 20px;
   }
 
+  .watchlist-header h1 {
+    font-size: 18px;
+  }
+
+  .watchlist-count {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+
   .watchlist-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+  }
+
+  .watchlist-card {
+    border-radius: 6px;
+  }
+
+  .watchlist-card-play {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
   }
 
   .watchlist-card-info {
@@ -314,12 +352,25 @@
   }
 
   .watchlist-card-title {
-    font-size: 12px;
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+
+  .watchlist-card-badge {
+    font-size: 9px;
+    padding: 2px 5px;
+    top: 6px;
+    right: 6px;
+  }
+
+  .watchlist-card-badge svg {
+    font-size: 11px;
   }
 
   .watchlist-empty {
     min-height: 300px;
     padding: 20px;
+    gap: 12px;
   }
 
   .watchlist-empty-icon {
@@ -342,5 +393,6 @@
   .watchlist-empty-btn {
     width: 100%;
     text-align: center;
+    padding: 10px 24px;
   }
 }

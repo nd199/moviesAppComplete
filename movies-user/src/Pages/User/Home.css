@@ -1,10 +1,22 @@
 .home {
-background-color: var(--main-color);
-position: relative;
-overflow: hidden;
+  background-color: var(--main-color);
+  position: relative;
+  overflow: hidden;
 }
 .main {
-display: flex;
-flex-direction: column;
-margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 60px;
+}
+
+@media (max-width: 768px) {
+  .main {
+    margin-top: 55px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    margin-top: 50px;
+  }
 }
