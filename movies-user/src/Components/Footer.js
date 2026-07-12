@@ -1,93 +1,71 @@
-import {
-  Facebook,
-  HandshakeOutlined,
-  Instagram,
-  MailOutlined,
-  PlaceOutlined,
-  Twitter,
-  WhatsApp,
-} from '@mui/icons-material';
+import { Facebook, Instagram, MailOutlined, PlaceOutlined, Twitter, WhatsApp } from '@mui/icons-material';
 import { HiOutlinePhone } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
-import './Footer.css';
 
-const Footer = () => {
-  return (
-    <footer className="footer">
-      <div className="footer-container">
-        <div className="footer-brand">
-          <div className="logo">
-            <div className="logo-icon">🎬</div>
-            <h2>CN.io</h2>
-          </div>
-          <p>
-            Your ultimate destination for movies and TV shows. Enjoy 4K
-            streaming, offline downloads, and personalized recommendations.
-          </p>
-          <div className="social-links">
-            <button className="social-link facebook" aria-label="Facebook">
-              <Facebook />
-            </button>
-            <button className="social-link twitter" aria-label="Twitter">
-              <Twitter />
-            </button>
-            <button className="social-link instagram" aria-label="Instagram">
-              <Instagram />
-            </button>
-            <button className="social-link whatsapp" aria-label="WhatsApp">
-              <WhatsApp />
-            </button>
+const socials = [
+  { icon: Facebook, label: "Facebook", color: "hover:bg-[#1877f2]/20 hover:text-[#1877f2] hover:border-[#1877f2]/30" },
+  { icon: Twitter, label: "Twitter", color: "hover:bg-[#1da1f2]/20 hover:text-[#1da1f2] hover:border-[#1da1f2]/30" },
+  { icon: Instagram, label: "Instagram", color: "hover:bg-[#e4405f]/20 hover:text-[#e4405f] hover:border-[#e4405f]/30" },
+  { icon: WhatsApp, label: "WhatsApp", color: "hover:bg-[#25d366]/20 hover:text-[#25d366] hover:border-[#25d366]/30" },
+];
+
+const links = [
+  { to: "/", label: "Home" },
+  { to: "/movies", label: "Movies" },
+  { to: "/shows", label: "Shows" },
+  { to: "/about", label: "About" },
+];
+
+const contacts = [
+  { icon: <PlaceOutlined sx={{ fontSize: 18 }} />, text: "Chennai, Tamil Nadu" },
+  { icon: <HiOutlinePhone size={18} />, text: "+91 8072205480" },
+  { icon: <MailOutlined sx={{ fontSize: 18 }} />, text: "naren06251999@gmail.com" },
+];
+
+const Footer = () => (
+  <footer className="relative bg-surface-900 text-white pt-16 pb-8 px-6 max-md:px-4 max-md:pt-10 max-md:pb-6">
+    <div className="section-divider absolute top-0 inset-x-0" />
+    <div className="max-w-[1200px] mx-auto">
+      <div className="grid grid-cols-[2fr_1fr_1fr] gap-12 max-lg:grid-cols-2 max-lg:gap-8 max-md:grid-cols-1 max-md:text-center">
+        <div className="flex flex-col gap-5 max-md:items-center">
+          <span className="text-2xl font-extrabold text-gradient">CN.io</span>
+          <p className="text-[#5a6380] text-sm leading-relaxed max-w-[360px] m-0">Your ultimate destination for movies and TV shows. 4K streaming, offline downloads, and personalized recommendations.</p>
+          <div className="flex gap-2 max-md:justify-center">
+            {socials.map(({ icon: Icon, label, color }) => (
+              <a key={label} href="#" aria-label={label} className={`w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-[#5a6380] flex items-center justify-center transition-all duration-300 ${color}`}>
+                <Icon sx={{ fontSize: 18 }} />
+              </a>
+            ))}
           </div>
         </div>
 
-        <div className="footer-links">
-          <h3>Quick Links</h3>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/Movies">Movies</Link>
-            </li>
-            <li>
-              <Link to="/Shows">Shows</Link>
-            </li>
-            <li>
-              <Link to="/About">About</Link>
-            </li>
-            <li>Privacy Policy</li>
-            <li>Terms of Service</li>
+        <div className="flex flex-col gap-4 max-md:items-center">
+          <h3 className="text-sm font-semibold text-[#8892b0] uppercase tracking-wider m-0">Quick Links</h3>
+          <ul className="flex flex-col gap-2.5 list-none p-0 m-0">
+            {links.map(({ to, label }) => (
+              <li key={label}><Link to={to} className="text-[#5a6380] no-underline text-sm hover:text-brand-300 transition-colors">{label}</Link></li>
+            ))}
+            <li className="text-[#5a6380] text-sm">Privacy Policy</li>
+            <li className="text-[#5a6380] text-sm">Terms of Service</li>
           </ul>
         </div>
 
-        <div className="footer-contact">
-          <h3>Contact Info</h3>
-          <div className="contact-item">
-            <PlaceOutlined className="contact-icon" />
-            <span>Chennai, Tamil Nadu</span>
-          </div>
-          <div className="contact-item">
-            <HiOutlinePhone className="contact-icon" />
-            <span>+91 8072205480</span>
-          </div>
-          <div className="contact-item">
-            <MailOutlined className="contact-icon" />
-            <span>naren06251999@gmail.com</span>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <div className="payment-methods">
-            <HandshakeOutlined />
-            <span>Secure Payments</span>
-          </div>
-          <div className="copyright">
-            © 2025 CN.io. All rights reserved. Made in Chennai 🇮🇳
-          </div>
+        <div className="flex flex-col gap-4 max-md:items-center">
+          <h3 className="text-sm font-semibold text-[#8892b0] uppercase tracking-wider m-0">Contact</h3>
+          {contacts.map(({ icon, text }) => (
+            <div key={text} className="flex items-center gap-3 text-[#5a6380] text-sm max-md:justify-center">
+              <span className="text-accent-400">{icon}</span> {text}
+            </div>
+          ))}
         </div>
       </div>
-    </footer>
-  );
-};
+
+      <div className="mt-12 pt-6 border-t border-white/5 flex justify-between items-center flex-wrap gap-4 max-md:justify-center max-md:text-center">
+        <span className="text-[#3b4560] text-xs">© 2025 CN.io. All rights reserved.</span>
+        <span className="text-[#3b4560] text-xs">Made in Chennai</span>
+      </div>
+    </div>
+  </footer>
+);
 
 export default Footer;

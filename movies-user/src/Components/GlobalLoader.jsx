@@ -1,87 +1,42 @@
 import { CircularProgress, Backdrop } from "@mui/material";
-import "./GlobalLoader.css";
 
-const GlobalLoader = ({ open = true, message = "Loading..." }) => {
-  return (
-    <Backdrop
-      className="global-backdrop"
-      open={open}
-      sx={{
-        color: "#fff",
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        backgroundColor: "rgba(2, 6, 23, 0.85)",
-        backdropFilter: "blur(8px)",
-      }}
-    >
-      <div className="global-loader-container">
-        <div className="loader-ring">
-          <CircularProgress
-            size={60}
-            thickness={4}
-            sx={{
-              color: "#f97316",
-              animation: "pulse 1.5s ease-in-out infinite",
-              '& .MuiCircularProgress-circle': {
-                strokeLinecap: 'round',
-              }
-            }}
-          />
-        </div>
-        <p className="loader-message">{message}</p>
+const GlobalLoader = ({ open = true, message = "Loading..." }) => (
+  <Backdrop open={open} sx={{ color: "#fff", zIndex: (t) => t.zIndex.drawer + 1, backgroundColor: "rgba(5,8,16,0.92)", backdropFilter: "blur(12px)" }}>
+    <div className="flex flex-col items-center gap-5">
+      <div className="relative">
+        <div className="absolute inset-0 w-16 h-16 rounded-full animate-glow" />
+        <CircularProgress size={52} thickness={3} sx={{ color: "#7c3aed", '& .MuiCircularProgress-circle': { strokeLinecap: 'round' } }} />
       </div>
-    </Backdrop>
-  );
-};
-
-// Skeleton Loader Component for Movie Lists
-export const MovieListSkeleton = ({ count = 5 }) => {
-  return (
-    <div className="skeleton-container">
-      <div className="skeleton-header">
-        <div className="skeleton-title"></div>
-        <div className="skeleton-link"></div>
-      </div>
-      <div className="skeleton-grid">
-        {Array.from({ length: count }).map((_, index) => (
-          <div key={index} className="skeleton-card">
-            <div className="skeleton-image"></div>
-            <div className="skeleton-info">
-              <div className="skeleton-title-text"></div>
-              <div className="skeleton-meta"></div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <p className="text-[#8892b0] text-sm font-medium tracking-wide m-0">{message}</p>
     </div>
-  );
-};
+  </Backdrop>
+);
 
-// Skeleton for Featured Section
-export const FeaturedSkeleton = () => {
-  return (
-    <div className="featured-skeleton">
-      <div className="featured-skeleton-grid">
-        <div className="featured-skeleton-video">
-          <div className="skeleton-image"></div>
-        </div>
-        <div className="featured-skeleton-info">
-          <div className="skeleton-tag"></div>
-          <div className="skeleton-title-large"></div>
-          <div className="skeleton-meta-row">
-            <div className="skeleton-meta-item"></div>
-            <div className="skeleton-meta-item"></div>
-            <div className="skeleton-meta-item"></div>
-          </div>
-          <div className="skeleton-desc"></div>
-          <div className="skeleton-desc-short"></div>
-          <div className="skeleton-buttons">
-            <div className="skeleton-button"></div>
-            <div className="skeleton-button-outline"></div>
-          </div>
-        </div>
-      </div>
+export const MovieListSkeleton = ({ count = 5 }) => (
+  <div className="py-10 px-[3.5vw]">
+    <div className="mb-6 px-1">
+      <div className="w-48 h-7 rounded-xl bg-white/5 animate-shimmer" />
+      <div className="w-14 h-[3px] rounded-full bg-white/10 mt-2.5 animate-shimmer" />
     </div>
-  );
-};
+    <div className="flex gap-3 overflow-hidden">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="flex-none w-[185px] flex flex-col gap-2">
+          <div className="w-full aspect-[2/3] rounded-2xl bg-white/5 animate-shimmer" />
+          <div className="w-4/5 h-3.5 rounded-lg bg-white/5 animate-shimmer" />
+          <div className="w-2/5 h-2.5 rounded bg-white/5 animate-shimmer" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+export const FeaturedSkeleton = () => (
+  <div className="w-full h-[88vh] min-h-[560px] bg-surface-950 flex items-center justify-center">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-16 h-16 rounded-full border-2 border-brand-500/20 animate-pulse" />
+      <div className="w-48 h-5 rounded-xl bg-white/5 animate-shimmer" />
+    </div>
+  </div>
+);
 
 export default GlobalLoader;

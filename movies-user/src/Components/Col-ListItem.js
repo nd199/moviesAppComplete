@@ -1,126 +1,113 @@
-import {
-  PlayArrow,
-  ThumbDownOutlined,
-  ThumbUpAltOutlined,
-} from '@mui/icons-material';
-import { useState, useEffect } from 'react';
+import { PlayArrow, BookmarkAdd } from '@mui/icons-material';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './Col-ListItem.css';
 import WatchlistButton from './WatchlistButton';
 
 const ColListItem = ({
-  name,
-  desc,
-  year,
-  img,
-  ageRating,
-  rating,
-  runtime,
-  genre,
-  trailer,
-  className = '',
-  tmdbId,
-  mediaType = 'movie',
+  name, desc, year, img, ageRating, rating, runtime, genre, trailer,
+  tmdbId, mediaType = 'movie',
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
-  useEffect(() => {
-    // Detect touch device
-    const checkTouchDevice = () => {
-      setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    };
-    checkTouchDevice();
-    window.addEventListener('resize', checkTouchDevice);
-    return () => window.removeEventListener('resize', checkTouchDevice);
-  }, []);
-
-  const formatRuntime = minutes => {
-    if (!minutes) return '';
-    const mins = parseInt(minutes);
-    const hours = Math.floor(mins / 60);
-    const remMins = mins % 60;
-    return hours ? `${hours}h ${remMins}m` : `${remMins}m`;
+  const formatRuntime = (min) => {
+    if (!min) return '';
+    const m = parseInt(min);
+    const h = Math.floor(m / 60);
+    return h ? `${h}h ${m % 60}m` : `${m}m`;
   };
 
-  const genres = genre
-    ? genre
-        .split(',')
-        .map(g => g.trim())
-        .slice(0, 2)
-    : [];
-
-  const showActions = isHovered || isTouchDevice;
+  const genres = genre ? genre.split(',').map(g => g.trim()).slice(0, 3) : [];
 
   return (
-    <Link
-      to="/play"
-      className={`col-card ${className} ${isHovered ? 'col-card-hovered' : ''}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={(e) => {
-        // Prevent navigation if clicking on action buttons
-        if (e.target.closest('.col-card-action')) {
-          e.preventDefault();
-        }
-      }}>
-      <div className="col-card-media">
+    <div className="cl-root group relative rounded-2xl overflow-hidden transition-all duration-400 hover:shadow-[0_12px_50px_-10px_rgba(124,58,237,0.3)] gradient-border bg-surface-800">
+
+      {/* Image */}
+      <div className="relative w-full aspect-[2/3] overflow-hidden">
         <img
-          src={
-            img ||
-            'https://via.placeholder.com/320x180/1a1a1a/9ca3af?text=No+Image'
-          }
+          src={img || 'https://via.placeholder.com/400x600/111827/3b4560?text=No+Image'}
           alt={name}
-          className="col-card-poster"
+          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           loading="lazy"
+          onLoad={() => setImgLoaded(true)}
         />
-        <span className="col-card-badge">{ageRating}</span>
-        <span className="col-card-audio-toggle" aria-label="Toggle audio">
-          🔊
-        </span>
+
+        {!imgLoaded && (
+          <div className="absolute inset-0 bg-gradient-to-r from-surface-800 via-surface-700 to-surface-800 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
+        )}
+
+        {/* Badges */}
+        <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
+          {ageRating && (
+            <span className="bg-brand-500/90 text-white text-[0.6rem] font-bold uppercase tracking-widest px-2 py-1 rounded-lg">
+              {ageRating}
+            </span>
+          )}
+          {rating && (
+            <span className="flex items-center gap-1 bg-surface-950/70 backdrop-blur-sm text-white text-[0.7rem] font-semibold px-2 py-1 rounded-lg border border-white/10 ml-auto">
+              <span className="text-gold-400">★</span> {rating}
+            </span>
+          )}
+        </div>
+
+        {/* Play — always visible on mobile */}
+        <Link
+          to={`/video/${name || 'unknown'}`}
+          state={{ trailer }}
+          className="absolute inset-0 flex items-center justify-center bg-surface-950/0 sm:bg-surface-950/0 sm:group-hover:bg-surface-950/50 transition-all duration-400 no-underline"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 scale-100 sm:scale-75 sm:group-hover:scale-100 transition-all duration-400 glow-brand"
+            style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)' }}>
+            <PlayArrow sx={{ fontSize: 24 }} />
+          </div>
+        </Link>
+
+        {runtime && (
+          <span className="absolute bottom-3 right-3 bg-surface-950/70 backdrop-blur-sm text-white text-[0.65rem] font-medium px-2 py-1 rounded-lg border border-white/10">
+            {formatRuntime(runtime)}
+          </span>
+        )}
+
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-surface-800 to-transparent" />
       </div>
 
-      <div className="col-card-body">
-        <div className="col-card-title-row">
-          <h3 className="col-card-title">{name}</h3>
+      {/* Content */}
+      <div className="p-4 -mt-6 relative">
+        <h3 className="text-sm font-bold text-white m-0 mb-1 leading-snug line-clamp-1 group-hover:text-brand-300 transition-colors duration-300">
+          {name}
+        </h3>
+
+        <div className="flex items-center gap-2 text-[0.7rem] text-[#5a6380] mb-2">
+          <span>{year}</span>
+          <span className="w-1 h-1 rounded-full bg-brand-500/50" />
+          <span>{mediaType === 'tv' ? 'TV Show' : 'Movie'}</span>
         </div>
 
-        <div className="col-card-meta-row">
-          <span className="col-card-meta-text">{year}</span>
-          {runtime && (
-            <>
-              <span className="col-card-meta-text">•</span>
-              <span className="col-card-meta-text">{formatRuntime(runtime)}</span>
-            </>
-          )}
-          <span className="col-card-meta-text">•</span>
-          <span className="col-card-meta-text">
-            <span className="col-card-star">★</span> {rating}
-          </span>
-        </div>
+        <p className="text-[0.75rem] leading-relaxed text-[#8892b0] m-0 line-clamp-2 mb-3">
+          {desc || 'No description available.'}
+        </p>
 
-        <div className="col-card-overview">{desc?.substring(0, 80)}...</div>
+        {genres.length > 0 && (
+          <div className="flex gap-1.5 flex-wrap mb-3">
+            {genres.map((g, i) => (
+              <span key={i} className="px-2 py-0.5 rounded-full text-[0.6rem] font-medium bg-accent-500/10 text-accent-300 border border-accent-500/20">
+                {g}
+              </span>
+            ))}
+          </div>
+        )}
 
-        <div className="col-card-genres">
-          {genres.map((g, i) => (
-            <span key={i} className="col-card-genre-chip">
-              {g}
-            </span>
-          ))}
-        </div>
+        <div className="flex items-center gap-2 pt-3 border-t border-white/5">
+          <Link
+            to={`/video/${name || 'unknown'}`}
+            state={{ trailer }}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl btn-primary text-[0.7rem] !py-2 !px-4 no-underline"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <PlayArrow sx={{ fontSize: 16 }} /> Watch
+          </Link>
 
-        {showActions && (
-          <div className="col-card-actions">
-            <Link 
-              to={`/video/${name || 'unknown'}`}
-              state={{ trailer: trailer }}
-              className="col-card-action"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <PlayArrow />
-            </Link>
+          {tmdbId && mediaType ? (
             <WatchlistButton
               tmdbId={tmdbId}
               mediaType={mediaType}
@@ -128,18 +115,16 @@ const ColListItem = ({
               posterPath={img}
               size="small"
               showLabel={false}
-              className="col-card-action"
+              className="!rounded-xl !bg-white/5 !border-white/10 hover:!bg-brand-500/15 hover:!border-brand-500/30"
             />
-            <div className="col-card-action" onClick={(e) => e.stopPropagation()}>
-              <ThumbUpAltOutlined />
-            </div>
-            <div className="col-card-action" onClick={(e) => e.stopPropagation()}>
-              <ThumbDownOutlined />
-            </div>
-          </div>
-        )}
+          ) : (
+            <button className="flex items-center justify-center w-8 h-8 rounded-xl bg-white/5 border border-white/10 text-[#5a6380] cursor-default">
+              <BookmarkAdd sx={{ fontSize: 16 }} />
+            </button>
+          )}
+        </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

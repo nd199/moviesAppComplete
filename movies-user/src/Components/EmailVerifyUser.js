@@ -6,168 +6,78 @@ import { validateOtp, verifyEmail } from '../Network/ApiCalls';
 import { resetErrorMessage } from '../redux/userSlice';
 import CrossMark from '../Utils/animations/CrossMark.json';
 import TickMark from '../Utils/animations/TickMark.json';
-import './EmailVerifyUser.css';
+
+const inputClass = "flex-1 glass rounded-xl px-4 py-3 text-white text-sm placeholder:text-[#4a5568] focus:outline-none focus:border-brand-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed";
 
 const EmailVerifyUser = ({ onEmailVerified, isForSubscription = false }) => {
   const [email, setEmail] = useState('');
-  const [showVerifyBtn, setShowVerifyBtn] = useState(false);
+  const [showBtn, setShowBtn] = useState(false);
   const [otp, setOtp] = useState('');
-  const [showOtpInput, setShowOtpInput] = useState(false);
-  const [otpMessage, setOtpMessage] = useState('');
-  const [otpTimer, setOtpTimer] = useState(0);
-  const [isSending, setIsSending] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isEmailDisabled, setIsEmailDisabled] = useState(false);
-
+  const [showOtp, setShowOtp] = useState(false);
+  const [msg, setMsg] = useState('');
+  const [timer, setTimer] = useState(0);
+  const [sending, setSending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [disabled, setDisabled] = useState(false);
   const dispatch = useDispatch();
-  const serverError = useSelector(state => state?.user?.errorMessage?.message);
+  const serverErr = useSelector(s => s?.user?.errorMessage?.message);
 
   useEffect(() => () => dispatch(resetErrorMessage()), [dispatch]);
   useEffect(() => {
-    if (!showOtpInput || otpTimer <= 0) return;
-    const interval = setInterval(() => setOtpTimer(t => t - 1), 1000);
-    return () => clearInterval(interval);
-  }, [showOtpInput, otpTimer]);
+    if (!showOtp || timer <= 0) return;
+    const t = setInterval(() => setTimer(p => p - 1), 1000);
+    return () => clearInterval(t);
+  }, [showOtp, timer]);
 
-  const isValidEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isValidOtp = otp => /^[0-9]{6}$/.test(otp);
+  const validEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  const validOtp = (o) => /^\d{6}$/.test(o);
+  const tick = { loop: true, autoplay: true, animationData: TickMark, rendererSettings: { preserveAspectRatio: 'xMidYMid slice' } };
+  const cross = { loop: true, autoplay: true, animationData: CrossMark, rendererSettings: { preserveAspectRatio: 'xMidYMid slice' } };
 
-  const handleSendOtp = async () => {
-    if (!isValidEmail(email)) return;
-    setIsSending(true);
-    setOtpMessage('');
-    setShowOtpInput(false);
-    
+  const sendOtp = async () => {
+    if (!validEmail(email)) return;
+    setSending(true); setMsg(''); setShowOtp(false);
     try {
-      // For subscription verification (isForSubscription=true), pass checkUserExists=false
-      // For registration verification, pass checkUserExists=true (default)
-      const checkUserExists = !isForSubscription;
-      const response = await verifyEmail(dispatch, email, checkUserExists);
-      
-      // Only check if email already exists when checkUserExists is true
-      if (checkUserExists && response?.exists === true) {
-        setOtpMessage('Email already registered. Please login instead.');
-        setShowOtpInput(false);
-        setShowVerifyBtn(false);
-        setIsEmailDisabled(true);
-      } else {
-        // Show OTP input
-        setShowOtpInput(true);
-        setOtpTimer(60);
-        setOtpMessage('');
-      }
+      const r = await verifyEmail(dispatch, email, !isForSubscription);
+      if (!isForSubscription && r?.exists) { setMsg('Email already registered.'); setShowOtp(false); setDisabled(true); }
+      else { setShowOtp(true); setTimer(60); }
     } catch (err) {
-      console.error('Error in handleSendOtp:', err);
-      // Check if it's a 409 conflict error - email already exists
-      if (err.response?.status === 409) {
-        setOtpMessage(err.response.data.message || 'Email already registered. Please login instead.');
-        setShowOtpInput(false);
-        setShowVerifyBtn(false);
-        setIsEmailDisabled(true);
-      } else {
-        // Network or other error
-        setOtpMessage('Failed to send OTP. Try again.');
-        setShowVerifyBtn(true);
-      }
-    } finally {
-      setIsSending(false);
-    }
+      if (err.response?.status === 409) { setMsg(err.response.data.message || 'Already registered.'); setDisabled(true); }
+      else setMsg('Failed to send OTP.');
+    } finally { setSending(false); }
   };
 
-  const handleVerifyOtp = async () => {
-    if (!isValidOtp(otp)) return;
-    setIsVerifying(true);
+  const verify = async () => {
+    if (!validOtp(otp)) return;
+    setVerifying(true);
     try {
-      const res = await validateOtp(dispatch, otp, email);
-      setOtpMessage(res || 'OTP verified successfully');
-      if (res?.includes('success')) {
-        setIsEmailDisabled(true);
-        setShowOtpInput(false);
-        onEmailVerified(email);
-      }
-    } catch (err) {
-      console.error(err);
-      const errorMsg = err?.response?.data?.message || 'Invalid OTP or OTP expired';
-      setOtpMessage(errorMsg);
-      onEmailVerified(false);
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  const TickOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: TickMark,
-    rendererSettings: { preserveAspectRatio: 'xMidYMid slice' },
-  };
-  const CrossOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: CrossMark,
-    rendererSettings: { preserveAspectRatio: 'xMidYMid slice' },
+      const r = await validateOtp(dispatch, otp, email);
+      setMsg(r || 'Verified');
+      if (r?.includes('success')) { setDisabled(true); setShowOtp(false); onEmailVerified(email); }
+    } catch { setMsg('Invalid OTP'); onEmailVerified(false); }
+    finally { setVerifying(false); }
   };
 
   return (
-    <div className="inputs">
-      <label>Email:</label>
-      <div className="email-input-wrapper">
-        <input
-          type="email"
-          value={email}
-          placeholder="your@email.com"
-          onChange={e => {
-            setEmail(e.target.value.toLowerCase());
-            setShowVerifyBtn(e.target.value.length > 1 && !isEmailDisabled);
-            setOtpMessage('');
-            setShowOtpInput(false);
-          }}
-          disabled={isEmailDisabled}
-        />
-        {otpMessage === 'OTP verified successfully' ? (
-          <Lottie options={TickOptions} style={{ width: 40, height: 40 }} />
-        ) : otpMessage === 'Invalid OTP or OTP expired' ? (
-          <Lottie options={CrossOptions} style={{ width: 40, height: 40 }} />
-        ) : null}
+    <div className="flex flex-col gap-3">
+      <label className="text-sm font-medium text-[#8892b0]">Email</label>
+      <div className="flex items-center gap-2">
+        <input type="email" value={email} placeholder="your@email.com" disabled={disabled}
+          onChange={e => { setEmail(e.target.value.toLowerCase()); setShowBtn(e.target.value.length > 1 && !disabled); setMsg(''); setShowOtp(false); }}
+          className={inputClass} />
+        {msg === 'OTP verified successfully' && <Lottie options={tick} style={{ width: 32, height: 32 }} />}
+        {msg.includes('Invalid') && <Lottie options={cross} style={{ width: 32, height: 32 }} />}
       </div>
-
-      {showVerifyBtn && (
-        <button
-          onClick={handleSendOtp}
-          disabled={!isValidEmail(email) || isSending}>
-          {isSending ? 'Sending...' : 'Verify Email'}
-        </button>
-      )}
-
-      {showOtpInput && (
-        <div className="otp-container">
-          <input
-            type="text"
-            value={otp}
-            maxLength={6}
-            placeholder="Enter OTP"
-            onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
-          />
-          <button
-            onClick={handleVerifyOtp}
-            disabled={!isValidOtp(otp) || isVerifying}>
-            <Send />
-          </button>
-          <p>{Math.floor(otpTimer / 60)}:{(otpTimer % 60).toString().padStart(2, '0')}</p>
+      {showBtn && <button onClick={sendOtp} disabled={!validEmail(email) || sending} className="btn-primary text-sm !py-2.5">{sending ? 'Sending...' : 'Verify'}</button>}
+      {showOtp && (
+        <div className="flex items-center gap-2">
+          <input type="text" value={otp} maxLength={6} placeholder="6-digit OTP" onChange={e => setOtp(e.target.value.replace(/\D/g, ''))} className={inputClass} />
+          <button onClick={verify} disabled={!validOtp(otp) || verifying} className="w-10 h-10 rounded-xl btn-primary flex items-center justify-center !p-0 disabled:opacity-50"><Send sx={{ fontSize: 16 }} /></button>
+          <span className="text-[#5a6380] text-xs">{Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}</span>
         </div>
       )}
-
-      {otpMessage && (
-        <p
-          className={
-            otpMessage === 'OTP verified successfully'
-              ? 'otp-message'
-              : 'otp-message-error'
-          }>
-          {otpMessage}
-        </p>
-      )}
-      {serverError && <p className="otp-message">{serverError}</p>}
+      {msg && <p className={`text-xs m-0 ${msg.includes('success') || msg.includes('Verified') ? 'text-emerald-400' : 'text-red-400'}`}>{msg}</p>}
+      {serverErr && <p className="text-red-400 text-xs m-0">{serverErr}</p>}
     </div>
   );
 };

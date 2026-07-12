@@ -1,75 +1,75 @@
-import {
-  PlayArrow,
-  ThumbDownOutlined,
-  ThumbUpAltOutlined,
-} from '@mui/icons-material';
+import { PlayArrow, InfoOutlined } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import WatchlistButton from './WatchlistButton';
-import './ListItem.css';
 
-const ListItem = ({
-  name,
-  year,
-  rating,
-  poster,
-  id,
-  tmdbId,
-  trailer,
-  mediaType,
-}) => {
+const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType }) => {
   return (
-    <div className="li-card-wrapper">
-      <div className="li-card">
-        <div className="li-card-media">
-          <img
-            src={
-              poster ||
-              "https://c4.wallpaperflare.com/wallpaper/123/991/646/avatar-blue-skin-james-cameron-s-movie-avatar-movie-poster-wallpaper-preview.jpg"
-            }
-            alt={name}
-            className="li-card-poster"
-          />
+    <div className="li-root group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-400 hover:z-50 snap-start shrink-0 w-[210px] max-lg:w-[180px] max-sm:w-[150px]
+      hover:shadow-[0_12px_50px_-10px_rgba(124,58,237,0.4)]">
 
-          <div className="li-card-overlay" />
+      {/* Poster */}
+      <div className="relative aspect-[2/3] overflow-hidden rounded-2xl">
+        <img
+          src={poster || "https://via.placeholder.com/300x450/111827/3b4560?text=No+Image"}
+          alt={name}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+          loading="lazy"
+        />
 
-          <div className="li-card-content">
-            <h4 className="li-card-title">{name}</h4>
-            <div className="li-card-meta">
-              {year} • {rating} ★
-            </div>
+        {/* Bottom gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-surface-950 via-surface-950/30 to-transparent" />
 
-            <div className="li-card-actions">
-              <Link 
-                to={`/video/${name || 'unknown'}`}
-                state={{ trailer: trailer }}
-                className="li-card-btn"
-              >
-                <PlayArrow fontSize="small" />
-              </Link>
-              {tmdbId && mediaType ? (
-                <WatchlistButton
-                  tmdbId={tmdbId}
-                  mediaType={mediaType}
-                  title={name}
-                  posterPath={poster}
-                  size="small"
-                  showLabel={false}
-                  className="li-card-btn watchlist-btn-card"
-                />
-              ) : (
-                <button className="li-card-btn" disabled>
-                  <PlayArrow fontSize="small" />
-                </button>
-              )}
-              <button className="li-card-btn">
-                <ThumbUpAltOutlined fontSize="small" />
-              </button>
-              <button className="li-card-btn">
-                <ThumbDownOutlined fontSize="small" />
-              </button>
-            </div>
+        {/* Hover shine */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-brand-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        {/* Rating — always visible */}
+        {rating && (
+          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-surface-950/70 backdrop-blur-sm rounded-lg px-2 py-0.5 border border-white/10">
+            <span className="text-gold-400 text-[0.65rem]">★</span>
+            <span className="text-white text-[0.7rem] font-bold">{rating}</span>
+          </div>
+        )}
+
+        {/* Play button — always visible on mobile, hover on desktop */}
+        <Link
+          to={`/video/${name || 'unknown'}`}
+          state={{ trailer }}
+          className="absolute inset-0 flex items-center justify-center no-underline"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 scale-100 sm:scale-75 sm:group-hover:scale-100 transition-all duration-400"
+            style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', boxShadow: '0 0 35px rgba(124,58,237,0.5)' }}>
+            <PlayArrow sx={{ fontSize: 24 }} />
+          </div>
+        </Link>
+
+        {/* Watchlist — always visible on mobile, hover on desktop */}
+        {tmdbId && mediaType && (
+          <div className="absolute bottom-2 right-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 translate-y-0 sm:translate-y-2 sm:group-hover:translate-y-0">
+            <WatchlistButton
+              tmdbId={tmdbId}
+              mediaType={mediaType}
+              title={name}
+              posterPath={poster}
+              size="small"
+              showLabel={false}
+              className="!w-7 !h-7 !min-w-[28px] !p-0 !rounded-lg !bg-surface-950/70 backdrop-blur-sm !border-white/15 hover:!bg-brand-500 hover:!border-brand-500"
+            />
+          </div>
+        )}
+
+        {/* Info — desktop only */}
+        <div className="absolute bottom-2 left-2 hidden sm:block opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+          <div className="w-7 h-7 rounded-lg bg-surface-950/70 backdrop-blur-sm border border-white/15 flex items-center justify-center text-white/60">
+            <InfoOutlined sx={{ fontSize: 14 }} />
           </div>
         </div>
+      </div>
+
+      {/* Title */}
+      <div className="px-1 pt-2 pb-1">
+        <h4 className="text-white text-[0.8rem] font-semibold m-0 leading-tight line-clamp-1 group-hover:text-brand-300 transition-colors duration-300">{name}</h4>
+        <p className="text-[#4a5568] text-[0.65rem] m-0 mt-0.5">{year}</p>
       </div>
     </div>
   );
