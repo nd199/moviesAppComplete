@@ -46,6 +46,7 @@ const getBaseURL = () => {
   return process.env.REACT_APP_API_URL || 'http://localhost:8080';
 };
 
+const isMockMode = process.env.REACT_APP_MOCK_MODE === 'true';
 const API_URL = getBaseURL();
 
 // ============================================
@@ -67,6 +68,12 @@ function AppWithHealthCheck() {
   }, []);
 
   useEffect(() => {
+    // Skip health check entirely in mock mode
+    if (isMockMode) {
+      setServerStatus('up');
+      return;
+    }
+
     checkServerHealth();
 
     let retryInterval;

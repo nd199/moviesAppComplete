@@ -2,6 +2,28 @@ import axios from 'axios';
 import { store } from './redux/store';
 
 // ============================================
+// MOCK MODE
+// ============================================
+
+const isMockMode = process.env.REACT_APP_MOCK_MODE === 'true';
+let mockInterceptorInstalled = false;
+
+async function installMockIfNeeded() {
+  if (isMockMode && !mockInterceptorInstalled) {
+    const { installMockInterceptor } = await import('./mockInterceptor');
+    // Install on all axios instances
+    [api, publicApi, passResetApi, paymentApi, springApi].forEach((instance) => {
+      installMockInterceptor(instance);
+    });
+    mockInterceptorInstalled = true;
+    console.log('[MOCK MODE] API requests will return sample data. No backend required.');
+  }
+}
+
+// Kick off mock installation eagerly
+installMockIfNeeded();
+
+// ============================================
 // CONFIGURATION
 // ============================================
 
