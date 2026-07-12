@@ -16,7 +16,6 @@ const EmailSubscriptionVerify = ({ onEmailUpdate, onEmailVerified, onEmailError 
   const [showOtp, setShowOtp] = useState(false);
   const [msg, setMsg] = useState('');
   const [timer, setTimer] = useState(0);
-  const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [error, setError] = useState('');
@@ -37,10 +36,8 @@ const EmailSubscriptionVerify = ({ onEmailUpdate, onEmailVerified, onEmailError 
   const cross = { loop: true, autoplay: true, animationData: CrossMark, rendererSettings: { preserveAspectRatio: 'xMidYMid slice' } };
 
   const sendOtp = async () => {
-    setSending(true);
     try { setShowVerify(false); setShowOtp(true); const r = await verifySubscriptionEmail(dispatch, email); setMsg(r); setTimer(60); }
     catch (err) { console.error(err); }
-    finally { setSending(false); }
   };
 
   const verifyOtp = async () => {

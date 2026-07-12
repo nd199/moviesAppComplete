@@ -32,9 +32,9 @@ const Footer = () => (
           <p className="text-[#5a6380] text-sm leading-relaxed max-w-[360px] m-0">Your ultimate destination for movies and TV shows. 4K streaming, offline downloads, and personalized recommendations.</p>
           <div className="flex gap-2 max-md:justify-center">
             {socials.map(({ icon: Icon, label, color }) => (
-              <a key={label} href="#" aria-label={label} className={`w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-[#5a6380] flex items-center justify-center transition-all duration-300 ${color}`}>
+              <button key={label} type="button" aria-label={label} className={`w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-[#5a6380] flex items-center justify-center transition-all duration-300 ${color}`}>
                 <Icon sx={{ fontSize: 18 }} />
-              </a>
+              </button>
             ))}
           </div>
         </div>
