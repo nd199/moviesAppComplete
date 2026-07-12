@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes, Navigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import "./App.css";
+
 
 // Redux actions
 import { setAuthStatus, setTokens, logout } from "./redux/userSlice";
@@ -36,11 +36,6 @@ import ServerConnection from "./Utils/ServerConnection";
 // ============================================
 // CONFIGURATION
 // ============================================
-
-const isLocal = () => {
-  const hostname = window.location.hostname;
-  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
-};
 
 const getBaseURL = () => {
   return process.env.REACT_APP_API_URL || 'http://localhost:8080';
@@ -106,8 +101,6 @@ function AppWithHealthCheck() {
 
 function AppWithNavigation() {
   const dispatch = useDispatch();
-  const authStatus = useSelector(state => state.user.authStatus);
-  const currentUser = useSelector(state => state.user.currentUser);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Initialize auth state on mount
@@ -183,8 +176,19 @@ function AppWithNavigation() {
 
   return (
     <Router>
-      <NavBar onMenuClick={() => setSidebarOpen(true)} />
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Layout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+    </Router>
+  );
+}
+
+function Layout({ sidebarOpen, setSidebarOpen }) {
+  const location = useLocation();
+  const isVideoPage = location.pathname.startsWith('/video');
+
+  return (
+    <>
+      {!isVideoPage && <NavBar onMenuClick={() => setSidebarOpen(true)} />}
+      {!isVideoPage && <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />}
       <Routes>
         {/* Public Routes */}
         <Route path="/server-status" element={<ServerConnection />} />
@@ -245,7 +249,7 @@ function AppWithNavigation() {
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Router>
+    </>
   );
 }
 
@@ -270,8 +274,8 @@ function ProtectedRoute({
   // Show loading while checking auth
   if (authStatus === 'loading') {
     return (
-      <div style={{ padding: "20px", textAlign: "center", color: "white" }}>
-        Loading...
+      <div className="min-h-screen bg-surface-950 flex items-center justify-center">
+        <div className="text-[#8892b0] text-sm">Loading...</div>
       </div>
     );
   }

@@ -27,10 +27,6 @@ const getLocalWatchlist = () => {
   }
 };
 
-const saveLocalWatchlist = (list) => {
-  localStorage.setItem('mock_watchlist', JSON.stringify(list));
-};
-
 // Route matcher: returns mock data based on URL pattern
 function matchRoute(method, url) {
   const m = method.toLowerCase();

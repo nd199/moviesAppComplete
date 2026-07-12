@@ -74,7 +74,7 @@ export const setTokens = (newAccessToken, newRefreshToken) => {
   setRefreshToken(newRefreshToken);
 };
 
-export default {
+const authStore = {
   setAccessToken,
   getAccessToken,
   getRefreshToken,
@@ -83,3 +83,5 @@ export default {
   hasTokens,
   setTokens,
 };
+
+export default authStore;

@@ -27,11 +27,6 @@ installMockIfNeeded();
 // CONFIGURATION
 // ============================================
 
-const isLocal = () => {
-  const hostname = window.location.hostname;
-  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
-};
-
 const getBaseUrl = () => {
   return process.env.REACT_APP_API_URL || 'http://localhost:8080';
 };
