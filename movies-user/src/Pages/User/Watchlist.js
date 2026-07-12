@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { 
   Bookmarks, 
   PlayArrow, 
-  DeleteOutline,
+  DeleteOutlined,
   MovieFilter,
   Tv
 } from '@mui/icons-material';

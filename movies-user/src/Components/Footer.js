@@ -2,7 +2,7 @@ import {
   Facebook,
   HandshakeOutlined,
   Instagram,
-  MailOutline,
+  MailOutlined,
   PlaceOutlined,
   Twitter,
   WhatsApp,
@@ -71,7 +71,7 @@ const Footer = () => {
             <span>+91 8072205480</span>
           </div>
           <div className="contact-item">
-            <MailOutline className="contact-icon" />
+            <MailOutlined className="contact-icon" />
             <span>naren06251999@gmail.com</span>
           </div>
         </div>
