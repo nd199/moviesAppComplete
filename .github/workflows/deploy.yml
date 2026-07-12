@@ -2,6 +2,10 @@ name: EC2 Deployment
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'backend/**'
+      - 'docker-compose.yaml'
+      - '.github/workflows/deploy.yml'
 jobs:
   build:
     runs-on: ubuntu-latest
