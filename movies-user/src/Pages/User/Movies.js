@@ -1,142 +1,63 @@
-import { Movie, SearchOff } from '@mui/icons-material';
+import { SearchOff } from '@mui/icons-material';
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ColListItem from "../../Components/Col-ListItem";
 import FilterNavbar from "../../Components/FilterNavbar";
 import Footer from "../../Components/Footer";
 import { fetchTmdbTrendingMovies, searchTmdbMovies } from "../../Network/ApiCalls";
-import "./Movies.css";
 
 const Movies = () => {
   const dispatch = useDispatch();
-  const { tmdbTrendingMovies = [], tmdbFetching = false, tmdbSearchResults = [] } = useSelector(
-    (state) => state?.product || {}
-  );
-
+  const { tmdbTrendingMovies = [], tmdbFetching = false, tmdbSearchResults = [] } = useSelector(s => s?.product || {});
   const [sortBy, setSortBy] = useState("popularity");
   const [searchQuery, setSearchQuery] = useState("");
   const [genre, setGenre] = useState("");
   const [year, setYear] = useState("");
   const [rating, setRating] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
+  const [searching, setSearching] = useState(false);
 
+  useEffect(() => { fetchTmdbTrendingMovies(dispatch); }, [dispatch]);
   useEffect(() => {
-    // Initial load
-    fetchTmdbTrendingMovies(dispatch);
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (searchQuery.trim()) {
-      setIsSearching(true);
-      const debounceTimer = setTimeout(() => {
-        searchTmdbMovies(dispatch, searchQuery);
-      }, 500);
-      return () => clearTimeout(debounceTimer);
-    } else {
-      setIsSearching(false);
-    }
+    if (!searchQuery.trim()) { setSearching(false); return; }
+    setSearching(true);
+    const t = setTimeout(() => searchTmdbMovies(dispatch, searchQuery), 500);
+    return () => clearTimeout(t);
   }, [dispatch, searchQuery]);
 
-  const filterMovies = useCallback(
-    (movies) => {
-      if (!movies?.length) return [];
+  const filter = useCallback((movies) => {
+    if (!movies?.length) return [];
+    return movies.filter(m => {
+      if (genre && genre !== 'All') { const g = m.genre || ''; if (!g.toLowerCase().includes(genre.toLowerCase())) return false; }
+      if (year) { const y = m.year || (m.release_date && new Date(m.release_date).getFullYear()); if (y !== parseInt(year)) return false; }
+      if (rating && parseFloat(m.rating || m.vote_average || 0) < parseFloat(rating)) return false;
+      return true;
+    }).sort((a, b) => sortBy === "popularity" ? (b.popularity || 0) - (a.popularity || 0) : (parseFloat(b.rating || 0) - parseFloat(a.rating || 0)));
+  }, [genre, year, rating, sortBy]);
 
-      return movies
-        .filter((movie) => {
-          // Genre filtering
-          if (genre && genre !== 'All') {
-            const movieGenres = movie.genre || '';
-            const genreMatch = movieGenres.toLowerCase().includes(genre.toLowerCase()) || 
-                              movieGenres.split(',').some(g => g.trim().toLowerCase().includes(genre.toLowerCase()));
-            if (!genreMatch) return false;
-          }
-          
-          // Year filtering
-          if (year) {
-            const movieYear = movie.year || (movie.release_date && new Date(movie.release_date).getFullYear());
-            if (movieYear !== parseInt(year)) return false;
-          }
-          
-          // Rating filtering
-          if (rating) {
-            const movieRating = parseFloat(movie.rating || movie.vote_average || 0);
-            if (movieRating < parseFloat(rating)) return false;
-          }
-          
-          return true;
-        })
-        .sort((a, b) => {
-          if (sortBy === "popularity") {
-            return (b.voteCount || b.popularity || 0) - (a.voteCount || a.popularity || 0);
-          } else if (sortBy === "rating") {
-            return (parseFloat(b.rating || b.vote_average || 0) - parseFloat(a.rating || a.vote_average || 0));
-          }
-          return 0;
-        });
-    },
-    [genre, year, rating, sortBy]
-  );
-
-  const moviesToDisplay = searchQuery ? tmdbSearchResults : tmdbTrendingMovies;
-  const filteredMovies = filterMovies(moviesToDisplay);
-  const isLoading = tmdbFetching || (isSearching && tmdbSearchResults.length === 0);
+  const movies = filter(searchQuery ? tmdbSearchResults : tmdbTrendingMovies);
+  const loading = tmdbFetching || (searching && !tmdbSearchResults.length);
 
   return (
-    <div className="moviesPage">
-      <div className="movieContainer">
-        <h1>Movies</h1>
-        <FilterNavbar
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          genre={genre}
-          setGenre={setGenre}
-          year={year}
-          setYear={setYear}
-          rating={rating}
-          setRating={setRating}
-        />
-        <div className="movieContainerContent">
-          {isLoading ? (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p className="loading-text-primary">
-                {isSearching ? 'Searching movies...' : 'Loading your movies collection...'}
-              </p>
-              <p className="loading-text-secondary">
-                {isSearching ? 'Finding the best matches for you' : 'Fetching latest ratings and trailers'}
-              </p>
+    <div className="min-h-screen bg-surface-950">
+      <div className="max-w-[1400px] mx-auto px-5 pt-20 pb-8">
+        <h1 className="text-4xl sm:text-5xl font-black text-white m-0 mb-2 text-center tracking-tight">Movies</h1>
+        <div className="h-[3px] w-16 mx-auto mb-6 rounded-full bg-gradient-to-r from-brand-500 to-accent-500" />
+        <FilterNavbar sortBy={sortBy} setSortBy={setSortBy} searchQuery={searchQuery} setSearchQuery={setSearchQuery} genre={genre} setGenre={setGenre} year={year} setYear={setYear} rating={rating} setRating={setRating} />
+        <div className="mt-6">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-24 gap-4">
+              <div className="w-12 h-12 border-[3px] border-white/10 border-t-brand-500 rounded-full animate-spin" />
+              <p className="text-[#8892b0] text-sm m-0">{searching ? 'Searching...' : 'Loading...'}</p>
             </div>
-          ) : filteredMovies.length > 0 ? (
-            filteredMovies.map((movie, id) => (
-              <ColListItem
-                key={`${movie.id || movie.tmdbId || id}-${movie.title || movie.name}`}
-                name={movie.title || movie.name}
-                desc={movie.description || movie.overview}
-                year={movie.year}
-                img={movie.poster}
-                ageRating={movie.ageRating}
-                cost={movie.cost}
-                rating={movie.rating || movie.vote_average}
-                runtime={movie.runtime}
-                genre={movie.genre}
-                trailer={movie.trailer}
-                className="card"
-                tmdbId={movie.tmdbId}
-                mediaType="movie"
-              />
-            ))
+          ) : movies.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {movies.map((m, i) => <ColListItem key={m.id || m.tmdbId || i} name={m.title || m.name} desc={m.description || m.overview} year={m.year} img={m.poster} ageRating={m.ageRating} rating={m.rating || m.vote_average} runtime={m.runtime} genre={m.genre} trailer={m.trailer} tmdbId={m.tmdbId} mediaType="movie" />)}
+            </div>
           ) : (
-            <div className="empty-state">
-              <SearchOff className="empty-state-icon" />
-              <h3>{searchQuery ? 'No movies found' : 'No movies match your filters'}</h3>
-              <p>
-                {searchQuery 
-                  ? 'Try searching with different keywords or check the spelling.'
-                  : 'Try clearing some filters or adjusting your criteria. We\'ve got thousands of movies waiting!'
-                }
-              </p>
+            <div className="flex flex-col items-center justify-center py-32 gap-4">
+              <SearchOff className="text-6xl text-surface-700" />
+              <h3 className="text-xl font-semibold text-[#8892b0] m-0">{searchQuery ? 'No results' : 'No movies available'}</h3>
+              <p className="text-[#5a6380] text-sm m-0">Try different keywords or filters</p>
             </div>
           )}
         </div>

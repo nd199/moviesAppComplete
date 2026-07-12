@@ -1,14 +1,4 @@
-import {
-  ArrowBack,
-  LocationOnOutlined,
-  LockOutlined,
-  MailOutlined,
-  Person2Outlined,
-  PhoneOutlined,
-  PublishOutlined,
-  Visibility,
-  VisibilityOff,
-} from '@mui/icons-material';
+import { ArrowBack, LocationOnOutlined, LockOutlined, MailOutlined, Person2Outlined, PhoneOutlined, PublishOutlined, Visibility, VisibilityOff } from '@mui/icons-material';
 import LinearProgress from '@mui/material/LinearProgress';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,18 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { uploadToImgBB } from '../../ImgBB';
-import {
-  changePassword,
-  updateProfile,
-  fetchUsers,
-} from '../../Network/ApiCalls';
-import {
-  formatPhoneNumber,
-  getPasswordStrength,
-  validatePasswordForm,
-  validateProfileForm,
-} from '../../Utils/profileValidation';
-import './Profile.css';
+import { changePassword, updateProfile, fetchUsers } from '../../Network/ApiCalls';
+import { formatPhoneNumber, getPasswordStrength, validatePasswordForm, validateProfileForm } from '../../Utils/profileValidation';
+
+const inputClass = "w-full p-3 rounded-xl bg-white/[0.06] border border-white/10 text-white placeholder:text-[#5a6380] focus:outline-none focus:border-brand-500 transition-all disabled:opacity-50";
+const inputErrorClass = `${inputClass} !border-red-500`;
+const labelClass = "text-sm font-medium text-[#8892b0] flex items-center gap-2";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -44,7 +28,6 @@ const Profile = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
 
-  // Password form states
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -52,726 +35,215 @@ const Profile = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Validation states
   const [profileErrors, setProfileErrors] = useState({});
   const [passwordErrors, setPasswordErrors] = useState({});
-
-  // Loading states
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  // Handle back navigation
-  const handleBack = () => {
-    navigate(-1);
-  };
+  const [originalValues] = useState({ name: user?.name || '', phoneNumber: user?.phoneNumber || '', address: user?.address || '', imageUrl: user?.imageUrl || '' });
 
-  // Track original values for change detection
-  const [originalValues, setOriginalValues] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phoneNumber: user?.phoneNumber || '',
-    address: user?.address || '',
-    imageUrl: user?.imageUrl || '',
-  });
-
-  // Check if form has changes
-  const hasProfileChanges = () => {
-    return (
-      name !== originalValues.name ||
-      phoneNumber !== originalValues.phoneNumber ||
-      address !== originalValues.address ||
-      imageUrl !== originalValues.imageUrl
-    );
-  };
+  const hasProfileChanges = () => name !== originalValues.name || phoneNumber !== originalValues.phoneNumber || address !== originalValues.address || imageUrl !== originalValues.imageUrl;
 
   const userUpdateHandler = async e => {
     e.preventDefault();
-
-    // Validate form
-    const formData = { name, email, phoneNumber, address, imageUrl };
-    const validation = validateProfileForm(formData);
-
-    if (!validation.isValid) {
-      setProfileErrors(validation.errors);
-
-      // Show specific validation error message
-      const firstError = Object.values(validation.errors)[0];
-      toast.error(firstError || 'Please fix the validation errors');
-      return;
-    }
-
+    const validation = validateProfileForm({ name, email, phoneNumber, address, imageUrl });
+    if (!validation.isValid) { setProfileErrors(validation.errors); toast.error(Object.values(validation.errors)[0] || 'Please fix the validation errors'); return; }
     setProfileErrors({});
     setIsUpdatingProfile(true);
-
     try {
       let updatedImageUrl = imageUrl;
-      if (avatar) {
-        updatedImageUrl = await uploadToImgBB(avatar, setUploadProgress);
-      }
-
-      const result = await updateProfile(
-        dispatch,
-        {
-          name,
-          email,
-          phoneNumber,
-          address,
-          imageUrl: updatedImageUrl,
-        },
-        user.id
-      );
-
-      if (result.success) {
-        toast.success('Profile updated!');
-        fetchUsers(dispatch);
-        setOriginalValues({
-          name,
-          email,
-          phoneNumber,
-          address,
-          imageUrl: updatedImageUrl,
-        });
-        setShowEditForm(false);
-      }
+      if (avatar) updatedImageUrl = await uploadToImgBB(avatar, setUploadProgress);
+      const result = await updateProfile(dispatch, { name, email, phoneNumber, address, imageUrl: updatedImageUrl }, user.id);
+      if (result.success) { toast.success('Profile updated!'); fetchUsers(dispatch); setShowEditForm(false); }
     } catch (err) {
-      let errorMessage = 'Profile update failed';
-
-      if (err.message) {
-        const errorLower = err.message.toLowerCase();
-
-        if (
-          errorLower.includes('email already exists') ||
-          errorLower.includes('duplicate email')
-        ) {
-          errorMessage =
-            'Email already exists. Please use a different email address.';
-        } else if (
-          errorLower.includes('phone already exists') ||
-          errorLower.includes('duplicate phone')
-        ) {
-          errorMessage =
-            'Phone number already exists. Please use a different phone number.';
-        } else if (
-          errorLower.includes('validation') ||
-          errorLower.includes('invalid')
-        ) {
-          errorMessage = 'Please check all fields and try again.';
-        } else if (
-          errorLower.includes('network') ||
-          errorLower.includes('connection')
-        ) {
-          errorMessage =
-            'Network error. Please check your connection and try again.';
-        } else {
-          errorMessage = err.message;
-        }
-      }
-
-      toast.error(errorMessage);
-    } finally {
-      setIsUpdatingProfile(false);
-    }
+      const msg = err.message?.toLowerCase() || '';
+      if (msg.includes('email already')) toast.error('Email already exists.');
+      else if (msg.includes('phone already')) toast.error('Phone number already exists.');
+      else toast.error(err.message || 'Profile update failed');
+    } finally { setIsUpdatingProfile(false); }
   };
 
   const passwordChangeHandler = async e => {
     e.preventDefault();
-
-    // Validate password form
-    const passwordData = {
-      currentPassword,
-      newPassword,
-      confirmPassword,
-      userName: user?.name,
-      userEmail: user?.email,
-      userPhone: user?.phoneNumber,
-    };
-    const validation = validatePasswordForm(passwordData);
-
-    if (!validation.isValid) {
-      setPasswordErrors(validation.errors);
-
-      // Show specific validation error message
-      const firstError = Object.values(validation.errors)[0];
-      toast.error(firstError || 'Please fix the validation errors');
-      return;
-    }
-
+    const validation = validatePasswordForm({ currentPassword, newPassword, confirmPassword, userName: user?.name, userEmail: user?.email, userPhone: user?.phoneNumber });
+    if (!validation.isValid) { setPasswordErrors(validation.errors); toast.error(Object.values(validation.errors)[0] || 'Please fix the validation errors'); return; }
     setPasswordErrors({});
     setIsChangingPassword(true);
-
     try {
-      const result = await changePassword(dispatch, passwordData);
-
-      if (result.success) {
-        toast.success('Password changed successfully!');
-        setShowPasswordForm(false);
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-      }
+      const result = await changePassword(dispatch, { currentPassword, newPassword, confirmPassword });
+      if (result.success) { toast.success('Password changed successfully!'); setShowPasswordForm(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); }
     } catch (err) {
-      // Handle different types of errors with specific messages
-      let errorMessage = 'Password change failed';
-
-      if (err.message) {
-        const errorLower = err.message.toLowerCase();
-
-        if (
-          errorLower.includes('current password is incorrect') ||
-          errorLower.includes('invalid current password')
-        ) {
-          errorMessage =
-            'Current password is incorrect. Please check and try again.';
-        } else if (
-          errorLower.includes('password must contain') ||
-          errorLower.includes('validation')
-        ) {
-          errorMessage =
-            "Password doesn't meet security requirements. Please check all requirements.";
-        } else if (
-          errorLower.includes('personal info') ||
-          errorLower.includes('name, email, phone')
-        ) {
-          errorMessage =
-            'Password must not contain personal information like your name, email, or phone number.';
-        } else if (
-          errorLower.includes('too similar') ||
-          errorLower.includes('different from current')
-        ) {
-          errorMessage =
-            'New password is too similar to current password. Please choose a more different password.';
-        } else if (
-          errorLower.includes('network') ||
-          errorLower.includes('connection')
-        ) {
-          errorMessage =
-            'Network error. Please check your connection and try again.';
-        } else {
-          errorMessage = err.message;
-        }
-      }
-
-      toast.error(errorMessage);
-    } finally {
-      setIsChangingPassword(false);
-    }
+      const msg = err.message?.toLowerCase() || '';
+      if (msg.includes('incorrect')) toast.error('Current password is incorrect.');
+      else if (msg.includes('personal info')) toast.error('Password must not contain personal information.');
+      else toast.error(err.message || 'Password change failed');
+    } finally { setIsChangingPassword(false); }
   };
 
-  // Handle phone number formatting
-  const handlePhoneChange = e => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
-    setPhoneNumber(value);
-  };
-
-  // Get password strength for UI feedback
+  const handlePhoneChange = e => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10));
   const passwordStrength = getPasswordStrength(newPassword);
-
-  // Helper function to check if password contains personal information
-  const containsPersonalInfoCheck = (password, name, email, phone) => {
-    if (!password) return false;
-
-    const passwordLower = password.toLowerCase();
-
-    // Check name (split into parts)
-    if (name) {
-      const nameParts = name.toLowerCase().split(' ');
-      for (let part of nameParts) {
-        if (part.length >= 3 && passwordLower.includes(part)) {
-          return true;
-        }
-      }
-    }
-
-    // Check email (before @)
-    if (email) {
-      const emailLocal = email.toLowerCase().split('@')[0];
-      if (emailLocal.length >= 3 && passwordLower.includes(emailLocal)) {
-        return true;
-      }
-    }
-
-    // Check phone number (any sequence of 3+ digits)
-    if (phone) {
-      const phoneDigits = phone.replace(/\D/g, '');
-      for (let i = 0; i <= phoneDigits.length - 3; i++) {
-        const sequence = phoneDigits.substring(i, i + 3);
-        if (password.includes(sequence)) {
-          return true;
-        }
-      }
-    }
-
+  const containsPersonalInfo = (pw, n, em, ph) => {
+    if (!pw) return false;
+    const low = pw.toLowerCase();
+    if (n) for (const p of n.toLowerCase().split(' ')) if (p.length >= 3 && low.includes(p)) return true;
+    if (em) { const local = em.split('@')[0].toLowerCase(); if (local.length >= 3 && low.includes(local)) return true; }
+    if (ph) { const d = ph.replace(/\D/g, ''); for (let i = 0; i <= d.length - 3; i++) if (pw.includes(d.substring(i, i + 3))) return true; }
     return false;
   };
 
-  // Regex patterns for password validation (moved outside JSX to avoid parsing issues)
-  const hasUpperCase = /[A-Z]/;
-  const hasLowerCase = /[a-z]/;
-  const hasNumbers = /\d/;
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/;
-
   const handleFileChange = e => {
     const file = e.target.files[0];
-    if (file) {
-      setAvatar(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setImageUrl(reader.result);
-      reader.readAsDataURL(file);
-    }
+    if (file) { setAvatar(file); const r = new FileReader(); r.onloadend = () => setImageUrl(r.result); r.readAsDataURL(file); }
   };
 
+  const hasUpper = /[A-Z]/, hasLower = /[a-z]/, hasNum = /\d/, hasSpec = /[!@#$%^&*(),.?":{}|<>]/;
+
+  const PasswordToggle = ({ show, onToggle }) => (
+    <button type="button" onClick={onToggle} className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none text-[#5a6380] cursor-pointer hover:text-white transition-colors">
+      {show ? <VisibilityOff /> : <Visibility />}
+    </button>
+  );
+
+  const PlaceholderImg = 'https://via.placeholder.com/150/111/999?text=U';
+
   return (
-    <div className="profileContainer">
+    <div className="min-h-screen bg-surface-950 p-6 pt-24">
       <ToastContainer />
-      <button className="backButton" onClick={handleBack}>
-        <ArrowBack />
-        Back
-      </button>
-      <div className="profileTitleContainer">
-        <h1 className="profileTitle">Your Profile</h1>
-      </div>
-      <div className="profileContentContainer">
-        <div className="profileInfo">
-          <div className="profileInfoContainer">
-            <div className="profileInfoImgContainer">
-              <img
-                src={
-                  imageUrl ||
-                  'https://via.placeholder.com/150/1a1a1a/9ca3af?text=U'
-                }
-                alt="Profile"
-                className="profileInfoImg"
-                onError={e =>
-                  (e.target.src =
-                    'https://via.placeholder.com/150/1a1a1a/9ca3af?text=U')
-                }
-              />
+      <div className="max-w-[1000px] mx-auto">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-[#5a6380] hover:text-white transition-colors bg-transparent border-none cursor-pointer mb-6 text-sm">
+          <ArrowBack fontSize="small" /> Back
+        </button>
+
+        <h1 className="text-3xl font-bold text-white mb-8 m-0">Your Profile</h1>
+
+        <div className="grid grid-cols-[350px_1fr] gap-8 max-lg:grid-cols-1">
+          {/* Profile Card */}
+          <div className="glass rounded-2xl p-8 text-center">
+            <img src={imageUrl || PlaceholderImg} alt="Profile" className="w-28 h-28 rounded-full object-cover border-4 border-brand-500 mx-auto mb-4" onError={e => { e.target.src = PlaceholderImg; }} />
+            <h3 className="text-xl font-semibold text-white m-0 mb-6">{name || 'User'}</h3>
+
+            <div className="text-left space-y-3">
+              <span className="text-xs font-semibold text-[#5a6380] uppercase tracking-wider">Account Details</span>
+              {[
+                { icon: <Person2Outlined fontSize="small" />, text: name || 'Not set' },
+                { icon: <MailOutlined fontSize="small" />, text: email || 'Not set' },
+                { icon: <PhoneOutlined fontSize="small" />, text: phoneNumber || 'Not set' },
+                { icon: <LocationOnOutlined fontSize="small" />, text: address || 'Not set' },
+              ].map(({ icon, text }) => (
+                <div key={text} className="flex items-center gap-3 text-[#8892b0] text-sm py-2 border-b border-white/5 last:border-0">
+                  <span className="text-brand-500">{icon}</span>
+                  <span>{text}</span>
+                </div>
+              ))}
             </div>
-            <h3 className="profileInfoName">{name || 'User'}</h3>
-            <div className="profileDetails">
-              <span className="profileInfoTitle">Account Details</span>
-              <div className="profileInfoItem">
-                <Person2Outlined />
-                <span>{name || 'Not set'}</span>
-              </div>
-              <div className="profileInfoItem">
-                <MailOutlined />
-                <span>{email || 'Not set'}</span>
-              </div>
-              <div className="profileInfoItem">
-                <PhoneOutlined />
-                <span>{phoneNumber || 'Not set'}</span>
-              </div>
-              <div className="profileInfoItem">
-                <LocationOnOutlined />
-                <span>{address || 'Not set'}</span>
-              </div>
-            </div>
+
             {!showEditForm && !showPasswordForm && (
-              <button
-                onClick={() => setShowEditForm(true)}
-                className="profileUpdateButton"
-                disabled={isUpdatingProfile || isChangingPassword}
-              >
-                <PublishOutlined style={{ marginRight: '8px' }} />
-                Edit Profile
-              </button>
-            )}
-            {!showEditForm && !showPasswordForm && (
-              <button
-                onClick={() => setShowPasswordForm(true)}
-                className="profileUpdateButton"
-                style={{
-                  marginTop: '0.5rem',
-                  background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-                }}
-                disabled={isUpdatingProfile || isChangingPassword}
-              >
-                <LockOutlined style={{ marginRight: '8px' }} />
-                Change Password
-              </button>
+              <div className="flex flex-col gap-3 mt-6">
+                <button onClick={() => setShowEditForm(true)} disabled={isUpdatingProfile || isChangingPassword} className="w-full btn-primary flex items-center justify-center gap-2">
+                  <PublishOutlined fontSize="small" /> Edit Profile
+                </button>
+                <button onClick={() => setShowPasswordForm(true)} disabled={isUpdatingProfile || isChangingPassword} className="w-full py-3 px-6 rounded-xl glass text-white font-semibold hover:bg-white/10 transition-all cursor-pointer flex items-center justify-center gap-2">
+                  <LockOutlined fontSize="small" /> Change Password
+                </button>
+              </div>
             )}
           </div>
-        </div>
 
-        {showEditForm && (
-          <div className="profileUpdateOverlay">
-            <div className="profileUpdate">
-              <button
-                onClick={() => setShowEditForm(false)}
-                className="editProfileCloseButton"
-              >
-                ✕
-              </button>
-              <h2 className="profileUpdateTitle">Edit Profile</h2>
-              <p className="profileUpdateSubtitle">
-                Update your personal information
-              </p>
-              <form className="profileUpdateForm" onSubmit={userUpdateHandler}>
-                <div className="profileUpdateRight">
-                  <div className="profileUpdateUpload">
-                    <img
-                      src={
-                        imageUrl ||
-                        'https://via.placeholder.com/150/1a1a1a/9ca3af?text=U'
-                      }
-                      alt=""
-                      className="profileUpdateImg"
-                    />
-                    <label htmlFor="file" className="profileUpdateLabel">
-                      <PublishOutlined /> Upload Photo
-                    </label>
-                    <input
-                      id="file"
-                      type="file"
-                      style={{ display: 'none' }}
-                      accept="image/*"
-                      onChange={handleFileChange}
-                    />
-                    {uploadProgress > 0 && (
-                      <LinearProgress
-                        variant="determinate"
-                        value={uploadProgress}
-                        className="uploadProgress"
-                      />
-                    )}
-                  </div>
+          {/* Edit Profile Form */}
+          {showEditForm && (
+            <div className="glass rounded-2xl p-8 relative">
+              <button onClick={() => setShowEditForm(false)} className="absolute top-4 right-4 w-8 h-8 rounded-xl bg-white/10 text-white flex items-center justify-center hover:bg-white/15 transition-colors border-none cursor-pointer text-lg">✕</button>
+              <h2 className="text-xl font-bold text-white m-0 mb-1">Edit Profile</h2>
+              <p className="text-[#5a6380] text-sm mb-6 m-0">Update your personal information</p>
+              <form onSubmit={userUpdateHandler} className="flex flex-col gap-5">
+                <div className="flex flex-col items-center gap-3 p-4 bg-white/[0.03] rounded-xl">
+                  <img src={imageUrl || PlaceholderImg} alt="" className="w-24 h-24 rounded-full object-cover border border-white/20" />
+                  <label htmlFor="file" className="flex items-center gap-2 text-sm text-[#8892b0] cursor-pointer hover:text-white transition-colors">
+                    <PublishOutlined fontSize="small" /> Upload Photo
+                  </label>
+                  <input id="file" type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                  {uploadProgress > 0 && <LinearProgress variant="determinate" value={uploadProgress} className="w-full" />}
                 </div>
-                <div className="profileUpdateLeft">
-                  <div className="profileUpdateItem">
-                    <label>Full Name</label>
-                    <input
-                      type="text"
-                      className={`profileUpdateInput ${profileErrors.name ? 'error' : ''}`}
-                      placeholder="Enter your full name"
-                      value={name}
-                      onChange={e => setName(e.target.value)}
-                    />
-                    {profileErrors.name && (
-                      <span className="error-message">
-                        {profileErrors.name}
-                      </span>
-                    )}
+
+                {[
+                  { label: "Full Name", value: name, onChange: e => setName(e.target.value), error: profileErrors.name, placeholder: "Enter your full name" },
+                  { label: "Email", value: email, onChange: e => setEmail(e.target.value), error: profileErrors.email, placeholder: "your@email.com", disabled: true },
+                  { label: "Phone", value: formatPhoneNumber(phoneNumber), onChange: handlePhoneChange, error: profileErrors.phoneNumber, placeholder: "Enter phone number", maxLength: 10, type: "tel" },
+                  { label: "Address", value: address, onChange: e => setAddress(e.target.value), error: profileErrors.address, placeholder: "Enter your address" },
+                ].map(({ label, value, onChange, error, placeholder, disabled, maxLength, type }) => (
+                  <div key={label} className="flex flex-col gap-1.5">
+                    <label className={labelClass}>{label}</label>
+                    <input type={type || "text"} className={error ? inputErrorClass : inputClass} placeholder={placeholder} value={value} onChange={onChange} disabled={disabled} maxLength={maxLength} />
+                    {error && <span className="text-red-400 text-xs">{error}</span>}
                   </div>
-                  <div className="profileUpdateItem">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      className={`profileUpdateInput ${profileErrors.email ? 'error' : ''}`}
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      disabled
-                    />
-                    {profileErrors.email && (
-                      <span className="error-message">
-                        {profileErrors.email}
-                      </span>
-                    )}
-                  </div>
-                  <div className="profileUpdateItem">
-                    <label>Phone</label>
-                    <input
-                      type="tel"
-                      className={`profileUpdateInput ${profileErrors.phoneNumber ? 'error' : ''}`}
-                      placeholder="Enter phone number"
-                      value={formatPhoneNumber(phoneNumber)}
-                      onChange={handlePhoneChange}
-                      maxLength={10}
-                    />
-                    {profileErrors.phoneNumber && (
-                      <span className="error-message">
-                        {profileErrors.phoneNumber}
-                      </span>
-                    )}
-                  </div>
-                  <div className="profileUpdateItem">
-                    <label>Address</label>
-                    <input
-                      type="text"
-                      className={`profileUpdateInput ${profileErrors.address ? 'error' : ''}`}
-                      placeholder="Enter your address"
-                      value={address}
-                      onChange={e => setAddress(e.target.value)}
-                    />
-                    {profileErrors.address && (
-                      <span className="error-message">
-                        {profileErrors.address}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  className={`profileUpdateButton ${isUpdatingProfile ? 'loading' : ''} ${!hasProfileChanges() ? 'disabled' : ''}`}
-                  disabled={isUpdatingProfile || !hasProfileChanges()}
-                >
-                  {isUpdatingProfile
-                    ? 'Saving...'
-                    : hasProfileChanges()
-                      ? 'Save Changes'
-                      : 'No Changes to Save'}
+                ))}
+
+                <button type="submit" className={`w-full py-3 rounded-xl font-semibold transition-all border-none cursor-pointer ${isUpdatingProfile || !hasProfileChanges() ? 'bg-white/5 text-[#5a6380] cursor-not-allowed' : 'btn-primary'}`} disabled={isUpdatingProfile || !hasProfileChanges()}>
+                  {isUpdatingProfile ? 'Saving...' : hasProfileChanges() ? 'Save Changes' : 'No Changes to Save'}
                 </button>
               </form>
             </div>
-          </div>
-        )}
+          )}
 
-        {showPasswordForm && (
-          <div className="profileUpdateOverlay">
-            <div className="profileUpdate">
-              <button
-                onClick={() => setShowPasswordForm(false)}
-                className="editProfileCloseButton"
-              >
-                ✕
-              </button>
-              <h2 className="profileUpdateTitle">Change Password</h2>
-              <p className="profileUpdateSubtitle">
-                Update your account password
-              </p>
-              <form
-                className="profileUpdateForm"
-                onSubmit={passwordChangeHandler}
-              >
-                <div
-                  className="profileUpdateLeft"
-                  style={{ gridColumn: '1 / -1' }}
-                >
-                  <div className="profileUpdateItem">
-                    <label>Current Password</label>
-                    <div style={{ position: 'relative' }}>
-                      <input
-                        type={showCurrentPassword ? 'text' : 'password'}
-                        className={`profileUpdateInput ${passwordErrors.currentPassword ? 'error' : ''}`}
-                        placeholder="Enter current password"
-                        value={currentPassword}
-                        onChange={e => setCurrentPassword(e.target.value)}
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowCurrentPassword(!showCurrentPassword)
-                        }
-                        style={{
-                          position: 'absolute',
-                          right: '10px',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          background: 'none',
-                          border: 'none',
-                          color: 'var(--profile-text-muted)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {showCurrentPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </button>
+          {/* Change Password Form */}
+          {showPasswordForm && (
+            <div className="glass rounded-2xl p-8 relative">
+              <button onClick={() => setShowPasswordForm(false)} className="absolute top-4 right-4 w-8 h-8 rounded-xl bg-white/10 text-white flex items-center justify-center hover:bg-white/15 transition-colors border-none cursor-pointer text-lg">✕</button>
+              <h2 className="text-xl font-bold text-white m-0 mb-1">Change Password</h2>
+              <p className="text-[#5a6380] text-sm mb-6 m-0">Update your account password</p>
+              <form onSubmit={passwordChangeHandler} className="flex flex-col gap-5">
+                {[
+                  { label: "Current Password", value: currentPassword, onChange: e => setCurrentPassword(e.target.value), error: passwordErrors.currentPassword, show: showCurrentPassword, toggle: () => setShowCurrentPassword(!showCurrentPassword), placeholder: "Enter current password" },
+                  { label: "New Password", value: newPassword, onChange: e => setNewPassword(e.target.value), error: passwordErrors.newPassword, show: showNewPassword, toggle: () => setShowNewPassword(!showNewPassword), placeholder: "Enter new password" },
+                  { label: "Confirm New Password", value: confirmPassword, onChange: e => setConfirmPassword(e.target.value), error: passwordErrors.confirmPassword, show: showConfirmPassword, toggle: () => setShowConfirmPassword(!showConfirmPassword), placeholder: "Confirm new password" },
+                ].map(({ label, value, onChange, error, show, toggle, placeholder }) => (
+                  <div key={label} className="flex flex-col gap-1.5">
+                    <label className={labelClass}>{label}</label>
+                    <div className="relative">
+                      <input type={show ? 'text' : 'password'} className={error ? inputErrorClass : inputClass} placeholder={placeholder} value={value} onChange={onChange} required />
+                      <PasswordToggle show={show} onToggle={toggle} />
                     </div>
-                    {passwordErrors.currentPassword && (
-                      <span className="error-message">
-                        {passwordErrors.currentPassword}
-                      </span>
-                    )}
+                    {error && <span className="text-red-400 text-xs">{error}</span>}
                   </div>
-                  <div className="profileUpdateItem">
-                    <label>New Password</label>
-                    <div style={{ position: 'relative' }}>
-                      <input
-                        type={showNewPassword ? 'text' : 'password'}
-                        className={`profileUpdateInput ${passwordErrors.newPassword ? 'error' : ''}`}
-                        placeholder="Enter new password"
-                        value={newPassword}
-                        onChange={e => setNewPassword(e.target.value)}
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        style={{
-                          position: 'absolute',
-                          right: '10px',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          background: 'none',
-                          border: 'none',
-                          color: 'var(--profile-text-muted)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
-                      </button>
+                ))}
+
+                {newPassword && (
+                  <div className="flex flex-col gap-2">
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-300" style={{ width: `${(passwordStrength.strength / 5) * 100}%`, backgroundColor: passwordStrength.color }} />
                     </div>
-                    {passwordErrors.newPassword && (
-                      <span className="error-message">
-                        {passwordErrors.newPassword}
-                      </span>
-                    )}
-                    {newPassword && (
-                      <div className="password-strength-indicator">
-                        <div className="strength-bar">
-                          <div
-                            className="strength-fill"
-                            style={{
-                              width: `${(passwordStrength.strength / 5) * 100}%`,
-                              backgroundColor: passwordStrength.color,
-                            }}
-                          ></div>
-                        </div>
-                        <span
-                          className="strength-text"
-                          style={{ color: passwordStrength.color }}
-                        >
-                          {passwordStrength.label}
-                        </span>
-                      </div>
-                    )}
-                    {newPassword && (
-                      <div className="password-requirements">
-                        <p
-                          style={{
-                            fontSize: '0.7rem',
-                            color: 'var(--profile-text-muted)',
-                            marginBottom: '0.5rem',
-                          }}
-                        >
-                          Password must contain:
-                        </p>
-                        <ul>
-                          <li
-                            style={{
-                              color: hasUpperCase.test(newPassword)
-                                ? '#10b981'
-                                : 'var(--profile-text-muted)',
-                            }}
-                          >
-                            Uppercase letter (A-Z)
-                          </li>
-                          <li
-                            style={{
-                              color: hasLowerCase.test(newPassword)
-                                ? '#10b981'
-                                : 'var(--profile-text-muted)',
-                            }}
-                          >
-                            Lowercase letter (a-z)
-                          </li>
-                          <li
-                            style={{
-                              color: hasNumbers.test(newPassword)
-                                ? '#10b981'
-                                : 'var(--profile-text-muted)',
-                            }}
-                          >
-                            Number (0-9)
-                          </li>
-                          <li
-                            style={{
-                              color: hasSpecialChar.test(newPassword)
-                                ? '#10b981'
-                                : 'var(--profile-text-muted)',
-                            }}
-                          >
-                            Special character (!@#$%^&*(),.?":{}|&lt;&gt;)
-                          </li>
-                          <li
-                            style={{
-                              color:
-                                newPassword.length >= 8 &&
-                                newPassword.length <= 128
-                                  ? '#10b981'
-                                  : 'var(--profile-text-muted)',
-                            }}
-                          >
-                            8-128 characters
-                          </li>
-                          <li
-                            style={{
-                              color:
-                                currentPassword &&
-                                newPassword &&
-                                currentPassword !== newPassword
-                                  ? '#10b981'
-                                  : 'var(--profile-text-muted)',
-                            }}
-                          >
-                            Different from current password
-                          </li>
-                          <li
-                            style={{
-                              color: !containsPersonalInfoCheck(
-                                newPassword,
-                                user?.name,
-                                user?.email,
-                                user?.phoneNumber
-                              )
-                                ? '#10b981'
-                                : 'var(--profile-text-muted)',
-                            }}
-                          >
-                            No personal information (name, email, phone)
-                          </li>
-                        </ul>
-                      </div>
-                    )}
+                    <span className="text-sm font-medium" style={{ color: passwordStrength.color }}>{passwordStrength.label}</span>
                   </div>
-                  <div className="profileUpdateItem">
-                    <label>Confirm New Password</label>
-                    <div style={{ position: 'relative' }}>
-                      <input
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        className={`profileUpdateInput ${passwordErrors.confirmPassword ? 'error' : ''}`}
-                        placeholder="Confirm new password"
-                        value={confirmPassword}
-                        onChange={e => setConfirmPassword(e.target.value)}
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowConfirmPassword(!showConfirmPassword)
-                        }
-                        style={{
-                          position: 'absolute',
-                          right: '10px',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          background: 'none',
-                          border: 'none',
-                          color: 'var(--profile-text-muted)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {showConfirmPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </button>
-                    </div>
-                    {passwordErrors.confirmPassword && (
-                      <span className="error-message">
-                        {passwordErrors.confirmPassword}
-                      </span>
-                    )}
+                )}
+
+                {newPassword && (
+                  <div className="bg-white/[0.03] rounded-xl p-4 border border-white/5">
+                    <p className="text-[0.7rem] text-[#5a6380] mb-2 m-0">Password must contain:</p>
+                    <ul className="space-y-1 list-none p-0 m-0">
+                      {[
+                        { label: "Uppercase letter (A-Z)", check: hasUpper.test(newPassword) },
+                        { label: "Lowercase letter (a-z)", check: hasLower.test(newPassword) },
+                        { label: "Number (0-9)", check: hasNum.test(newPassword) },
+                        { label: "Special character (!@#$%^&*)", check: hasSpec.test(newPassword) },
+                        { label: "8-128 characters", check: newPassword.length >= 8 && newPassword.length <= 128 },
+                        { label: "Different from current password", check: currentPassword && newPassword && currentPassword !== newPassword },
+                        { label: "No personal information", check: !containsPersonalInfo(newPassword, user?.name, user?.email, user?.phoneNumber) },
+                      ].map(({ label, check }) => (
+                        <li key={label} className="text-xs flex items-center gap-2" style={{ color: check ? '#10b981' : 'rgb(156,163,175)' }}>
+                          <span>{check ? '✓' : '○'}</span> {label}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
-                <button
-                  type="submit"
-                  className={`profileUpdateButton ${isChangingPassword ? 'loading' : ''}`}
-                  style={{ gridColumn: '1 / -1' }}
-                  disabled={isChangingPassword}
-                >
+                )}
+
+                <button type="submit" className={`w-full py-3 rounded-xl font-semibold transition-all border-none cursor-pointer ${isChangingPassword ? 'bg-white/5 text-[#5a6380] cursor-not-allowed' : 'btn-primary'}`} disabled={isChangingPassword}>
                   {isChangingPassword ? 'Updating...' : 'Update Password'}
                 </button>
               </form>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

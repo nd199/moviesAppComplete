@@ -5,137 +5,59 @@ import ColListItem from "../../Components/Col-ListItem";
 import FilterNavbar from "../../Components/FilterNavbar";
 import Footer from "../../Components/Footer";
 import { fetchTmdbTrendingShows, searchTmdbShows } from "../../Network/ApiCalls";
-import "./Shows.css";
 
 const Shows = () => {
   const dispatch = useDispatch();
-  const { tmdbTrendingShows = [], tmdbFetching = false, tmdbSearchResults = [] } = useSelector(
-    (state) => state?.product || {}
-  );
-
+  const { tmdbTrendingShows = [], tmdbFetching = false, tmdbSearchResults = [] } = useSelector(s => s?.product || {});
   const [sortBy, setSortBy] = useState("popularity");
   const [searchQuery, setSearchQuery] = useState("");
   const [genre, setGenre] = useState("");
   const [year, setYear] = useState("");
   const [rating, setRating] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
+  const [searching, setSearching] = useState(false);
 
+  useEffect(() => { fetchTmdbTrendingShows(dispatch); }, [dispatch]);
   useEffect(() => {
-    // Initial load
-    fetchTmdbTrendingShows(dispatch);
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (searchQuery.trim()) {
-      setIsSearching(true);
-      const debounceTimer = setTimeout(() => {
-        searchTmdbShows(dispatch, searchQuery);
-      }, 500);
-      return () => clearTimeout(debounceTimer);
-    } else {
-      setIsSearching(false);
-    }
+    if (!searchQuery.trim()) { setSearching(false); return; }
+    setSearching(true);
+    const t = setTimeout(() => searchTmdbShows(dispatch, searchQuery), 500);
+    return () => clearTimeout(t);
   }, [dispatch, searchQuery]);
 
-  const filterShows = useCallback(
-    (shows) => {
-      if (!shows?.length) return [];
+  const filter = useCallback((shows) => {
+    if (!shows?.length) return [];
+    return shows.filter(s => {
+      if (genre && genre !== 'All') { const g = s.genre || ''; if (!g.toLowerCase().includes(genre.toLowerCase())) return false; }
+      if (year) { const y = s.year || (s.first_air_date && new Date(s.first_air_date).getFullYear()); if (y !== parseInt(year)) return false; }
+      if (rating && parseFloat(s.rating || s.vote_average || 0) < parseFloat(rating)) return false;
+      return true;
+    }).sort((a, b) => sortBy === "popularity" ? (b.popularity || 0) - (a.popularity || 0) : (parseFloat(b.rating || 0) - parseFloat(a.rating || 0)));
+  }, [genre, year, rating, sortBy]);
 
-      return shows
-        .filter((show) => {
-          // Genre filtering
-          if (genre && genre !== 'All') {
-            const showGenres = show.genre || '';
-            const genreMatch = showGenres.toLowerCase().includes(genre.toLowerCase()) || 
-                              showGenres.split(',').some(g => g.trim().toLowerCase().includes(genre.toLowerCase()));
-            if (!genreMatch) return false;
-          }
-          
-          // Year filtering - for TV shows, use first_air_date
-          if (year) {
-            const showYear = show.year || (show.first_air_date && new Date(show.first_air_date).getFullYear());
-            if (showYear !== parseInt(year)) return false;
-          }
-          
-          // Rating filtering
-          if (rating) {
-            const showRating = parseFloat(show.rating || show.vote_average || 0);
-            if (showRating < parseFloat(rating)) return false;
-          }
-          
-          return true;
-        })
-        .sort((a, b) => {
-          if (sortBy === "popularity") {
-            return (b.voteCount || b.popularity || 0) - (a.voteCount || a.popularity || 0);
-          } else if (sortBy === "rating") {
-            return (parseFloat(b.rating || b.vote_average || 0) - parseFloat(a.rating || a.vote_average || 0));
-          }
-          return 0;
-        });
-    },
-    [genre, year, rating, sortBy]
-  );
-
-  const showsToDisplay = searchQuery ? tmdbSearchResults : tmdbTrendingShows;
-  const filteredShows = filterShows(showsToDisplay);
-  const isLoading = tmdbFetching || (isSearching && tmdbSearchResults.length === 0);
+  const shows = filter(searchQuery ? tmdbSearchResults : tmdbTrendingShows);
+  const loading = tmdbFetching || (searching && !tmdbSearchResults.length);
 
   return (
-    <div className="showsPage">
-      <div className="showContainer">
-        <h1>TV Shows</h1>
-        <FilterNavbar
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          genre={genre}
-          setGenre={setGenre}
-          year={year}
-          setYear={setYear}
-          rating={rating}
-          setRating={setRating}
-        />
-        <div className="showContainerContent">
-          {isLoading ? (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p className="loading-text-primary">
-                {isSearching ? 'Searching TV shows...' : 'Loading your TV shows collection...'}
-              </p>
-              <p className="loading-text-secondary">
-                {isSearching ? 'Finding the best series for you' : 'Fetching latest episodes & ratings'}
-              </p>
+    <div className="min-h-screen bg-surface-950">
+      <div className="max-w-[1400px] mx-auto px-5 pt-20 pb-8">
+        <h1 className="text-4xl sm:text-5xl font-black text-white m-0 mb-2 text-center tracking-tight">TV Shows</h1>
+        <div className="h-[3px] w-16 mx-auto mb-6 rounded-full bg-gradient-to-r from-accent-500 to-brand-500" />
+        <FilterNavbar sortBy={sortBy} setSortBy={setSortBy} searchQuery={searchQuery} setSearchQuery={setSearchQuery} genre={genre} setGenre={setGenre} year={year} setYear={setYear} rating={rating} setRating={setRating} />
+        <div className="mt-6">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-24 gap-4">
+              <div className="w-12 h-12 border-[3px] border-white/10 border-t-brand-500 rounded-full animate-spin" />
+              <p className="text-[#8892b0] text-sm m-0">{searching ? 'Searching...' : 'Loading...'}</p>
             </div>
-          ) : filteredShows.length > 0 ? (
-            filteredShows.map((show, id) => (
-              <ColListItem
-                key={`${show.id || show.tmdbId || id}-${show.name || show.title}`}
-                name={show.name || show.title}
-                desc={show.description || show.overview}
-                year={show.year}
-                img={show.poster}
-                ageRating={show.ageRating}
-                rating={show.rating || show.vote_average}
-                runtime={show.runtime}
-                genre={show.genre}
-                trailer={show.trailer}
-                className="card"
-                tmdbId={show.tmdbId}
-                mediaType="tv"
-              />
-            ))
+          ) : shows.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {shows.map((s, i) => <ColListItem key={s.id || s.tmdbId || i} name={s.name || s.title} desc={s.description || s.overview} year={s.year} img={s.poster} ageRating={s.ageRating} rating={s.rating || s.vote_average} runtime={s.runtime} genre={s.genre} trailer={s.trailer} tmdbId={s.tmdbId} mediaType="tv" />)}
+            </div>
           ) : (
-            <div className="empty-state">
-              <SearchOff className="empty-state-icon" />
-              <h3>{searchQuery ? 'No TV shows found' : 'No shows match your filters'}</h3>
-              <p>
-                {searchQuery 
-                  ? 'Try searching with different keywords or check the spelling.'
-                  : 'Try clearing some filters or adjusting your criteria. We\'ve got thousands of series waiting!'
-                }
-              </p>
+            <div className="flex flex-col items-center justify-center py-32 gap-4">
+              <SearchOff className="text-6xl text-surface-700" />
+              <h3 className="text-xl font-semibold text-[#8892b0] m-0">{searchQuery ? 'No results' : 'No shows available'}</h3>
+              <p className="text-[#5a6380] text-sm m-0">Try different keywords or filters</p>
             </div>
           )}
         </div>

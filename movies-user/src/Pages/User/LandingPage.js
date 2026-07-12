@@ -1,94 +1,60 @@
 import { useSelector } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
-import "./LandingPage.css";
 
-function LandingPage() {
-  const isAuth = Boolean(useSelector((state) => state.user?.currentUser));
-
-  if (isAuth) {
-    return <Navigate to="/home" replace />;
-  }
+const LandingPage = () => {
+  const isAuth = Boolean(useSelector(s => s.user?.currentUser));
+  if (isAuth) return <Navigate to="/" replace />;
 
   return (
-    <div className="lp">
-      <nav className="lp-nav">
-        <div className="lp-container">
-          <div className="lp-logo">🎬 MovieHub</div>
-          <div className="lp-nav-actions">
-            <Link to="/login" className="lp-link">
-              Login
-            </Link>
-            <Link to="/register" className="lp-btn">
-              Get Started
-            </Link>
+    <div className="min-h-screen bg-surface-950 text-white">
+      <nav className="sticky top-0 z-50 py-4 px-6 glass-strong">
+        <div className="max-w-[1200px] mx-auto flex items-center justify-between">
+          <span className="text-xl font-bold text-gradient">CN.io</span>
+          <div className="flex items-center gap-3">
+            <Link to="/login" className="text-[#8892b0] no-underline text-sm hover:text-white transition-colors">Login</Link>
+            <Link to="/register" className="btn-primary rounded-xl px-4 py-2 text-sm">Get Started</Link>
           </div>
         </div>
       </nav>
 
-      <header className="lp-hero">
-        <div className="lp-container hero-content">
-          <h1>
-            Stream Movies & Shows <br />
-            <span>Without Limits</span>
+      <header className="flex items-center justify-center min-h-[85vh] text-center px-6">
+        <div className="max-w-[600px]">
+          <h1 className="text-[clamp(2.5rem,6vw,4rem)] font-black mb-5 m-0 leading-tight">
+            Stream Without<br /><span className="text-gradient">Limits</span>
           </h1>
-
-          <p>
-            Discover thousands of movies and TV shows. No ads. HD quality.
-            Cancel anytime.
-          </p>
-
-          <div className="lp-hero-actions">
-            <Link to="/register" className="lp-btn primary">
-              Start Free Trial
-            </Link>
-            <Link to="/login" className="lp-btn ghost">
-              I Already Have an Account
-            </Link>
+          <p className="text-lg text-[#5a6380] mb-8 m-0">Thousands of movies and TV shows. No ads. HD quality. Cancel anytime.</p>
+          <div className="flex gap-3 justify-center">
+            <Link to="/register" className="btn-primary rounded-xl">Start Free Trial</Link>
+            <Link to="/login" className="btn-secondary rounded-xl">Sign In</Link>
           </div>
         </div>
       </header>
 
-      <section className="lp-features lp-container">
-        <div className="feature">
-          <h3>🎥 HD Streaming</h3>
-          <p>Crystal-clear streaming on all devices.</p>
-        </div>
-        <div className="feature">
-          <h3>📱 Watch Anywhere</h3>
-          <p>Mobile, tablet, TV, and desktop support.</p>
-        </div>
-        <div className="feature">
-          <h3>❤️ Personalized</h3>
-          <p>Smart recommendations just for you.</p>
+      <section className="max-w-[1200px] mx-auto px-6 py-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[{ icon: "🎥", title: "HD Streaming", desc: "Crystal-clear on all devices" }, { icon: "📱", title: "Watch Anywhere", desc: "Mobile, tablet, TV, desktop" }, { icon: "❤️", title: "Personalized", desc: "Smart recommendations" }].map(f => (
+          <div key={f.title} className="glass rounded-2xl p-8 text-center hover:border-white/15 transition-all">
+            <div className="text-3xl mb-3">{f.icon}</div>
+            <h3 className="text-lg font-bold m-0 mb-1">{f.title}</h3>
+            <p className="text-[#5a6380] text-sm m-0">{f.desc}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="py-16 section-divider">
+        <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-3 max-sm:grid-cols-1 gap-8 text-center">
+          {[{ v: "10K+", l: "Movies" }, { v: "1M+", l: "Users" }, { v: "99.9%", l: "Uptime" }].map(({ v, l }) => (
+            <div key={l}><h2 className="text-3xl font-black text-gradient m-0">{v}</h2><span className="text-[#5a6380] text-sm">{l}</span></div>
+          ))}
         </div>
       </section>
 
-      <section className="lp-stats">
-        <div className="lp-container stats-grid">
-          <div>
-            <h2>10K+</h2>
-            <span>Movies</span>
-          </div>
-          <div>
-            <h2>1M+</h2>
-            <span>Users</span>
-          </div>
-          <div>
-            <h2>99.9%</h2>
-            <span>Uptime</span>
-          </div>
-        </div>
-      </section>
-
-      <footer className="lp-footer">
-        <h2>Ready to Start Watching?</h2>
-        <Link to="/register" className="lp-btn primary large">
-          Create Free Account
-        </Link>
-        <p>No credit card required</p>
+      <footer className="text-center py-20 px-6">
+        <h2 className="text-2xl font-bold mb-5 m-0">Ready to Start?</h2>
+        <Link to="/register" className="btn-primary rounded-xl">Create Free Account</Link>
+        <p className="text-[#5a6380] text-sm mt-3 m-0">No credit card required</p>
       </footer>
     </div>
   );
-}
+};
 
 export default LandingPage;
