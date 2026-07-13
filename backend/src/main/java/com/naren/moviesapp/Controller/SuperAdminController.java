@@ -50,9 +50,9 @@ public class SuperAdminController {
             // Generate invite token for existing admin
             String setupToken = inviteService.generateInviteToken(email, RoleName.ROLE_ADMIN);
 
-            // Use admin frontend URL for set-password (port 5173 for dev)
-            String baseUrl = activeProfile.equals("prod") ? "https://movies-admin-one.vercel.app" : "http://localhost:5173";
-            String setupLink = baseUrl + "/set-password?token=" + setupToken;
+            // Use merged frontend URL for set-password
+            String baseUrl = activeProfile.equals("prod") ? "https://movies-app-complete.vercel.app" : "http://localhost:3000";
+            String setupLink = baseUrl + "/admin/set-password?token=" + setupToken;
 
             // Send email with setup link
             emailService.sendInviteEmail(email, setupLink);

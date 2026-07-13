@@ -20,14 +20,11 @@ const ContentManagerEdit = () => {
   });
 
   useEffect(() => {
-    fetchContentManagerData();
-  }, [id]);
-
-  const fetchContentManagerData = async () => {
-    try {
-      const response = await fetchContentManagerById(id);
-      setFormData({
-        name: response.name || '',
+    const fetchData = async () => {
+      try {
+        const response = await fetchContentManagerById(id);
+        setFormData({
+          name: response.name || '',
         email: response.email || '',
         phoneNumber: response.phoneNumber || '',
         imageUrl: response.imageUrl || '',

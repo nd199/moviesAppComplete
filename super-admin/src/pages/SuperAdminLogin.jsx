@@ -1,173 +1,111 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { HiShieldExclamation, HiLockClosed, HiEnvelope, HiSparkles, HiServer } from 'react-icons/hi2';
 import { authAPI } from '../services/api';
-import { setAccessToken, setRefreshToken } from '../authStore';
 
 const SuperAdminLogin = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
+  const [formData, setFormData] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("🚀 Login handleSubmit called");
-    console.log("📝 Form data:", formData);
+    setError('');
     setLoading(true);
-
     try {
-      console.log("📡 Calling authAPI.login...");
       await authAPI.login(formData);
-      console.log("✅ authAPI.login successful");
-
-      console.log("🎯 Showing success toast");
-      toast.success("Login successful!");
-
-      console.log("🧭 Navigating to /super-admin/dashboard...");
-      navigate("/super-admin/dashboard");
-
-    } catch (error) {
-      console.error("❌ Login failed:", error);
-      const errorMessage = error.response?.data?.message || 'Login failed';
-      console.log("🔴 Showing error toast:", errorMessage);
-      toast.error(errorMessage);
+      toast.success('Login successful');
+      navigate('/super-admin');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed');
     } finally {
-      console.log("⏹️ Setting loading to false");
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gray-800 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gray-700 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gray-900 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse animation-delay-4000"></div>
-      </div>
-
-      <div className="relative z-10 max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="mx-auto h-20 w-20 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform duration-300">
-            <HiShieldExclamation className="h-10 w-10 text-white" />
+    <div className="min-h-screen bg-gray-100 flex relative overflow-hidden">
+      {/* Left decorative panel */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative items-center justify-center p-12">
+        <div className="absolute top-20 left-20 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/3 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 right-1/4 w-20 h-20 bg-white/5 rounded-3xl rotate-45" />
+        <div className="relative z-10 max-w-md text-white">
+          <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-orange-500 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-red-500/30">
+            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
           </div>
-          <h2 className="mt-8 text-4xl font-bold text-white">
-            SuperAdmin Portal
-          </h2>
-          <p className="mt-3 text-lg text-gray-300">
-            Secure System Administrator Access
+          <h1 className="text-4xl font-bold leading-tight mb-4">
+            Super Admin<br /><span className="text-gray-400">Control Panel</span>
+          </h1>
+          <p className="text-lg text-gray-400 leading-relaxed">
+            Secure system administration for managing platform administrators and monitoring system health.
           </p>
-          <div className="mt-4 flex items-center justify-center space-x-2">
-            <HiSparkles className="h-5 w-5 text-yellow-400" />
-            <span className="text-sm text-gray-400">Movies Platform Management</span>
-            <HiSparkles className="h-5 w-5 text-yellow-400" />
+          <div className="mt-10 flex items-center gap-4">
+            <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="text-sm text-gray-400">System Secure • Encrypted • Monitored</span>
           </div>
         </div>
-        
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
-                Administrator Email
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <HiEnvelope className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="username"
-                  name="username"
-                  type="email"
-                  required
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-600/30 bg-white/10 backdrop-blur-sm placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
-                  placeholder="admin@movies.com"
-                />
-              </div>
-            </div>
+      </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Security Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <HiLockClosed className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-600/30 bg-white/10 backdrop-blur-sm placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
-                  placeholder="Enter secure password"
-                />
-              </div>
+      {/* Right form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          <div className="lg:hidden text-center mb-8">
+            <div className="w-14 h-14 bg-gradient-to-br from-red-600 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-500/25">
+              <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
             </div>
+          </div>
 
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
-              >
-                {loading ? (
-                  <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Authenticating...
-                  </span>
-                ) : (
-                  <span className="flex items-center">
-                    <HiServer className="mr-2 h-5 w-5" />
-                    Access System
-                  </span>
-                )}
-              </button>
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Super Admin Login</h2>
+            <p className="text-gray-600 mt-1">Secure access to system controls</p>
+          </div>
+
+          {error && (
+            <div className="mb-6 p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+              <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-red-600 text-sm font-medium">{error}</p>
             </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+              <input type="email" name="username" value={formData.username} onChange={handleChange} required
+                className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-sm"
+                placeholder="superadmin@movies.com" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+              <input type="password" name="password" value={formData.password} onChange={handleChange} required
+                className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-sm"
+                placeholder="Enter password" />
+            </div>
+            <button type="submit" disabled={loading}
+              className="w-full py-3 bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white font-semibold rounded-xl transition-all disabled:opacity-50 shadow-lg text-sm">
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Authenticating...
+                </div>
+              ) : 'Access System'}
+            </button>
           </form>
-        </div>
 
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center space-x-2 text-xs text-gray-400">
-            <HiShieldExclamation className="h-4 w-4" />
-            <span>Secure • Encrypted • Monitored</span>
+          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+            <p className="text-xs text-gray-500">Restricted area. All access attempts are logged.</p>
           </div>
-          <p className="text-xs text-gray-500">
-            This is a restricted area. All access attempts are logged and monitored.
-          </p>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 0.1; }
-          50% { opacity: 0.2; }
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
     </div>
   );
 };
