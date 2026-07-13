@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/system/superadmin")
+@RequestMapping("/api/v1/system/superadmin")
 @PreAuthorize("hasAuthority('SYSTEM_CONFIG')")
 public class SuperAdminController {
 

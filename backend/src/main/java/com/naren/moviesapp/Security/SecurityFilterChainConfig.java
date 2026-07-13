@@ -204,7 +204,8 @@ public class SecurityFilterChainConfig {
                         .hasAuthority("SYSTEM_CONFIG")
 
                         .requestMatchers("/superadmin/**",
-                                "/system/superadmin/**")
+                                "/system/superadmin/**",
+                                "/api/v1/system/superadmin/**")
                         .hasAuthority("SYSTEM_CONFIG")
 
                         .requestMatchers("/set-password/**",
