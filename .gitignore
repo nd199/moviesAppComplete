@@ -49,10 +49,10 @@ movies-frontend/build/
 movies-frontend/.cache/
 movies-frontend/.next/
 movies-frontend/out/
-movies-user/node_modules/
-movies-user/build/
-movies-user/.cache/
-movies-user/package-lock.json
+frontend/node_modules/
+frontend/build/
+frontend/.cache/
+frontend/package-lock.json
 movies-admin/node_modules/
 movies-admin/build/
 movies-admin/dist/
