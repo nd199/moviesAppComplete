@@ -6,12 +6,18 @@
 
 import {
   mockUser,
+  mockAdminUser,
+  mockContentManagerUser,
   mockMovies,
   mockShows,
   mockSouthIndianMovies,
   mockSubscriptionPlans,
   mockWatchlist,
   mockNotifications,
+  mockCustomers,
+  mockAdmins,
+  mockContentManagers,
+  mockCustomerStats,
 } from './mockData';
 
 // Helper to simulate network delay
@@ -28,12 +34,50 @@ const getLocalWatchlist = () => {
 };
 
 // Route matcher: returns mock data based on URL pattern
-function matchRoute(method, url) {
+function matchRoute(method, url, config) {
   const m = method.toLowerCase();
   const u = url.toLowerCase();
 
   // ─── Auth ──────────────────────────────────────
   if (m === 'post' && u.includes('/auth/login')) {
+    // Detect admin login from request body
+    let body = {};
+    try {
+      if (typeof config?.data === 'string') {
+        body = JSON.parse(config.data);
+      } else if (config?.data && typeof config.data === 'object') {
+        body = config.data;
+      }
+    } catch (e) { body = {}; }
+    const username = body.username || '';
+    const isAdminLogin = username.includes('admin');
+    const isCmLogin = username.includes('cm');
+
+    if (isAdminLogin) {
+      localStorage.setItem('mock_is_admin', 'true');
+      localStorage.removeItem('mock_is_cm');
+      return {
+        data: {
+          accessToken: 'mock_admin_access_token',
+          refreshToken: 'mock_admin_refresh_token',
+          user: mockAdminUser,
+        },
+      };
+    }
+    if (isCmLogin) {
+      localStorage.setItem('mock_is_cm', 'true');
+      localStorage.removeItem('mock_is_admin');
+      return {
+        data: {
+          accessToken: 'mock_cm_access_token',
+          refreshToken: 'mock_cm_refresh_token',
+          user: mockContentManagerUser,
+        },
+      };
+    }
+
+    localStorage.removeItem('mock_is_admin');
+    localStorage.removeItem('mock_is_cm');
     return {
       data: {
         accessToken: 'mock_access_token_dev',
@@ -46,6 +90,8 @@ function matchRoute(method, url) {
     return { data: { ...mockUser, message: 'Registration successful' } };
   }
   if (m === 'post' && u.includes('/auth/logout')) {
+    localStorage.removeItem('mock_is_admin');
+    localStorage.removeItem('mock_is_cm');
     return { data: { message: 'Logged out' } };
   }
   if (m === 'post' && u.includes('/auth/refresh-token')) {
@@ -277,12 +323,120 @@ function matchRoute(method, url) {
     return { data: { status: 'ok', mode: 'mock' } };
   }
 
-  // ─── Admin (stubs) ─────────────────────────────
-  if (m === 'get' && u.includes('/admin/users')) {
-    return { data: [mockUser] };
+  // ─── Admin Auth ────────────────────────────────
+  if (m === 'post' && u.includes('/content-manager/login')) {
+    return {
+      data: {
+        accessToken: 'mock_cm_access_token',
+        refreshToken: 'mock_cm_refresh_token',
+        user: mockContentManagerUser,
+      },
+    };
   }
-  if (m === 'get' && u.includes('/admin/analytics')) {
-    return { data: { totalUsers: 1, totalMovies: mockMovies.length, totalShows: mockShows.length } };
+  if (m === 'post' && u.includes('/auth/set-password')) {
+    return { data: { message: 'Password set successfully' } };
+  }
+
+  // ─── Customers (Admin) ─────────────────────────
+  if (m === 'get' && u.match(/\/customers\/stats/)) {
+    return { data: mockCustomerStats };
+  }
+  if (m === 'get' && u.match(/\/customers\/\d+$/) && !u.includes('stats')) {
+    const id = parseInt(u.match(/\/customers\/(\d+)/)?.[1]);
+    return { data: mockCustomers.find(c => c.id === id) || mockCustomers[0] };
+  }
+  if (m === 'get' && u.includes('/customers') && !u.includes('stats')) {
+    return { data: mockCustomers };
+  }
+  if (m === 'put' && u.match(/\/customers\/\d+/)) {
+    const id = parseInt(u.match(/\/customers\/(\d+)/)?.[1]);
+    return { data: { message: 'Customer updated', id } };
+  }
+  if (m === 'delete' && u.match(/\/customers\/\d+/)) {
+    return { data: { message: 'Customer deleted' } };
+  }
+
+  // ─── Admins (Admin) ────────────────────────────
+  if (m === 'get' && u.includes('/admins/stats')) {
+    return { data: { totalAdmins: mockAdmins.length, activeAdmins: mockAdmins.filter(a => a.isActive).length } };
+  }
+  if (m === 'get' && u.includes('/admins/active')) {
+    return { data: mockAdmins.filter(a => a.isActive) };
+  }
+  if (m === 'get' && u.match(/\/admins\/department\//)) {
+    return { data: mockAdmins };
+  }
+  if (m === 'get' && u.match(/\/admins\/\d+$/) && !u.includes('stats') && !u.includes('active') && !u.includes('department')) {
+    const id = parseInt(u.match(/\/admins\/(\d+)/)?.[1]);
+    return { data: mockAdmins.find(a => a.id === id) || mockAdmins[0] };
+  }
+  if (m === 'get' && u.includes('/admins') && !u.includes('stats') && !u.includes('active') && !u.includes('department')) {
+    return { data: mockAdmins };
+  }
+  if (m === 'post' && u.includes('/admins')) {
+    return { data: { message: 'Admin created', id: 102 } };
+  }
+  if (m === 'put' && u.match(/\/admins\/\d+\/toggle-status/)) {
+    return { data: { message: 'Status toggled', isActive: true } };
+  }
+  if (m === 'put' && u.match(/\/admins\/\d+/)) {
+    const id = parseInt(u.match(/\/admins\/(\d+)/)?.[1]);
+    return { data: { message: 'Admin updated', id } };
+  }
+  if (m === 'delete' && u.match(/\/admins\/\d+/)) {
+    return { data: { message: 'Admin deleted' } };
+  }
+
+  // ─── Content Managers (Admin) ──────────────────
+  if (m === 'get' && u.match(/\/content-manager\/\d+$/)) {
+    const id = parseInt(u.match(/\/content-manager\/(\d+)/)?.[1]);
+    return { data: mockContentManagers.find(cm => cm.id === id) || mockContentManagers[0] };
+  }
+  if (m === 'get' && u.includes('/content-manager')) {
+    return { data: mockContentManagers };
+  }
+  if (m === 'post' && u.includes('/content-manager') && !u.includes('login')) {
+    return { data: { message: 'Content manager created', id: 202 } };
+  }
+  if (m === 'put' && u.match(/\/content-manager\/\d+/)) {
+    const id = parseInt(u.match(/\/content-manager\/(\d+)/)?.[1]);
+    return { data: { message: 'Content manager updated', id } };
+  }
+  if (m === 'delete' && u.match(/\/content-manager\/\d+/)) {
+    return { data: { message: 'Content manager deleted' } };
+  }
+
+  // ─── Admin Statistics ──────────────────────────
+  if (m === 'get' && u.includes('/admin/statistics/revenue')) {
+    return { data: { current: 12500, previous: 10000, change: 25 } };
+  }
+  if (m === 'get' && u.includes('/admin/statistics/users')) {
+    return { data: { current: 1234, previous: 1000, change: 23.4 } };
+  }
+  if (m === 'get' && u.includes('/admin/statistics/movies')) {
+    return { data: { current: 567, previous: 500, change: 13.4 } };
+  }
+  if (m === 'get' && u.includes('/admin/statistics/subscriptions')) {
+    return { data: { current: 890, previous: 800, change: 11.25 } };
+  }
+  if (m === 'get' && u.includes('/admin/subscriptions/latest')) {
+    return {
+      data: [
+        { id: 1, user: { name: 'John Doe', email: 'john@example.com' }, plan: { name: 'Premium', price: 499 }, status: 'ACTIVE', createdAt: new Date().toISOString() },
+        { id: 2, user: { name: 'Jane Smith', email: 'jane@example.com' }, plan: { name: 'Basic', price: 99 }, status: 'PENDING', createdAt: new Date(Date.now() - 86400000).toISOString() },
+        { id: 3, user: { name: 'Bob Johnson', email: 'bob@example.com' }, plan: { name: 'Standard', price: 199 }, status: 'CANCELLED', createdAt: new Date(Date.now() - 172800000).toISOString() },
+      ]
+    };
+  }
+
+  // ─── Profile (return admin user for admin login) ─
+  if (m === 'get' && u.includes('/profile/current')) {
+    // Check if admin tokens are stored
+    const is_admin = localStorage.getItem('mock_is_admin') === 'true';
+    const is_cm = localStorage.getItem('mock_is_cm') === 'true';
+    if (is_admin) return { data: mockAdminUser };
+    if (is_cm) return { data: mockContentManagerUser };
+    return { data: mockUser };
   }
 
   // No match — return null so the real axios call proceeds
@@ -298,7 +452,7 @@ export function installMockInterceptor(axiosInstance) {
     async (config) => {
       const method = config.method || 'get';
       const url = `${config.baseURL || ''}${config.url || ''}`;
-      const response = matchRoute(method, url);
+      const response = matchRoute(method, url, config);
 
       if (response) {
         await delay(200 + Math.random() * 300);

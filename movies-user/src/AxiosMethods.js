@@ -1,27 +1,12 @@
 import axios from 'axios';
 import { store } from './redux/store';
+import { installMockInterceptor } from './mockInterceptor';
 
 // ============================================
-// MOCK MODE
+// MOCK MODE - will be installed after all instances are created
 // ============================================
 
 const isMockMode = process.env.REACT_APP_MOCK_MODE === 'true';
-let mockInterceptorInstalled = false;
-
-async function installMockIfNeeded() {
-  if (isMockMode && !mockInterceptorInstalled) {
-    const { installMockInterceptor } = await import('./mockInterceptor');
-    // Install on all axios instances
-    [api, publicApi, passResetApi, paymentApi, springApi].forEach((instance) => {
-      installMockInterceptor(instance);
-    });
-    mockInterceptorInstalled = true;
-    console.log('[MOCK MODE] API requests will return sample data. No backend required.');
-  }
-}
-
-// Kick off mock installation eagerly
-installMockIfNeeded();
 
 // ============================================
 // CONFIGURATION
@@ -187,6 +172,17 @@ const springApi = axios.create({
   timeout: 30000,
   withCredentials: true,
 });
+
+// ============================================
+// MOCK MODE - install interceptors on all instances
+// ============================================
+
+if (isMockMode) {
+  [api, publicApi, passResetApi, paymentApi, springApi].forEach((instance) => {
+    installMockInterceptor(instance);
+  });
+  console.log('[MOCK MODE] All API requests will return sample data. No backend required.');
+}
 
 // ============================================
 // EXPORTS

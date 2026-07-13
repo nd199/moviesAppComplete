@@ -659,3 +659,56 @@ export const mockNotifications = [
   { id: 2, title: "Subscription Reminder", message: "Your subscription expires in 3 days", read: false, createdAt: "2024-01-14T08:00:00Z" },
   { id: 3, title: "Weekend Picks", message: "Check out our top picks for this weekend", read: true, createdAt: "2024-01-12T12:00:00Z" },
 ];
+
+// ─── Admin Mock Data ───────────────────────────────
+
+export const mockAdminUser = {
+  id: 100,
+  name: "Admin User",
+  email: "admin@cnio.dev",
+  imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=admin",
+  isSubscribed: true,
+  roles: ["ROLE_ADMIN"],
+  phone: "+91 9876543210",
+  createdAt: "2024-01-01T00:00:00Z",
+};
+
+export const mockContentManagerUser = {
+  id: 200,
+  name: "Content Manager",
+  email: "cm@cnio.dev",
+  imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=cm",
+  isSubscribed: false,
+  roles: ["ROLE_CONTENT_MANAGER"],
+  phone: "+91 9876543211",
+  createdAt: "2024-02-01T00:00:00Z",
+};
+
+export const mockCustomers = [
+  { id: 1, name: "Naren Dev", email: "naren@cnio.dev", phoneNumber: "+91 8072205480", address: "Chennai, India", imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=naren", roles: ["ROLE_USER"], isSubscribed: true, isActive: true, createdAt: "2024-06-15T10:00:00Z", updatedAt: "2024-06-15T10:00:00Z" },
+  { id: 2, name: "Priya Kumar", email: "priya@example.com", phoneNumber: "+91 9876543210", address: "Mumbai, India", imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=priya", roles: ["ROLE_USER"], isSubscribed: false, isActive: true, createdAt: "2024-07-01T10:00:00Z", updatedAt: "2024-07-01T10:00:00Z" },
+  { id: 3, name: "Rahul Singh", email: "rahul@example.com", phoneNumber: "+91 9123456789", address: "Delhi, India", imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=rahul", roles: ["ROLE_USER"], isSubscribed: true, isActive: true, createdAt: "2024-07-10T10:00:00Z", updatedAt: "2024-07-10T10:00:00Z" },
+  { id: 4, name: "Anita Desai", email: "anita@example.com", phoneNumber: "+91 9988776655", address: "Bangalore, India", imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=anita", roles: ["ROLE_USER"], isSubscribed: false, isActive: false, createdAt: "2024-08-01T10:00:00Z", updatedAt: "2024-08-01T10:00:00Z" },
+  { id: 5, name: "Vikram Patel", email: "vikram@example.com", phoneNumber: "+91 9871234567", address: "Pune, India", imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=vikram", roles: ["ROLE_USER"], isSubscribed: true, isActive: true, createdAt: "2024-08-15T10:00:00Z", updatedAt: "2024-08-15T10:00:00Z" },
+];
+
+export const mockAdmins = [
+  { id: 100, name: "Admin User", email: "admin@cnio.dev", phoneNumber: "+91 9876543210", address: "Chennai, India", imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=admin", roles: [{ name: "ROLE_ADMIN" }], isActive: true, department: "IT", accessLevel: 4, createdAt: "2024-01-01T00:00:00Z", lastLogin: "2024-09-01T10:00:00Z" },
+  { id: 101, name: "Super Admin", email: "super@cnio.dev", phoneNumber: "+91 9876543211", address: "Chennai, India", imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=super", roles: [{ name: "ROLE_SUPER_ADMIN" }], isActive: true, department: "Management", accessLevel: 4, createdAt: "2024-01-01T00:00:00Z", lastLogin: "2024-09-01T10:00:00Z" },
+];
+
+export const mockContentManagers = [
+  { id: 200, name: "Content Manager", email: "cm@cnio.dev", phoneNumber: "+91 9876543211", imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=cm", department: "Content", specialization: "both", accessLevel: 2, isActive: true, createdAt: "2024-02-01T00:00:00Z" },
+  { id: 201, name: "Movie Expert", email: "movies@cnio.dev", phoneNumber: "+91 9876543212", imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=moviecm", department: "Movies", specialization: "movies", accessLevel: 1, isActive: true, createdAt: "2024-03-01T00:00:00Z" },
+];
+
+export const mockCustomerStats = [
+  { month: 1, total: 45 },
+  { month: 2, total: 52 },
+  { month: 3, total: 61 },
+  { month: 4, total: 48 },
+  { month: 5, total: 73 },
+  { month: 6, total: 89 },
+  { month: 7, total: 95 },
+  { month: 8, total: 110 },
+];

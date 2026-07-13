@@ -22,9 +22,22 @@ const LoginForm = () => {
     if (!em || !password) { setPopup({ show: true, msg: "Enter both email and password" }); return; }
     setLoading(true);
     try {
-      await login(dispatch, { username: em, password });
+      const response = await login(dispatch, { username: em, password });
       setPopup({ show: true, msg: "Login successful!" });
-      setTimeout(() => navigate("/", { replace: true }), 800);
+      
+      // Role-based redirect
+      const user = response?.user;
+      const roles = user?.roles || [];
+      const isAdmin = roles.some(r => r === 'ROLE_ADMIN' || r?.name === 'ROLE_ADMIN');
+      const isCM = roles.some(r => r === 'ROLE_CONTENT_MANAGER' || r?.name === 'ROLE_CONTENT_MANAGER');
+      
+      setTimeout(() => {
+        if (isAdmin || isCM) {
+          navigate("/admin/dashboard", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
+      }, 800);
     } catch (err) {
       setPopup({ show: true, msg: err.response?.data?.message || err.response?.data?.error || 'Login failed.' });
     } finally { setLoading(false); }
@@ -67,6 +80,7 @@ const LoginForm = () => {
         <div className="mt-6 text-center text-sm text-[#5a6380] space-y-2">
           <p className="m-0">Don't have an account? <Link to="/register" className="text-brand-400 font-semibold no-underline hover:text-brand-300">Register</Link></p>
           <p className="m-0"><span className="cursor-pointer hover:text-white transition-colors" onClick={handleForgot}>Forgot password?</span></p>
+          <p className="m-0"><Link to="/admin/login" className="text-brand-400 font-semibold no-underline hover:text-brand-300">Admin Login</Link></p>
           <div className="mt-4 p-3 glass rounded-xl text-[#8892b0] text-xs font-medium">
             Demo: demo@example.com / Demo123456
           </div>

@@ -33,7 +33,7 @@ const Featured = () => {
   );
 
   return (
-    <section className="relative w-full h-[88vh] min-h-[min(560px,80vh)] max-h-[850px] bg-black -mt-16">
+    <section className="relative w-full h-screen min-h-[min(560px,80vh)] max-h-[850px] bg-black -mt-16">
       <Swiper modules={[Navigation, Pagination, Autoplay]} slidesPerView={1} navigation pagination={{ clickable: true }} autoplay={{ delay: 7000, disableOnInteraction: false }} loop className="h-full">
         {data.map((item, i) => (
           <SwiperSlide key={i}>

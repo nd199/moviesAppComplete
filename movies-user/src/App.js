@@ -29,6 +29,31 @@ import Sidebar from "./Components/Sidebar";
 import PaymentCheckout from "./Pages/Payment/PaymentCheckout";
 import Success from "./Pages/Payment/Success";
 
+// Admin Pages
+import AdminLogin from "./Pages/Admin/AdminLogin";
+import ContentManagerLogin from "./Pages/Admin/ContentManagerLogin";
+import Dashboard from "./Pages/Admin/Dashboard";
+import UserList from "./Pages/Admin/UserList";
+import NewUser from "./Pages/Admin/NewUser";
+import UserEdit from "./Pages/Admin/UserEdit";
+import MovieList from "./Pages/Admin/MovieList";
+import NewMovie from "./Pages/Admin/NewMovie";
+import MovieEdit from "./Pages/Admin/MovieEdit";
+import ShowList from "./Pages/Admin/ShowList";
+import NewShow from "./Pages/Admin/NewShow";
+import ShowEdit from "./Pages/Admin/ShowEdit";
+import AdminList from "./Pages/Admin/AdminList";
+import NewAdmin from "./Pages/Admin/NewAdmin";
+import AdminEdit from "./Pages/Admin/AdminEdit";
+import ContentManagerList from "./Pages/Admin/ContentManagerList";
+import NewContentManager from "./Pages/Admin/NewContentManager";
+import ContentManagerEdit from "./Pages/Admin/ContentManagerEdit";
+import Settings from "./Pages/Admin/Settings";
+
+// Admin Components
+import AdminLayout from "./Components/Admin/AdminLayout";
+import AdminProtectedRoute from "./Components/Admin/AdminProtectedRoute";
+
 // Utils
 import Fallback from "./Utils/FallBackPage";
 import ServerConnection from "./Utils/ServerConnection";
@@ -183,8 +208,50 @@ function AppWithNavigation() {
 
 function Layout({ sidebarOpen, setSidebarOpen }) {
   const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
   const isVideoPage = location.pathname.startsWith('/video');
 
+  // Admin layout
+  if (isAdminRoute) {
+    return (
+      <Routes>
+        {/* Admin login pages (no layout shell) */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/cm-login" element={<ContentManagerLogin />} />
+
+        {/* Admin pages with layout */}
+        <Route path="/admin/*" element={
+          <AdminProtectedRoute>
+            <AdminLayout />
+          </AdminProtectedRoute>
+        }>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="users" element={<UserList />} />
+          <Route path="users/new" element={<NewUser />} />
+          <Route path="users/edit/:id" element={<UserEdit />} />
+          <Route path="movies" element={<MovieList />} />
+          <Route path="movies/new" element={<NewMovie />} />
+          <Route path="movies/edit/:id" element={<MovieEdit />} />
+          <Route path="shows" element={<ShowList />} />
+          <Route path="shows/new" element={<NewShow />} />
+          <Route path="shows/edit/:id" element={<ShowEdit />} />
+          <Route path="admins" element={<AdminList />} />
+          <Route path="admins/new" element={<NewAdmin />} />
+          <Route path="admins/edit/:id" element={<AdminEdit />} />
+          <Route path="content-managers" element={<ContentManagerList />} />
+          <Route path="content-managers/new" element={<NewContentManager />} />
+          <Route path="content-managers/edit/:id" element={<ContentManagerEdit />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+        </Route>
+
+        {/* Catch all for admin */}
+        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+      </Routes>
+    );
+  }
+
+  // User layout
   return (
     <>
       {!isVideoPage && <NavBar onMenuClick={() => setSidebarOpen(true)} />}
@@ -233,17 +300,16 @@ function Layout({ sidebarOpen, setSidebarOpen }) {
           }
         />
 
-        <Route 
-          path="/video/:id" 
+        <Route
+          path="/video/:id"
           element={
             <ProtectedRoute requireSubscription redirectToRegister>
               <VideoFullScreen />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Redirects */}
-        <Route path="/admin/login" element={<Navigate to="/" replace />} />
         <Route path="/registerAdmin" element={<Navigate to="/" replace />} />
 
         {/* Catch all */}
