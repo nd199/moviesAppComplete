@@ -23,7 +23,7 @@ const NavBar = ({ onMenuClick }) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((s) => s.user?.currentUser);
-  const hideSignIn = location.pathname === '/login';
+  const hideSignIn = location.pathname === '/login' || location.pathname === '/register';
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 40);
@@ -152,7 +152,7 @@ const NavBar = ({ onMenuClick }) => {
               <Search sx={{ fontSize: 18 }} />
             </button>
 
-            {user ? (
+            {!hideSignIn && user ? (
               <div className="relative">
                 <button onClick={() => setOpen(!open)} className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-xl glass hover:bg-white/10 transition-all duration-300 cursor-pointer">
                   <img src={user.imageUrl || "/images/defaultAvatar.png"} alt="" className="w-8 h-8 rounded-full object-cover ring-2 ring-brand-500/40" onError={e => { e.target.src = "/images/default-avatar.png"; }} />
