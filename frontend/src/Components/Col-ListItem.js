@@ -10,6 +10,8 @@ const ColListItem = ({
   const [imgLoaded, setImgLoaded] = useState(false);
   const cardRef = useRef(null);
 
+  const displayRating = rating != null ? Number(rating).toFixed(1) : null;
+
   const formatRuntime = (min) => {
     if (!min) return '';
     const m = parseInt(min);
@@ -70,9 +72,9 @@ const ColListItem = ({
               {ageRating}
             </span>
           )}
-          {rating && (
+          {displayRating && (
             <span className="flex items-center gap-1 bg-surface-950/70 backdrop-blur-sm text-white text-[0.7rem] font-semibold px-2 py-1 rounded-lg border border-white/10 ml-auto">
-              <span className="text-gold-400">★</span> {rating}
+              <span className="text-gold-400">★</span> {displayRating}
             </span>
           )}
         </div>

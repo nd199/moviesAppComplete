@@ -1,9 +1,9 @@
-import { PlayArrow, InfoOutlined } from '@mui/icons-material';
+import { PlayArrow } from '@mui/icons-material';
 import { useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import WatchlistButton from './WatchlistButton';
 
-const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType }) => {
+const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType, genre }) => {
   const cardRef = useRef(null);
 
   const handleMouseMove = useCallback((e) => {
@@ -22,6 +22,8 @@ const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType }) =>
     if (!card) return;
     card.style.transform = 'perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)';
   }, []);
+
+  const displayRating = rating != null ? Number(rating).toFixed(1) : null;
 
   return (
     <div
@@ -51,10 +53,19 @@ const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType }) =>
           style={{ boxShadow: 'inset 0 0 30px rgba(124,58,237,0.2), inset 0 0 60px rgba(6,182,212,0.08)' }} />
 
         {/* Rating — always visible */}
-        {rating && (
+        {displayRating && (
           <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-surface-950/70 backdrop-blur-sm rounded-lg px-2 py-0.5 border border-white/10 z-10">
             <span className="text-gold-400 text-[0.65rem]">★</span>
-            <span className="text-white text-[0.7rem] font-bold">{rating}</span>
+            <span className="text-white text-[0.7rem] font-bold">{displayRating}</span>
+          </div>
+        )}
+
+        {/* Genre tag — always visible on mobile, hover on desktop */}
+        {genre && (
+          <div className="absolute top-2.5 left-2.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 z-10">
+            <span className="px-2 py-0.5 rounded-lg bg-surface-950/70 backdrop-blur-sm border border-white/10 text-white text-[0.6rem] font-medium">
+              {genre.split(',')[0]}
+            </span>
           </div>
         )}
 
@@ -85,13 +96,6 @@ const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType }) =>
             />
           </div>
         )}
-
-        {/* Info — desktop only */}
-        <div className="absolute bottom-2 left-2 hidden sm:block opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 z-10">
-          <div className="w-7 h-7 rounded-lg bg-surface-950/70 backdrop-blur-sm border border-white/15 flex items-center justify-center text-white/60">
-            <InfoOutlined sx={{ fontSize: 14 }} />
-          </div>
-        </div>
       </div>
 
       {/* Title */}

@@ -1,279 +1,140 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Admin Invitation - Movies Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Invitation - CN.io</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #f5f5f5;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background: radial-gradient(1200px circle at 20% 0%, rgba(229, 9, 20, 0.12) 0%, transparent 45%),
-                        radial-gradient(900px circle at 90% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
-                        linear-gradient(180deg, #050505 0%, #0b0b0b 100%);
-            min-height: 100vh;
-        }
-        .container {
-            background: #141414;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #050810;
             padding: 0;
-            border-radius: 20px;
-            box-shadow: 0 22px 55px rgba(0,0,0,0.65);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        .wrapper { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+        .card {
+            background: #0a0e1a;
+            border-radius: 24px;
             overflow: hidden;
+            border: 1px solid rgba(124,58,237,0.15);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5), 0 0 60px rgba(124,58,237,0.08);
         }
-        .header {
-            background: linear-gradient(135deg, #0b0b0b 0%, #1b1b1b 50%, #0b0b0b 100%);
-            padding: 40px 30px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+        .hero {
+            position: relative; height: 220px;
+            background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=400&fit=crop') center/cover;
+            display: flex; align-items: center; justify-content: center;
         }
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: float 6s ease-in-out infinite;
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(5,8,16,0.3) 0%, rgba(10,14,26,0.95) 100%);
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
+        .hero-content { position: relative; z-index: 1; text-align: center; }
         .logo {
-            font-size: 32px;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
+            font-size: 28px; font-weight: 800;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-        .title {
-            font-size: 24px;
-            color: white;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-            font-weight: 300;
-        }
-        .subtitle {
-            font-size: 16px;
-            color: rgba(255,255,255,0.78);
-            position: relative;
-            z-index: 1;
-        }
-        .content {
-            padding: 40px 30px;
-        }
-        .welcome-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .icon-container {
-            width: 80px;
-            height: 80px;
-            background: radial-gradient(circle at 30% 30%, rgba(229, 9, 20, 0.45) 0%, rgba(229, 9, 20, 0.10) 45%, rgba(255,255,255,0.05) 100%),
-                        linear-gradient(135deg, #0b0b0b 0%, #1f1f1f 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 14px 35px rgba(0,0,0,0.65);
-        }
-        .icon {
-            font-size: 40px;
-            color: white;
-        }
+        .hero-tagline { color: rgba(255,255,255,0.6); font-size: 13px; margin-top: 4px; font-weight: 500; }
+        .body-content { padding: 40px 40px 20px; }
+        .greeting { color: #e2e8f0; font-size: 22px; font-weight: 700; margin: 0 0 12px; }
+        .description { color: #8892b0; font-size: 14px; line-height: 1.7; margin: 0 0 20px; }
         .highlight-box {
-            background: linear-gradient(180deg, #1b1b1b 0%, #161616 100%);
-            padding: 25px;
-            border-radius: 15px;
-            margin: 30px 0;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-left: 5px solid #e50914;
-            box-shadow: 0 10px 24px rgba(0,0,0,0.45);
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(124,58,237,0.12);
+            border-left: 4px solid #7c3aed; border-radius: 12px; padding: 24px; margin: 25px 0;
         }
-        .highlight-box h3 {
-            color: #ffffff;
-            margin: 0 0 15px 0;
-            font-size: 18px;
-        }
-        .features-list {
-            list-style: none;
-            padding: 0;
-            margin: 15px 0;
-        }
+        .highlight-box h3 { color: #e2e8f0; font-size: 16px; font-weight: 700; margin: 0 0 10px; }
+        .features-list { list-style: none; padding: 0; margin: 12px 0 0; }
         .features-list li {
-            padding: 8px 0;
-            padding-left: 25px;
-            position: relative;
+            padding: 6px 0 6px 24px; position: relative; color: #8892b0; font-size: 13px; line-height: 1.6;
         }
         .features-list li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #e50914;
-            font-weight: bold;
+            content: '\2713'; position: absolute; left: 0; color: #06b6d4; font-weight: bold;
         }
-        .btn-container {
-            text-align: center;
-            margin: 40px 0;
+        .btn-wrapper { text-align: center; margin: 30px 0; }
+        .btn-accept {
+            display: inline-block; padding: 16px 48px;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            color: #ffffff !important; text-decoration: none; border-radius: 14px;
+            font-weight: 700; font-size: 15px; box-shadow: 0 8px 30px rgba(124,58,237,0.35);
         }
-        .btn {
-            display: inline-block;
-            padding: 16px 40px;
-            background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 16px;
-            box-shadow: 0 14px 35px rgba(229, 9, 20, 0.30);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+        .link-fallback {
+            margin: 20px 0; padding: 16px 20px; background: rgba(255,255,255,0.03);
+            border: 1px dashed rgba(124,58,237,0.2); border-radius: 12px; word-break: break-all;
         }
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
+        .link-fallback-label { color: #4a5568; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 8px; }
+        .link-fallback a { color: #7c3aed; font-size: 12px; text-decoration: none; font-family: 'SF Mono', Consolas, monospace; }
+        .security-box {
+            background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.15);
+            border-left: 4px solid #fbbf24; border-radius: 12px; padding: 20px; margin: 25px 0;
         }
-        .btn:hover::before {
-            left: 100%;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 18px 42px rgba(229, 9, 20, 0.40);
-        }
-        .link-container {
-            background: #0f0f0f;
-            padding: 20px;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            word-break: break-all;
-            border: 1px dashed rgba(255,255,255,0.25);
-            margin: 20px 0;
-        }
-        .link-container a {
-            color: #ff4d57;
-            text-decoration: none;
-        }
-        .link-container a:hover {
-            text-decoration: underline;
-        }
-        .security-note {
-            background: linear-gradient(180deg, #1a1a1a 0%, #151515 100%);
-            padding: 20px;
-            border-radius: 10px;
-            margin: 30px 0;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-left: 5px solid #fbbf24;
-            box-shadow: 0 10px 24px rgba(0,0,0,0.45);
-        }
-        .security-note h4 {
-            color: #fbbf24;
-            margin: 0 0 10px 0;
-            font-size: 16px;
-        }
+        .security-box h4 { color: #fbbf24; font-size: 14px; font-weight: 700; margin: 0 0 8px; }
+        .security-box p, .security-box li { color: #8892b0; font-size: 13px; line-height: 1.6; }
+        .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(124,58,237,0.2), transparent); margin: 30px 0; }
         .footer {
-            background: linear-gradient(180deg, #0f0f0f 0%, #141414 100%);
-            padding: 30px;
-            text-align: center;
-            border-top: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 30px 40px; text-align: center;
         }
-        .footer p {
-            margin: 5px 0;
-            color: #bdbdbd;
-        }
-        .footer .company-name {
-            font-weight: bold;
-            color: #ffffff;
-        }
-        .footer .auto-note {
-            font-size: 12px;
-            color: #8b8b8b;
-            margin-top: 15px;
-        }
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.20), transparent);
-            margin: 30px 0;
-        }
+        .footer-text { color: #3b4560; font-size: 11px; margin: 4px 0; }
+        .footer-brand { color: #5a6380; font-weight: 600; }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <div class="logo">🎬 Movies Platform</div>
-        <div class="title">Admin Account Invitation</div>
-        <div class="subtitle">Join our administrative team</div>
-    </div>
-
-    <div class="content">
-        <div class="welcome-section">
-            <div class="icon-container">
-                <div class="icon">👤</div>
+<div class="wrapper">
+    <div class="card">
+        <div class="hero">
+            <div class="hero-content">
+                <div class="logo">CN.io</div>
+                <div class="hero-tagline">Admin Panel Access</div>
             </div>
-            <h2>Welcome to the Team!</h2>
-            <p>You have been invited to join Movies Platform as an administrator. This invitation was sent to <strong
-                    th:text="${toEmail}"></strong>.</p>
         </div>
 
-        <div class="highlight-box">
-            <h3>🎯 What This Means</h3>
-            <p>You're being granted administrative access to manage and oversee the Movies Platform. As an admin, you'll
-                have powerful tools to:</p>
-            <ul class="features-list">
-                <li>Manage movies and showtimes</li>
-                <li>Oversee user accounts and permissions</li>
-                <li>Access comprehensive analytics and reports</li>
-                <li>Configure platform settings</li>
-                <li>Manage content and administrative users</li>
-            </ul>
+        <div class="body-content">
+            <h1 class="greeting">Admin Invitation</h1>
+            <p class="description">
+                You've been invited to join <strong style="color:#e2e8f0;">CN.io</strong> as an administrator.
+                This invitation was sent to <strong style="color:#e2e8f0;" th:text="${toEmail}"></strong>.
+            </p>
+
+            <div class="highlight-box">
+                <h3>Your Admin Capabilities</h3>
+                <p style="color:#8892b0; font-size:13px; margin:0;">As an admin, you'll have access to powerful management tools:</p>
+                <ul class="features-list">
+                    <li>Manage movies, shows, and content library</li>
+                    <li>Oversee user accounts and subscriptions</li>
+                    <li>Access analytics and platform reports</li>
+                    <li>Invite and manage other admins</li>
+                    <li>Configure platform settings</li>
+                </ul>
+            </div>
+
+            <div class="btn-wrapper">
+                <a class="btn-accept" th:href="${inviteLink}">Accept Invitation</a>
+            </div>
+
+            <div class="link-fallback">
+                <div class="link-fallback-label">Or copy this link</div>
+                <a th:href="${inviteLink}" th:text="${inviteLink}"></a>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="security-box">
+                <h4>Security Notice</h4>
+                <p>This invitation link is valid for <strong>24 hours</strong>. Please:</p>
+                <ul class="features-list" style="margin-top:8px;">
+                    <li>Never share this link with anyone</li>
+                    <li>Set a strong, unique password</li>
+                    <li>Contact us if you didn't expect this invitation</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="btn-container">
-            <a class="btn" href="#" th:href="${inviteLink}">🚀 Set Up Admin Account</a>
+        <div class="footer">
+            <p class="footer-text">Best regards, <span class="footer-brand">The CN.io Team</span></p>
+            <p class="footer-text">&copy; 2025 <span class="footer-brand">CN.io</span> &mdash; All rights reserved</p>
         </div>
-
-        <div class="divider"></div>
-
-        <p><strong>Alternative Access:</strong></p>
-        <p>If the button above doesn't work, you can copy and paste this link into your browser:</p>
-        <div class="link-container">
-            <a th:href="${inviteLink}" th:text="${inviteLink}"></a>
-        </div>
-
-        <div class="security-note">
-            <h4>🔒 Security Information</h4>
-            <p><strong>Important:</strong> This invitation link is valid for 24 hours only. For your security:</p>
-            <ul class="features-list">
-                <li>Never share this link with anyone</li>
-                <li>Set a strong, unique password</li>
-                <li>If you didn't request this invitation, please contact us immediately</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="footer">
-        <p>Best regards,<br>
-            <span class="company-name">The Movies Platform Team</span></p>
-        <p>We're excited to have you on board! 🎉</p>
-        <p class="auto-note">
-            This is an automated message. Please do not reply to this email.<br>
-            For support, contact our team at support@moviesplatform.com
-        </p>
     </div>
 </div>
 </body>

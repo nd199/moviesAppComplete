@@ -92,7 +92,7 @@ const Featured = () => {
                     {item.rating && (
                       <>
                         <span className="w-1.5 h-1.5 rounded-full bg-gold-400" />
-                        <span className="text-gold-400 text-[0.8rem] font-bold">★ {item.rating}</span>
+                        <span className="text-gold-400 text-[0.8rem] font-bold">★ {Number(item.rating).toFixed(1)}</span>
                       </>
                     )}
                   </div>
@@ -111,7 +111,7 @@ const Featured = () => {
                       mediaType="movie"
                       title={item.title}
                       posterPath={item.poster}
-                      className="!rounded-xl !bg-white/5 !border-white/10 !text-white hover:!bg-white/10 hover:!border-brand-500/30 backdrop-blur-sm"
+                      className="!rounded-xl !bg-white/5 !border-white/10 !text-white hover:!bg-white/10 hover:!border-brand-500/30 backdrop-blur-sm !px-6 !py-3"
                       showLabel={true}
                     />
                   </div>
