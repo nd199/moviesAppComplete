@@ -49,6 +49,7 @@ import ContentManagerList from "./Pages/Admin/ContentManagerList";
 import NewContentManager from "./Pages/Admin/NewContentManager";
 import ContentManagerEdit from "./Pages/Admin/ContentManagerEdit";
 import Settings from "./Pages/Admin/Settings";
+import SetPassword from "./Pages/Admin/SetPassword";
 
 // Admin Components
 import AdminLayout from "./Components/Admin/AdminLayout";
@@ -218,6 +219,7 @@ function Layout({ sidebarOpen, setSidebarOpen }) {
         {/* Admin login pages (no layout shell) */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/cm-login" element={<ContentManagerLogin />} />
+        <Route path="/admin/set-password" element={<SetPassword />} />
 
         {/* Admin pages with layout */}
         <Route path="/admin/*" element={
