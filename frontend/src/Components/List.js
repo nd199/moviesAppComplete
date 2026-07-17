@@ -10,6 +10,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { fetchMovies, fetchShows, fetchTmdbTrendingMovies, fetchTmdbTrendingShows, fetchTmdbPopularMovies, fetchTmdbTopRatedMovies, fetchTmdbNowPlayingMovies, fetchTmdbUpcomingMovies, fetchTmdbPopularShows, fetchTmdbTopRatedShows } from '../Network/ApiCalls';
 import { MovieListSkeleton } from './GlobalLoader';
 import ListItem from './ListItem';
+import { useScrollReveal } from '../Utils/useScrollReveal';
 
 SwiperCore.use([Navigation, Pagination]);
 
@@ -34,6 +35,7 @@ const List = ({ title, type = 'local', index = 0 }) => {
   const tmdbShows = useSelector(s => s?.product?.tmdbTrendingShows);
   const [loading, setLoading] = useState(true);
   const [extra, setExtra] = useState([]);
+  const sectionRef = useScrollReveal({ threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
 
   useEffect(() => {
     let cancel = false;
@@ -67,7 +69,7 @@ const List = ({ title, type = 'local', index = 0 }) => {
   const theme = sectionThemes[index % 4];
 
   return (
-    <section className={`w-full py-10 px-[3.5vw] ${theme.bg}`}>
+    <section ref={sectionRef} className={`reveal w-full py-10 px-[3.5vw] ${theme.bg}`}>
       <div className="flex items-end justify-between gap-4 mb-6 px-1">
         <div>
           <h2 className="text-2xl font-extrabold text-white m-0 tracking-tight">{title}</h2>

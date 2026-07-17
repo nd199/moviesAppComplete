@@ -107,4 +107,73 @@ a { color: inherit; text-decoration: none; }
     mask-composite: exclude;
     pointer-events: none;
   }
+
+  /* Scroll-reveal: elements fade+slide up when they enter the viewport */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* Staggered grid children reveal */
+  .stagger-grid > * {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .stagger-grid.revealed > *:nth-child(1) { transition-delay: 0.05s; }
+  .stagger-grid.revealed > *:nth-child(2) { transition-delay: 0.1s; }
+  .stagger-grid.revealed > *:nth-child(3) { transition-delay: 0.15s; }
+  .stagger-grid.revealed > *:nth-child(4) { transition-delay: 0.2s; }
+  .stagger-grid.revealed > *:nth-child(5) { transition-delay: 0.25s; }
+  .stagger-grid.revealed > *:nth-child(6) { transition-delay: 0.3s; }
+  .stagger-grid.revealed > *:nth-child(7) { transition-delay: 0.35s; }
+  .stagger-grid.revealed > *:nth-child(8) { transition-delay: 0.4s; }
+  .stagger-grid.revealed > *:nth-child(9) { transition-delay: 0.45s; }
+  .stagger-grid.revealed > *:nth-child(10) { transition-delay: 0.5s; }
+  .stagger-grid.revealed > * {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* Floating particle dots */
+  .particle-field {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .particle-field::before,
+  .particle-field::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    animation: particle-drift 20s ease-in-out infinite alternate;
+  }
+  .particle-field::before {
+    width: 300px; height: 300px;
+    top: 20%; left: 10%;
+    background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%);
+  }
+  .particle-field::after {
+    width: 400px; height: 400px;
+    bottom: 10%; right: 5%;
+    background: radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 70%);
+    animation-delay: -10s;
+  }
+
+  @keyframes particle-drift {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -20px) scale(1.1); }
+    100% { transform: translate(-20px, 15px) scale(0.95); }
+  }
 }

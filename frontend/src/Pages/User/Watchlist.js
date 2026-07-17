@@ -6,6 +6,7 @@ import WatchlistButton from '../../Components/WatchlistButton';
 import { watchlistAPI } from '../../AxiosMethods';
 import { fetchTmdbMovieDetails, fetchTmdbTvShowDetails } from '../../Network/ApiCalls';
 import GlobalLoader from '../../Components/GlobalLoader';
+import { useScrollReveal } from '../../Utils/useScrollReveal';
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState([]);
@@ -16,6 +17,7 @@ const Watchlist = () => {
   const [genre, setGenre] = useState("");
   const [year, setYear] = useState("");
   const [rating, setRating] = useState("");
+  const gridRef = useScrollReveal({ threshold: 0.05 });
 
   useEffect(() => {
     watchlistAPI.getWatchlist().then(r => { setWatchlist(r.data || []); setLoading(false); })
@@ -42,8 +44,15 @@ const Watchlist = () => {
   );
 
   return (
-    <div className="min-h-screen bg-surface-950 pt-20">
-      <FilterNavbar sortBy={sortBy} setSortBy={setSortBy} searchQuery={searchQuery} setSearchQuery={setSearchQuery} genre={genre} setGenre={setGenre} year={year} setYear={setYear} rating={rating} setRating={setRating} />
+    <div className="min-h-screen bg-surface-950">
+      {/* Header */}
+      <div className="relative pt-20 pb-6 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-500/5 via-transparent to-transparent pointer-events-none" />
+        <div className="max-w-[1400px] mx-auto relative z-10">
+          <FilterNavbar sortBy={sortBy} setSortBy={setSortBy} searchQuery={searchQuery} setSearchQuery={setSearchQuery} genre={genre} setGenre={setGenre} year={year} setYear={setYear} rating={rating} setRating={setRating} />
+        </div>
+      </div>
+
       <div className="max-w-[1400px] mx-auto px-5">
         <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/10">
           <Bookmarks className="text-brand-500" />
@@ -53,18 +62,21 @@ const Watchlist = () => {
 
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
-            <Bookmarks className="text-6xl text-surface-700" />
+            <div className="relative mb-2">
+              <div className="absolute inset-0 w-20 h-20 rounded-full bg-brand-500/10 blur-xl" />
+              <Bookmarks className="text-6xl text-surface-700 relative z-10" />
+            </div>
             <h2 className="text-xl font-semibold text-[#8892b0] m-0">{watchlist.length === 0 ? 'Watchlist is empty' : 'No matches'}</h2>
-            <p className="text-[#5a6380] text-sm m-0">{watchlist.length === 0 ? 'Add movies and shows to see them here' : 'Try adjusting filters'}</p>
+            <p className="text-[#5a6380] text-sm m-0 max-w-[300px] text-center">{watchlist.length === 0 ? 'Add movies and shows to see them here' : 'Try adjusting filters'}</p>
             <div className="flex gap-3 mt-2">
               <Link to="/movies" className="btn-primary rounded-xl">Movies</Link>
               <Link to="/shows" className="btn-secondary rounded-xl">Shows</Link>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div ref={gridRef} className="reveal stagger-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {filtered.map(item => (
-              <div key={`${item.tmdbId}-${item.mediaType}`} className="group glass rounded-2xl overflow-hidden hover:border-white/15 transition-all duration-300">
+              <div key={`${item.tmdbId}-${item.mediaType}`} className="group glass rounded-2xl overflow-hidden hover:border-white/15 transition-all duration-300 hover:shadow-[0_12px_50px_-10px_rgba(124,58,237,0.3)]">
                 <div className="relative aspect-[2/3] overflow-hidden">
                   <img src={getPoster(item.posterPath)} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-black/0 sm:bg-black/0 sm:group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100">

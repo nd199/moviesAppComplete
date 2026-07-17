@@ -5,6 +5,7 @@ import ColListItem from "../../Components/Col-ListItem";
 import FilterNavbar from "../../Components/FilterNavbar";
 import Footer from "../../Components/Footer";
 import { fetchTmdbTrendingShows, searchTmdbShows } from "../../Network/ApiCalls";
+import { useScrollReveal } from "../../Utils/useScrollReveal";
 
 const Shows = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const Shows = () => {
   const [year, setYear] = useState("");
   const [rating, setRating] = useState("");
   const [searching, setSearching] = useState(false);
+  const gridRef = useScrollReveal({ threshold: 0.05 });
 
   useEffect(() => { fetchTmdbTrendingShows(dispatch); }, [dispatch]);
   useEffect(() => {
@@ -39,18 +41,29 @@ const Shows = () => {
 
   return (
     <div className="min-h-screen bg-surface-950">
-      <div className="max-w-[1400px] mx-auto px-5 pt-20 pb-8">
-        <h1 className="text-4xl sm:text-5xl font-black text-white m-0 mb-2 text-center tracking-tight">TV Shows</h1>
-        <div className="h-[3px] w-16 mx-auto mb-6 rounded-full bg-gradient-to-r from-accent-500 to-brand-500" />
-        <FilterNavbar sortBy={sortBy} setSortBy={setSortBy} searchQuery={searchQuery} setSearchQuery={setSearchQuery} genre={genre} setGenre={setGenre} year={year} setYear={setYear} rating={rating} setRating={setRating} />
-        <div className="mt-6">
+      {/* Hero header */}
+      <div className="relative pt-20 pb-8 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-accent-500/5 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute top-[10%] left-[5%] w-[400px] h-[400px] bg-accent-500/5 blur-[120px] pointer-events-none" />
+        <div className="max-w-[1400px] mx-auto relative z-10">
+          <h1 className="text-4xl sm:text-5xl font-black text-white m-0 mb-2 text-center tracking-tight">TV Shows</h1>
+          <div className="h-[3px] w-16 mx-auto mb-6 rounded-full bg-gradient-to-r from-accent-500 to-brand-500" />
+          <FilterNavbar sortBy={sortBy} setSortBy={setSortBy} searchQuery={searchQuery} setSearchQuery={setSearchQuery} genre={genre} setGenre={setGenre} year={year} setYear={setYear} rating={rating} setRating={setRating} />
+        </div>
+      </div>
+
+      <div className="max-w-[1400px] mx-auto px-5 pb-8">
+        <div className="mt-2">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-24 gap-4">
-              <div className="w-12 h-12 border-[3px] border-white/10 border-t-brand-500 rounded-full animate-spin" />
+              <div className="relative">
+                <div className="absolute inset-0 w-16 h-16 rounded-full animate-glow" />
+                <div className="w-12 h-12 border-[3px] border-white/10 border-t-accent-500 rounded-full animate-spin" />
+              </div>
               <p className="text-[#8892b0] text-sm m-0">{searching ? 'Searching...' : 'Loading...'}</p>
             </div>
           ) : shows.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div ref={gridRef} className="reveal stagger-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {shows.map((s, i) => <ColListItem key={s.id || s.tmdbId || i} name={s.name || s.title} desc={s.description || s.overview} year={s.year} img={s.poster} ageRating={s.ageRating} rating={s.rating || s.vote_average} runtime={s.runtime} genre={s.genre} trailer={s.trailer} tmdbId={s.tmdbId} mediaType="tv" />)}
             </div>
           ) : (

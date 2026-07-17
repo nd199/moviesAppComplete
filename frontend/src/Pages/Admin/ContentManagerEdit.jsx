@@ -25,22 +25,25 @@ const ContentManagerEdit = () => {
         const response = await fetchContentManagerById(id);
         setFormData({
           name: response.name || '',
-        email: response.email || '',
-        phoneNumber: response.phoneNumber || '',
-        imageUrl: response.imageUrl || '',
-        department: response.department || '',
-        specialization: response.specialization || 'both',
-        accessLevel: response.accessLevel || 1,
-        isActive: response.isActive !== undefined ? response.isActive : true
-      });
-    } catch (error) {
-      console.error('Failed to fetch content manager details:', error);
-      toast.error('Failed to fetch content manager details');
-      navigate('/admin/content-managers');
-    } finally {
-      setFetchLoading(false);
-    }
-  };
+          email: response.email || '',
+          phoneNumber: response.phoneNumber || '',
+          imageUrl: response.imageUrl || '',
+          department: response.department || '',
+          specialization: response.specialization || 'both',
+          accessLevel: response.accessLevel || 1,
+          isActive: response.isActive !== undefined ? response.isActive : true
+        });
+      } catch (error) {
+        console.error('Failed to fetch content manager details:', error);
+        toast.error('Failed to fetch content manager details');
+        navigate('/admin/content-managers');
+      } finally {
+        setFetchLoading(false);
+      }
+    };
+    fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

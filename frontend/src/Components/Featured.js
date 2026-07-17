@@ -25,7 +25,8 @@ const Featured = () => {
   if (loading) return <FeaturedSkeleton />;
   if (!data.length) return (
     <section className="relative w-full h-screen bg-surface-900 flex items-center justify-center">
-      <div className="text-center">
+      <div className="absolute inset-0 particle-field" />
+      <div className="text-center relative z-10">
         <h2 className="text-3xl font-black text-white mb-4 m-0">No Featured Movies</h2>
         <Link to="/movies" className="btn-primary inline-flex no-underline">Browse Movies</Link>
       </div>
@@ -34,23 +35,36 @@ const Featured = () => {
 
   return (
     <section className="relative w-full h-screen min-h-[min(560px,80vh)] max-h-[850px] bg-black -mt-16">
-      <Swiper modules={[Navigation, Pagination, Autoplay]} slidesPerView={1} navigation pagination={{ clickable: true }} autoplay={{ delay: 7000, disableOnInteraction: false }} loop className="h-full">
+      <Swiper
+        modules={[Navigation, Pagination, Autoplay]}
+        slidesPerView={1}
+        navigation
+        pagination={{ clickable: true }}
+        autoplay={{ delay: 7000, disableOnInteraction: false }}
+        loop
+        className="h-full"
+      >
         {data.map((item, i) => (
           <SwiperSlide key={i}>
             <div className="relative w-full h-full">
-              {item.trailer && (
+              {/* Video background (YouTube) or poster fallback */}
+              {item.trailer ? (
                 <div className="absolute inset-0">
                   <VideoPlayer className="w-full h-full" videoId={item.trailer.split('v=')[1] || ''} isYouTube />
                 </div>
+              ) : (
+                <img src={item.poster} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
               )}
 
-              {/* Layered gradients */}
-              <div className="absolute inset-0 bg-gradient-to-r from-surface-950 via-surface-950/60 to-transparent z-[1]" />
-              <div className="absolute inset-0 bg-gradient-to-t from-surface-950 via-surface-950/20 to-black/40 z-[1]" />
+              {/* Layered gradients for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-surface-950 via-surface-950/70 to-transparent z-[1]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-surface-950 via-surface-950/30 to-black/30 z-[1]" />
+
               {/* Colored glow accents */}
               <div className="absolute bottom-0 left-[5%] w-[500px] h-[250px] bg-brand-500/10 blur-[120px] z-[1] pointer-events-none" />
               <div className="absolute top-[15%] right-[10%] w-[350px] h-[350px] bg-accent-500/8 blur-[140px] z-[1] pointer-events-none" />
 
+              {/* Content */}
               <div className="relative z-[2] h-full flex items-end pb-24 px-[6vw] max-w-[1400px] mx-auto">
                 <div className="max-w-[560px] flex flex-col gap-4 animate-slide-left">
                   {/* Badges */}
@@ -75,6 +89,12 @@ const Featured = () => {
                     <span className="px-2.5 py-0.5 rounded-lg bg-brand-500/15 border border-brand-500/30 text-brand-300 text-[0.7rem] font-bold uppercase">{item.ageRating}</span>
                     <span className="w-1.5 h-1.5 rounded-full bg-accent-400" />
                     <span className="text-[#8892b0]">{item.genre}</span>
+                    {item.rating && (
+                      <>
+                        <span className="w-1.5 h-1.5 rounded-full bg-gold-400" />
+                        <span className="text-gold-400 text-[0.8rem] font-bold">★ {item.rating}</span>
+                      </>
+                    )}
                   </div>
 
                   {/* Description */}
@@ -123,7 +143,7 @@ const Featured = () => {
         .swiper-button-prev:hover::after{transform:translateX(-2px)!important}
         .swiper-button-next:hover::after{transform:translateX(2px)!important}
         .swiper-button-prev:hover,.swiper-button-next:hover{
-          background:rgba(124,58,237,.85)!important;
+          background:linear-gradient(135deg,#7c3aed,#06b6d4)!important;
           border-color:rgba(124,58,237,.6)!important;
           box-shadow:0 0 25px rgba(124,58,237,.4),0 4px 15px rgba(0,0,0,.3)!important;
           transform:translateY(-50%) scale(1.05)!important;

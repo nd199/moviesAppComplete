@@ -1,5 +1,5 @@
 import { PlayArrow, BookmarkAdd } from '@mui/icons-material';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import WatchlistButton from './WatchlistButton';
 
@@ -8,6 +8,7 @@ const ColListItem = ({
   tmdbId, mediaType = 'movie',
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
+  const cardRef = useRef(null);
 
   const formatRuntime = (min) => {
     if (!min) return '';
@@ -18,8 +19,31 @@ const ColListItem = ({
 
   const genres = genre ? genre.split(',').map(g => g.trim()).slice(0, 3) : [];
 
+  const handleMouseMove = useCallback((e) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    const rotateX = (y - 0.5) * -6;
+    const rotateY = (x - 0.5) * 6;
+    card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    const card = cardRef.current;
+    if (!card) return;
+    card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale(1)';
+  }, []);
+
   return (
-    <div className="cl-root group relative rounded-2xl overflow-hidden transition-all duration-400 hover:shadow-[0_12px_50px_-10px_rgba(124,58,237,0.3)] gradient-border bg-surface-800">
+    <div
+      ref={cardRef}
+      className="cl-root group relative rounded-2xl overflow-hidden gradient-border bg-surface-800"
+      style={{ transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease' }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
 
       {/* Image */}
       <div className="relative w-full aspect-[2/3] overflow-hidden">
@@ -35,10 +59,14 @@ const ColListItem = ({
           <div className="absolute inset-0 bg-gradient-to-r from-surface-800 via-surface-700 to-surface-800 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
         )}
 
+        {/* Hover edge glow */}
+        <div className="absolute inset-0 rounded-t-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10"
+          style={{ boxShadow: 'inset 0 0 40px rgba(124,58,237,0.2), inset 0 0 80px rgba(6,182,212,0.06)' }} />
+
         {/* Badges */}
-        <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
+        <div className="absolute top-3 left-3 right-3 flex items-start justify-between z-10">
           {ageRating && (
-            <span className="bg-brand-500/90 text-white text-[0.6rem] font-bold uppercase tracking-widest px-2 py-1 rounded-lg">
+            <span className="bg-brand-500/90 text-white text-[0.6rem] font-bold uppercase tracking-widest px-2 py-1 rounded-lg backdrop-blur-sm">
               {ageRating}
             </span>
           )}
@@ -53,7 +81,7 @@ const ColListItem = ({
         <Link
           to={`/video/${name || 'unknown'}`}
           state={{ trailer }}
-          className="absolute inset-0 flex items-center justify-center bg-surface-950/0 sm:bg-surface-950/0 sm:group-hover:bg-surface-950/50 transition-all duration-400 no-underline"
+          className="absolute inset-0 flex items-center justify-center bg-surface-950/0 sm:bg-surface-950/0 sm:group-hover:bg-surface-950/50 transition-all duration-400 no-underline z-10"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 scale-100 sm:scale-75 sm:group-hover:scale-100 transition-all duration-400 glow-brand"
@@ -63,7 +91,7 @@ const ColListItem = ({
         </Link>
 
         {runtime && (
-          <span className="absolute bottom-3 right-3 bg-surface-950/70 backdrop-blur-sm text-white text-[0.65rem] font-medium px-2 py-1 rounded-lg border border-white/10">
+          <span className="absolute bottom-3 right-3 bg-surface-950/70 backdrop-blur-sm text-white text-[0.65rem] font-medium px-2 py-1 rounded-lg border border-white/10 z-10">
             {formatRuntime(runtime)}
           </span>
         )}

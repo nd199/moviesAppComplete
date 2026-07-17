@@ -21,31 +21,30 @@ const ShowEdit = () => {
   });
 
   useEffect(() => {
+    const fetchShowData = async () => {
+      try {
+        const showData = await fetchShowById(id);
+        setFormData({
+          name: showData.name || '',
+          rating: showData.rating || '',
+          description: showData.description || '',
+          poster: showData.poster || '',
+          ageRating: showData.ageRating || '',
+          year: showData.year || '',
+          runtime: showData.runtime || '',
+          genre: showData.genre || '',
+          category: showData.category || 'General',
+        });
+      } catch (error) {
+        toast.error('Failed to fetch show details');
+        console.error('Error fetching show:', error);
+        navigate('/admin/shows');
+      } finally {
+        setFetchLoading(false);
+      }
+    };
     fetchShowData();
-  }, [id]);
-
-  const fetchShowData = async () => {
-    try {
-      const showData = await fetchShowById(id);
-      setFormData({
-        name: showData.name || '',
-        rating: showData.rating || '',
-        description: showData.description || '',
-        poster: showData.poster || '',
-        ageRating: showData.ageRating || '',
-        year: showData.year || '',
-        runtime: showData.runtime || '',
-        genre: showData.genre || '',
-        category: showData.category || 'General',
-      });
-    } catch (error) {
-      toast.error('Failed to fetch show details');
-      console.error('Error fetching show:', error);
-      navigate('/admin/shows');
-    } finally {
-      setFetchLoading(false);
-    }
-  };
+  }, [id, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
