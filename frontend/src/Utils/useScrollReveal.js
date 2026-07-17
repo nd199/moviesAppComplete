@@ -1,55 +1,42 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 export function useScrollReveal(options = {}) {
-  const ref = useRef(null);
   const { threshold = 0.15, rootMargin = '0px 0px -40px 0px', once = true } = options;
+  const observerRef = useRef(null);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+  const setRef = useCallback((node) => {
+    // Disconnect any previous observer
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    if (!node) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          el.classList.add('revealed');
-          if (once) observer.unobserve(el);
+          node.classList.add('revealed');
+          if (once) observer.unobserve(node);
         } else if (!once) {
-          el.classList.remove('revealed');
+          node.classList.remove('revealed');
         }
       },
       { threshold, rootMargin }
     );
 
-    observer.observe(el);
-    return () => observer.disconnect();
+    observer.observe(node);
+    observerRef.current = observer;
   }, [threshold, rootMargin, once]);
 
-  return ref;
+  useEffect(() => {
+    return () => {
+      if (observerRef.current) observerRef.current.disconnect();
+    };
+  }, []);
+
+  return setRef;
 }
 
 export function useStaggerReveal(options = {}) {
-  const ref = useRef(null);
-  const { threshold = 0.1, rootMargin = '0px 0px -30px 0px', once = true } = options;
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add('revealed');
-          if (once) observer.unobserve(el);
-        } else if (!once) {
-          el.classList.remove('revealed');
-        }
-      },
-      { threshold, rootMargin }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [threshold, rootMargin, once]);
-
-  return ref;
+  return useScrollReveal(options);
 }
