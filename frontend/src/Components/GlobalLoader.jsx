@@ -1,11 +1,24 @@
 import { CircularProgress, Backdrop } from "@mui/material";
 
 const GlobalLoader = ({ open = true, message = "Loading..." }) => (
-  <Backdrop open={open} sx={{ color: "#fff", zIndex: (t) => t.zIndex.drawer + 1, backgroundColor: "rgba(5,8,16,0.92)", backdropFilter: "blur(12px)" }}>
+  <Backdrop open={open}
+    sx={{
+      color: "#fff",
+      zIndex: (t) => t.zIndex.drawer + 1,
+      backgroundColor: "rgba(5,8,16,0.92)",
+      backdropFilter: "blur(12px)",
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
     <div className="flex flex-col items-center gap-5">
       <div className="relative">
         <div className="absolute inset-0 w-16 h-16 rounded-full animate-glow" />
-        <CircularProgress size={52} thickness={3} sx={{ color: "#7c3aed", '& .MuiCircularProgress-circle': { strokeLinecap: 'round' } }} />
+        <CircularProgress size={52} thickness={3}
+          sx={{
+            color: "#7c3aed",
+            '& .MuiCircularProgress-circle': { strokeLinecap: 'round' },
+          }} />
       </div>
       <p className="text-[#8892b0] text-sm font-medium tracking-wide m-0">{message}</p>
     </div>
@@ -33,7 +46,10 @@ export const MovieListSkeleton = ({ count = 5 }) => (
 export const FeaturedSkeleton = () => (
   <div className="w-full h-[88vh] min-h-[560px] bg-surface-950 flex items-center justify-center">
     <div className="flex flex-col items-center gap-4">
-      <div className="w-16 h-16 rounded-full border-2 border-brand-500/20 animate-pulse" />
+      <div className="relative">
+        <div className="absolute inset-0 w-16 h-16 rounded-full animate-glow" />
+        <div className="w-14 h-14 rounded-full border-[3px] border-brand-500/20 border-t-brand-500 animate-spin" />
+      </div>
       <div className="w-48 h-5 rounded-xl bg-white/5 animate-shimmer" />
     </div>
   </div>
