@@ -76,6 +76,13 @@ public class AuthService {
 
                 logger.info("Admin found in database: {}", dbAdmin.getEmail());
 
+                if (!Boolean.TRUE.equals(dbAdmin.getIsActive())) {
+                    logger.warn("Admin login rejected for {}: Account is not active", dbAdmin.getEmail());
+                    throw new AccountNotRegisteredException(
+                            "Account is not active. Please set your password via the invitation link."
+                    );
+                }
+
                 String token = generateTokenForAdmin(dbAdmin);
 
                 AdminDTO dto = adminDTOMapper.apply(dbAdmin);

@@ -76,6 +76,7 @@ public class SuperAdminController {
             admin.setIsActive(false); // dormant until password is set
             admin.setIsEmailVerified(true);
             admin.setAccessLevel(1);
+            admin.setPassword(java.util.UUID.randomUUID().toString()); // placeholder; login blocked by isActive=false
 
             Role adminRole = roleService.findRoleByName(RoleName.ROLE_ADMIN);
             if (adminRole != null) {
