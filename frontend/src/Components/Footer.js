@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../Utils/useScrollReveal';
 
 const socials = [
-  { icon: Facebook, label: "Facebook", url: "https://facebook.com/cnio", color: "hover:bg-[#1877f2]/20 hover:text-[#1877f2] hover:border-[#1877f2]/30" },
-  { icon: Twitter, label: "Twitter", url: "https://x.com/cnio", color: "hover:bg-[#1da1f2]/20 hover:text-[#1da1f2] hover:border-[#1da1f2]/30" },
-  { icon: Instagram, label: "Instagram", url: "https://instagram.com/cnio", color: "hover:bg-[#e4405f]/20 hover:text-[#e4405f] hover:border-[#e4405f]/30" },
-  { icon: WhatsApp, label: "WhatsApp", url: "https://wa.me/918072205480", color: "hover:bg-[#25d366]/20 hover:text-[#25d366] hover:border-[#25d366]/30" },
+  { icon: Facebook, label: "Facebook", url: "#", color: "hover:bg-[#1877f2]/20 hover:text-[#1877f2] hover:border-[#1877f2]/30" },
+  { icon: Twitter, label: "Twitter", url: "#", color: "hover:bg-[#1da1f2]/20 hover:text-[#1da1f2] hover:border-[#1da1f2]/30" },
+  { icon: Instagram, label: "Instagram", url: "#", color: "hover:bg-[#e4405f]/20 hover:text-[#e4405f] hover:border-[#e4405f]/30" },
+  { icon: WhatsApp, label: "WhatsApp", url: "#", color: "hover:bg-[#25d366]/20 hover:text-[#25d366] hover:border-[#25d366]/30" },
 ];
 
 const links = [
@@ -21,7 +21,7 @@ const links = [
 const contacts = [
   { icon: <PlaceOutlined sx={{ fontSize: 18 }} />, text: "Chennai, Tamil Nadu" },
   { icon: <HiOutlinePhone size={18} />, text: "+91 8072205480" },
-  { icon: <MailOutlined sx={{ fontSize: 18 }} />, text: "naren06251999@gmail.com" },
+  { icon: <MailOutlined sx={{ fontSize: 18 }} />, text: "#" },
 ];
 
 const Footer = () => {

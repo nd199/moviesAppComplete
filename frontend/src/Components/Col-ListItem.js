@@ -1,4 +1,4 @@
-import { PlayArrow, BookmarkAdd } from '@mui/icons-material';
+import { PlayArrow, BookmarkAdd, Info } from '@mui/icons-material';
 import { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import WatchlistButton from './WatchlistButton';
@@ -136,6 +136,16 @@ const ColListItem = ({
           >
             <PlayArrow sx={{ fontSize: 16 }} /> Watch
           </Link>
+
+          {tmdbId && mediaType && (
+            <Link
+              to={`/${mediaType === 'tv' ? 'show' : 'movie'}/${tmdbId}`}
+              className="flex items-center justify-center w-9 h-9 min-w-[36px] rounded-xl bg-white/5 border border-white/10 text-[#8892b0] hover:text-white hover:bg-brand-500/15 hover:border-brand-500/30 transition-all no-underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Info sx={{ fontSize: 18 }} />
+            </Link>
+          )}
 
           {tmdbId && mediaType ? (
             <WatchlistButton

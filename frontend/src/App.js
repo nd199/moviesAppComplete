@@ -17,6 +17,8 @@ import LoginForm from "./Pages/User/LoginForm";
 import RegistrationForm from "./Pages/User/RegistrationForm";
 import ForgotPassword from "./Pages/User/ForgotPassword";
 import NotFound from "./Pages/User/NotFound";
+import Detail from "./Pages/User/Detail";
+import UserSettings from "./Pages/User/Settings";
 import Subscription from "./Pages/User/Subscription";
 import EmailVerification from "./Pages/User/EmailVerification";
 import VideoFullScreen from "./Pages/User/VideoFullScreen";
@@ -283,6 +285,8 @@ function Layout({ sidebarOpen, setSidebarOpen }) {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/shows" element={<Shows />} />
+        <Route path="/movie/:id" element={<Detail />} />
+        <Route path="/show/:id" element={<Detail />} />
 
         {/* Protected Routes - Require Authentication */}
         <Route
@@ -305,6 +309,14 @@ function Layout({ sidebarOpen, setSidebarOpen }) {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <UserSettings />
             </ProtectedRoute>
           }
         />

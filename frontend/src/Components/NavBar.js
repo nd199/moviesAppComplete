@@ -79,9 +79,13 @@ const NavBar = ({ onMenuClick }) => {
 
   const lottie = { loop: true, autoplay: true, animationData: popcornAnimation, rendererSettings: { preserveAspectRatio: "xMidYMid slice" } };
 
-  const handleLogout = useCallback(async () => {
-    try { await api.post('/auth/logout', { refreshToken: getRefreshToken() }); } catch {}
-    clearAuth(); dispatch(logout()); navigate("/login"); setOpen(false);
+  const handleLogout = useCallback(() => {
+    const token = getRefreshToken();
+    clearAuth();
+    dispatch(logout());
+    navigate("/login");
+    setOpen(false);
+    api.post('/auth/logout', { refreshToken: token }).catch(() => {});
   }, [dispatch, navigate]);
 
   const handleSearch = useCallback((e) => {

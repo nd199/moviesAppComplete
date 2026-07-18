@@ -1,4 +1,4 @@
-import { PlayArrow } from '@mui/icons-material';
+import { PlayArrow, Info } from '@mui/icons-material';
 import { useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import WatchlistButton from './WatchlistButton';
@@ -82,9 +82,16 @@ const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType, genr
           </div>
         </Link>
 
-        {/* Watchlist — always visible on mobile, hover on desktop */}
+        {/* Watchlist + Info — always visible on mobile, hover on desktop */}
         {tmdbId && mediaType && (
-          <div className="absolute bottom-2 right-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 translate-y-0 sm:translate-y-2 sm:group-hover:translate-y-0 z-10">
+          <div className="absolute bottom-2 right-2 flex gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 translate-y-0 sm:translate-y-2 sm:group-hover:translate-y-0 z-10">
+            <Link
+              to={`/${mediaType === 'tv' ? 'show' : 'movie'}/${tmdbId}`}
+              className="w-9 h-9 min-w-[36px] rounded-lg bg-surface-950/70 backdrop-blur-sm border border-white/15 flex items-center justify-center text-[#8892b0] hover:text-white hover:bg-brand-500 hover:border-brand-500 transition-all no-underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Info sx={{ fontSize: 18 }} />
+            </Link>
             <WatchlistButton
               tmdbId={tmdbId}
               mediaType={mediaType}

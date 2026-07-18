@@ -1,15 +1,14 @@
 import { SearchOff } from '@mui/icons-material';
-import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState, useCallback } from "react";
 import ColListItem from "../../Components/Col-ListItem";
 import FilterNavbar from "../../Components/FilterNavbar";
 import Footer from "../../Components/Footer";
-import { fetchTmdbTrendingShows, searchTmdbShows } from "../../Network/ApiCalls";
+import { publicRequest } from "../../AxiosMethods";
 import { useScrollReveal } from "../../Utils/useScrollReveal";
 
 const Shows = () => {
-  const dispatch = useDispatch();
-  const { tmdbTrendingShows = [], tmdbFetching = false, tmdbSearchResults = [] } = useSelector(s => s?.product || {});
+  const [shows, setShows] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("popularity");
   const [searchQuery, setSearchQuery] = useState("");
   const [genre, setGenre] = useState("");
@@ -18,37 +17,46 @@ const Shows = () => {
   const [searching, setSearching] = useState(false);
   const gridRef = useScrollReveal({ threshold: 0.05 });
 
-  useEffect(() => { fetchTmdbTrendingShows(dispatch); }, [dispatch]);
+  const fetchShows = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (searchQuery.trim()) {
+        setSearching(true);
+        const res = await publicRequest().get(`/tmdb/search/shows?query=${encodeURIComponent(searchQuery)}`);
+        setShows(res.data?.results || []);
+      } else {
+        setSearching(false);
+        const sortParam = sortBy === 'rating' ? 'vote_average.desc' : 'popularity.desc';
+        let url = `/tmdb/discover/shows?sort_by=${sortParam}&vote_count.gte=100`;
+        if (genre) url += `&with_genres=${genre}`;
+        if (year) url += `&first_air_date_year=${year}`;
+        const res = await publicRequest().get(url);
+        let results = res.data?.results || [];
+        if (rating) {
+          results = results.filter(s => parseFloat(s.rating || 0) >= parseFloat(rating));
+        }
+        setShows(results);
+      }
+    } catch {
+      setShows([]);
+    }
+    setLoading(false);
+  }, [searchQuery, sortBy, genre, year, rating]);
+
   useEffect(() => {
-    if (!searchQuery.trim()) { setSearching(false); return; }
-    setSearching(true);
-    const t = setTimeout(() => searchTmdbShows(dispatch, searchQuery), 500);
+    const t = setTimeout(fetchShows, searchQuery ? 500 : 0);
     return () => clearTimeout(t);
-  }, [dispatch, searchQuery]);
-
-  const filter = useCallback((shows) => {
-    if (!shows?.length) return [];
-    return shows.filter(s => {
-      if (genre && genre !== 'All') { const g = s.genre || ''; if (!g.toLowerCase().includes(genre.toLowerCase())) return false; }
-      if (year) { const y = s.year || (s.first_air_date && new Date(s.first_air_date).getFullYear()); if (y !== parseInt(year)) return false; }
-      if (rating && parseFloat(s.rating || s.vote_average || 0) < parseFloat(rating)) return false;
-      return true;
-    }).sort((a, b) => sortBy === "popularity" ? (b.popularity || 0) - (a.popularity || 0) : (parseFloat(b.rating || 0) - parseFloat(a.rating || 0)));
-  }, [genre, year, rating, sortBy]);
-
-  const shows = filter(searchQuery ? tmdbSearchResults : tmdbTrendingShows);
-  const loading = tmdbFetching || (searching && !tmdbSearchResults.length);
+  }, [fetchShows, searchQuery]);
 
   return (
     <div className="min-h-screen bg-surface-950">
-      {/* Hero header */}
       <div className="relative pt-20 pb-8 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-accent-500/5 via-transparent to-transparent pointer-events-none" />
         <div className="absolute top-[10%] left-[5%] w-[400px] h-[400px] bg-accent-500/5 blur-[120px] pointer-events-none" />
         <div className="max-w-[1400px] mx-auto relative z-10">
           <h1 className="text-4xl sm:text-5xl font-black text-white m-0 mb-2 text-center tracking-tight">TV Shows</h1>
           <div className="h-[3px] w-16 mx-auto mb-6 rounded-full bg-gradient-to-r from-accent-500 to-brand-500" />
-          <FilterNavbar sortBy={sortBy} setSortBy={setSortBy} searchQuery={searchQuery} setSearchQuery={setSearchQuery} genre={genre} setGenre={setGenre} year={year} setYear={setYear} rating={rating} setRating={setRating} />
+          <FilterNavbar sortBy={sortBy} setSortBy={setSortBy} searchQuery={searchQuery} setSearchQuery={setSearchQuery} genre={genre} setGenre={setGenre} year={year} setYear={setYear} rating={rating} setRating={setRating} mediaType="tv" />
         </div>
       </div>
 
@@ -64,7 +72,9 @@ const Shows = () => {
             </div>
           ) : shows.length > 0 ? (
             <div ref={gridRef} className="reveal stagger-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {shows.map((s, i) => <ColListItem key={s.id || s.tmdbId || i} name={s.name || s.title} desc={s.description || s.overview} year={s.year} img={s.poster} ageRating={s.ageRating} rating={s.rating || s.vote_average} runtime={s.runtime} genre={s.genre} trailer={s.trailer} tmdbId={s.tmdbId} mediaType="tv" />)}
+              {shows.map((s, i) => (
+                <ColListItem key={s.tmdbId || i} name={s.name || s.title} desc={s.description} year={s.year} img={s.poster} ageRating={s.ageRating} rating={s.rating} runtime={s.runtime} genre={s.genre} trailer={s.trailer} tmdbId={s.tmdbId} mediaType="tv" />
+              ))}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-32 gap-4">
