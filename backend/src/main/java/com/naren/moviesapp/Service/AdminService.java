@@ -356,23 +356,11 @@ public class AdminService implements AdminServiceInterface {
         Admin admin = adminRepository.findByEmail(email).orElse(null);
 
         if (admin == null) {
-            admin = new Admin();
-            admin.setName(email.split("@")[0]);
-            admin.setEmail(email);
-            admin.setPhoneNumber("");
-            admin.setAddress("");
-            admin.setDepartment("Admin");
-            admin.setIsActive(true);
-            admin.setIsEmailVerified(true);
-            admin.setAccessLevel(1);
-
-            Role adminRole = roleService.findRoleByName(RoleName.ROLE_ADMIN);
-            if (adminRole != null) {
-                admin.addRole(adminRole);
-            }
+            throw new AdminNotFoundException("Admin not found with email: " + email + ". Invitation may have expired.");
         }
 
         admin.setPassword(passwordEncoder.encode(newPassword));
+        admin.setIsActive(true);
         adminRepository.save(admin);
 
         logger.info("Password set for admin: {}", email);
