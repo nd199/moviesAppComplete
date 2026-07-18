@@ -14,8 +14,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -73,7 +77,8 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         return token;
     }
 
-    public Map<String, Object> loginWithTokens(ContentManagerLogin login) {
+    public Map<String, Object> loginWithTokens(ContentManagerLogin login,
+                                                jakarta.servlet.http.HttpServletRequest httpRequest) {
         logger.info("Content manager token login attempt: {}", login.email());
 
         ContentManager contentManager = contentManagerRepository.findByEmail(login.email())
@@ -92,12 +97,11 @@ public class ContentManagerService implements ContentManagerServiceInterface {
             throw new ResourceNotFoundException("Account is inactive");
         }
 
-        // Generate access token
         Map<String, Object> claims = Map.of("type", "CONTENT_MANAGER");
         String accessToken = jwtUtil.issueToken(contentManager.getEmail(), claims);
 
-        // Create refresh token (ContentManager uses Admin token system)
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(contentManager);
+        String deviceFingerprint = generateDeviceFingerprint(httpRequest);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(contentManager, deviceFingerprint);
 
         // Build user data
         Map<String, Object> userMap = new java.util.HashMap<>();
@@ -402,5 +406,18 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         contentManager.setPassword(passwordEncoder.encode(newPassword));
         contentManagerRepository.save(contentManager);
         logger.info("Password updated successfully for content manager: {}", email);
+    }
+
+    private String generateDeviceFingerprint(jakarta.servlet.http.HttpServletRequest request) {
+        try {
+            String userAgent = request.getHeader("User-Agent") != null ? request.getHeader("User-Agent") : "";
+            String acceptLanguage = request.getHeader("Accept-Language") != null ? request.getHeader("Accept-Language") : "";
+            String raw = userAgent + "|" + acceptLanguage;
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hash);
+        } catch (Exception e) {
+            return UUID.randomUUID().toString();
+        }
     }
 }

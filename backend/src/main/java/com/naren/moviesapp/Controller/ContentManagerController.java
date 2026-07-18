@@ -35,10 +35,11 @@ public class ContentManagerController {
 
     // Authentication endpoint-s
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody ContentManagerLogin login) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody ContentManagerLogin login,
+                                                     jakarta.servlet.http.HttpServletRequest httpRequest) {
         logger.info("Content manager login request: {}", login.email());
 
-        Map<String, Object> result = contentManagerService.loginWithTokens(login);
+        Map<String, Object> result = contentManagerService.loginWithTokens(login, httpRequest);
 
         logger.info("Content manager login successful for: {}", login.email());
         return ResponseEntity.ok(result);
