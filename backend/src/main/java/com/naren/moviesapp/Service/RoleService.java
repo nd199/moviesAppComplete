@@ -42,7 +42,7 @@ public class RoleService {
         return roleRepository.findByName(RoleName.valueOf(roleName)).orElse(null);
     }
 
-    Role findRoleByName(RoleName roleName) {
+    public Role findRoleByName(RoleName roleName) {
         return roleRepository.findByName(roleName).orElse(null);
     }
 
