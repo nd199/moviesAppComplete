@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +18,10 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Stri
     @Modifying
     @Query("DELETE FROM RefreshToken rt WHERE rt.userId = :userId AND rt.userType = :userType")
     void deleteByUserIdAndUserType(@Param("userId") Long userId, @Param("userType") UserType userType);
+
+    @Modifying
+    @Query("DELETE FROM RefreshToken rt WHERE rt.familyId = :familyId")
+    void deleteByFamilyId(@Param("familyId") String familyId);
+
+    List<RefreshToken> findByUserIdAndUserType(Long userId, UserType userType);
 }

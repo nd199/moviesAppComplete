@@ -38,20 +38,19 @@ public class RefreshTokenService {
         this.jwtUtil = jwtUtil;
     }
 
-    public RefreshToken createRefreshToken(Customer customer) {
-        return createRefreshTokenInternal(customer.getId(), UserType.CUSTOMER);
+    public RefreshToken createRefreshToken(Customer customer, String deviceFingerprint) {
+        return createRefreshTokenInternal(customer.getId(), UserType.CUSTOMER, deviceFingerprint);
     }
 
-    public RefreshToken createRefreshToken(Admin admin) {
-        return createRefreshTokenInternal(admin.getId(), UserType.ADMIN);
+    public RefreshToken createRefreshToken(Admin admin, String deviceFingerprint) {
+        return createRefreshTokenInternal(admin.getId(), UserType.ADMIN, deviceFingerprint);
     }
 
-    public RefreshToken createRefreshToken(ContentManager contentManager) {
-        return createRefreshTokenInternal(contentManager.getId(), UserType.ADMIN);
+    public RefreshToken createRefreshToken(ContentManager contentManager, String deviceFingerprint) {
+        return createRefreshTokenInternal(contentManager.getId(), UserType.ADMIN, deviceFingerprint);
     }
 
-    private RefreshToken createRefreshTokenInternal(Long userId, UserType userType) {
-        // Delete existing refresh tokens for this user
+    private RefreshToken createRefreshTokenInternal(Long userId, UserType userType, String deviceFingerprint) {
         deleteByUserIdAndUserType(userId, userType);
 
         RefreshToken refreshToken = new RefreshToken(
@@ -60,15 +59,29 @@ public class RefreshTokenService {
                 UUID.randomUUID().toString(),
                 Instant.now().plus(refreshExpirationDays, ChronoUnit.DAYS)
         );
+        refreshToken.setDeviceFingerprint(deviceFingerprint);
 
         refreshToken = refreshTokenRepository.save(refreshToken);
-        logger.info("Created new refresh token for user: {} {}", userType, userId);
+        logger.info("Created new refresh token for user: {} {} (device: {})", userType, userId, deviceFingerprint);
 
         return refreshToken;
     }
 
+    /**
+     * Rotate a refresh token with theft detection and device binding.
+     *
+     * Security flow:
+     * 1. Check device fingerprint → different device = THEFT → revoke all
+     * 2. If the token was already used → THEFT → revoke all
+     * 3. Mark old token as used
+     * 4. Create new token in the same family, SAME device
+     * 5. Delete old token
+     *
+     * @return the new refresh token
+     * @throws RuntimeException if token is invalid or theft is detected
+     */
     @Transactional
-    public RefreshToken rotateRefreshToken(String token) {
+    public RefreshToken rotateRefreshToken(String token, String deviceFingerprint) {
         RefreshToken existingToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Refresh token not found"));
 
@@ -76,21 +89,50 @@ public class RefreshTokenService {
             throw new RuntimeException("Refresh token expired");
         }
 
-        // Create new refresh token
+        if (!existingToken.getDeviceFingerprint().equals(deviceFingerprint)) {
+            logger.warn("DEVICE MISMATCH THEFT DETECTED for user: {} {} — expected: {}, got: {}",
+                    existingToken.getUserType(), existingToken.getUserId(),
+                    existingToken.getDeviceFingerprint(), deviceFingerprint);
+            revokeAllUserTokens(existingToken.getUserId(), existingToken.getUserType());
+            throw new RuntimeException("Device mismatch detected. All sessions revoked for security.");
+        }
+
+        if (existingToken.isUsed()) {
+            logger.warn("TOKEN REUSE THEFT DETECTED for user: {} {} — family: {}",
+                    existingToken.getUserType(), existingToken.getUserId(), existingToken.getFamilyId());
+            revokeAllUserTokens(existingToken.getUserId(), existingToken.getUserType());
+            throw new RuntimeException("Token reuse detected. All sessions revoked for security.");
+        }
+
+        existingToken.setUsed(true);
+        refreshTokenRepository.save(existingToken);
+
         RefreshToken newRefreshToken = new RefreshToken(
                 existingToken.getUserId(),
                 existingToken.getUserType(),
                 UUID.randomUUID().toString(),
                 Instant.now().plus(refreshExpirationDays, ChronoUnit.DAYS)
         );
-
-        // Delete old token
-        refreshTokenRepository.delete(existingToken);
+        newRefreshToken.setFamilyId(existingToken.getFamilyId());
+        newRefreshToken.setDeviceFingerprint(existingToken.getDeviceFingerprint());
 
         newRefreshToken = refreshTokenRepository.save(newRefreshToken);
-        logger.info("Rotated refresh token for user: {} {}", existingToken.getUserType(), existingToken.getUserId());
+
+        refreshTokenRepository.delete(existingToken);
+
+        logger.info("Rotated refresh token for user: {} {} (family: {}, device: {})",
+                existingToken.getUserType(), existingToken.getUserId(),
+                existingToken.getFamilyId(), existingToken.getDeviceFingerprint());
 
         return newRefreshToken;
+    }
+
+    /**
+     * Revoke ALL refresh tokens for a user — used when theft is detected.
+     */
+    public void revokeAllUserTokens(Long userId, UserType userType) {
+        refreshTokenRepository.deleteByUserIdAndUserType(userId, userType);
+        logger.warn("Revoked ALL refresh tokens for user: {} {}", userType, userId);
     }
 
     public RefreshToken findByToken(String token) {
@@ -141,7 +183,6 @@ public class RefreshTokenService {
 
         verifyExpiration(refreshToken);
 
-        // Load user based on type and generate token
         if (UserType.ADMIN.equals(refreshToken.getUserType())) {
             Admin admin = adminRepository.findById(refreshToken.getUserId())
                     .orElseThrow(() -> new RuntimeException("Admin not found"));
@@ -149,7 +190,6 @@ public class RefreshTokenService {
         } else if (UserType.CUSTOMER.equals(refreshToken.getUserType())) {
             Customer customer = customerRepository.findById(refreshToken.getUserId())
                     .orElseThrow(() -> new RuntimeException("Customer not found"));
-            // For customer, we need to convert roles properly
             return jwtUtil.issueToken(customer.getEmail(), customer.getRoles());
         }
 

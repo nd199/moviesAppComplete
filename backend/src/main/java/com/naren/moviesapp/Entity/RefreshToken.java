@@ -24,6 +24,15 @@ public class RefreshToken {
     @Column(nullable = false)
     private Instant expiryDate;
 
+    @Column(name = "family_id", nullable = false)
+    private String familyId;
+
+    @Column(nullable = false)
+    private boolean used = false;
+
+    @Column(name = "device_fingerprint", nullable = false)
+    private String deviceFingerprint;
+`
     public RefreshToken() {
         this.id = UUID.randomUUID().toString();
     }
@@ -34,9 +43,9 @@ public class RefreshToken {
         this.userType = userType;
         this.token = token;
         this.expiryDate = expiryDate;
+        this.familyId = UUID.randomUUID().toString();
     }
 
-    // Getters and setters
     public String getId() {
         return id;
     }
@@ -75,6 +84,30 @@ public class RefreshToken {
 
     public void setExpiryDate(Instant expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    public String getFamilyId() {
+        return familyId;
+    }
+
+    public void setFamilyId(String familyId) {
+        this.familyId = familyId;
+    }
+
+    public boolean isUsed() {
+        return used;
+    }
+
+    public void setUsed(boolean used) {
+        this.used = used;
+    }
+
+    public String getDeviceFingerprint() {
+        return deviceFingerprint;
+    }
+
+    public void setDeviceFingerprint(String deviceFingerprint) {
+        this.deviceFingerprint = deviceFingerprint;
     }
 
     public boolean isExpired() {

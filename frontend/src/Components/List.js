@@ -95,7 +95,7 @@ const List = ({ title, type = 'local', index = 0 }) => {
 
       <style>{`
         .swiper-pagination{bottom:0!important}
-        .swiper-pagination-bullet{width:24px!important;height:4px!important;background:rgba(255,255,255,.1)!important;opacity:1!important;transition:all .3s!important;border-radius:2px!important}
+        .swiper-pagination-bullet{width:24px!important;height:4px!important;margin:0 4px!important;background:rgba(255,255,255,.1)!important;opacity:1!important;transition:all .3s!important;border-radius:2px!important}
         .swiper-pagination-bullet-active{background:linear-gradient(90deg,#7c3aed,#06b6d4)!important;width:32px!important;box-shadow:0 0 10px rgba(124,58,237,.3)!important}
         .swiper-button-prev,.swiper-button-next{width:36px!important;height:36px!important;border-radius:10px!important;background:rgba(255,255,255,.06)!important;color:#fff!important;border:1px solid rgba(255,255,255,.08)!important;top:38%!important;transition:all .3s!important;backdrop-filter:blur(8px)!important}
         .swiper-button-prev{left:4px!important}.swiper-button-next{right:4px!important}

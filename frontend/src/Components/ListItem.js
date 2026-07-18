@@ -100,7 +100,7 @@ const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType, genr
 
       {/* Title */}
       <div className="px-1 pt-2 pb-1">
-        <h4 className="text-white text-[0.8rem] font-semibold m-0 leading-tight line-clamp-1 group-hover:text-brand-300 transition-colors duration-300">{name}</h4>
+        <h4 className="text-white text-[0.95rem] font-semibold m-0 leading-tight line-clamp-1 group-hover:text-brand-300 transition-colors duration-300">{name}</h4>
         <p className="text-[#4a5568] text-[0.65rem] m-0 mt-0.5">{year}</p>
       </div>
     </div>
