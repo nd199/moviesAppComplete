@@ -24,7 +24,7 @@ public abstract class BaseUser {
     @Column(name = "password", columnDefinition = "TEXT", nullable = false)
     protected String password;
 
-    @Column(name = "phone_number", columnDefinition = "TEXT")
+    @Column(name = "phone_number", nullable = false, columnDefinition = "TEXT")
     protected String phoneNumber;
 
     @Column(nullable = false)
