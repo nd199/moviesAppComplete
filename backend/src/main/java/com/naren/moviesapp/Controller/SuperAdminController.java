@@ -70,7 +70,11 @@ public class SuperAdminController {
             Admin admin = new Admin();
             admin.setName(name);
             admin.setEmail(email);
-            admin.setPhoneNumber(phoneNumber);
+            // Generate unique placeholder if phone not provided (column is NOT NULL UNIQUE)
+            String phone = (phoneNumber != null && !phoneNumber.trim().isEmpty())
+                    ? phoneNumber
+                    : "INVITE_" + System.currentTimeMillis();
+            admin.setPhoneNumber(phone);
             admin.setAddress(address != null ? address : "");
             admin.setDepartment(department != null ? department : "Admin");
             admin.setIsActive(false); // dormant until password is set
