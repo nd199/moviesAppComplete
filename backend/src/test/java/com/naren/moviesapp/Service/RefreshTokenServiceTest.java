@@ -51,7 +51,7 @@ class RefreshTokenServiceTest {
         RefreshToken savedToken = TestDataFactory.createTestRefreshToken();
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(savedToken);
 
-        RefreshToken result = underTest.createRefreshToken(user);
+        RefreshToken result = underTest.createRefreshToken(user, "test-fingerprint");
 
         verify(refreshTokenRepository).deleteByUserIdAndUserType(user.getId(), UserType.CUSTOMER);
 
@@ -76,19 +76,20 @@ class RefreshTokenServiceTest {
         existingToken.setUserType(UserType.CUSTOMER);
         existingToken.setToken(oldToken);
         existingToken.setExpiryDate(Instant.now().plus(1, java.time.temporal.ChronoUnit.DAYS));
+        existingToken.setDeviceFingerprint("test-fingerprint");
 
         RefreshToken newSavedToken = TestDataFactory.createTestRefreshToken();
         when(refreshTokenRepository.findByToken(oldToken)).thenReturn(Optional.of(existingToken));
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(newSavedToken);
 
-        RefreshToken result = underTest.rotateRefreshToken(oldToken);
+        RefreshToken result = underTest.rotateRefreshToken(oldToken, "test-fingerprint");
 
         verify(refreshTokenRepository).delete(existingToken);
 
         ArgumentCaptor<RefreshToken> tokenCaptor = ArgumentCaptor.forClass(RefreshToken.class);
-        verify(refreshTokenRepository).save(tokenCaptor.capture());
+        verify(refreshTokenRepository, atLeast(2)).save(tokenCaptor.capture());
 
-        RefreshToken capturedToken = tokenCaptor.getValue();
+        RefreshToken capturedToken = tokenCaptor.getAllValues().get(tokenCaptor.getAllValues().size() - 1);
         assertThat(capturedToken.getUserId()).isEqualTo(user.getId());
         assertThat(capturedToken.getUserType()).isEqualTo(UserType.CUSTOMER);
         assertThat(capturedToken.getToken()).isNotEqualTo(oldToken);
@@ -101,7 +102,7 @@ class RefreshTokenServiceTest {
 
         when(refreshTokenRepository.findByToken(oldToken)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> underTest.rotateRefreshToken(oldToken))
+        assertThatThrownBy(() -> underTest.rotateRefreshToken(oldToken, "test-fingerprint"))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Refresh token not found");
 
@@ -124,7 +125,7 @@ class RefreshTokenServiceTest {
 
         when(refreshTokenRepository.findByToken(oldToken)).thenReturn(Optional.of(existingToken));
 
-        assertThatThrownBy(() -> underTest.rotateRefreshToken(oldToken))
+        assertThatThrownBy(() -> underTest.rotateRefreshToken(oldToken, "test-fingerprint"))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Refresh token expired");
 
