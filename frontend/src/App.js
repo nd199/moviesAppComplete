@@ -15,6 +15,7 @@ import { getRefreshToken, getAccessToken, clearAuth, setAccessToken, setRefreshT
 import Home from "./Pages/User/Home";
 import LoginForm from "./Pages/User/LoginForm";
 import RegistrationForm from "./Pages/User/RegistrationForm";
+import ForgotPassword from "./Pages/User/ForgotPassword";
 import Subscription from "./Pages/User/Subscription";
 import EmailVerification from "./Pages/User/EmailVerification";
 import VideoFullScreen from "./Pages/User/VideoFullScreen";
@@ -277,6 +278,7 @@ function Layout({ sidebarOpen, setSidebarOpen }) {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegistrationForm />} />
+        <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/shows" element={<Shows />} />
