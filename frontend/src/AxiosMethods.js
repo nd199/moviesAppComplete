@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { store } from './redux/store';
+import { logout } from './redux/userSlice';
 import { installMockInterceptor } from './mockInterceptor';
 
 // ============================================
@@ -95,6 +96,7 @@ api.interceptors.response.use(
       const refreshToken = getRefreshToken();
       if (!refreshToken) {
         clearTokens();
+        store.dispatch(logout());
         return Promise.reject(error);
       }
       
@@ -110,6 +112,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         clearTokens();
+        store.dispatch(logout());
         return Promise.reject(refreshError);
       }
     }

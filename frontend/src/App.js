@@ -183,9 +183,20 @@ function AppWithNavigation() {
       }
     };
 
-    // Small delay to ensure store is ready
-    const timer = setTimeout(initializeAuth, 100);
-    return () => clearTimeout(timer);
+    // Initialize auth immediately (PersistGate ensures store is ready)
+    initializeAuth();
+
+  }, [dispatch]);
+
+  // Cross-tab logout sync
+  useEffect(() => {
+    const handleStorage = (e) => {
+      if (e.key === 'persist:root' && !e.newValue) {
+        dispatch(logout());
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, [dispatch]);
 
   // Handle payment success callback
@@ -199,6 +210,7 @@ function AppWithNavigation() {
       window.paymentSuccess = null;
     };
   }, [dispatch]);
+
 
   return (
     <Router>
