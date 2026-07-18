@@ -4,15 +4,14 @@ import { Link } from 'react-router-dom';
 import SwiperCore from 'swiper';
 import 'swiper/css';
 import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { fetchMovies, fetchShows, fetchTmdbTrendingMovies, fetchTmdbTrendingShows, fetchTmdbPopularMovies, fetchTmdbTopRatedMovies, fetchTmdbNowPlayingMovies, fetchTmdbUpcomingMovies, fetchTmdbPopularShows, fetchTmdbTopRatedShows } from '../Network/ApiCalls';
 import { MovieListSkeleton } from './GlobalLoader';
 import ListItem from './ListItem';
 import { useScrollReveal } from '../Utils/useScrollReveal';
 
-SwiperCore.use([Navigation, Pagination]);
+SwiperCore.use([Navigation]);
 
 const fetchMap = {
   'local': null,
@@ -82,25 +81,20 @@ const List = ({ title, type = 'local', index = 0 }) => {
         )}
       </div>
 
-      <div style={{ paddingBottom: '40px', position: 'relative' }}>
-        <Swiper key={items.length + type} modules={[Navigation, Pagination]} spaceBetween={10} slidesPerView="auto" navigation pagination={{ clickable: true }}>
-          {items.map((item, idx) => {
-            const f = type.startsWith('tmdb') ? format(item) : item;
-            return (
-              <SwiperSlide key={item.id || item.tmdbId || idx} style={{ width: 'auto' }}>
-                <ListItem id={f.id} tmdbId={f.tmdbId} name={f.name} desc={f.desc}
-                          year={f.year} ageRating={f.ageRating} rating={f.rating} runtime={f.runtime}
-                          genre={f.genre} poster={f.poster} trailer={f.trailer} mediaType={f.mediaType} />
-              </SwiperSlide>
-            );
-          })}
-        </Swiper>
-      </div>
+      <Swiper key={items.length + type} modules={[Navigation]} spaceBetween={10} slidesPerView="auto" navigation>
+        {items.map((item, idx) => {
+          const f = type.startsWith('tmdb') ? format(item) : item;
+          return (
+            <SwiperSlide key={item.id || item.tmdbId || idx} style={{ width: 'auto' }}>
+              <ListItem id={f.id} tmdbId={f.tmdbId} name={f.name} desc={f.desc}
+                        year={f.year} ageRating={f.ageRating} rating={f.rating} runtime={f.runtime}
+                        genre={f.genre} poster={f.poster} trailer={f.trailer} mediaType={f.mediaType} />
+            </SwiperSlide>
+          );
+        })}
+      </Swiper>
 
       <style>{`
-        .swiper-pagination{bottom:0!important}
-        .swiper-pagination-bullet{width:24px!important;height:4px!important;margin:0 4px!important;background:rgba(255,255,255,.1)!important;opacity:1!important;transition:all .3s!important;border-radius:2px!important}
-        .swiper-pagination-bullet-active{background:linear-gradient(90deg,#7c3aed,#06b6d4)!important;width:32px!important;box-shadow:0 0 10px rgba(124,58,237,.3)!important}
         .swiper-button-prev,.swiper-button-next{width:36px!important;height:36px!important;border-radius:10px!important;background:rgba(255,255,255,.06)!important;color:#fff!important;border:1px solid rgba(255,255,255,.08)!important;top:38%!important;transition:all .3s!important;backdrop-filter:blur(8px)!important}
         .swiper-button-prev{left:4px!important}.swiper-button-next{right:4px!important}
         .swiper-button-prev::after,.swiper-button-next::after{font-size:.8rem!important;font-weight:700!important}

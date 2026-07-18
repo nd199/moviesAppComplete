@@ -638,7 +638,8 @@ public class TmdbController {
         movie.setRating(tmdbMovie.getVoteAverage() != null ? tmdbMovie.getVoteAverage() : 0.0);
         movie.setDescription(tmdbMovie.getOverview() != null ? tmdbMovie.getOverview() : "");
         movie.setPoster(tmdbService.getFullPosterPath(tmdbMovie.getPosterPath()));
-        movie.setAgeRating(tmdbMovie.getAdult() != null && tmdbMovie.getAdult() ? "R" : "PG-13");
+        String certification = tmdbService.getMovieCertification(tmdbId);
+        movie.setAgeRating(certification != null ? certification : (tmdbMovie.getAdult() != null && tmdbMovie.getAdult() ? "R" : "PG-13"));
 
         // Parse year from release date
         if (tmdbMovie.getReleaseDate() != null && tmdbMovie.getReleaseDate().length() >= 4) {
@@ -708,7 +709,8 @@ public class TmdbController {
         show.setRating(tmdbTvShow.getVoteAverage() != null ? tmdbTvShow.getVoteAverage() : 0.0);
         show.setDescription(tmdbTvShow.getOverview() != null ? tmdbTvShow.getOverview() : "");
         show.setPoster(tmdbService.getFullPosterPath(tmdbTvShow.getPosterPath()));
-        show.setAgeRating("TV-14");
+        String showCertification = tmdbService.getTvShowCertification(tmdbId);
+        show.setAgeRating(showCertification != null ? showCertification : "TV-14");
 
         // Parse year from first air date
         if (tmdbTvShow.getFirstAirDate() != null && tmdbTvShow.getFirstAirDate().length() >= 4) {
@@ -841,5 +843,85 @@ public class TmdbController {
         return ResponseEntity.ok(Map.of(
                 "message", "All trailer caches cleared successfully"
         ));
+    }
+
+    @GetMapping("/movie/{tmdbId}/cast")
+    public ResponseEntity<?> getMovieCast(@PathVariable Long tmdbId) {
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+        }
+        var cast = tmdbService.getMovieCast(tmdbId);
+        return ResponseEntity.ok(Map.of("cast", cast));
+    }
+
+    @GetMapping("/tv/{tmdbId}/cast")
+    public ResponseEntity<?> getTvShowCast(@PathVariable Long tmdbId) {
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+        }
+        var cast = tmdbService.getTvShowCast(tmdbId);
+        return ResponseEntity.ok(Map.of("cast", cast));
+    }
+
+    @GetMapping("/movie/{tmdbId}/similar")
+    public ResponseEntity<?> getSimilarMovies(
+            @PathVariable Long tmdbId,
+            @RequestParam(defaultValue = "1") int page) {
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+        }
+        var results = tmdbService.getSimilarMovies(tmdbId, page);
+        return ResponseEntity.ok(Map.of("results", results));
+    }
+
+    @GetMapping("/tv/{tmdbId}/similar")
+    public ResponseEntity<?> getSimilarTvShows(
+            @PathVariable Long tmdbId,
+            @RequestParam(defaultValue = "1") int page) {
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+        }
+        var results = tmdbService.getSimilarTvShows(tmdbId, page);
+        return ResponseEntity.ok(Map.of("results", results));
+    }
+
+    @GetMapping("/movie/{tmdbId}/recommended")
+    public ResponseEntity<?> getRecommendedMovies(
+            @PathVariable Long tmdbId,
+            @RequestParam(defaultValue = "1") int page) {
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+        }
+        var results = tmdbService.getRecommendedMovies(tmdbId, page);
+        return ResponseEntity.ok(Map.of("results", results));
+    }
+
+    @GetMapping("/tv/{tmdbId}/recommended")
+    public ResponseEntity<?> getRecommendedTvShows(
+            @PathVariable Long tmdbId,
+            @RequestParam(defaultValue = "1") int page) {
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+        }
+        var results = tmdbService.getRecommendedTvShows(tmdbId, page);
+        return ResponseEntity.ok(Map.of("results", results));
+    }
+
+    @GetMapping("/genres/movies")
+    public ResponseEntity<?> getMovieGenres() {
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+        }
+        var genres = tmdbService.getMovieGenres();
+        return ResponseEntity.ok(Map.of("genres", genres));
+    }
+
+    @GetMapping("/genres/tv")
+    public ResponseEntity<?> getTvGenres() {
+        if (!tmdbService.isConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+        }
+        var genres = tmdbService.getTvGenres();
+        return ResponseEntity.ok(Map.of("genres", genres));
     }
 }

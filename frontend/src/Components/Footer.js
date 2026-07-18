@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../Utils/useScrollReveal';
 
 const socials = [
-  { icon: Facebook, label: "Facebook", color: "hover:bg-[#1877f2]/20 hover:text-[#1877f2] hover:border-[#1877f2]/30" },
-  { icon: Twitter, label: "Twitter", color: "hover:bg-[#1da1f2]/20 hover:text-[#1da1f2] hover:border-[#1da1f2]/30" },
-  { icon: Instagram, label: "Instagram", color: "hover:bg-[#e4405f]/20 hover:text-[#e4405f] hover:border-[#e4405f]/30" },
-  { icon: WhatsApp, label: "WhatsApp", color: "hover:bg-[#25d366]/20 hover:text-[#25d366] hover:border-[#25d366]/30" },
+  { icon: Facebook, label: "Facebook", url: "https://facebook.com/cnio", color: "hover:bg-[#1877f2]/20 hover:text-[#1877f2] hover:border-[#1877f2]/30" },
+  { icon: Twitter, label: "Twitter", url: "https://x.com/cnio", color: "hover:bg-[#1da1f2]/20 hover:text-[#1da1f2] hover:border-[#1da1f2]/30" },
+  { icon: Instagram, label: "Instagram", url: "https://instagram.com/cnio", color: "hover:bg-[#e4405f]/20 hover:text-[#e4405f] hover:border-[#e4405f]/30" },
+  { icon: WhatsApp, label: "WhatsApp", url: "https://wa.me/918072205480", color: "hover:bg-[#25d366]/20 hover:text-[#25d366] hover:border-[#25d366]/30" },
 ];
 
 const links = [
@@ -75,10 +75,11 @@ const Footer = () => {
             <span className="text-2xl font-extrabold text-gradient">CN.io</span>
             <p className="text-[#5a6380] text-sm leading-relaxed max-w-[360px] m-0">Your ultimate destination for movies and TV shows. 4K streaming, offline downloads, and personalized recommendations.</p>
             <div className="flex gap-2 max-md:justify-center">
-              {socials.map(({ icon: Icon, label, color }) => (
-                <button key={label} type="button" aria-label={label} className={`w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-[#5a6380] flex items-center justify-center transition-all duration-300 ${color}`}>
+              {socials.map(({ icon: Icon, label, url, color }) => (
+                <a key={label} href={url} target="_blank" rel="noopener noreferrer" aria-label={label}
+                  className={`w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-[#5a6380] flex items-center justify-center transition-all duration-300 no-underline ${color}`}>
                   <Icon sx={{ fontSize: 18 }} />
-                </button>
+                </a>
               ))}
             </div>
           </div>

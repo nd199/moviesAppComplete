@@ -92,7 +92,7 @@ const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType, genr
               posterPath={poster}
               size="small"
               showLabel={false}
-              className="!w-7 !h-7 !min-w-[28px] !p-0 !rounded-lg !bg-surface-950/70 backdrop-blur-sm !border-white/15 hover:!bg-brand-500 hover:!border-brand-500"
+              className="!w-9 !h-9 !min-w-[36px] !p-0 !rounded-lg !bg-surface-950/70 backdrop-blur-sm !border-white/15 hover:!bg-brand-500 hover:!border-brand-500"
             />
           </div>
         )}

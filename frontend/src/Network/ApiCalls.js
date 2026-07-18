@@ -435,6 +435,62 @@ export const searchTmdbShows = async (dispatch, query, page = 1) => {
   }
 };
 
+export const fetchMovieCast = async (tmdbId) => {
+  try {
+    const res = await publicRequest().get(`/tmdb/movie/${tmdbId}/cast`);
+    return res.data?.cast || [];
+  } catch { return []; }
+};
+
+export const fetchTvShowCast = async (tmdbId) => {
+  try {
+    const res = await publicRequest().get(`/tmdb/tv/${tmdbId}/cast`);
+    return res.data?.cast || [];
+  } catch { return []; }
+};
+
+export const fetchSimilarMovies = async (tmdbId) => {
+  try {
+    const res = await publicRequest().get(`/tmdb/movie/${tmdbId}/similar`);
+    return res.data?.results || [];
+  } catch { return []; }
+};
+
+export const fetchSimilarTvShows = async (tmdbId) => {
+  try {
+    const res = await publicRequest().get(`/tmdb/tv/${tmdbId}/similar`);
+    return res.data?.results || [];
+  } catch { return []; }
+};
+
+export const fetchRecommendedMovies = async (tmdbId) => {
+  try {
+    const res = await publicRequest().get(`/tmdb/movie/${tmdbId}/recommended`);
+    return res.data?.results || [];
+  } catch { return []; }
+};
+
+export const fetchRecommendedTvShows = async (tmdbId) => {
+  try {
+    const res = await publicRequest().get(`/tmdb/tv/${tmdbId}/recommended`);
+    return res.data?.results || [];
+  } catch { return []; }
+};
+
+export const fetchMovieGenres = async () => {
+  try {
+    const res = await publicRequest().get('/tmdb/genres/movies');
+    return res.data?.genres || [];
+  } catch { return []; }
+};
+
+export const fetchTvGenres = async () => {
+  try {
+    const res = await publicRequest().get('/tmdb/genres/tv');
+    return res.data?.genres || [];
+  } catch { return []; }
+};
+
 // Sync TMDB content (requires auth)
 export const syncTmdbMovie = async (tmdbId) => {
   try {

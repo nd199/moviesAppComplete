@@ -1,5 +1,7 @@
   package com.naren.moviesapp.Service;
 
+import com.naren.moviesapp.Dto.TmdbCastMemberDto;
+import com.naren.moviesapp.Dto.TmdbConvertedDto;
 import com.naren.moviesapp.Dto.TmdbMovieDto;
 import com.naren.moviesapp.Dto.TmdbSearchResponse;
 import com.naren.moviesapp.Dto.TmdbTvShowDto;
@@ -460,6 +462,64 @@ public class TmdbService {
         }
     }
 
+    public String getMovieCertification(Long tmdbId) {
+        if (apiKey == null || apiKey.isBlank()) return null;
+        try {
+            Map<String, Object> response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("/movie/" + tmdbId + "/release_dates").queryParam("api_key", apiKey).build())
+                    .retrieve().bodyToMono(Map.class).block();
+            if (response == null || response.get("results") == null) return null;
+            List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
+            for (Map<String, Object> country : results) {
+                if ("US".equals(country.get("iso_3166_1"))) {
+                    List<Map<String, Object>> releaseDates = (List<Map<String, Object>>) country.get("release_dates");
+                    if (releaseDates != null) {
+                        for (Map<String, Object> rd : releaseDates) {
+                            String cert = (String) rd.get("certification");
+                            if (cert != null && !cert.isBlank()) return cert;
+                        }
+                    }
+                }
+            }
+            for (Map<String, Object> country : results) {
+                List<Map<String, Object>> releaseDates = (List<Map<String, Object>>) country.get("release_dates");
+                if (releaseDates != null) {
+                    for (Map<String, Object> rd : releaseDates) {
+                        String cert = (String) rd.get("certification");
+                        if (cert != null && !cert.isBlank()) return cert;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.debug("Failed to fetch certification for movie {}: {}", tmdbId, e.getMessage());
+        }
+        return null;
+    }
+
+    public String getTvShowCertification(Long tmdbId) {
+        if (apiKey == null || apiKey.isBlank()) return null;
+        try {
+            Map<String, Object> response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("/tv/" + tmdbId + "/content_ratings").queryParam("api_key", apiKey).build())
+                    .retrieve().bodyToMono(Map.class).block();
+            if (response == null || response.get("results") == null) return null;
+            List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
+            for (Map<String, Object> country : results) {
+                if ("US".equals(country.get("iso_3166_1"))) {
+                    String rating = (String) country.get("rating");
+                    if (rating != null && !rating.isBlank()) return rating;
+                }
+            }
+            for (Map<String, Object> country : results) {
+                String rating = (String) country.get("rating");
+                if (rating != null && !rating.isBlank()) return rating;
+            }
+        } catch (Exception e) {
+            logger.debug("Failed to fetch certification for TV show {}: {}", tmdbId, e.getMessage());
+        }
+        return null;
+    }
+
     public String getFullPosterPath(String posterPath) {
         if (posterPath == null || posterPath.isBlank()) {
             return "";
@@ -625,5 +685,155 @@ public class TmdbService {
                 .publishedAt((String) map.get("published_at"))
                 .size((Integer) map.get("size"))
                 .build();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<TmdbCastMemberDto> getMovieCast(Long tmdbId) {
+        if (apiKey == null || apiKey.isBlank()) return List.of();
+        try {
+            Map<String, Object> response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("/movie/" + tmdbId + "/credits").queryParam("api_key", apiKey).build())
+                    .retrieve().bodyToMono(Map.class).block();
+            if (response == null || response.get("cast") == null) return List.of();
+            List<Map<String, Object>> cast = (List<Map<String, Object>>) response.get("cast");
+            return cast.stream().limit(20).map(m -> TmdbCastMemberDto.builder()
+                    .id(getLong(m.get("id")))
+                    .name((String) m.get("name"))
+                    .character((String) m.get("character"))
+                    .profilePath((String) m.get("profile_path"))
+                    .order(getInteger(m.get("order")))
+                    .build()).toList();
+        } catch (Exception e) {
+            logger.debug("Failed to fetch cast for movie {}: {}", tmdbId, e.getMessage());
+            return List.of();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<TmdbCastMemberDto> getTvShowCast(Long tmdbId) {
+        if (apiKey == null || apiKey.isBlank()) return List.of();
+        try {
+            Map<String, Object> response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("/tv/" + tmdbId + "/credits").queryParam("api_key", apiKey).build())
+                    .retrieve().bodyToMono(Map.class).block();
+            if (response == null || response.get("cast") == null) return List.of();
+            List<Map<String, Object>> cast = (List<Map<String, Object>>) response.get("cast");
+            return cast.stream().limit(20).map(m -> TmdbCastMemberDto.builder()
+                    .id(getLong(m.get("id")))
+                    .name((String) m.get("name"))
+                    .character((String) m.get("character"))
+                    .profilePath((String) m.get("profile_path"))
+                    .order(getInteger(m.get("order")))
+                    .build()).toList();
+        } catch (Exception e) {
+            logger.debug("Failed to fetch cast for TV show {}: {}", tmdbId, e.getMessage());
+            return List.of();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<TmdbConvertedDto> getSimilarMovies(Long tmdbId, int page) {
+        if (apiKey == null || apiKey.isBlank()) return List.of();
+        try {
+            Map<String, Object> response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("/movie/" + tmdbId + "/similar").queryParam("page", page).queryParam("api_key", apiKey).build())
+                    .retrieve().bodyToMono(Map.class).block();
+            if (response == null || response.get("results") == null) return List.of();
+            List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
+            return results.stream().limit(10).map(m -> {
+                TmdbMovieDto movie = convertToMovieDto(m);
+                return TmdbConvertedDto.fromMovie(movie, this);
+            }).filter(java.util.Objects::nonNull).toList();
+        } catch (Exception e) {
+            logger.debug("Failed to fetch similar movies for {}: {}", tmdbId, e.getMessage());
+            return List.of();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<TmdbConvertedDto> getSimilarTvShows(Long tmdbId, int page) {
+        if (apiKey == null || apiKey.isBlank()) return List.of();
+        try {
+            Map<String, Object> response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("/tv/" + tmdbId + "/similar").queryParam("page", page).queryParam("api_key", apiKey).build())
+                    .retrieve().bodyToMono(Map.class).block();
+            if (response == null || response.get("results") == null) return List.of();
+            List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
+            return results.stream().limit(10).map(m -> {
+                TmdbTvShowDto show = convertToTvShowDto(m);
+                return TmdbConvertedDto.fromTvShow(show, this);
+            }).filter(java.util.Objects::nonNull).toList();
+        } catch (Exception e) {
+            logger.debug("Failed to fetch similar TV shows for {}: {}", tmdbId, e.getMessage());
+            return List.of();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<TmdbConvertedDto> getRecommendedMovies(Long tmdbId, int page) {
+        if (apiKey == null || apiKey.isBlank()) return List.of();
+        try {
+            Map<String, Object> response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("/movie/" + tmdbId + "/recommendations").queryParam("page", page).queryParam("api_key", apiKey).build())
+                    .retrieve().bodyToMono(Map.class).block();
+            if (response == null || response.get("results") == null) return List.of();
+            List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
+            return results.stream().limit(10).map(m -> {
+                TmdbMovieDto movie = convertToMovieDto(m);
+                return TmdbConvertedDto.fromMovie(movie, this);
+            }).filter(java.util.Objects::nonNull).toList();
+        } catch (Exception e) {
+            logger.debug("Failed to fetch recommended movies for {}: {}", tmdbId, e.getMessage());
+            return List.of();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<TmdbConvertedDto> getRecommendedTvShows(Long tmdbId, int page) {
+        if (apiKey == null || apiKey.isBlank()) return List.of();
+        try {
+            Map<String, Object> response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("/tv/" + tmdbId + "/recommendations").queryParam("page", page).queryParam("api_key", apiKey).build())
+                    .retrieve().bodyToMono(Map.class).block();
+            if (response == null || response.get("results") == null) return List.of();
+            List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
+            return results.stream().limit(10).map(m -> {
+                TmdbTvShowDto show = convertToTvShowDto(m);
+                return TmdbConvertedDto.fromTvShow(show, this);
+            }).filter(java.util.Objects::nonNull).toList();
+        } catch (Exception e) {
+            logger.debug("Failed to fetch recommended TV shows for {}: {}", tmdbId, e.getMessage());
+            return List.of();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> getMovieGenres() {
+        if (apiKey == null || apiKey.isBlank()) return List.of();
+        try {
+            Map<String, Object> response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("/genre/movie/list").queryParam("api_key", apiKey).build())
+                    .retrieve().bodyToMono(Map.class).block();
+            if (response == null || response.get("genres") == null) return List.of();
+            return (List<Map<String, Object>>) response.get("genres");
+        } catch (Exception e) {
+            logger.debug("Failed to fetch movie genres: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> getTvGenres() {
+        if (apiKey == null || apiKey.isBlank()) return List.of();
+        try {
+            Map<String, Object> response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("/genre/tv/list").queryParam("api_key", apiKey).build())
+                    .retrieve().bodyToMono(Map.class).block();
+            if (response == null || response.get("genres") == null) return List.of();
+            return (List<Map<String, Object>>) response.get("genres");
+        } catch (Exception e) {
+            logger.debug("Failed to fetch TV genres: {}", e.getMessage());
+            return List.of();
+        }
     }
 }

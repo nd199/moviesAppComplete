@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import Lottie from 'react-lottie';
-import { CheckOption } from './AnimationData';
+import { Refresh, WifiOff } from '@mui/icons-material';
 
 const Fallback = ({ retryCount = 0, onRetry }) => {
   const maxRetries = 5;
@@ -10,8 +9,10 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
   const [autoRetryEnabled, setAutoRetryEnabled] = useState(true);
 
   const statusMessages = useMemo(() => [
-    'Initializing container...', 'Booting Spring context...',
-    'Establishing database connection...', 'Finalizing startup sequence...'
+    'Initializing container...',
+    'Booting Spring context...',
+    'Establishing database connection...',
+    'Finalizing startup...'
   ], []);
 
   useEffect(() => {
@@ -35,40 +36,64 @@ const Fallback = ({ retryCount = 0, onRetry }) => {
   }, [autoRetryEnabled, canRetry, retryCount, onRetry]);
 
   return (
-    <div className="min-h-screen bg-surface-950 flex items-center justify-center p-6">
-      <div className="max-w-[500px] w-full text-center">
-        <div className="w-48 h-48 mx-auto mb-6"><Lottie options={CheckOption} /></div>
-        <h1 className="text-2xl font-bold text-white mb-4 m-0">Warming Up Backend Service</h1>
-        <p className="text-[#8892b0] mb-2 m-0">The backend service is starting up on free-tier infrastructure.</p>
-        <p className="text-brand-500 font-medium mb-2 m-0">{statusMessages[statusIndex]}</p>
-        <p className="text-[#5a6380] text-sm mb-4 m-0">Estimated time: 3 min 0 sec</p>
+    <div className="min-h-screen bg-surface-950 flex items-center justify-center p-6 relative">
+      <div className="absolute top-[20%] right-[10%] w-[300px] h-[300px] bg-brand-500/5 blur-[120px] pointer-events-none" />
 
-        {canRetry && autoRetryEnabled && <p className="text-amber-400 text-sm mb-2 m-0">Auto-retry in: {timeRemaining}s</p>}
-        {retryCount > 0 && <p className="text-[#5a6380] text-sm mb-4 m-0">Retry attempt {retryCount} of {maxRetries}</p>}
+      <div className="max-w-[440px] w-full text-center relative z-10">
+        <div className="w-16 h-16 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mx-auto mb-6">
+          <WifiOff sx={{ fontSize: 28, color: '#7c3aed' }} />
+        </div>
 
-        {canRetry ? (
-          <div className="flex flex-col items-center gap-4">
-            <button onClick={() => { const d = Math.min(1000 * Math.pow(2, retryCount), 15000); setTimeout(() => onRetry ? onRetry() : window.location.reload(), d); }} className="btn-primary">Retry Now</button>
-            <label className="flex items-center gap-2 text-sm text-[#8892b0]">
-              <input type="checkbox" checked={autoRetryEnabled} onChange={(e) => setAutoRetryEnabled(e.target.checked)} className="accent-brand-500" />
-              Auto-retry every 30 seconds
-            </label>
-            {autoRetryEnabled && <p className="text-[#5a6380] text-sm m-0">Attempting to reconnect automatically in {timeRemaining}s...</p>}
+        <h1 className="text-2xl font-bold text-white m-0 mb-2">Service Warming Up</h1>
+        <p className="text-[#5a6380] text-sm m-0 mb-6">
+          The backend is starting on free-tier infrastructure. This takes 2-3 minutes on first access.
+        </p>
+
+        <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 mb-6">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span className="text-amber-400 text-sm font-medium">{statusMessages[statusIndex]}</span>
           </div>
-        ) : (
-          <div className="flex flex-col items-center gap-4">
-            <p className="text-[#8892b0] m-0">The service is still initializing. Please wait a moment and try again.</p>
-            <button onClick={() => window.location.reload()} className="btn-primary">Try Again Later</button>
+          <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-brand-500 to-accent-500 rounded-full transition-all duration-1000"
+              style={{ width: `${((30 - timeRemaining) / 30) * 100}%` }} />
           </div>
+          <p className="text-[#3b4560] text-xs m-0 mt-2">Auto-retry in {timeRemaining}s</p>
+        </div>
+
+        {retryCount > 0 && (
+          <p className="text-[#3b4560] text-xs m-0 mb-4">Attempt {retryCount} of {maxRetries}</p>
         )}
 
-        <div className="mt-8 text-left glass rounded-2xl p-5">
-          <h3 className="text-sm font-semibold text-white mb-2 m-0">While the service initializes, you can:</h3>
-          <ul className="text-sm text-[#8892b0] list-disc pl-5 flex flex-col gap-1 m-0">
-            <li>Check your internet connection</li>
-            <li>Try refreshing the page</li>
-            <li>Contact support if the issue persists</li>
-          </ul>
+        <div className="flex flex-col gap-3">
+          {canRetry ? (
+            <>
+              <button
+                onClick={() => {
+                  const d = Math.min(1000 * Math.pow(2, retryCount), 15000);
+                  setTimeout(() => onRetry ? onRetry() : window.location.reload(), d);
+                }}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-500 to-accent-500 text-white text-sm font-semibold border-none cursor-pointer hover:shadow-lg hover:shadow-brand-500/25 transition-all flex items-center justify-center gap-2"
+              >
+                <Refresh sx={{ fontSize: 16 }} /> Retry Now
+              </button>
+              <label className="flex items-center justify-center gap-2 text-sm text-[#5a6380] cursor-pointer">
+                <input type="checkbox" checked={autoRetryEnabled} onChange={(e) => setAutoRetryEnabled(e.target.checked)}
+                  className="accent-brand-500 w-4 h-4" />
+                Auto-retry every 30s
+              </label>
+            </>
+          ) : (
+            <>
+              <p className="text-[#5a6380] text-sm m-0 mb-2">Service is still initializing. Please wait and try again.</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-500 to-accent-500 text-white text-sm font-semibold border-none cursor-pointer hover:shadow-lg hover:shadow-brand-500/25 transition-all"
+              >
+                Try Again
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -109,6 +109,13 @@ public class TmdbConvertedDto {
             // Ignore trailer fetch errors
         }
 
+        String certification = null;
+        try {
+            certification = tmdbService.getMovieCertification(movie.getTmdbId());
+        } catch (Exception e) {
+            // ignore
+        }
+
         return TmdbConvertedDto.builder()
                 .tmdbId(movie.getTmdbId())
                 .title(movie.getTitle())
@@ -118,7 +125,7 @@ public class TmdbConvertedDto {
                 .description(movie.getOverview())
                 .poster(tmdbService.getFullPosterPath(movie.getPosterPath()))
                 .backdrop(tmdbService.getFullBackdropPath(movie.getBackdropPath()))
-                .ageRating(movie.getAdult() != null && movie.getAdult() ? "R" : "PG-13")
+                .ageRating(certification != null ? certification : (movie.getAdult() != null && movie.getAdult() ? "R" : null))
                 .year(year)
                 .runtime(runtimeStr)
                 .genre(genreStr)
@@ -189,6 +196,13 @@ public class TmdbConvertedDto {
             // Ignore trailer fetch errors
         }
 
+        String certification = null;
+        try {
+            certification = tmdbService.getTvShowCertification(tvShow.getTmdbId());
+        } catch (Exception e) {
+            // ignore
+        }
+
         return TmdbConvertedDto.builder()
                 .tmdbId(tvShow.getTmdbId())
                 .name(tvShow.getName())
@@ -198,7 +212,7 @@ public class TmdbConvertedDto {
                 .description(tvShow.getOverview())
                 .poster(tmdbService.getFullPosterPath(tvShow.getPosterPath()))
                 .backdrop(tmdbService.getFullBackdropPath(tvShow.getBackdropPath()))
-                .ageRating("TV-14")
+                .ageRating(certification)
                 .year(year)
                 .runtime(runtimeStr)
                 .genre(genreStr)

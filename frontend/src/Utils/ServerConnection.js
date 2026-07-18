@@ -1,16 +1,26 @@
-import Lottie from 'react-lottie';
-import { ServerConnectingOptions } from './AnimationData';
-
 const ServerConnection = () => (
-  <div className="min-h-screen bg-surface-950 flex items-center justify-center p-6">
-    <div className="text-center max-w-md">
-      <div className="w-64 h-64 mx-auto mb-6"><Lottie options={ServerConnectingOptions} /></div>
-      <div className="text-xl font-bold text-white mb-3">Warming Up Backend Service</div>
-      <div className="text-[#8892b0] text-sm mb-4">Initializing... Estimated time: ~2 min 50 sec</div>
-      <div className="glass rounded-2xl p-5">
-        <p className="text-[#8892b0] mb-2 m-0">The backend service is starting up on free-tier infrastructure.</p>
-        <p className="text-[#5a6380] text-sm mb-2 m-0">This may take up to 2 min 50 sec to spin up</p>
-        <p className="text-[#8892b0] text-sm m-0"><strong>Note:</strong> Initial warm-up typically takes 2-3 minutes on first access.</p>
+  <div className="min-h-screen bg-surface-950 flex items-center justify-center p-6 relative">
+    <div className="absolute top-[20%] left-[15%] w-[350px] h-[350px] bg-brand-500/5 blur-[140px] pointer-events-none" />
+
+    <div className="text-center max-w-md relative z-10">
+      <div className="relative w-20 h-20 mx-auto mb-8">
+        <div className="absolute inset-0 rounded-full border-2 border-brand-500/20" />
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-brand-500 animate-spin" />
+        <div className="absolute inset-2 rounded-full border-2 border-transparent border-t-accent-500 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-3 h-3 rounded-full bg-brand-500 animate-pulse" />
+        </div>
+      </div>
+
+      <h1 className="text-xl font-bold text-white m-0 mb-2">Connecting to Server</h1>
+      <p className="text-[#5a6380] text-sm m-0 mb-6">Setting up a secure connection...</p>
+
+      <div className="flex items-center justify-center gap-2 text-[#3b4560] text-xs">
+        <div className="flex gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-brand-500/40 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-brand-500/40 animate-pulse" style={{ animationDelay: '0.2s' }} />
+          <span className="w-1.5 h-1.5 rounded-full bg-brand-500/40 animate-pulse" style={{ animationDelay: '0.4s' }} />
+        </div>
       </div>
     </div>
   </div>

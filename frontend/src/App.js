@@ -16,6 +16,7 @@ import Home from "./Pages/User/Home";
 import LoginForm from "./Pages/User/LoginForm";
 import RegistrationForm from "./Pages/User/RegistrationForm";
 import ForgotPassword from "./Pages/User/ForgotPassword";
+import NotFound from "./Pages/User/NotFound";
 import Subscription from "./Pages/User/Subscription";
 import EmailVerification from "./Pages/User/EmailVerification";
 import VideoFullScreen from "./Pages/User/VideoFullScreen";
@@ -329,7 +330,7 @@ function Layout({ sidebarOpen, setSidebarOpen }) {
         <Route path="/registerAdmin" element={<Navigate to="/" replace />} />
 
         {/* Catch all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
