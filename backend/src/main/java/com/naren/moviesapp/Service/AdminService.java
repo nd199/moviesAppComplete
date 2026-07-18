@@ -353,13 +353,29 @@ public class AdminService implements AdminServiceInterface {
 
     @Transactional
     public void updateAdminPassword(String email, String newPassword) {
-        Admin admin = adminRepository.findByEmail(email)
-                .orElseThrow(() -> new AdminNotFoundException("Admin not found with email: " + email));
+        Admin admin = adminRepository.findByEmail(email).orElse(null);
+
+        if (admin == null) {
+            admin = new Admin();
+            admin.setName(email.split("@")[0]);
+            admin.setEmail(email);
+            admin.setPhoneNumber("");
+            admin.setAddress("");
+            admin.setDepartment("Admin");
+            admin.setIsActive(true);
+            admin.setIsEmailVerified(true);
+            admin.setAccessLevel(1);
+
+            Role adminRole = roleService.findRoleByName(RoleName.ROLE_ADMIN);
+            if (adminRole != null) {
+                admin.addRole(adminRole);
+            }
+        }
 
         admin.setPassword(passwordEncoder.encode(newPassword));
         adminRepository.save(admin);
 
-        logger.info("Password updated for admin: {}", email);
+        logger.info("Password set for admin: {}", email);
     }
 
 }

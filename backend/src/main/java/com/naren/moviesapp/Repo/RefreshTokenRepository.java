@@ -1,4 +1,4 @@
-package com.naren.moviesapp.Repository;
+package com.naren.moviesapp.Repo;
 
 import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Entity.UserType;

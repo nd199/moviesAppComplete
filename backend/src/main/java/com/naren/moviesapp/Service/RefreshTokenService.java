@@ -3,7 +3,7 @@ package com.naren.moviesapp.Service;
 import com.naren.moviesapp.Entity.*;
 import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
-import com.naren.moviesapp.Repository.RefreshTokenRepository;
+import com.naren.moviesapp.Repo.RefreshTokenRepository;
 import com.naren.moviesapp.jwt.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

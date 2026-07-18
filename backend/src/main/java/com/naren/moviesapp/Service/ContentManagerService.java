@@ -401,11 +401,29 @@ public class ContentManagerService implements ContentManagerServiceInterface {
     }
 
     public void updateContentManagerPassword(String email, String newPassword) {
-        logger.info("Updating password for content manager: {}", email);
-        ContentManager contentManager = getContentManagerByEmail(email);
+        logger.info("Setting password for content manager: {}", email);
+        ContentManager contentManager = contentManagerRepository.findByEmail(email).orElse(null);
+
+        if (contentManager == null) {
+            contentManager = new ContentManager();
+            contentManager.setName(email.split("@")[0]);
+            contentManager.setEmail(email);
+            contentManager.setPhoneNumber("");
+            contentManager.setDepartment("Content");
+            contentManager.setSpecialization("both");
+            contentManager.setIsActive(true);
+            contentManager.setIsEmailVerified(true);
+            contentManager.setAccessLevel(1);
+
+            Role cmRole = roleService.findRoleByName(RoleName.ROLE_CONTENT_MANAGER);
+            if (cmRole != null) {
+                contentManager.addRole(cmRole);
+            }
+        }
+
         contentManager.setPassword(passwordEncoder.encode(newPassword));
         contentManagerRepository.save(contentManager);
-        logger.info("Password updated successfully for content manager: {}", email);
+        logger.info("Password set for content manager: {}", email);
     }
 
     private String generateDeviceFingerprint(jakarta.servlet.http.HttpServletRequest request) {

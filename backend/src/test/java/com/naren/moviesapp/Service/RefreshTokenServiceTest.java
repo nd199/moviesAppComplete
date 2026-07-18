@@ -5,7 +5,7 @@ import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Entity.UserType;
 import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
-import com.naren.moviesapp.Repository.RefreshTokenRepository;
+import com.naren.moviesapp.Repo.RefreshTokenRepository;
 import com.naren.moviesapp.TestData.TestDataFactory;
 import com.naren.moviesapp.jwt.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
