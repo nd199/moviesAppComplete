@@ -1,4 +1,4 @@
-import { ArrowBack, CameraAlt, Lock, Mail, Phone, LocationOn, Person, Edit, Shield, CreditCard, CalendarToday, Visibility, VisibilityOff } from '@mui/icons-material';
+import { ArrowBack, CameraAlt, Lock, Mail, Phone, LocationOn, Person, Shield, CreditCard, CalendarToday, Visibility, VisibilityOff } from '@mui/icons-material';
 import LinearProgress from '@mui/material/LinearProgress';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

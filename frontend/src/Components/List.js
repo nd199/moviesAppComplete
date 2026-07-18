@@ -69,7 +69,7 @@ const List = ({ title, type = 'local', index = 0 }) => {
   const theme = sectionThemes[index % 4];
 
   return (
-    <section ref={sectionRef} className={`reveal w-full py-10 px-[3.5vw] ${theme.bg}`}>
+    <section ref={sectionRef} className={`reveal w-full py-20 px-[3.5vw] ${theme.bg}`}>
       <div className="flex items-end justify-between gap-4 mb-6 px-1">
         <div>
           <h2 className="text-2xl font-extrabold text-white m-0 tracking-tight">{title}</h2>
@@ -82,16 +82,20 @@ const List = ({ title, type = 'local', index = 0 }) => {
         )}
       </div>
 
-      <Swiper key={items.length + type} modules={[Navigation, Pagination]} spaceBetween={10} slidesPerView="auto" navigation pagination={{ clickable: true }} className="pb-8">
-        {items.map((item, idx) => {
-          const f = type.startsWith('tmdb') ? format(item) : item;
-          return (
-            <SwiperSlide key={item.id || item.tmdbId || idx} style={{ width: 'auto' }}>
-              <ListItem id={f.id} tmdbId={f.tmdbId} name={f.name} desc={f.desc} year={f.year} ageRating={f.ageRating} rating={f.rating} runtime={f.runtime} genre={f.genre} poster={f.poster} trailer={f.trailer} mediaType={f.mediaType} />
-            </SwiperSlide>
-          );
-        })}
-      </Swiper>
+      <div style={{ paddingBottom: '40px', position: 'relative' }}>
+        <Swiper key={items.length + type} modules={[Navigation, Pagination]} spaceBetween={10} slidesPerView="auto" navigation pagination={{ clickable: true }}>
+          {items.map((item, idx) => {
+            const f = type.startsWith('tmdb') ? format(item) : item;
+            return (
+              <SwiperSlide key={item.id || item.tmdbId || idx} style={{ width: 'auto' }}>
+                <ListItem id={f.id} tmdbId={f.tmdbId} name={f.name} desc={f.desc}
+                          year={f.year} ageRating={f.ageRating} rating={f.rating} runtime={f.runtime}
+                          genre={f.genre} poster={f.poster} trailer={f.trailer} mediaType={f.mediaType} />
+              </SwiperSlide>
+            );
+          })}
+        </Swiper>
+      </div>
 
       <style>{`
         .swiper-pagination{bottom:0!important}
