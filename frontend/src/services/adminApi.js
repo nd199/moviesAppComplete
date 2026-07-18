@@ -90,6 +90,11 @@ export const createAdmin = async (adminData, roles) => {
   return response.data;
 };
 
+export const inviteAdmin = async (inviteData) => {
+  const response = await api.post('/system/superadmin/invite', inviteData);
+  return response.data;
+};
+
 export const updateAdmin = async (adminId, adminData) => {
   const response = await api.put(`/admins/${adminId}`, adminData);
   return response.data;
