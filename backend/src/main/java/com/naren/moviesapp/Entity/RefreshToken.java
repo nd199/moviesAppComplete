@@ -32,7 +32,7 @@ public class RefreshToken {
 
     @Column(name = "device_fingerprint", nullable = false)
     private String deviceFingerprint;
-`
+
     public RefreshToken() {
         this.id = UUID.randomUUID().toString();
     }
