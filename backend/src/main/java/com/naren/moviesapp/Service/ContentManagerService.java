@@ -408,7 +408,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
             contentManager = new ContentManager();
             contentManager.setName(email.split("@")[0]);
             contentManager.setEmail(email);
-            contentManager.setPhoneNumber("");
+            contentManager.setPhoneNumber(null);
             contentManager.setDepartment("Content");
             contentManager.setSpecialization("both");
             contentManager.setIsActive(true);

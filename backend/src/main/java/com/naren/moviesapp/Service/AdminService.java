@@ -359,7 +359,7 @@ public class AdminService implements AdminServiceInterface {
             admin = new Admin();
             admin.setName(email.split("@")[0]);
             admin.setEmail(email);
-            admin.setPhoneNumber("");
+            admin.setPhoneNumber(null);
             admin.setAddress("");
             admin.setDepartment("Admin");
             admin.setIsActive(true);
