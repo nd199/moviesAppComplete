@@ -7,6 +7,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+    show-sql: true
     properties:
       hibernate:
         format_sql: false
@@ -52,10 +53,10 @@ app:
 logging:
   level:
     root: WARN
-    com.naren.moviesapp: INFO
+    com.naren.moviesapp: DEBUG
     org.springframework.security: WARN
     org.springframework.mail: DEBUG
     jakarta.mail: DEBUG
-    org.springframework.web: WARN
-    org.hibernate.SQL: WARN
-    org.hibernate.type.descriptor.sql: WARN
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
