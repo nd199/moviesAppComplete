@@ -93,11 +93,11 @@ jobs:
 
             echo
             echo "===== STOP OLD CONTAINER ====="
-            docker compose down
+            docker-compose down
 
             echo
             echo "===== START NEW CONTAINER ====="
-            docker compose up -d --force-recreate --remove-orphans
+            docker-compose up -d --force-recreate --remove-orphans
 
             echo
             echo "===== VERIFY CONTAINER ====="
