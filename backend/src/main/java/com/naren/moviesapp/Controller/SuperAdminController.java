@@ -50,10 +50,8 @@ public class SuperAdminController {
                 return ResponseEntity.badRequest().body(Map.of("message", "Name and valid email are required"));
             }
 
-            // Create inactive admin stub via service
             AdminInviteDTO admin = adminService.createAdmin(name, email, phoneNumber, address, department);
 
-            // Generate invite token
             String setupToken = inviteService.generateInviteToken(email, RoleName.ROLE_ADMIN);
 
             String baseUrl = activeProfile.equals("prod") ? "https://movies-app-complete.vercel.app" : "http://localhost:3000";
@@ -75,8 +73,6 @@ public class SuperAdminController {
         if (email == null || email.trim().isEmpty()) {
             return false;
         }
-
-        // Basic email regex pattern
         String emailRegex = "^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$";
         return email.matches(emailRegex);
     }

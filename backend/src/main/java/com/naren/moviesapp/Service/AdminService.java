@@ -15,10 +15,8 @@ import com.naren.moviesapp.Exception.PasswordInvalidException;
 import com.naren.moviesapp.Record.AdminRegistration;
 import com.naren.moviesapp.Record.AdminUpdateRequest;
 import com.naren.moviesapp.Repo.AdminRepository;
-import com.naren.moviesapp.jwt.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class AdminService implements AdminServiceInterface {
@@ -41,20 +38,15 @@ public class AdminService implements AdminServiceInterface {
     private final AdminDTOMapper adminDTOMapper;
     private final AdminInviteDTOMapper adminInviteDTOMapper;
     private final RoleService roleService;
-    private final JwtUtil jwtUtil;
-    private final RedisTemplate<String, String> redisTemplate;
 
     public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEncoder,
                         AdminDTOMapper adminDTOMapper, AdminInviteDTOMapper adminInviteDTOMapper,
-                        RoleService roleService, JwtUtil jwtUtil,
-                        RedisTemplate<String, String> redisTemplate) {
+                        RoleService roleService) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.adminDTOMapper = adminDTOMapper;
         this.adminInviteDTOMapper = adminInviteDTOMapper;
         this.roleService = roleService;
-        this.jwtUtil = jwtUtil;
-        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -91,7 +83,6 @@ public class AdminService implements AdminServiceInterface {
 
         Set<Role> roles = new HashSet<>();
         for (String roleName : roleNames) {
-            // Clean normalization - handle both ROLE_ and non-ROLE_ formats
             String normalizedRole = roleName.toUpperCase().startsWith("ROLE_")
                     ? roleName.toUpperCase()
                     : "ROLE_" + roleName.toUpperCase();
@@ -305,14 +296,10 @@ public class AdminService implements AdminServiceInterface {
         return auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(r -> {
-                    // Only process actual roles, not permissions
-                    // Roles are like ROLE_ADMIN, ROLE_SUPER_ADMIN
-                    // Permissions are like ROLE_MOVIE_WRITE, ROLE_USER_READ
                     return r.equals("ROLE_USER") || r.equals("ROLE_ADMIN") || r.equals("ROLE_SUPER_ADMIN")
                             || r.equals("ROLE_CONTENT_MANAGER") || r.equals("ROLE_SUPPORT");
                 })
                 .map(r -> {
-                    // Clean normalization - handle both ROLE_ and non-ROLE_ formats
                     String normalizedRole = r.toUpperCase().startsWith("ROLE_")
                             ? r.toUpperCase()
                             : "ROLE_" + r.toUpperCase();
@@ -327,33 +314,6 @@ public class AdminService implements AdminServiceInterface {
                 .map(Role::getName)
                 .max(Comparator.comparing(RoleHierarchyPolicy::getLevel))
                 .orElse(RoleName.ROLE_USER);
-    }
-
-    @Override
-    public String generateInviteToken(String email, RoleName role) {
-        logger.info("Generating invite token for email: {} with role: {}", email, role);
-
-        Map<String, Object> claims = Map.of(
-                "email", email,
-                "role", role.name(),
-                "type", "admin_invite",
-                "exp", System.currentTimeMillis() + (24 * 60 * 60 * 1000)
-        );
-
-        String token = jwtUtil.issueToken(email, claims);
-
-        redisTemplate.opsForValue().set("invite:" + token, email, 24, TimeUnit.HOURS);
-
-        return token;
-    }
-
-    public boolean validateInviteToken(String token) {
-        String email = redisTemplate.opsForValue().get("invite:" + token);
-        return email != null;
-    }
-
-    public void consumeInviteToken(String token) {
-        redisTemplate.delete("invite:" + token);
     }
 
     @Override
@@ -385,21 +345,6 @@ public class AdminService implements AdminServiceInterface {
         Admin saved = adminRepository.save(admin);
         logger.info("Inactive admin stub created with ID: {} for email: {}", saved.getId(), email);
         return adminInviteDTOMapper.apply(saved);
-    }
-
-    @Transactional
-    public void updateAdminPassword(String email, String newPassword) {
-        Admin admin = adminRepository.findByEmail(email).orElse(null);
-
-        if (admin == null) {
-            throw new AdminNotFoundException("Admin not found with email: " + email + ". Invitation may have expired.");
-        }
-
-        admin.setPassword(passwordEncoder.encode(newPassword));
-        admin.setIsActive(true);
-        adminRepository.save(admin);
-
-        logger.info("Password set for admin: {}", email);
     }
 
 }

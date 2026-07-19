@@ -45,14 +45,4 @@ public class AdminInviteService {
         Map<String, Object> claims = jwtUtil.extractAllClaims(token);
         return (String) claims.get("email");
     }
-
-    public RoleName getRoleFromToken(String token) {
-        Map<String, Object> claims = jwtUtil.extractAllClaims(token);
-        String roleName = (String) claims.get("role");
-        String normalizedRole = roleName.toUpperCase().startsWith("ROLE_")
-                ? roleName.toUpperCase()
-                : "ROLE_" + roleName.toUpperCase();
-
-        return RoleName.valueOf(normalizedRole);
-    }
 }

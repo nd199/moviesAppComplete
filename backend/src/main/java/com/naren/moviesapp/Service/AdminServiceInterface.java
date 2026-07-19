@@ -1,7 +1,6 @@
 package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Dto.AdminInviteDTO;
-import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Record.AdminRegistration;
 import com.naren.moviesapp.Record.AdminUpdateRequest;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +30,4 @@ public interface AdminServiceInterface {
     ResponseEntity<?> toggleAdminStatus(Long adminId);
 
     AdminInviteDTO createAdmin(String name, String email, String phoneNumber, String address, String department);
-
-    String generateInviteToken(String email, RoleName roleName);
 }
