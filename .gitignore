@@ -66,6 +66,14 @@ frontendpayment/build/
 payment/node_modules/
 
 # ===============================
+# Dev Data (fake data, seed scripts)
+# ===============================
+frontend/src/lib/fakeData.js
+super-admin/src/lib/fakeData.js
+backend/dev-data/
+frontend/.env.local
+
+# ===============================
 # Misc
 # ===============================
 previewConfig.json
