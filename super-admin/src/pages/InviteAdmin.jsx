@@ -3,10 +3,8 @@ import toast from 'react-hot-toast';
 import { systemAPI } from '../services/api';
 
 const InviteAdmin = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', phoneNumber: '', address: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phoneNumber: '', address: '', department: '' });
   const [loading, setLoading] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupData, setPopupData] = useState({ success: false, message: '' });
 
   const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -14,14 +12,13 @@ const InviteAdmin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await systemAPI.inviteAdmin(formData);
-      setPopupData({ success: true, message: `Invitation sent to ${formData.email}. They will receive an email with setup instructions.` });
-      setFormData({ name: '', email: '', phoneNumber: '', address: '' });
+      await systemAPI.inviteAdmin(formData);
+      toast.success(`Invitation sent to ${formData.email}`);
+      setFormData({ name: '', email: '', phoneNumber: '', address: '', department: '' });
     } catch (error) {
-      setPopupData({ success: false, message: error.response?.data?.message || 'Failed to send invitation' });
+      toast.error(error.response?.data?.message || 'Failed to send invitation');
     } finally {
       setLoading(false);
-      setShowPopup(true);
     }
   };
 
@@ -58,6 +55,12 @@ const InviteAdmin = () => {
                 placeholder="1234567890" />
             </div>
             <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Department</label>
+              <input type="text" name="department" value={formData.department} onChange={handleChange}
+                className="w-full px-4 py-2.5 bg-gray-200/60 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-sm"
+                placeholder="Engineering" />
+            </div>
+            <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Office Address *</label>
               <input type="text" name="address" value={formData.address} onChange={handleChange} required
                 className="w-full px-4 py-2.5 bg-gray-200/60 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-sm"
@@ -72,30 +75,6 @@ const InviteAdmin = () => {
           </div>
         </form>
       </div>
-
-      {showPopup && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-100 rounded-2xl border border-gray-200 p-8 max-w-sm w-full mx-4 shadow-2xl">
-            <div className="flex items-center justify-center mb-6">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${popupData.success ? 'bg-emerald-100' : 'bg-red-100'}`}>
-                {popupData.success ? (
-                  <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                ) : (
-                  <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                )}
-              </div>
-            </div>
-            <h3 className={`text-lg font-bold text-center mb-2 ${popupData.success ? 'text-emerald-700' : 'text-red-700'}`}>
-              {popupData.success ? 'Invitation Sent' : 'Error'}
-            </h3>
-            <p className="text-gray-600 text-sm text-center mb-6">{popupData.message}</p>
-            <button onClick={() => setShowPopup(false)}
-              className={`w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-all ${popupData.success ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'}`}>
-              {popupData.success ? 'Done' : 'Try Again'}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

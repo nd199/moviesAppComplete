@@ -50,7 +50,7 @@ const SuperAdminDashboard = () => {
               <h2 className="text-xl font-semibold">Admin Management</h2>
             </div>
             <p className="text-gray-400 mb-4">Create and manage admin accounts</p>
-            <button 
+            <button
               onClick={() => navigate('/super-admin/invite')}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
             >
