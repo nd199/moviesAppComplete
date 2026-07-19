@@ -320,11 +320,12 @@ public class AdminService implements AdminServiceInterface {
     @Transactional
     public AdminInviteDTO createAdmin(String name, String email, String phoneNumber,
                                       String address, String department) {
-        logger.info("Creating inactive admin stub for invite: {}", email);
+        logger.info("=== CREATE ADMIN START === email: {}", email);
 
         if (adminRepository.existsByEmail(email)) {
             throw new AdminAlreadyExistsException("Admin with email " + email + " already exists");
         }
+        logger.info("Email check passed, no duplicate");
 
         Admin admin = new Admin();
         admin.setName(name);
@@ -338,12 +339,17 @@ public class AdminService implements AdminServiceInterface {
         admin.setPassword(java.util.UUID.randomUUID().toString());
 
         Role adminRole = roleService.findRoleByName(RoleName.ROLE_ADMIN);
+        logger.info("ROLE_ADMIN found: {}", adminRole != null);
         if (adminRole != null) {
             admin.addRole(adminRole);
         }
 
+        logger.info("About to save admin entity");
         Admin saved = adminRepository.save(admin);
-        logger.info("Inactive admin stub created with ID: {} for email: {}", saved.getId(), email);
+        logger.info("Admin saved with ID: {}, now flushing", saved.getId());
+        adminRepository.flush();
+        logger.info("Flush complete, admin ID: {}", saved.getId());
+
         return adminInviteDTOMapper.apply(saved);
     }
 

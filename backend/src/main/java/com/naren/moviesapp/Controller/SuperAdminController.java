@@ -46,25 +46,33 @@ public class SuperAdminController {
             String address = (String) request.get("address");
             String department = (String) request.get("department");
 
+            logger.info("=== INVITE START === email: {}", email);
+
             if (!isValidEmail(email) || name == null || name.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("message", "Name and valid email are required"));
             }
 
+            logger.info("Step 1: Creating admin...");
             AdminInviteDTO admin = adminService.createAdmin(name, email, phoneNumber, address, department);
+            logger.info("Step 1 done: admin created with id {}", admin.id());
 
+            logger.info("Step 2: Generating invite token...");
             String setupToken = inviteService.generateInviteToken(email, RoleName.ROLE_ADMIN);
+            logger.info("Step 2 done: token generated");
 
             String baseUrl = activeProfile.equals("prod") ? "https://movies-app-complete.vercel.app" : "http://localhost:3000";
             String setupLink = baseUrl + "/admin/set-password?token=" + setupToken;
 
+            logger.info("Step 3: Sending invite email...");
             emailService.sendInviteEmail(email, setupLink);
+            logger.info("Step 3 done: email sent");
 
             return ResponseEntity.ok(Map.of(
                     "message", "Admin invite sent to " + email,
                     "admin", admin
             ));
         } catch (Exception e) {
-            logger.error("Failed to send admin invite", e);
+            logger.error("=== INVITE FAILED === {}", e.getMessage(), e);
             return ResponseEntity.badRequest().body(Map.of("message", "Failed to send admin invite: " + e.getMessage()));
         }
     }
