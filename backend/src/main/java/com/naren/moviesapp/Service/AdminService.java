@@ -3,6 +3,8 @@ package com.naren.moviesapp.Service;
 import com.naren.moviesapp.Config.RoleHierarchyPolicy;
 import com.naren.moviesapp.Dto.AdminDTO;
 import com.naren.moviesapp.Dto.AdminDTOMapper;
+import com.naren.moviesapp.Dto.AdminInviteDTO;
+import com.naren.moviesapp.Dto.AdminInviteDTOMapper;
 import com.naren.moviesapp.Dto.AdminStatsDTO;
 import com.naren.moviesapp.Entity.Admin;
 import com.naren.moviesapp.Entity.Role;
@@ -37,16 +39,19 @@ public class AdminService implements AdminServiceInterface {
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
     private final AdminDTOMapper adminDTOMapper;
+    private final AdminInviteDTOMapper adminInviteDTOMapper;
     private final RoleService roleService;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
 
     public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEncoder,
-                        AdminDTOMapper adminDTOMapper, RoleService roleService, JwtUtil jwtUtil,
+                        AdminDTOMapper adminDTOMapper, AdminInviteDTOMapper adminInviteDTOMapper,
+                        RoleService roleService, JwtUtil jwtUtil,
                         RedisTemplate<String, String> redisTemplate) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.adminDTOMapper = adminDTOMapper;
+        this.adminInviteDTOMapper = adminInviteDTOMapper;
         this.roleService = roleService;
         this.jwtUtil = jwtUtil;
         this.redisTemplate = redisTemplate;
@@ -349,6 +354,37 @@ public class AdminService implements AdminServiceInterface {
 
     public void consumeInviteToken(String token) {
         redisTemplate.delete("invite:" + token);
+    }
+
+    @Override
+    @Transactional
+    public AdminInviteDTO createAdmin(String name, String email, String phoneNumber,
+                                      String address, String department) {
+        logger.info("Creating inactive admin stub for invite: {}", email);
+
+        if (adminRepository.existsByEmail(email)) {
+            throw new AdminAlreadyExistsException("Admin with email " + email + " already exists");
+        }
+
+        Admin admin = new Admin();
+        admin.setName(name);
+        admin.setEmail(email);
+        admin.setPhoneNumber(phoneNumber);
+        admin.setAddress(address != null ? address : "");
+        admin.setDepartment(department != null ? department : "Admin");
+        admin.setIsActive(false);
+        admin.setIsEmailVerified(true);
+        admin.setAccessLevel(1);
+        admin.setPassword(java.util.UUID.randomUUID().toString());
+
+        Role adminRole = roleService.findRoleByName(RoleName.ROLE_ADMIN);
+        if (adminRole != null) {
+            admin.addRole(adminRole);
+        }
+
+        Admin saved = adminRepository.save(admin);
+        logger.info("Inactive admin stub created with ID: {} for email: {}", saved.getId(), email);
+        return adminInviteDTOMapper.apply(saved);
     }
 
     @Transactional
