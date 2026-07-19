@@ -1,7 +1,11 @@
 package com.naren.moviesapp.Controller;
 
+import com.naren.moviesapp.Service.AdminInviteService;
+import com.naren.moviesapp.Service.AdminService;
 import com.naren.moviesapp.Service.ContentManagerInviteService;
 import com.naren.moviesapp.Service.ContentManagerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,11 +18,19 @@ import java.util.Map;
 @RequestMapping("/api/v1/auth")
 public class SetPasswordController {
 
+    private static final Logger logger = LoggerFactory.getLogger(SetPasswordController.class);
+
+    private final AdminInviteService adminInviteService;
+    private final AdminService adminService;
     private final ContentManagerInviteService contentManagerInviteService;
     private final ContentManagerService contentManagerService;
 
-    public SetPasswordController(ContentManagerInviteService contentManagerInviteService,
+    public SetPasswordController(AdminInviteService adminInviteService,
+                                 AdminService adminService,
+                                 ContentManagerInviteService contentManagerInviteService,
                                  ContentManagerService contentManagerService) {
+        this.adminInviteService = adminInviteService;
+        this.adminService = adminService;
         this.contentManagerInviteService = contentManagerInviteService;
         this.contentManagerService = contentManagerService;
     }
@@ -42,18 +54,29 @@ public class SetPasswordController {
                 return ResponseEntity.badRequest().body(Map.of("message", "Passwords do not match"));
             }
 
+            boolean isAdminToken = adminInviteService.validateInviteToken(token);
             boolean isContentManagerToken = contentManagerInviteService.validateInviteToken(token);
 
-            if (!isContentManagerToken) {
+            if (!isAdminToken && !isContentManagerToken) {
                 return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired invitation token"));
             }
 
-            String email = contentManagerInviteService.getEmailFromToken(token);
-            contentManagerService.updateContentManagerPassword(email, password);
-            contentManagerInviteService.consumeInviteToken(token);
+            String email;
+            if (isAdminToken) {
+                email = adminInviteService.getEmailFromToken(token);
+                adminService.updateAdminPassword(email, password);
+                adminInviteService.consumeInviteToken(token);
+                logger.info("Admin password set for: {}", email);
+            } else {
+                email = contentManagerInviteService.getEmailFromToken(token);
+                contentManagerService.updateContentManagerPassword(email, password);
+                contentManagerInviteService.consumeInviteToken(token);
+                logger.info("Content manager password set for: {}", email);
+            }
 
             return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
         } catch (Exception e) {
+            logger.error("Failed to set password", e);
             return ResponseEntity.badRequest().body(Map.of("message", "Failed to update password: " + e.getMessage()));
         }
     }

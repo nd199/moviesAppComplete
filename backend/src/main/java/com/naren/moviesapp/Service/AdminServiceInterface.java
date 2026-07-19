@@ -30,4 +30,6 @@ public interface AdminServiceInterface {
     ResponseEntity<?> toggleAdminStatus(Long adminId);
 
     AdminInviteDTO createAdmin(String name, String email, String phoneNumber, String address, String department);
+
+    void updateAdminPassword(String email, String newPassword);
 }

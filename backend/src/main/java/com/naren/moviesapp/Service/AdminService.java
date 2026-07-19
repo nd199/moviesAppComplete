@@ -353,4 +353,19 @@ public class AdminService implements AdminServiceInterface {
         return adminInviteDTOMapper.apply(saved);
     }
 
+    @Override
+    @Transactional
+    public void updateAdminPassword(String email, String newPassword) {
+        logger.info("Setting password for admin: {}", email);
+
+        Admin admin = adminRepository.findByEmail(email)
+                .orElseThrow(() -> new AdminNotFoundException("Admin not found with email: " + email));
+
+        admin.setPassword(passwordEncoder.encode(newPassword));
+        admin.setIsActive(true);
+        adminRepository.save(admin);
+
+        logger.info("Admin {} password set and activated", email);
+    }
+
 }
