@@ -60,5 +60,6 @@ export const systemAPI = {
   getCustomers: () => api.get('/api/v1/customers'),
   getAdmins: () => api.get('/api/v1/admins'),
   inviteAdmin: (data) => api.post('/api/v1/system/superadmin/invite', data),
+  resendInvite: (data) => api.post('/api/v1/system/superadmin/resend-invite', data),
   getHealth: () => api.get('/api/v1/ping'),
 };

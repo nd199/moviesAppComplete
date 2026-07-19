@@ -1,7 +1,9 @@
 package com.naren.moviesapp.Controller;
 
 import com.naren.moviesapp.Dto.AdminInviteDTO;
+import com.naren.moviesapp.Entity.Admin;
 import com.naren.moviesapp.Entity.RoleName;
+import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Service.AdminInviteService;
 import com.naren.moviesapp.Service.AdminService;
 import com.naren.moviesapp.Utils.EmailService;
@@ -26,14 +28,16 @@ public class SuperAdminController {
 
     private final AdminService adminService;
     private final AdminInviteService inviteService;
+    private final AdminRepository adminRepository;
     private final EmailService emailService;
     @Value("${spring.profiles.active}")
     private String activeProfile;
 
     public SuperAdminController(AdminService adminService, AdminInviteService inviteService,
-                                 EmailService emailService) {
+                                 AdminRepository adminRepository, EmailService emailService) {
         this.adminService = adminService;
         this.inviteService = inviteService;
+        this.adminRepository = adminRepository;
         this.emailService = emailService;
     }
 
@@ -83,5 +87,41 @@ public class SuperAdminController {
         }
         String emailRegex = "^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$";
         return email.matches(emailRegex);
+    }
+
+    @PostMapping("/resend-invite")
+    public ResponseEntity<?> resendInvite(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+
+            if (!isValidEmail(email)) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Valid email is required"));
+            }
+
+            Admin admin = adminRepository.findByEmail(email)
+                    .orElse(null);
+
+            if (admin == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "No admin found with email " + email));
+            }
+
+            if (admin.getIsActive()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Admin " + email + " is already active"));
+            }
+
+            String setupToken = inviteService.generateInviteToken(email, RoleName.ROLE_ADMIN);
+
+            String baseUrl = activeProfile.equals("prod") ? "https://movies-app-complete.vercel.app" : "http://localhost:3000";
+            String setupLink = baseUrl + "/admin/set-password?token=" + setupToken;
+
+            emailService.sendInviteEmail(email, setupLink);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Invite resent to " + email
+            ));
+        } catch (Exception e) {
+            logger.error("Failed to resend invite", e);
+            return ResponseEntity.badRequest().body(Map.of("message", "Failed to resend invite: " + e.getMessage()));
+        }
     }
 }

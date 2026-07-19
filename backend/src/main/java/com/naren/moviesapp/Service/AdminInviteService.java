@@ -24,11 +24,11 @@ public class AdminInviteService {
                 "email", email,
                 "role", role.name(),
                 "type", "admin_invite",
-                "exp", System.currentTimeMillis() + (24 * 60 * 60 * 1000)
+                "exp", System.currentTimeMillis() + (7L * 24 * 60 * 60 * 1000)
         );
 
         String token = jwtUtil.issueToken(email, claims);
-        redisTemplate.opsForValue().set("invite:" + token, email, 24, TimeUnit.HOURS);
+        redisTemplate.opsForValue().set("invite:" + token, email, 7, TimeUnit.DAYS);
         return token;
     }
 
