@@ -8,6 +8,7 @@ const isLocalHost = () =>
 
 const getBaseURL = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  if (isLocalHost()) return "http://localhost:8080";
   return "https://nmoviesapi.duckdns.org";
 };
 
