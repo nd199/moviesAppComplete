@@ -183,6 +183,7 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getAdminById(Long adminId) {
         logger.info("Fetching admin with ID: {}", adminId);
 
@@ -193,6 +194,7 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getAdminByEmail(String email) {
         logger.info("Fetching admin with email: {}", email);
 
@@ -203,6 +205,7 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getAllAdmins() {
         logger.info("Fetching all admins");
 
@@ -215,6 +218,7 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getActiveAdmins() {
         logger.info("Fetching all active admins");
 
@@ -227,6 +231,7 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getAdminsByDepartment(String department) {
         logger.info("Fetching admins by department: {}", department);
 
@@ -239,6 +244,7 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getAdminStats() {
         logger.info("Fetching admin statistics");
 
