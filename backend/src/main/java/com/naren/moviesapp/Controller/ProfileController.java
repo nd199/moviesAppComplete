@@ -78,11 +78,27 @@ public class ProfileController {
         logger.info("Password change request for user: {}", userDetails.getUsername());
 
         try {
-            customerService.updatePasswordWithValidation(
-                    userDetails.getUsername(),
-                    passwordChangeRequest.currentPassword(),
-                    passwordChangeRequest.newPassword()
-            );
+            String email = userDetails.getUsername();
+
+            // Try customer first, then admin
+            if (customerService.existsByEmail(email)) {
+                customerService.updatePasswordWithValidation(
+                        email,
+                        passwordChangeRequest.currentPassword(),
+                        passwordChangeRequest.newPassword()
+                );
+            } else if (adminService.adminExistsByEmail(email)) {
+                adminService.updateAdminPasswordWithValidation(
+                        email,
+                        passwordChangeRequest.currentPassword(),
+                        passwordChangeRequest.newPassword()
+                );
+            } else {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "message", "User not found",
+                        "status", "error"
+                ));
+            }
 
             return ResponseEntity.ok().body(Map.of(
                     "message", "Password changed successfully",
