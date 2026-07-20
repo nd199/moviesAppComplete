@@ -40,6 +40,17 @@ public class TmdbController {
         ));
     }
 
+    private static final Map<String, Object> EMPTY_RESPONSE = Map.of(
+            "results", List.of(),
+            "page", 1,
+            "totalPages", 0,
+            "totalResults", 0
+    );
+
+    private ResponseEntity<?> emptyOk() {
+        return ResponseEntity.ok(EMPTY_RESPONSE);
+    }
+
     @GetMapping("/search/movies")
     public ResponseEntity<?> searchMovies(
             @RequestParam String query,
@@ -47,9 +58,7 @@ public class TmdbController {
         logger.info("Searching TMDB movies with query: {}, page: {}", query, page);
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         if (query == null || query.isBlank()) {
@@ -92,9 +101,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         if (query == null || query.isBlank()) {
@@ -136,9 +143,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var response = tmdbService.getTrendingMovies(page);
@@ -174,9 +179,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var response = tmdbService.getTrendingTvShows(page);
@@ -212,9 +215,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var response = tmdbService.getTopRatedMovies(page);
@@ -253,9 +254,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var response = tmdbService.discoverMovies(sortBy, genreId, year, page);
@@ -294,9 +293,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var response = tmdbService.discoverTvShows(sortBy, genreId, year, page);
@@ -335,9 +332,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var response = tmdbService.getNowPlayingMovies(page);
@@ -376,9 +371,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var response = tmdbService.getUpcomingMovies(page);
@@ -417,9 +410,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var response = tmdbService.getPopularTvShows(page);
@@ -458,9 +449,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var response = tmdbService.getTopRatedTvShows(page);
@@ -499,9 +488,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var response = tmdbService.getSouthIndianMovies(page);
@@ -536,9 +523,7 @@ public class TmdbController {
     public ResponseEntity<?> getMovieDetails(@PathVariable Long tmdbId) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return ResponseEntity.notFound().build();
         }
 
         var movieOpt = tmdbService.getMovieDetails(tmdbId);
@@ -555,9 +540,7 @@ public class TmdbController {
     public ResponseEntity<?> getTvShowDetails(@PathVariable Long tmdbId) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return ResponseEntity.notFound().build();
         }
 
         var tvShowOpt = tmdbService.getTvShowDetails(tmdbId);
@@ -575,9 +558,7 @@ public class TmdbController {
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         List<TmdbConvertedDto> allFeatured = new ArrayList<>();
@@ -618,9 +599,7 @@ public class TmdbController {
     public ResponseEntity<?> syncMovie(@PathVariable Long tmdbId) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var movieOpt = tmdbService.getMovieDetails(tmdbId);
@@ -689,9 +668,7 @@ public class TmdbController {
     public ResponseEntity<?> syncTvShow(@PathVariable Long tmdbId) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var tvShowOpt = tmdbService.getTvShowDetails(tmdbId);
@@ -765,9 +742,7 @@ public class TmdbController {
     public ResponseEntity<?> getMovieVideos(@PathVariable Long tmdbId) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var videosOpt = tmdbService.getMovieVideos(tmdbId);
@@ -788,9 +763,7 @@ public class TmdbController {
     public ResponseEntity<?> getTvShowVideos(@PathVariable Long tmdbId) {
 
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "TMDB API key not configured"
-            ));
+            return emptyOk();
         }
 
         var videosOpt = tmdbService.getTvShowVideos(tmdbId);
@@ -848,7 +821,7 @@ public class TmdbController {
     @GetMapping("/movie/{tmdbId}/cast")
     public ResponseEntity<?> getMovieCast(@PathVariable Long tmdbId) {
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+            return ResponseEntity.ok(Map.of("cast", List.of()));
         }
         var cast = tmdbService.getMovieCast(tmdbId);
         return ResponseEntity.ok(Map.of("cast", cast));
@@ -857,7 +830,7 @@ public class TmdbController {
     @GetMapping("/tv/{tmdbId}/cast")
     public ResponseEntity<?> getTvShowCast(@PathVariable Long tmdbId) {
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+            return ResponseEntity.ok(Map.of("cast", List.of()));
         }
         var cast = tmdbService.getTvShowCast(tmdbId);
         return ResponseEntity.ok(Map.of("cast", cast));
@@ -868,7 +841,7 @@ public class TmdbController {
             @PathVariable Long tmdbId,
             @RequestParam(defaultValue = "1") int page) {
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+            return ResponseEntity.ok(Map.of("cast", List.of()));
         }
         var results = tmdbService.getSimilarMovies(tmdbId, page);
         return ResponseEntity.ok(Map.of("results", results));
@@ -879,7 +852,7 @@ public class TmdbController {
             @PathVariable Long tmdbId,
             @RequestParam(defaultValue = "1") int page) {
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+            return ResponseEntity.ok(Map.of("cast", List.of()));
         }
         var results = tmdbService.getSimilarTvShows(tmdbId, page);
         return ResponseEntity.ok(Map.of("results", results));
@@ -890,7 +863,7 @@ public class TmdbController {
             @PathVariable Long tmdbId,
             @RequestParam(defaultValue = "1") int page) {
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+            return ResponseEntity.ok(Map.of("cast", List.of()));
         }
         var results = tmdbService.getRecommendedMovies(tmdbId, page);
         return ResponseEntity.ok(Map.of("results", results));
@@ -901,7 +874,7 @@ public class TmdbController {
             @PathVariable Long tmdbId,
             @RequestParam(defaultValue = "1") int page) {
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+            return ResponseEntity.ok(Map.of("cast", List.of()));
         }
         var results = tmdbService.getRecommendedTvShows(tmdbId, page);
         return ResponseEntity.ok(Map.of("results", results));
@@ -910,7 +883,7 @@ public class TmdbController {
     @GetMapping("/genres/movies")
     public ResponseEntity<?> getMovieGenres() {
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+            return ResponseEntity.ok(Map.of("cast", List.of()));
         }
         var genres = tmdbService.getMovieGenres();
         return ResponseEntity.ok(Map.of("genres", genres));
@@ -919,7 +892,7 @@ public class TmdbController {
     @GetMapping("/genres/tv")
     public ResponseEntity<?> getTvGenres() {
         if (!tmdbService.isConfigured()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "TMDB API key not configured"));
+            return ResponseEntity.ok(Map.of("cast", List.of()));
         }
         var genres = tmdbService.getTvGenres();
         return ResponseEntity.ok(Map.of("genres", genres));

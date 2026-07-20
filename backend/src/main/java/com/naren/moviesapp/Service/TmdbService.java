@@ -535,7 +535,7 @@ public class TmdbService {
     }
 
     public boolean isConfigured() {
-        return apiKey != null && !apiKey.isBlank();
+        return apiKey != null && !apiKey.isBlank() && !"dev".equalsIgnoreCase(apiKey);
     }
 
     public Optional<List<TmdbVideoDto>> getMovieVideos(Long tmdbId) {
