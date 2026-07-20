@@ -34,6 +34,16 @@ services:
       - db
     restart: unless-stopped
 
+  mailpit:
+    container_name: mailpit-mv
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - db
+    restart: unless-stopped
+
   app:
     image: codenaren23/movies-api:latest
     container_name: movie-api

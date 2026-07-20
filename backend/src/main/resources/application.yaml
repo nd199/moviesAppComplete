@@ -5,7 +5,7 @@ server:
 
 spring:
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+    active: dev
   jpa:
     open-in-view: false
 
@@ -18,10 +18,9 @@ app:
   data-initialization:
     enabled: ${DATA_INITIALIZATION_ENABLED:true}
   superadmin:
-    email: ${SUPER_ADMIN_EMAIL}
-    password: ${SUPER_ADMIN_PASSWORD}
+    email: ${SUPER_ADMIN_EMAIL:superadmin@movies.com}
+    password: ${SUPER_ADMIN_PASSWORD:ChangeMe123!}
   tmdb:
-    api-key: ${TMDB_API_KEY}
+    api-key: ${TMDB_API_KEY:dev}
     base-url: https://api.themoviedb.org/3
     image-base-url: https://image.tmdb.org/t/p
-

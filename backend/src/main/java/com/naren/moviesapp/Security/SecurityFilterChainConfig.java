@@ -156,6 +156,7 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/products/**",
                                 "/api/v1/about",
                                 "/api/v1/tmdb/**",
+                                "/api/v1/local/**",
                                 "/api/v1/public/**"
                         ).permitAll()
 

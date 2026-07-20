@@ -44,26 +44,9 @@ frontend/build/
 frontend/.cache/
 frontend/.next/
 frontend/out/
-movies-frontend/node_modules/
-movies-frontend/build/
-movies-frontend/.cache/
-movies-frontend/.next/
-movies-frontend/out/
-frontend/node_modules/
-frontend/build/
-frontend/.cache/
-frontend/package-lock.json
-movies-admin/node_modules/
-movies-admin/build/
-movies-admin/dist/
-movies-admin/package-lock.json
 super-admin/node_modules/
 super-admin/build/
 super-admin/dist/
-super-admin/package-lock.json
-frontendpayment/node_modules/
-frontendpayment/build/
-payment/node_modules/
 
 # ===============================
 # Dev Data (fake data, seed scripts)
@@ -71,7 +54,6 @@ payment/node_modules/
 frontend/src/lib/fakeData.js
 super-admin/src/lib/fakeData.js
 backend/dev-data/
-frontend/.env.local
 
 # ===============================
 # Misc
@@ -101,9 +83,7 @@ junit.xml
 *.lcov
 
 # ===============================
-# Lock Files (additional projects)
+# Lock Files
 # ===============================
 yarn.lock
 pnpm-lock.yaml
-.continueignore.env
-.env
