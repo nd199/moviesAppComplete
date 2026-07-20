@@ -92,7 +92,7 @@ public class AuthController {
 
         if (authResponse instanceof AdminAuthResponse adminAuth) {
             accessToken = authService.generateTokenForAdmin(adminAuth.admin());
-            refreshToken = null;
+            refreshToken = refreshTokenService.createRefreshToken(adminAuth.admin(), deviceFingerprint);
         } else if (authResponse instanceof CustomerAuthResponse customerAuth) {
             accessToken = authService.generateTokenForCustomer(customerAuth.customer());
             refreshToken = refreshTokenService.createRefreshToken(customerAuth.customer(), deviceFingerprint);

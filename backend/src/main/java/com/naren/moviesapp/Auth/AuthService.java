@@ -230,8 +230,11 @@ public class AuthService {
 
         // Load user based on type and generate token
         if (UserType.ADMIN.equals(refreshToken.getUserType())) {
-            Admin admin = adminRepository.findById(refreshToken.getUserId())
-                    .orElseThrow(() -> new RuntimeException("Admin not found"));
+            Admin admin = adminRepository.findByEmailWithRoles(
+                    adminRepository.findById(refreshToken.getUserId())
+                            .orElseThrow(() -> new RuntimeException("Admin not found"))
+                            .getEmail()
+            ).orElseThrow(() -> new RuntimeException("Admin not found"));
             return generateTokenForAdmin(admin);
         } else if (UserType.CUSTOMER.equals(refreshToken.getUserType())) {
             Customer customer = customerRepository.findById(refreshToken.getUserId())
