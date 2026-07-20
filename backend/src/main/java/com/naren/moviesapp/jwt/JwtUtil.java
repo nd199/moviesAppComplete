@@ -172,6 +172,25 @@ public class JwtUtil {
         Map<String, Object> enhancedClaims = new HashMap<>();
         enhancedClaims.put("jti", UUID.randomUUID().toString());
         enhancedClaims.put("iat", System.currentTimeMillis() / 1000);
+        enhancedClaims.put("type", "access");
+
+        // Add authorities to claims for consistency with issueToken(subject, roles)
+        Set<String> authorities = new HashSet<>();
+        if (roles != null) {
+            roles.forEach(role -> {
+                if (role != null && role.getName() != null) {
+                    authorities.add(role.getName().name());
+                    try {
+                        com.naren.moviesapp.Config.RolePermissionMapper.getPermissions(role.getName())
+                                .forEach(permission -> authorities.add(permission.name()));
+                    } catch (Exception e) {
+                        logger.error("Error getting permissions for role {}: {}",
+                                role.getName(), e.getMessage());
+                    }
+                }
+            });
+        }
+        enhancedClaims.put("authorities", authorities);
 
         return Jwts.builder()
                 .claims(enhancedClaims)
