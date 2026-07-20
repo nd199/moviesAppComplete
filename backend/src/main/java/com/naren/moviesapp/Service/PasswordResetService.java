@@ -4,6 +4,7 @@ import com.naren.moviesapp.Entity.PasswordResetToken;
 import com.naren.moviesapp.Exception.EmailSendingException;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.PasswordResetRequest;
+import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.PasswordRTRepository;
 import com.naren.moviesapp.Utils.EmailService;
@@ -25,17 +26,24 @@ public class PasswordResetService {
     private final PasswordRTRepository tokenRepository;
     private final EmailService emailService;
     private final CustomerService customerService;
+    private final AdminService adminService;
     private final CustomerRepository customerRepository;
+    private final AdminRepository adminRepository;
 
-    public PasswordResetService(PasswordRTRepository tokenRepository, EmailService emailService, CustomerService customerService, CustomerRepository customerRepository) {
+    public PasswordResetService(PasswordRTRepository tokenRepository, EmailService emailService, CustomerService customerService, AdminService adminService, CustomerRepository customerRepository, AdminRepository adminRepository) {
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
         this.customerService = customerService;
+        this.adminService = adminService;
         this.customerRepository = customerRepository;
+        this.adminRepository = adminRepository;
     }
 
     public void createPasswordResetToken(String email) {
-        if (!customerRepository.existsByEmail(email)) {
+        boolean isCustomer = customerRepository.existsByEmail(email);
+        boolean isAdmin = adminRepository.existsByEmail(email);
+
+        if (!isCustomer && !isAdmin) {
             throw new ResourceNotFoundException("Your account " +
                     "is not present please check your email else register first");
         }
@@ -71,7 +79,13 @@ public class PasswordResetService {
             throw new RuntimeException("Token is Expired or Invalid");
         }
         String email = resetToken.get().getEmail();
-        customerService.updatePassword(email, newPassword);
+
+        if (customerRepository.existsByEmail(email)) {
+            customerService.updatePassword(email, newPassword);
+        } else if (adminRepository.existsByEmail(email)) {
+            adminService.updateAdminPassword(email, newPassword);
+        }
+
         tokenRepository.deleteByEmail(email);
     }
 }
