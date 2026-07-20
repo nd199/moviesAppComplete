@@ -3,6 +3,7 @@ package com.naren.moviesapp.Service;
 import com.naren.moviesapp.Entity.PasswordResetToken;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.PasswordResetRequest;
+import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.PasswordRTRepository;
 import com.naren.moviesapp.Utils.EmailService;
@@ -32,13 +33,17 @@ class PasswordResetServiceTest {
     @Mock
     private CustomerService customerService;
     @Mock
+    private AdminService adminService;
+    @Mock
     private CustomerRepository customerRepository;
+    @Mock
+    private AdminRepository adminRepository;
 
     private PasswordResetService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new PasswordResetService(tokenRepository, emailService, customerService, customerRepository);
+        underTest = new PasswordResetService(tokenRepository, emailService, customerService, adminService, customerRepository, adminRepository);
     }
 
     @Test
@@ -46,6 +51,7 @@ class PasswordResetServiceTest {
         String email = "test@example.com";
 
         when(customerRepository.existsByEmail(email)).thenReturn(false);
+        when(adminRepository.existsByEmail(email)).thenReturn(false);
 
         assertThatThrownBy(() -> underTest.createPasswordResetToken(email))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -56,10 +62,32 @@ class PasswordResetServiceTest {
     }
 
     @Test
-    void createPasswordResetToken_EmailExists() {
+    void createPasswordResetToken_CustomerEmailExists() {
         String email = "test@example.com";
 
         when(customerRepository.existsByEmail(email)).thenReturn(true);
+        doNothing().when(emailService).sendPasswordResetMail(any(), any());
+
+        underTest.createPasswordResetToken(email);
+
+        ArgumentCaptor<PasswordResetToken> tokenCaptor = ArgumentCaptor.forClass(PasswordResetToken.class);
+        verify(tokenRepository).deleteByEmail(email);
+        verify(tokenRepository).save(tokenCaptor.capture());
+
+        PasswordResetToken capturedToken = tokenCaptor.getValue();
+        assertThat(capturedToken.getEmail()).isEqualTo(email);
+        assertThat(capturedToken.getToken()).isNotNull();
+        assertThat(capturedToken.getExpiry()).isAfter(Instant.now());
+
+        verify(emailService).sendPasswordResetMail(eq(email), eq(capturedToken.getToken()));
+    }
+
+    @Test
+    void createPasswordResetToken_AdminEmailExists() {
+        String email = "admin@example.com";
+
+        when(customerRepository.existsByEmail(email)).thenReturn(false);
+        when(adminRepository.existsByEmail(email)).thenReturn(true);
         doNothing().when(emailService).sendPasswordResetMail(any(), any());
 
         underTest.createPasswordResetToken(email);
@@ -134,7 +162,7 @@ class PasswordResetServiceTest {
     }
 
     @Test
-    void resetPassword_Success() {
+    void resetPassword_CustomerSuccess() {
         String token = UUID.randomUUID().toString();
         String newPassword = "newPassword123";
         String email = "test@example.com";
@@ -144,11 +172,33 @@ class PasswordResetServiceTest {
         resetToken.setExpiry(Instant.now().plus(1, java.time.temporal.ChronoUnit.HOURS));
 
         when(tokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
+        when(customerRepository.existsByEmail(email)).thenReturn(true);
 
         PasswordResetRequest request = new PasswordResetRequest(token, newPassword);
         underTest.resetPassword(request);
 
         verify(customerService).updatePassword(email, newPassword);
+        verify(tokenRepository).deleteByEmail(email);
+    }
+
+    @Test
+    void resetPassword_AdminSuccess() {
+        String token = UUID.randomUUID().toString();
+        String newPassword = "newPassword123";
+        String email = "admin@example.com";
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setEmail(email);
+        resetToken.setExpiry(Instant.now().plus(1, java.time.temporal.ChronoUnit.HOURS));
+
+        when(tokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
+        when(customerRepository.existsByEmail(email)).thenReturn(false);
+        when(adminRepository.existsByEmail(email)).thenReturn(true);
+
+        PasswordResetRequest request = new PasswordResetRequest(token, newPassword);
+        underTest.resetPassword(request);
+
+        verify(adminService).updateAdminPassword(email, newPassword);
         verify(tokenRepository).deleteByEmail(email);
     }
 
@@ -166,6 +216,7 @@ class PasswordResetServiceTest {
                 .hasMessage("Token is Expired or Invalid");
 
         verify(customerService, never()).updatePassword(any(), any());
+        verify(adminService, never()).updateAdminPassword(any(), any());
         verify(tokenRepository, never()).deleteByEmail(any());
     }
 
@@ -187,6 +238,7 @@ class PasswordResetServiceTest {
                 .hasMessage("Token is Expired or Invalid");
 
         verify(customerService, never()).updatePassword(any(), any());
+        verify(adminService, never()).updateAdminPassword(any(), any());
         verify(tokenRepository, never()).deleteByEmail(any());
     }
 }
