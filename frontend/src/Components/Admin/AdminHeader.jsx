@@ -5,7 +5,14 @@ import { logout } from '../../redux/userSlice';
 import { clearAuth } from '../../authStore';
 import axios from 'axios';
 
-const getBaseURL = () => process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const isLocalHost = () =>
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1';
+
+const getBaseURL = () => {
+  if (isLocalHost()) return 'http://localhost:8080';
+  return process.env.REACT_APP_API_URL || 'https://nmoviesapi.duckdns.org';
+};
 
 const AdminHeader = () => {
   const location = useLocation();

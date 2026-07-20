@@ -13,8 +13,13 @@ const isMockMode = process.env.REACT_APP_MOCK_MODE === 'true';
 // CONFIGURATION
 // ============================================
 
+const isLocalHost = () =>
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1';
+
 const getBaseUrl = () => {
-  return process.env.REACT_APP_API_URL || 'http://localhost:8080';
+  if (isLocalHost()) return 'http://localhost:8080';
+  return process.env.REACT_APP_API_URL || 'https://nmoviesapi.duckdns.org';
 };
 
 const getApiBaseUrl = () => `${getBaseUrl()}/api/v1`;
@@ -185,6 +190,19 @@ if (isMockMode) {
     installMockInterceptor(instance);
   });
   console.log('[MOCK MODE] All API requests will return sample data. No backend required.');
+}
+
+// ============================================
+// DEV MODE - rewrite /tmdb/ → /local/ for local data
+// ============================================
+
+if (isLocalHost()) {
+  publicApi.interceptors.request.use((config) => {
+    if (config.url && config.url.startsWith('/tmdb/')) {
+      config.url = config.url.replace('/tmdb/', '/local/');
+    }
+    return config;
+  });
 }
 
 // ============================================

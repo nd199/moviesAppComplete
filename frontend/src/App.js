@@ -67,8 +67,13 @@ import ServerConnection from "./Utils/ServerConnection";
 // CONFIGURATION
 // ============================================
 
+const isLocalHost = () =>
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1';
+
 const getBaseURL = () => {
-  return process.env.REACT_APP_API_URL || 'http://localhost:8080';
+  if (isLocalHost()) return 'http://localhost:8080';
+  return process.env.REACT_APP_API_URL || 'https://nmoviesapi.duckdns.org';
 };
 
 const isMockMode = process.env.REACT_APP_MOCK_MODE === 'true';

@@ -10,7 +10,12 @@ import AdminsList from './pages/AdminsList';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
+const isLocalHost = () =>
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1';
+
 const getBaseURL = () => {
+  if (isLocalHost()) return 'http://localhost:8080';
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
   return "https://nmoviesapi.duckdns.org";
 };
