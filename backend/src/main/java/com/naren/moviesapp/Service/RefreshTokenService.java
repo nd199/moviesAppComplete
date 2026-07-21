@@ -186,11 +186,11 @@ public class RefreshTokenService {
         if (UserType.ADMIN.equals(refreshToken.getUserType())) {
             Admin admin = adminRepository.findById(refreshToken.getUserId())
                     .orElseThrow(() -> new RuntimeException("Admin not found"));
-            return jwtUtil.issueToken(admin.getEmail(), admin.getRoles());
+            return jwtUtil.issueTokenWithRoleExpiration(admin.getEmail(), admin.getRoles());
         } else if (UserType.CUSTOMER.equals(refreshToken.getUserType())) {
             Customer customer = customerRepository.findById(refreshToken.getUserId())
                     .orElseThrow(() -> new RuntimeException("Customer not found"));
-            return jwtUtil.issueToken(customer.getEmail(), customer.getRoles());
+            return jwtUtil.issueTokenWithRoleExpiration(customer.getEmail(), customer.getRoles());
         }
 
         throw new RuntimeException("Unknown user type: " + refreshToken.getUserType());

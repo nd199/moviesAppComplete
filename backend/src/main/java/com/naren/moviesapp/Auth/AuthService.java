@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +28,13 @@ import java.util.stream.Collectors;
 public class AuthService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+
+    private static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final long SHORT_LOCKOUT_MS = 15 * 60 * 1000L;  // 15 minutes
+    private static final long LONG_LOCKOUT_MS = 60 * 60 * 1000L;   // 1 hour
+    private static final int LONG_LOCKOUT_THRESHOLD = 15;
+
+    private final ConcurrentHashMap<String, int[]> failedAttempts = new ConcurrentHashMap<>();
 
     private final AuthenticationManager authenticationManager;
     private final CustomerDTOMapper customerDTOMapper;
@@ -43,6 +51,9 @@ public class AuthService {
         logger.info("Login attempt started for username: {}", authRequest.username());
 
         validateRequest(authRequest);
+
+        String loginKey = authRequest.username().toLowerCase().trim();
+        checkRateLimit(loginKey);
 
         try {
             logger.debug("Starting authentication process for: {}", authRequest.username());
@@ -111,11 +122,16 @@ public class AuthService {
                 CustomerDTO dto = customerDTOMapper.apply(customer);
 
                 String normalizedEmail = dto.email() != null ? dto.email().toLowerCase().trim() : dto.email();
-                
-                String token = jwtUtil.issueToken(
-                        normalizedEmail,
-                        new HashSet<>(customer.getRoles())
-                );
+
+                boolean isSuperAdmin = customer.getRoles().stream()
+                        .anyMatch(role -> role.getName() == RoleName.ROLE_SUPER_ADMIN);
+
+                String token;
+                if (isSuperAdmin) {
+                    token = jwtUtil.issueTokenWithRoleExpiration(normalizedEmail, new HashSet<>(customer.getRoles()));
+                } else {
+                    token = jwtUtil.issueToken(normalizedEmail, new HashSet<>(customer.getRoles()));
+                }
 
                 logger.info("Customer login successful for email: {}", customer.getEmail());
 
@@ -167,10 +183,47 @@ public class AuthService {
 
         } catch (BadCredentialsException e) {
             logger.warn("Login failed for username: {} - Invalid credentials", authRequest.username());
-            throw new InvalidCredentialsException(
-                    "Invalid email or password. Please check your credentials and try again."
-            );
+            recordFailedAttempt(loginKey);
+            throw new InvalidCredentialsException("Invalid credentials");
         }
+    }
+
+    private void checkRateLimit(String key) {
+        int[] state = failedAttempts.get(key);
+        if (state == null) return;
+
+        int attempts = state[0];
+        long lockoutUntil = state[1];
+
+        if (attempts >= MAX_FAILED_ATTEMPTS) {
+            long now = System.currentTimeMillis();
+            if (now < lockoutUntil) {
+                long remainingSec = (lockoutUntil - now) / 1000;
+                logger.warn("Rate limited for {} - {} seconds remaining", key, remainingSec);
+                throw new AuthenticationException(
+                        "Too many failed attempts. Try again later.",
+                        "RATE_LIMITED"
+                );
+            }
+            failedAttempts.remove(key);
+        }
+    }
+
+    private void recordFailedAttempt(String key) {
+        failedAttempts.compute(key, (k, existing) -> {
+            int attempts = existing != null ? existing[0] + 1 : 1;
+            long now = System.currentTimeMillis();
+            long lockoutUntil = existing != null ? existing[1] : 0;
+
+            if (attempts >= LONG_LOCKOUT_THRESHOLD) {
+                lockoutUntil = now + LONG_LOCKOUT_MS;
+            } else if (attempts >= MAX_FAILED_ATTEMPTS) {
+                lockoutUntil = now + SHORT_LOCKOUT_MS;
+            }
+
+            logger.info("Failed attempt #{} for {}", attempts, k);
+            return new int[]{attempts, (int) (lockoutUntil & 0xFFFFFFFFL)};
+        });
     }
 
     private Set<Role> buildRoles(CustomerDTO dto) {

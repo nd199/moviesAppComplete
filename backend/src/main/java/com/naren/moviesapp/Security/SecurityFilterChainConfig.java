@@ -236,7 +236,7 @@ public class SecurityFilterChainConfig {
                                 )
                         )
                         .xssProtection(HeadersConfigurer.XXssConfig::disable)
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
                 )
 
                 .authenticationProvider(authenticationProvider)
