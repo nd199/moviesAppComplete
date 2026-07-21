@@ -2,13 +2,10 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { loginStart, loginFailure, setTokens, setAuthStatus, fetchCurrentSuccess } from '../../redux/userSlice';
+import { loginStart, loginFailure, setAuthStatus, fetchCurrentSuccess } from '../../redux/userSlice';
 import { setAccessToken, setRefreshToken } from '../../authStore';
 import { fetchCurrentUserDetails } from '../../Network/ApiCalls';
 import { contentManagerLogin } from '../../services/adminApi';
-import { mockContentManagerUser } from '../../mockData';
-
-const isMockMode = process.env.REACT_APP_MOCK_MODE === 'true';
 
 const ContentManagerLogin = () => {
   const [email, setEmail] = useState("");
@@ -28,10 +25,8 @@ const ContentManagerLogin = () => {
       const { accessToken, refreshToken } = response;
       setAccessToken(accessToken);
       if (refreshToken) setRefreshToken(refreshToken);
-      dispatch(setTokens({ accessToken, refreshToken }));
       dispatch(setAuthStatus('authenticated'));
-      if (isMockMode) dispatch(fetchCurrentSuccess(mockContentManagerUser));
-      else await fetchCurrentUserDetails(dispatch);
+      await fetchCurrentUserDetails(dispatch);
       toast.success('Content Manager login successful!');
       navigate('/admin/dashboard');
     } catch (err) {

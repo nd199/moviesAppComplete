@@ -18,4 +18,7 @@ public interface UserPlanInfoRepository extends JpaRepository<UserPlanInfo, Long
 
     @Query("SELECT upi FROM UserPlanInfo upi WHERE upi.customer.email = :email AND upi.isActive = true")
     Optional<UserPlanInfo> findActivePlanByEmail(@Param("email") String email);
+
+    @Query("SELECT COUNT(upi) FROM UserPlanInfo upi WHERE upi.isActive = true")
+    long countActiveSubscriptions();
 }

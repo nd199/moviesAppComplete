@@ -2,13 +2,10 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { loginStart, loginFailure, setTokens, setAuthStatus, fetchCurrentSuccess } from '../../redux/userSlice';
+import { loginStart, loginFailure, setAuthStatus, fetchCurrentSuccess } from '../../redux/userSlice';
 import { setAccessToken, setRefreshToken } from '../../authStore';
 import { fetchCurrentUserDetails } from '../../Network/ApiCalls';
 import { adminLogin } from '../../services/adminApi';
-import { mockAdminUser } from '../../mockData';
-
-const isMockMode = process.env.REACT_APP_MOCK_MODE === 'true';
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
@@ -28,10 +25,8 @@ const AdminLogin = () => {
       const { accessToken, refreshToken } = response;
       setAccessToken(accessToken);
       if (refreshToken) setRefreshToken(refreshToken);
-      dispatch(setTokens({ accessToken, refreshToken }));
       dispatch(setAuthStatus('authenticated'));
-      if (isMockMode) dispatch(fetchCurrentSuccess(mockAdminUser));
-      else await fetchCurrentUserDetails(dispatch);
+      await fetchCurrentUserDetails(dispatch);
       toast.success('Login successful!');
       navigate('/admin/dashboard');
     } catch (err) {
