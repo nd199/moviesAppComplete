@@ -2,23 +2,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { getRefreshToken, setAccessToken, clearAuth } from './authStore';
+import { getRefreshToken, setAccessToken, setRefreshToken, clearAuth } from './authStore';
+import { getBaseURL } from './config';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import Dashboard from './pages/Dashboard';
 import InviteAdmin from './pages/InviteAdmin';
 import AdminsList from './pages/AdminsList';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
-
-const isLocalHost = () =>
-  window.location.hostname === 'localhost' ||
-  window.location.hostname === '127.0.0.1';
-
-const getBaseURL = () => {
-  if (isLocalHost()) return 'http://localhost:8080';
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  return "https://nmoviesapi.duckdns.org";
-};
 
 function App() {
   const [serverStatus, setServerStatus] = useState('checking');
@@ -35,10 +26,13 @@ function App() {
 
     checkServer();
 
-    const refreshToken = getRefreshToken();
-    if (refreshToken) {
-      axios.post(`${getBaseURL()}/api/v1/auth/refresh-token`, { refreshToken })
-        .then(res => { setAccessToken(res.data.accessToken); if (res.data.refreshToken) localStorage.setItem("refreshToken", res.data.refreshToken); })
+    const rt = getRefreshToken();
+    if (rt) {
+      axios.post(`${getBaseURL()}/api/v1/auth/refresh-token`, { refreshToken: rt })
+        .then(res => {
+          setAccessToken(res.data.accessToken);
+          if (res.data.refreshToken) setRefreshToken(res.data.refreshToken);
+        })
         .catch(() => clearAuth());
     }
   }, []);
