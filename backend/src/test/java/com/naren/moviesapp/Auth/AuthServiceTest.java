@@ -179,7 +179,7 @@ class AuthServiceTest {
 
         CustomerDTO mapped = buildDTO("ROLE_SUPER_ADMIN");
         when(customerDTOMapper.apply(principal)).thenReturn(mapped);
-        doReturn("jwt-token").when(jwtUtil).issueToken(anyString(), anySet());
+        doReturn("jwt-token").when(jwtUtil).issueTokenWithRoleExpiration(anyString(), anySet());
 
         AuthResponse response =
                 underTest.login(new AuthRequest("superadmin@codeNaren.com", "password"));
@@ -189,7 +189,7 @@ class AuthServiceTest {
         assertThat(customerResponse.customerDTO().roles())
                 .contains("ROLE_SUPER_ADMIN");
 
-        verify(jwtUtil).issueToken(anyString(), anySet());
+        verify(jwtUtil).issueTokenWithRoleExpiration(anyString(), anySet());
     }
 
     private CustomerDTO buildDTO(String role) {
