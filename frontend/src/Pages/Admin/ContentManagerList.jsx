@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
+import { HiUser, HiCheckCircle, HiXCircle } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { fetchContentManagers, deleteContentManager as deleteContentManagerApi } from '../../services/adminApi';
 
+const avatarGradients = [
+  'from-brand-500 to-indigo-500',
+  'from-blue-500 to-cyan-500',
+  'from-amber-500 to-orange-500',
+  'from-emerald-500 to-teal-500',
+  'from-rose-500 to-pink-500',
+];
+
 const ContentManagerList = () => {
   const [contentManagers, setContentManagers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     loadContentManagers();
@@ -38,113 +48,139 @@ const ContentManagerList = () => {
     }
   };
 
-  const defaultContentManagerPicture = [
-    "https://picsum.photos/seed/cm1/100/100.jpg",
-    "https://picsum.photos/seed/cm2/100/100.jpg",
-  ];
-  const defaultSelected =
-    defaultContentManagerPicture[Math.floor(Math.random() * defaultContentManagerPicture.length)];
+  const filtered = contentManagers.filter(cm =>
+    cm.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    cm.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
+  const totalCMs = contentManagers.length;
+  const activeCMs = contentManagers.filter(cm => cm.isActive).length;
 
   return (
-    <div className="w-full h-full">
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-semibold text-white">Content Managers</h1>
-          <span className="px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded">
-            {contentManagers.length} total
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <input
-            type="text"
-            placeholder="Search content managers..."
-            className="px-4 py-2 rounded-lg border border-slate-600 bg-slate-800 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-          />
-          <Link 
-            to="/admin/content-managers/new"
-            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-green-500/10 hover:from-green-600 hover:to-teal-700"
-          >
-            <FaPlus />
-            Create Content Manager
-          </Link>
-        </div>
+    <div className="space-y-6">
+      {/* Summary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Total CMs', value: totalCMs, icon: HiUser, color: 'from-brand-600 to-brand-700' },
+          { label: 'Active', value: activeCMs, icon: HiCheckCircle, color: 'from-emerald-500 to-teal-500' },
+          { label: 'Inactive', value: totalCMs - activeCMs, icon: HiXCircle, color: 'from-red-500 to-rose-500' },
+          { label: 'Showing', value: filtered.length, icon: HiUser, color: 'from-accent-600 to-accent-700' },
+        ].map((stat) => (
+          <div key={stat.label} className="bg-surface-900 border border-surface-700 rounded-2xl p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-surface-500">{stat.label}</p>
+                <p className="text-2xl font-bold text-white mt-1">{stat.value}</p>
+              </div>
+              <div className={`w-10 h-10 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center`}>
+                <stat.icon className="h-5 w-5 text-white" />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
-      <div className="h-[calc(100vh-200px)] overflow-hidden rounded-2xl border border-slate-700 bg-slate-800 shadow-2xl shadow-black/20 backdrop-blur">
-        <div className="h-full overflow-auto">
-          <table className="w-full text-sm min-w-[1200px]">
-            <thead className="bg-slate-800 text-slate-300 sticky top-0 z-10 backdrop-blur-sm">
+      {/* Actions Bar */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-surface-500" />
+            <input
+              type="text"
+              placeholder="Search content managers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2.5 rounded-xl border border-surface-700 bg-surface-900 text-white placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-colors text-sm w-72"
+            />
+          </div>
+        </div>
+        <Link to="/admin/content-managers/new">
+          <button className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-accent-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30 transition-all">
+            <FaPlus className="h-3.5 w-3.5" />
+            Create Content Manager
+          </button>
+        </Link>
+      </div>
+
+      {/* Table */}
+      <div className="bg-surface-900 border border-surface-700 rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-surface-800 border-b border-surface-700">
               <tr>
-                <th className="px-4 py-4 text-left font-medium">ID</th>
-                <th className="px-4 py-4 text-left font-medium">Content Manager</th>
-                <th className="px-4 py-4 text-left font-medium">Email</th>
-                <th className="px-4 py-4 text-left font-medium">Status</th>
-                <th className="px-4 py-4 text-left font-medium">Movies</th>
-                <th className="px-4 py-4 text-left font-medium">Shows</th>
-                <th className="px-4 py-4 text-left font-medium">Created</th>
-                <th className="px-4 py-4 text-left font-medium">Actions</th>
+                <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">ID</th>
+                <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Content Manager</th>
+                <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Email</th>
+                <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Status</th>
+                <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Movies</th>
+                <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Shows</th>
+                <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Created</th>
+                <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700">
-              {contentManagers.length === 0 ? (
+            <tbody className="divide-y divide-surface-800">
+              {loading ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-slate-400">
-                    No content managers found.
+                  <td colSpan={8} className="px-4 py-12 text-center">
+                    <div className="flex items-center justify-center gap-3 text-surface-500">
+                      <div className="w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-sm">Loading content managers...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="px-4 py-12 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 bg-surface-800 rounded-full flex items-center justify-center">
+                        <HiUser className="h-6 w-6 text-surface-500" />
+                      </div>
+                      <p className="text-surface-500 text-sm">No content managers found</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
-                contentManagers.map((cm) => (
-                  <tr key={cm.id} className="hover:bg-slate-700/30">
-                    <td className="px-4 py-3 text-slate-300">{cm.id}</td>
+                filtered.map((cm, idx) => (
+                  <tr key={cm.id} className="hover:bg-surface-800/50 transition-colors">
+                    <td className="px-4 py-3 text-surface-500 font-mono text-xs">{cm.id}</td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center">
-                        <img
-                          className="w-10 h-10 rounded-full object-cover mr-3"
-                          src={cm.imageUrl || defaultSelected}
-                          alt="Content Manager Avatar"
-                        />
+                      <div className="flex items-center gap-3">
+                        <div className={`w-9 h-9 bg-gradient-to-br ${avatarGradients[idx % avatarGradients.length]} rounded-full flex items-center justify-center shadow-sm`}>
+                          <span className="text-white text-xs font-bold">{cm.name?.charAt(0) || '?'}</span>
+                        </div>
                         <div>
                           <div className="font-semibold text-white">{cm.name}</div>
-                          <div className="text-xs text-slate-400">Content Manager</div>
+                          <div className="text-xs text-surface-500">Content Manager</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-slate-300">{cm.email}</td>
+                    <td className="px-4 py-3 text-surface-500">{cm.email}</td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-1 text-xs rounded ${
+                      <span className={`px-2.5 py-1 text-xs rounded-full font-semibold ${
                         cm.isActive
-                          ? 'bg-green-900/30 text-green-300'
-                          : 'bg-red-900/30 text-red-300'
+                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                          : 'bg-red-500/15 text-red-400 border border-red-500/20'
                       }`}>
                         {cm.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-300">{cm.moviesManaged || 0}</td>
-                    <td className="px-4 py-3 text-slate-300">{cm.showsManaged || 0}</td>
-                    <td className="px-4 py-3 text-slate-300">
-                      {cm.createdAt ? new Date(cm.createdAt).toLocaleDateString() : 'N/A'}
+                    <td className="px-4 py-3 text-white font-medium">{cm.moviesManaged || 0}</td>
+                    <td className="px-4 py-3 text-white font-medium">{cm.showsManaged || 0}</td>
+                    <td className="px-4 py-3 text-surface-500 text-xs">
+                      {cm.createdAt ? new Date(cm.createdAt).toLocaleDateString() : '—'}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Link
-                          to={`/admin/content-managers/edit/${cm.id}`}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600"
-                        >
-                          <FaEdit />
+                      <div className="flex items-center gap-1.5">
+                        <Link to={`/admin/content-managers/edit/${cm.id}`}>
+                          <button className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-surface-800 border border-surface-700 text-surface-500 hover:text-white hover:border-surface-600 transition-colors">
+                            <FaEdit className="h-3.5 w-3.5" />
+                          </button>
                         </Link>
                         <button
                           onClick={() => handleDelete(cm.id)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-600 bg-red-900/20 text-red-300 hover:bg-red-900/30"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
                         >
-                          <FaTrash />
+                          <FaTrash className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </td>

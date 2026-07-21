@@ -13,18 +13,18 @@ const ChartSelector = ({ data, title }) => {
   ];
 
   return (
-    <div className="bg-gray-100 rounded-2xl border border-gray-200 p-5 shadow-sm">
+    <div className="bg-surface-900 rounded-2xl border border-surface-700 p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold text-gray-900">{title}</h3>
-        <div className="flex bg-gray-200 rounded-lg p-0.5">
+        <h3 className="text-base font-semibold text-white">{title}</h3>
+        <div className="flex bg-surface-800 rounded-lg p-0.5 border border-surface-700">
           {chartTypes.map(chart => (
             <button
               key={chart.id}
               onClick={() => setSelectedChart(chart.id)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                 selectedChart === chart.id
-                  ? 'bg-white text-violet-700 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-brand-600 text-white shadow-sm'
+                  : 'text-surface-500 hover:text-white'
               }`}
             >
               {chart.name}

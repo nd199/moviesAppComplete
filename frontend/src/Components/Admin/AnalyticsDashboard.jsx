@@ -59,9 +59,9 @@ const AnalyticsDashboard = () => {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {[1, 2].map((i) => (
-          <div key={i} className="bg-gray-100 rounded-2xl border border-gray-200 p-6 animate-pulse">
-            <div className="h-4 bg-gray-300 rounded w-1/3 mb-4"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
+          <div key={i} className="bg-surface-900 rounded-2xl border border-surface-700 p-6 animate-pulse">
+            <div className="h-4 bg-surface-700 rounded w-1/3 mb-4"></div>
+            <div className="h-64 bg-surface-800 rounded"></div>
           </div>
         ))}
       </div>
@@ -70,17 +70,17 @@ const AnalyticsDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-semibold text-gray-900">Advanced Analytics</h2>
+      <h2 className="text-lg font-semibold text-white">Advanced Analytics</h2>
       <ChartSelector data={userStats} title="User Analytics" />
       <ChartSelector data={revenueData} title="Revenue Analytics" />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-gray-100 rounded-2xl border border-gray-200 p-5 shadow-sm">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">Content Distribution</h3>
+        <div className="bg-surface-900 rounded-2xl border border-surface-700 p-5">
+          <h3 className="text-base font-semibold text-white mb-4">Content Distribution</h3>
           <AdvancedCharts data={movieStats} chartType="bar" />
         </div>
-        <div className="bg-gray-100 rounded-2xl border border-gray-200 p-5 shadow-sm">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">User Overview</h3>
+        <div className="bg-surface-900 rounded-2xl border border-surface-700 p-5">
+          <h3 className="text-base font-semibold text-white mb-4">User Overview</h3>
           <AdvancedCharts data={subscriptionData} chartType="pie" />
         </div>
       </div>

@@ -1,14 +1,8 @@
 import { useEffect, useState } from 'react';
 import { adminAPI } from '../../AxiosMethods';
 
-const statusStyles = {
-  ACTIVE: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
-  INACTIVE: 'bg-red-50 text-red-700 ring-red-600/20',
-  PENDING: 'bg-amber-50 text-amber-700 ring-amber-600/20',
-};
-
 const avatarColors = [
-  'from-violet-500 to-indigo-500',
+  'from-brand-500 to-indigo-500',
   'from-blue-500 to-cyan-500',
   'from-amber-500 to-orange-500',
   'from-emerald-500 to-teal-500',
@@ -27,8 +21,8 @@ const WidgetsLarge = () => {
   }, []);
 
   return (
-    <div className="bg-gray-100 rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-      <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-4">
+    <div className="bg-surface-900 rounded-2xl border border-surface-700 overflow-hidden">
+      <div className="bg-gradient-to-r from-brand-600 to-accent-600 px-5 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-base font-semibold text-white">Recent Users</h3>
@@ -44,29 +38,33 @@ const WidgetsLarge = () => {
       <div className="p-5 space-y-3">
         {loading ? (
           <div className="flex justify-center py-8">
-            <div className="w-6 h-6 border-2 border-gray-300 border-t-violet-600 rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-surface-600 border-t-brand-500 rounded-full animate-spin" />
           </div>
         ) : users.length > 0 ? (
           users.map((user, idx) => (
-            <div key={user.id || idx} className="flex items-center justify-between p-3 rounded-xl bg-gray-200/60 hover:bg-gray-200 transition-colors">
+            <div key={user.id || idx} className="flex items-center justify-between p-3 rounded-xl bg-surface-800 border border-surface-700 hover:border-surface-600 transition-colors">
               <div className="flex items-center gap-3">
                 <div className={`w-9 h-9 bg-gradient-to-br ${avatarColors[idx % avatarColors.length]} rounded-full flex items-center justify-center shadow-sm`}>
                   <span className="text-white text-xs font-bold">{user.name?.charAt(0) || '?'}</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                  <p className="text-xs text-gray-600">{user.email}</p>
+                  <p className="text-sm font-medium text-white">{user.name}</p>
+                  <p className="text-xs text-surface-500">{user.email}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ring-1 ring-inset ${user.isActive !== false ? statusStyles.ACTIVE : statusStyles.INACTIVE}`}>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                  user.isActive !== false
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                    : 'bg-red-500/15 text-red-400 border border-red-500/20'
+                }`}>
                   {user.isActive !== false ? 'Active' : 'Inactive'}
                 </span>
               </div>
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-500 text-sm py-8">No users found</p>
+          <p className="text-center text-surface-500 text-sm py-8">No users found</p>
         )}
       </div>
     </div>

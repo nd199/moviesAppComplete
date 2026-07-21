@@ -1,233 +1,90 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HiUserPlus, HiEnvelope, HiCheckCircle, HiXCircle, HiBriefcase, HiFilm, HiTv } from 'react-icons/hi2';
+import { HiArrowLeft, HiCheckCircle, HiXCircle } from 'react-icons/hi2';
 import { createContentManager } from '../../services/adminApi';
 
 const NewContentManager = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phoneNumber: '',
-    department: '',
-    specialization: 'both'
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', phoneNumber: '', department: '', specialization: 'both' });
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupData, setPopupData] = useState({ success: false, message: '' });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       await createContentManager(formData);
-      setPopupData({
-        success: true,
-        message: `Content manager account created and invite sent to ${formData.email}`
-      });
-      setFormData({
-        name: '',
-        email: '',
-        phoneNumber: '',
-        department: '',
-        specialization: 'both'
-      });
+      setPopupData({ success: true, message: `Content manager account created and invite sent to ${formData.email}` });
+      setFormData({ name: '', email: '', phoneNumber: '', department: '', specialization: 'both' });
     } catch (error) {
-      console.error('Failed to create content manager:', error);
-      setPopupData({
-        success: false,
-        message: error.response?.data?.message || 'Network error. Please try again.'
-      });
-    } finally {
-      setLoading(false);
-      setShowPopup(true);
-    }
+      setPopupData({ success: false, message: error.response?.data?.message || 'Network error. Please try again.' });
+    } finally { setLoading(false); setShowPopup(true); }
   };
 
-  const closePopup = () => {
-    setShowPopup(false);
-    if (popupData.success) {
-      navigate('/admin/content-managers');
-    }
-  };
+  const closePopup = () => { setShowPopup(false); if (popupData.success) navigate('/admin/content-managers'); };
+
+  const inputClass = "w-full px-4 py-3 rounded-xl border border-surface-700 bg-surface-800 text-white placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all text-sm";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-green-600 rounded-full flex items-center justify-center">
-            <HiUserPlus className="h-8 w-8 text-white" />
-          </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Create Content Manager Account
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Create a new content manager account and send setup instructions
-          </p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-white">Create Content Manager</h1>
+          <p className="text-sm text-surface-500 mt-0.5">Create a new content manager account</p>
         </div>
-        
-        <div className="bg-white shadow-xl rounded-lg p-8">
+        <button onClick={() => navigate('/admin/content-managers')}
+          className="inline-flex items-center gap-2 rounded-xl border border-surface-700 bg-surface-800 px-4 py-2 text-sm font-semibold text-surface-500 hover:text-white hover:border-surface-600 transition-colors">
+          <HiArrowLeft className="h-4 w-4" />
+          Back
+        </button>
+      </div>
+
+      <div className="max-w-2xl">
+        <div className="bg-surface-900 border border-surface-700 rounded-2xl p-6">
           <form className="space-y-6" onSubmit={handleSubmit}>
+            <div><label className="block text-sm font-medium text-surface-500 mb-2">Full Name *</label><input name="name" type="text" required value={formData.name} onChange={handleChange} className={inputClass} placeholder="John Doe" /></div>
+            <div><label className="block text-sm font-medium text-surface-500 mb-2">Email Address *</label><input name="email" type="email" required value={formData.email} onChange={handleChange} className={inputClass} placeholder="contentmanager@example.com" /></div>
+            <div><label className="block text-sm font-medium text-surface-500 mb-2">Phone Number *</label><input name="phoneNumber" type="tel" required value={formData.phoneNumber} onChange={handleChange} className={inputClass} placeholder="1234567890" pattern="[0-9]{10}" title="Phone number must be exactly 10 digits" /></div>
+            <div><label className="block text-sm font-medium text-surface-500 mb-2">Department</label><input name="department" type="text" value={formData.department} onChange={handleChange} className={inputClass} placeholder="Content Department (optional)" /></div>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                placeholder="John Doe"
-              />
+              <label className="block text-sm font-medium text-surface-500 mb-2">Specialization *</label>
+              <select name="specialization" value={formData.specialization} onChange={handleChange} className={inputClass} required>
+                <option value="both">Movies & Shows</option><option value="movies">Movies Only</option><option value="shows">Shows Only</option>
+              </select>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <HiEnvelope className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                  placeholder="contentmanager@example.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number
-              </label>
-              <input
-                id="phoneNumber"
-                name="phoneNumber"
-                type="tel"
-                required
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                placeholder="1234567890"
-                pattern="[0-9]{10}"
-                title="Phone number must be exactly 10 digits"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-2">
-                Department
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <HiBriefcase className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="department"
-                  name="department"
-                  type="text"
-                  value={formData.department}
-                  onChange={handleChange}
-                  className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                  placeholder="Content Department (optional)"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="specialization" className="block text-sm font-medium text-gray-700 mb-2">
-                Specialization
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  {formData.specialization === 'movies' ? <HiFilm className="h-5 w-5 text-gray-400" /> : 
-                   formData.specialization === 'shows' ? <HiTv className="h-5 w-5 text-gray-400" /> : 
-                   <HiUserPlus className="h-5 w-5 text-gray-400" />}
-                </div>
-                <select
-                  id="specialization"
-                  name="specialization"
-                  value={formData.specialization}
-                  onChange={handleChange}
-                  className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                  required
-                >
-                  <option value="both">Movies & Shows</option>
-                  <option value="movies">Movies Only</option>
-                  <option value="shows">Shows Only</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading || !formData.name || !formData.email}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
-              >
-                {loading ? (
-                  <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Creating Content Manager Account...
-                  </span>
-                ) : (
-                  'Create Content Manager Account'
-                )}
+              <button type="submit" disabled={loading || !formData.name || !formData.email}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-accent-600 text-white font-semibold shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm">
+                {loading ? 'Creating...' : 'Create Content Manager Account'}
               </button>
             </div>
           </form>
         </div>
-
-        {showPopup && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-              <div className="flex items-center justify-center mb-4">
-                {popupData.success ? (
-                  <HiCheckCircle className="h-12 w-12 text-green-500" />
-                ) : (
-                  <HiXCircle className="h-12 w-12 text-red-500" />
-                )}
-              </div>
-              
-              <h3 className={`text-lg font-semibold text-center mb-2 ${popupData.success ? 'text-green-800' : 'text-red-800'}`}>
-                {popupData.success ? 'Success!' : 'Error!'}
-              </h3>
-              
-              <p className="text-gray-600 text-center mb-4">
-                {popupData.message}
-              </p>
-
-              <button
-                onClick={closePopup}
-                className="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition-colors"
-              >
-                {popupData.success ? 'View Content Managers' : 'Try Again'}
-              </button>
-            </div>
-          </div>
-        )}
       </div>
+
+      {showPopup && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-surface-900 border border-surface-700 rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+            <div className="flex items-center justify-center mb-4">
+              {popupData.success ? <HiCheckCircle className="h-12 w-12 text-emerald-400" /> : <HiXCircle className="h-12 w-12 text-red-400" />}
+            </div>
+            <h3 className={`text-lg font-semibold text-center mb-2 ${popupData.success ? 'text-white' : 'text-red-400'}`}>
+              {popupData.success ? 'Success!' : 'Error!'}
+            </h3>
+            <p className="text-surface-500 text-center mb-4 text-sm">{popupData.message}</p>
+            <button onClick={closePopup} className="w-full bg-surface-800 border border-surface-700 text-white py-2 px-4 rounded-xl hover:bg-surface-700 transition-colors text-sm font-semibold">
+              {popupData.success ? 'View Content Managers' : 'Try Again'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
