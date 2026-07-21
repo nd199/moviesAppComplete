@@ -3,15 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes, Navigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
-
-// Redux actions
-import { setAuthStatus, setTokens, logout } from "./redux/userSlice";
+import { setAuthStatus, logout } from "./redux/userSlice";
+import { persistor } from "./redux/store";
 import { fetchCurrentUserDetails } from "./Network/ApiCalls";
-
-// Auth store
 import { getRefreshToken, getAccessToken, clearAuth, setAccessToken, setRefreshToken } from "./authStore";
 
-// Pages
 import Home from "./Pages/User/Home";
 import LoginForm from "./Pages/User/LoginForm";
 import RegistrationForm from "./Pages/User/RegistrationForm";
@@ -33,7 +29,6 @@ import Sidebar from "./Components/Sidebar";
 import PaymentCheckout from "./Pages/Payment/PaymentCheckout";
 import Success from "./Pages/Payment/Success";
 
-// Admin Pages
 import AdminLogin from "./Pages/Admin/AdminLogin";
 import ContentManagerLogin from "./Pages/Admin/ContentManagerLogin";
 import Dashboard from "./Pages/Admin/Dashboard";
@@ -55,17 +50,11 @@ import ContentManagerEdit from "./Pages/Admin/ContentManagerEdit";
 import Settings from "./Pages/Admin/Settings";
 import SetPassword from "./Pages/Admin/SetPassword";
 
-// Admin Components
 import AdminLayout from "./Components/Admin/AdminLayout";
 import AdminProtectedRoute from "./Components/Admin/AdminProtectedRoute";
 
-// Utils
 import Fallback from "./Utils/FallBackPage";
 import ServerConnection from "./Utils/ServerConnection";
-
-// ============================================
-// CONFIGURATION
-// ============================================
 
 const isLocalHost = () =>
   window.location.hostname === 'localhost' ||
@@ -76,12 +65,7 @@ const getBaseURL = () => {
   return process.env.REACT_APP_API_URL || 'https://nmoviesapi.duckdns.org';
 };
 
-const isMockMode = process.env.REACT_APP_MOCK_MODE === 'true';
 const API_URL = getBaseURL();
-
-// ============================================
-// HEALTH CHECK COMPONENT
-// ============================================
 
 function AppWithHealthCheck() {
   const [serverStatus, setServerStatus] = useState('checking');
@@ -98,12 +82,6 @@ function AppWithHealthCheck() {
   }, []);
 
   useEffect(() => {
-    // Skip health check entirely in mock mode
-    if (isMockMode) {
-      setServerStatus('up');
-      return;
-    }
-
     checkServerHealth();
 
     let retryInterval;
@@ -130,77 +108,63 @@ function AppWithHealthCheck() {
   return <AppWithNavigation />;
 }
 
-// ============================================
-// MAIN APP COMPONENT
-// ============================================
-
 function AppWithNavigation() {
   const dispatch = useDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Initialize auth state on mount
   useEffect(() => {
     const initializeAuth = async () => {
       const refreshToken = getRefreshToken();
       const accessToken = getAccessToken();
 
-      // If we have a refresh token, try to get new access token
       if (refreshToken) {
         try {
           const response = await axios.post(
-            `${API_URL}/api/v1/auth/refresh-token`, 
+            `${API_URL}/api/v1/auth/refresh-token`,
             { refreshToken },
             { headers: { 'Content-Type': 'application/json' } }
           );
-          
+
           const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
-          
-          // Update tokens
+
           setAccessToken(newAccessToken);
           if (newRefreshToken) {
             setRefreshToken(newRefreshToken);
           }
-          
-          // Update Redux state
-          dispatch(setTokens({ accessToken: newAccessToken, refreshToken: newRefreshToken }));
+
           dispatch(setAuthStatus('authenticated'));
-          
-          // Fetch user details
           await fetchCurrentUserDetails(dispatch);
         } catch (error) {
-          // Token refresh failed - clear everything
           console.log('Token refresh failed:', error.message);
           clearAuth();
           dispatch(logout());
+          persistor.purge();
         }
-      } 
-      // If we only have access token (less common), try to use it
+      }
       else if (accessToken) {
-        dispatch(setAuthStatus('authenticated'));
         try {
           await fetchCurrentUserDetails(dispatch);
+          dispatch(setAuthStatus('authenticated'));
         } catch (error) {
-          // Access token is invalid - clear auth
           console.log('Access token invalid:', error.message);
           clearAuth();
           dispatch(logout());
+          persistor.purge();
         }
-      } 
-      // No tokens at all
+      }
       else {
         dispatch(setAuthStatus('unauthenticated'));
       }
     };
 
-    // Initialize auth immediately (PersistGate ensures store is ready)
     initializeAuth();
 
   }, [dispatch]);
 
-  // Cross-tab logout sync
   useEffect(() => {
     const handleStorage = (e) => {
-      if (e.key === 'persist:root' && !e.newValue) {
+      if (e.key === 'accessToken' && !e.newValue) {
+        clearAuth();
         dispatch(logout());
       }
     };
@@ -208,13 +172,11 @@ function AppWithNavigation() {
     return () => window.removeEventListener('storage', handleStorage);
   }, [dispatch]);
 
-  // Handle payment success callback
   useEffect(() => {
     window.paymentSuccess = () => {
-      // Refresh user data after payment success
       fetchCurrentUserDetails(dispatch);
     };
-    
+
     return () => {
       window.paymentSuccess = null;
     };
@@ -353,9 +315,7 @@ function Layout({ sidebarOpen, setSidebarOpen }) {
   );
 }
 
-// ============================================
-// PROTECTED ROUTE COMPONENT
-// ============================================
+// protected route component
 
 function ProtectedRoute({ 
   children, 
@@ -365,13 +325,6 @@ function ProtectedRoute({
   const authStatus = useSelector(state => state.user.authStatus);
   const currentUser = useSelector(state => state.user.currentUser);
 
-  // Debug logging
-  // console.log('[ProtectedRoute] authStatus:', authStatus);
-  // console.log('[ProtectedRoute] currentUser:', currentUser);
-  // console.log('[ProtectedRoute] isSubscribed:', currentUser?.isSubscribed);
-  // console.log('[ProtectedRoute] requireSubscription:', requireSubscription);
-
-  // Show loading while checking auth
   if (authStatus === 'loading') {
     return (
       <div className="min-h-screen bg-surface-950 flex items-center justify-center">
@@ -380,27 +333,22 @@ function ProtectedRoute({
     );
   }
 
-  // Not authenticated - redirect to login or register
   if (authStatus !== 'authenticated') {
     return (
-      <Navigate 
-        to={redirectToRegister ? "/register" : "/login"} 
-        replace 
+      <Navigate
+        to={redirectToRegister ? "/register" : "/login"}
+        replace
       />
     );
   }
 
-  // Check for admin role
   const isAdmin = currentUser?.roles?.includes("ROLE_ADMIN");
-  
-  // If require subscription but user is admin, allow access
+
   if (requireSubscription && isAdmin) {
     return children;
   }
 
-  // If require subscription but user is not subscribed
   if (requireSubscription && !currentUser?.isSubscribed) {
-    // Redirect to subscription page if not subscribed
     return <Navigate to="/subscription" replace />;
   }
 

@@ -1,17 +1,7 @@
 import axios from 'axios';
-import { store } from './redux/store';
+import { store, persistor } from './redux/store';
 import { logout } from './redux/userSlice';
-import { installMockInterceptor } from './mockInterceptor';
-
-// ============================================
-// MOCK MODE - will be installed after all instances are created
-// ============================================
-
-const isMockMode = process.env.REACT_APP_MOCK_MODE === 'true';
-
-// ============================================
-// CONFIGURATION
-// ============================================
+import { getAccessToken, getRefreshToken, setTokens, clearAuth } from './authStore';
 
 const isLocalHost = () =>
   window.location.hostname === 'localhost' ||
@@ -24,47 +14,7 @@ const getBaseUrl = () => {
 
 const getApiBaseUrl = () => `${getBaseUrl()}/api/v1`;
 
-// ============================================
-// TOKEN MANAGEMENT
-// ============================================
-
-const getAccessToken = () => {
-  try {
-    // Check localStorage first (most reliable)
-    const localToken = localStorage.getItem('accessToken');
-    if (localToken) return localToken;
-    
-    // Fallback to Redux store
-    const state = store.getState();
-    return state?.user?.accessToken || null;
-  } catch (e) {
-    console.error('Error getting access token:', e);
-    return null;
-  }
-};
-
-const getRefreshToken = () => {
-  try {
-    return localStorage.getItem('refreshToken');
-  } catch (e) {
-    console.error('Error getting refresh token:', e);
-    return null;
-  }
-};
-
-const clearTokens = () => {
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-};
-
-const setTokens = (accessToken, refreshToken) => {
-  if (accessToken) localStorage.setItem('accessToken', accessToken);
-  if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
-};
-
-// ============================================
-// AUTHENTICATED API INSTANCE
-// ============================================
+let refreshPromise = null;
 
 const api = axios.create({
   baseURL: getApiBaseUrl(),
@@ -76,7 +26,6 @@ const api = axios.create({
   },
 });
 
-// Request interceptor - add auth token
 api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
@@ -88,47 +37,54 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor - handle token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
-    // If 401 and haven't tried to refresh yet
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       const refreshToken = getRefreshToken();
       if (!refreshToken) {
-        clearTokens();
+        clearAuth();
         store.dispatch(logout());
+        persistor.purge();
         return Promise.reject(error);
       }
-      
+
+      if (!refreshPromise) {
+        refreshPromise = (async () => {
+          try {
+            const response = await axios.post(`${getApiBaseUrl()}/auth/refresh-token`, {
+              refreshToken,
+            });
+            const { accessToken, refreshToken: newRefreshToken } = response.data;
+            setTokens(accessToken, newRefreshToken);
+            return { accessToken, newRefreshToken };
+          } catch (refreshError) {
+            clearAuth();
+            store.dispatch(logout());
+            persistor.purge();
+            throw refreshError;
+          } finally {
+            refreshPromise = null;
+          }
+        })();
+      }
+
       try {
-        const response = await axios.post(`${getApiBaseUrl()}/auth/refresh-token`, {
-          refreshToken,
-        });
-        
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
-        setTokens(accessToken, newRefreshToken);
-        
+        const { accessToken } = await refreshPromise;
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        clearTokens();
-        store.dispatch(logout());
         return Promise.reject(refreshError);
       }
     }
-    
+
     return Promise.reject(error);
   }
 );
-
-// ============================================
-// PUBLIC API INSTANCE (No Auth)
-// ============================================
 
 const publicApi = axios.create({
   baseURL: getApiBaseUrl(),
@@ -143,7 +99,6 @@ const publicApi = axios.create({
 publicApi.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Log public API errors but don't redirect
     if (error.response?.status === 401) {
       console.warn('Public API auth error (expected for some endpoints)');
     }
@@ -151,19 +106,11 @@ publicApi.interceptors.response.use(
   }
 );
 
-// ============================================
-// PASSWORD RESET API INSTANCE
-// ============================================
-
 const passResetApi = axios.create({
   baseURL: `${getBaseUrl()}/api/password-reset`,
   timeout: 30000,
   withCredentials: true,
 });
-
-// ============================================
-// PAYMENT API INSTANCE
-// ============================================
 
 const paymentApi = axios.create({
   baseURL: `${getApiBaseUrl()}/payments`,
@@ -171,30 +118,11 @@ const paymentApi = axios.create({
   withCredentials: true,
 });
 
-// ============================================
-// SPRING API INSTANCE
-// ============================================
-
 const springApi = axios.create({
   baseURL: getBaseUrl(),
   timeout: 30000,
   withCredentials: true,
 });
-
-// ============================================
-// MOCK MODE - install interceptors on all instances
-// ============================================
-
-if (isMockMode) {
-  [api, publicApi, passResetApi, paymentApi, springApi].forEach((instance) => {
-    installMockInterceptor(instance);
-  });
-  console.log('[MOCK MODE] All API requests will return sample data. No backend required.');
-}
-
-// ============================================
-// DEV MODE - rewrite /tmdb/ → /local/ for local data
-// ============================================
 
 if (isLocalHost()) {
   publicApi.interceptors.request.use((config) => {
@@ -205,13 +133,8 @@ if (isLocalHost()) {
   });
 }
 
-// ============================================
-// EXPORTS
-// ============================================
+export { api as default, publicApi, passResetApi, paymentApi, springApi };
 
-export { api as default, publicApi, passResetApi, paymentApi, springApi, clearTokens, setTokens };
-
-// Request helpers
 export const userRequest = () => api;
 export const publicRequest = () => publicApi;
 export const authRequest = () => api;
@@ -219,11 +142,6 @@ export const passResetRequest = () => passResetApi;
 export const paymentRequest = () => paymentApi;
 export const springRequest = () => springApi;
 
-// ============================================
-// API METHODS
-// ============================================
-
-// Auth API
 export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (userData) => api.post('/auth/register', userData),
@@ -235,7 +153,6 @@ export const authAPI = {
   resetPassword: (token, newPassword) => passResetApi.post('/reset', { token, newPassword }),
 };
 
-// Movie API
 export const movieAPI = {
   getAllMovies: () => api.get('/movies'),
   getMovieById: (id) => api.get(`/movies/${id}`),
@@ -248,7 +165,6 @@ export const movieAPI = {
   searchMovies: (query) => api.get(`/movies/search?q=${query}`),
 };
 
-// Show API
 export const showAPI = {
   getAllShows: () => api.get('/shows'),
   getShowById: (id) => api.get(`/shows/${id}`),
@@ -261,7 +177,6 @@ export const showAPI = {
   searchShows: (query) => api.get(`/shows/search?q=${query}`),
 };
 
-// Subscription API
 export const subscriptionAPI = {
   getSubscriptionPlans: () => api.get('/subscription/plans'),
   getCurrentSubscription: () => api.get('/subscription/current'),
@@ -271,7 +186,6 @@ export const subscriptionAPI = {
   getSubscriptionHistory: () => api.get('/subscription/history'),
 };
 
-// Payment API
 export const paymentAPI = {
   submitPayment: (paymentData) => paymentApi.post('/submitPayment', paymentData),
   getPaymentHistory: () => api.get('/payments/history'),
@@ -279,37 +193,34 @@ export const paymentAPI = {
   refundPayment: (paymentId) => api.post(`/payments/${paymentId}/refund`),
 };
 
-// Streaming API
 export const streamingAPI = {
   getMovieStreamUrl: (movieId) => api.get(`/streaming/movie/${movieId}`),
-  getShowStreamUrl: (showId, season, episode) => 
+  getShowStreamUrl: (showId, season, episode) =>
     api.get(`/streaming/show/${showId}/season/${season}/episode/${episode}`),
-  updateWatchProgress: (contentId, progress) => 
+  updateWatchProgress: (contentId, progress) =>
     api.post('/streaming/progress', { contentId, progress }),
   getWatchHistory: () => api.get('/streaming/history'),
-  addToWatchlist: (contentId, contentType) => 
+  addToWatchlist: (contentId, contentType) =>
     api.post('/streaming/watchlist', { contentId, contentType }),
-  removeFromWatchlist: (contentId) => 
+  removeFromWatchlist: (contentId) =>
     api.delete(`/streaming/watchlist/${contentId}`),
   getWatchlist: () => api.get('/streaming/watchlist'),
 };
 
-// User Preferences API
 export const userPreferencesAPI = {
   getPreferences: () => api.get('/preferences'),
   updatePreferences: (preferences) => api.put('/preferences', preferences),
-  addToFavorites: (contentId, contentType) => 
+  addToFavorites: (contentId, contentType) =>
     api.post('/favorites', { contentId, contentType }),
   removeFromFavorites: (contentId) => api.delete(`/favorites/${contentId}`),
   getFavorites: () => api.get('/favorites'),
-  rateContent: (contentId, rating, contentType) => 
+  rateContent: (contentId, rating, contentType) =>
     api.post('/ratings', { contentId, rating, contentType }),
   getUserRatings: () => api.get('/ratings'),
 };
 
-// Search API
 export const searchAPI = {
-  search: (query, filters = {}) => 
+  search: (query, filters = {}) =>
     api.get('/search', { params: { q: query, ...filters } }),
   searchMovies: (query) => api.get('/search/movies', { params: { q: query } }),
   searchShows: (query) => api.get('/search/shows', { params: { q: query } }),
@@ -319,7 +230,6 @@ export const searchAPI = {
   getRecentlyAdded: () => api.get('/recent'),
 };
 
-// Notification API
 export const notificationAPI = {
   getNotifications: () => api.get('/notifications'),
   markAsRead: (notificationId) => api.put(`/notifications/${notificationId}/read`),
@@ -329,7 +239,6 @@ export const notificationAPI = {
   updateNotificationSettings: (settings) => api.put('/notifications/settings', settings),
 };
 
-// Watchlist API
 export const watchlistAPI = {
   addToWatchlist: (watchlistData) => api.post('/watchlist', watchlistData),
   getWatchlist: () => api.get('/watchlist'),
@@ -339,7 +248,6 @@ export const watchlistAPI = {
   getWatchlistCount: () => api.get('/watchlist/count'),
 };
 
-// Admin API
 export const adminAPI = {
   getAllUsers: () => api.get('/admin/users'),
   createUser: (userData) => api.post('/admin/users', userData),

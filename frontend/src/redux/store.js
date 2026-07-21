@@ -8,7 +8,8 @@ import userReducer from './userSlice';
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user'], // Only persist user state
+  whitelist: ['user'],
+  blacklist: [], // Tokens are managed by authStore.js, not Redux
 };
 
 const rootReducer = combineReducers({
@@ -30,7 +31,3 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store);
-
-// Selector to get tokens from Redux
-export const selectAccessToken = state => state.user.accessToken;
-export const selectRefreshToken = state => state.user.refreshToken;

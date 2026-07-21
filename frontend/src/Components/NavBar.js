@@ -5,6 +5,7 @@ import Lottie from "react-lottie";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { logout } from "../redux/userSlice";
+import { persistor } from "../redux/store";
 import api, { publicRequest } from "../AxiosMethods";
 import { clearAuth, getRefreshToken } from "../authStore";
 import popcornAnimation from "../Utils/animations/popcorn.json";
@@ -83,6 +84,7 @@ const NavBar = ({ onMenuClick }) => {
     const token = getRefreshToken();
     clearAuth();
     dispatch(logout());
+    persistor.purge();
     navigate("/login");
     setOpen(false);
     api.post('/auth/logout', { refreshToken: token }).catch(() => {});
@@ -208,7 +210,7 @@ const NavBar = ({ onMenuClick }) => {
                 )}
               </div>
             ) : (
-              !hideSignIn && (
+              !hideSignIn && authStatus !== 'loading' && (
                 <Link to="/login" className="px-5 py-2 rounded-xl btn-primary text-sm no-underline !py-2 !px-5">
                   Sign In
                 </Link>
