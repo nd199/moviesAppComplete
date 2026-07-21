@@ -110,7 +110,6 @@ public class AuthService {
 
                 CustomerDTO dto = customerDTOMapper.apply(customer);
 
-                // Normalize email to lowercase to match frontend login normalization
                 String normalizedEmail = dto.email() != null ? dto.email().toLowerCase().trim() : dto.email();
                 
                 String token = jwtUtil.issueToken(
@@ -209,8 +208,6 @@ public class AuthService {
             );
         }
 
-        // Account is considered registered if the customer record exists and is active
-        // isRegistered was redundant - a user is either in the system or not
         if (!isSuperAdmin && !Boolean.TRUE.equals(customer.getIsActive())) {
             logger.warn("Account validation failed for {}: Account is not active", customer.getEmail());
             throw new AccountNotRegisteredException(
@@ -228,7 +225,6 @@ public class AuthService {
 
         refreshTokenService.verifyExpiration(refreshToken);
 
-        // Load user based on type and generate token
         if (UserType.ADMIN.equals(refreshToken.getUserType())) {
             Admin admin = adminRepository.findByEmailWithRoles(
                     adminRepository.findById(refreshToken.getUserId())
@@ -255,7 +251,6 @@ public class AuthService {
     public String generateTokenForCustomer(Customer customer) {
         logger.info("Generating token for customer: {}", customer.getEmail());
         CustomerDTO customerDTO = customerDTOMapper.apply(customer);
-        // Normalize email to lowercase for consistent token subject
         String normalizedEmail = customerDTO.email() != null ? customerDTO.email().toLowerCase().trim() : customerDTO.email();
 
         Set<Role> roles = new HashSet<Role>();
@@ -268,14 +263,12 @@ public class AuthService {
 
     public String generateTokenForContentManager(ContentManager contentManager) {
         logger.info("Generating token for content manager: {}", contentManager.getEmail());
-        // Normalize email to lowercase for consistent token subject
         String normalizedEmail = contentManager.getEmail() != null ? contentManager.getEmail().toLowerCase().trim() : contentManager.getEmail();
         return jwtUtil.issueToken(normalizedEmail, contentManager.getRoles());
     }
 
     public String generateTokenForAdmin(Admin admin) {
         logger.info("Generating token for admin: {}", admin.getEmail());
-        // Normalize email to lowercase for consistent token subject
         String normalizedEmail = admin.getEmail() != null ? admin.getEmail().toLowerCase().trim() : admin.getEmail();
         Set<Role> roles = new HashSet<>(admin.getRoles());
         return jwtUtil.issueTokenWithRoleExpiration(normalizedEmail, roles);

@@ -174,7 +174,6 @@ public class JwtUtil {
         enhancedClaims.put("iat", System.currentTimeMillis() / 1000);
         enhancedClaims.put("type", "access");
 
-        // Add authorities to claims for consistency with issueToken(subject, roles)
         Set<String> authorities = new HashSet<>();
         if (roles != null) {
             roles.forEach(role -> {

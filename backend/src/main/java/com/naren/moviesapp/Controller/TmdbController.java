@@ -324,9 +324,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Get now playing movies from TMDB
-     */
     @GetMapping("/now-playing/movies")
     public ResponseEntity<?> getNowPlayingMovies(
             @RequestParam(defaultValue = "1") int page) {
@@ -363,9 +360,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Get upcoming movies from TMDB
-     */
     @GetMapping("/upcoming/movies")
     public ResponseEntity<?> getUpcomingMovies(
             @RequestParam(defaultValue = "1") int page) {
@@ -402,9 +396,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Get popular TV shows from TMDB
-     */
     @GetMapping("/popular/shows")
     public ResponseEntity<?> getPopularTvShows(
             @RequestParam(defaultValue = "1") int page) {
@@ -441,9 +432,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Get top rated TV shows from TMDB
-     */
     @GetMapping("/top-rated/shows")
     public ResponseEntity<?> getTopRatedTvShows(
             @RequestParam(defaultValue = "1") int page) {
@@ -480,9 +468,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Get South Indian movies from TMDB
-     */
     @GetMapping("/south-indian/movies")
     public ResponseEntity<?> getSouthIndianMovies(
             @RequestParam(defaultValue = "1") int page) {
@@ -563,7 +548,6 @@ public class TmdbController {
 
         List<TmdbConvertedDto> allFeatured = new ArrayList<>();
 
-        // Get trending movies
         var moviesResponse = tmdbService.getTrendingMovies(page);
         if (moviesResponse.isPresent() && moviesResponse.get().getResults() != null) {
             for (TmdbMovieDto movie : moviesResponse.get().getResults()) {
@@ -575,7 +559,6 @@ public class TmdbController {
             }
         }
 
-        // Get trending TV shows
         var showsResponse = tmdbService.getTrendingTvShows(page);
         if (showsResponse.isPresent() && showsResponse.get().getResults() != null) {
             for (TmdbTvShowDto tvShow : showsResponse.get().getResults()) {
@@ -610,7 +593,6 @@ public class TmdbController {
 
         TmdbMovieDto tmdbMovie = movieOpt.get();
 
-        // Create Movie entity from TMDB data
         Movie movie = new Movie();
         movie.setTmdbId(tmdbMovie.getTmdbId());
         movie.setName(tmdbMovie.getTitle());
@@ -620,7 +602,6 @@ public class TmdbController {
         String certification = tmdbService.getMovieCertification(tmdbId);
         movie.setAgeRating(certification != null ? certification : (tmdbMovie.getAdult() != null && tmdbMovie.getAdult() ? "R" : "PG-13"));
 
-        // Parse year from release date
         if (tmdbMovie.getReleaseDate() != null && tmdbMovie.getReleaseDate().length() >= 4) {
             try {
                 movie.setYear(Integer.parseInt(tmdbMovie.getReleaseDate().substring(0, 4)));
@@ -631,7 +612,6 @@ public class TmdbController {
             movie.setYear(2024);
         }
 
-        // Parse runtime
         if (tmdbMovie.getRuntime() != null) {
             int hours = tmdbMovie.getRuntime() / 60;
             int minutes = tmdbMovie.getRuntime() % 60;
@@ -644,7 +624,6 @@ public class TmdbController {
             movie.setRuntime("0m");
         }
 
-        // Parse genres
         if (tmdbMovie.getGenres() != null && !tmdbMovie.getGenres().isEmpty()) {
             movie.setGenre(String.join(", ", tmdbMovie.getGenres().stream()
                     .map(TmdbMovieDto.TmdbGenreDto::getName)
@@ -679,7 +658,6 @@ public class TmdbController {
 
         TmdbTvShowDto tmdbTvShow = tvShowOpt.get();
 
-        // Create Show entity from TMDB data
         Show show = new Show();
         show.setTmdbId(tmdbTvShow.getTmdbId());
         show.setName(tmdbTvShow.getName());
@@ -689,7 +667,6 @@ public class TmdbController {
         String showCertification = tmdbService.getTvShowCertification(tmdbId);
         show.setAgeRating(showCertification != null ? showCertification : "TV-14");
 
-        // Parse year from first air date
         if (tmdbTvShow.getFirstAirDate() != null && tmdbTvShow.getFirstAirDate().length() >= 4) {
             try {
                 show.setYear(Integer.parseInt(tmdbTvShow.getFirstAirDate().substring(0, 4)));
@@ -700,7 +677,6 @@ public class TmdbController {
             show.setYear(2024);
         }
 
-        // Parse runtime
         if (tmdbTvShow.getEpisodeRunTime() != null && !tmdbTvShow.getEpisodeRunTime().isEmpty()) {
             Integer runtime = tmdbTvShow.getEpisodeRunTime().get(0);
             if (runtime != null) {
@@ -718,7 +694,6 @@ public class TmdbController {
             show.setRuntime("0m");
         }
 
-        // Parse genres
         if (tmdbTvShow.getGenres() != null && !tmdbTvShow.getGenres().isEmpty()) {
             show.setGenre(String.join(", ", tmdbTvShow.getGenres().stream()
                     .map(TmdbTvShowDto.TmdbGenreDto::getName)
@@ -780,9 +755,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Refresh movie trailer cache
-     */
     @PostMapping("/cache/refresh/movie/{tmdbId}")
     public ResponseEntity<?> refreshMovieTrailerCache(@PathVariable Long tmdbId) {
         logger.info("Received request to refresh movie trailer cache for ID: {}", tmdbId);
@@ -793,9 +765,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Refresh TV show trailer cache
-     */
     @PostMapping("/cache/refresh/show/{tmdbId}")
     public ResponseEntity<?> refreshTvShowTrailerCache(@PathVariable Long tmdbId) {
         logger.info("Received request to refresh TV show trailer cache for ID: {}", tmdbId);
@@ -806,9 +775,6 @@ public class TmdbController {
         ));
     }
 
-    /**
-     * Clear all trailer caches
-     */
     @PostMapping("/cache/clear")
     public ResponseEntity<?> clearAllTrailerCaches() {
         logger.info("Received request to clear all trailer caches");

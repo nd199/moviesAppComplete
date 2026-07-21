@@ -1,9 +1,3 @@
-/**
- * Mock API Interceptor
- * Intercepts axios requests and returns mock data when REACT_APP_MOCK_MODE=true
- * Allows the frontend to run fully standalone without any backend.
- */
-
 import {
   mockUser,
   mockAdminUser,
@@ -20,10 +14,8 @@ import {
   mockCustomerStats,
 } from './mockData';
 
-// Helper to simulate network delay
 const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Simulated local storage for watchlist (persists across page reloads)
 const getLocalWatchlist = () => {
   try {
     const stored = localStorage.getItem('mock_watchlist');
@@ -33,7 +25,6 @@ const getLocalWatchlist = () => {
   }
 };
 
-// Route matcher: returns mock data based on URL pattern
 function matchRoute(method, url, config) {
   const m = method.toLowerCase();
   const u = url.toLowerCase();

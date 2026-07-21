@@ -37,13 +37,11 @@ public class ProfileController {
     public ResponseEntity<?> getCurrentUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
         logger.debug("Fetching current user profile: {}", userDetails.getUsername());
         String username = userDetails.getUsername();
-        
-        // First try to find as Customer
+
         try {
             CustomerDTO customerDTO = customerService.getCustomerByEmail(username);
             return new ResponseEntity<>(customerDTO, HttpStatus.OK);
         } catch (Exception e) {
-            // If not found as customer, try as Admin
             logger.debug("User {} not found as customer, trying as admin", username);
             try {
                 ResponseEntity<?> adminResponse = adminService.getAdminByEmail(username);
@@ -62,10 +60,7 @@ public class ProfileController {
             @AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Updating profile for current user: {}", userDetails.getUsername());
 
-        // Get current user by email
         CustomerDTO currentCustomer = customerService.getCustomerByEmail(userDetails.getUsername());
-
-        // Update the customer profile
         CustomerDTO updatedCustomer = customerService.updateCustomer(customerUpdateRequest, currentCustomer.id());
 
         return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
@@ -80,7 +75,6 @@ public class ProfileController {
         try {
             String email = userDetails.getUsername();
 
-            // Try customer first, then admin
             if (customerService.existsByEmail(email)) {
                 customerService.updatePasswordWithValidation(
                         email,

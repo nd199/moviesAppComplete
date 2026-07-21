@@ -1,11 +1,5 @@
-/**
- * API Calls - All network requests to the backend
- * Organized by functionality with proper error handling
- */
-
 import { userRequest, publicRequest, passResetRequest, paymentRequest } from '../AxiosMethods';
-import { setAccessToken, setRefreshToken } from '../authStore';
-import { setTokens } from '../redux/userSlice';
+import { setAccessToken, setRefreshToken, clearAuth } from '../authStore';
 import {
   fetchTmdbTrendingMoviesStart,
   fetchTmdbTrendingMoviesSuccess,
@@ -45,10 +39,6 @@ import {
   verifyEmailSuccess,
 } from '../redux/userSlice';
 
-// ============================================
-// AUTHENTICATION API
-// ============================================
-
 export const register = async (dispatch, customerInfo) => {
   dispatch(registerStart());
   try {
@@ -68,15 +58,13 @@ export const login = async (dispatch, userInfo) => {
   try {
     const res = await userRequest().post('/auth/login', userInfo);
     const { accessToken, refreshToken } = res.data;
-    
-    // Store tokens
+
     setAccessToken(accessToken);
     setRefreshToken(refreshToken);
-    dispatch(setTokens({ accessToken, refreshToken }));
-    
+
     dispatch(loginSuccess(res.data));
     dispatch(setAuthStatus("authenticated"));
-    
+
     return res.data;
   } catch (error) {
     const message = error.response?.data?.message || error.response?.data?.error || 'Invalid credentials';
@@ -89,10 +77,8 @@ export const logout = async (dispatch) => {
   try {
     await userRequest().post('/auth/logout');
   } catch (error) {
-    // Ignore logout errors
   } finally {
-    setAccessToken(null);
-    setRefreshToken(null);
+    clearAuth();
     dispatch(setAuthStatus("unauthenticated"));
   }
 };
@@ -117,15 +103,12 @@ export const verifyEmail = async (dispatch, email, checkUserExists = true) => {
     dispatch(verifyEmailSuccess(res.data));
     return res.data;
   } catch (error) {
-    // Preserve the error response for the component to handle
     const message = error.response?.data?.message || error.response?.data?.error || 'Failed to verify email';
     dispatch(verifyEmailFailure({ message }));
-    // Re-throw with the original error to preserve response data
     throw error;
   }
 };
 
-// Separate API for subscription email verification - uses dedicated subscription endpoint
 export const verifySubscriptionEmail = async (dispatch, email) => {
   dispatch(verifyEmailStart());
   try {
@@ -133,10 +116,8 @@ export const verifySubscriptionEmail = async (dispatch, email) => {
     dispatch(verifyEmailSuccess(res.data));
     return res.data;
   } catch (error) {
-    // Preserve the error response for the component to handle
     const message = error.response?.data?.message || error.response?.data?.error || 'Failed to verify email for subscription';
     dispatch(verifyEmailFailure({ message }));
-    // Re-throw with the original error to preserve response data
     throw error;
   }
 };
@@ -157,7 +138,6 @@ export const validateOtp = async (dispatch, otp, email) => {
   }
 };
 
-// Separate API for subscription OTP validation
 export const validateSubscriptionOtp = async (dispatch, otp, email) => {
   dispatch(validateOtpStart());
   try {
@@ -186,10 +166,6 @@ export const updatePasswordAndPushToLoginPage = async (dispatch, data) => {
     throw error;
   }
 };
-
-// ============================================
-// USER API
-// ============================================
 
 export const fetchCurrentUserDetails = async (dispatch) => {
   dispatch(fetchCurrentStart());
@@ -254,10 +230,6 @@ export const fetchUsers = async () => {
   }
 };
 
-// ============================================
-// CONTENT API (Movies & Shows)
-// ============================================
-
 export const fetchMovies = async () => {
   try {
     const res = await userRequest().get('/movies');
@@ -311,10 +283,6 @@ export const addProduct = async (product) => {
     throw error;
   }
 };
-
-// ============================================
-// TMDB API (Public - No Auth Required)
-// ============================================
 
 export const fetchTmdbTrendingMovies = async (dispatch) => {
   dispatch(fetchTmdbTrendingMoviesStart());
@@ -491,7 +459,6 @@ export const fetchTvGenres = async () => {
   } catch { return []; }
 };
 
-// Sync TMDB content (requires auth)
 export const syncTmdbMovie = async (tmdbId) => {
   try {
     const res = await userRequest().post(`/tmdb/sync/movie/${tmdbId}`);
@@ -528,10 +495,6 @@ export const fetchTmdbTvShowDetails = async (tmdbId) => {
   }
 };
 
-// ============================================
-// PAYMENT API
-// ============================================
-
 export const savePaymentApi = (payload) => paymentRequest().post('/submitPayment', payload);
 
 export const getPaymentDetailsApi = (email) => paymentRequest().get(`/paymentDetails?email=${email}`);
@@ -541,7 +504,6 @@ export const updateFinalUserApi = (finalUser) => paymentRequest().post('/updateF
 export const markUserAsSubscribed = async () => {
   try {
     const res = await userRequest().post('/payments/subscribe-success');
-    // Backend returns { message, data: { userData } } - extract data
     return res.data?.data || res.data;
   } catch (error) {
     throw error;
@@ -552,13 +514,8 @@ export const pingSpringApi = async (email) => {
   try {
     await userRequest().post('/payments/ping', { email });
   } catch (error) {
-    // Silently fail
   }
 };
-
-// ============================================
-// SUBSCRIPTION API
-// ============================================
 
 export const getSubscriptionPlans = async () => {
   try {
@@ -586,10 +543,6 @@ export const createSubscriptionIntent = async (planId) => {
     throw error;
   }
 };
-
-// ============================================
-// STREAMING API
-// ============================================
 
 export const getMovieStreamUrl = async (movieId) => {
   try {

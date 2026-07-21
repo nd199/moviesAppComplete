@@ -385,24 +385,20 @@ public class AdminService implements AdminServiceInterface {
         Admin admin = adminRepository.findByEmail(email)
                 .orElseThrow(() -> new AdminNotFoundException("Admin not found with email: " + email));
 
-        // Verify current password
         if (!passwordEncoder.matches(currentPassword, admin.getPassword())) {
             logger.warn("Password update failed - current password incorrect for admin: {}", email);
             throw new PasswordInvalidException("Current password is incorrect");
         }
 
-        // Check if new password is same as current
         if (passwordEncoder.matches(newPassword, admin.getPassword())) {
             logger.warn("Password update failed - new password same as current for admin: {}", email);
             throw new PasswordInvalidException("New password cannot be the same as your current password");
         }
 
-        // Validate new password strength
         if (newPassword == null || newPassword.length() < REQ_PASSWORD_LENGTH) {
             throw new PasswordInvalidException("Password must be at least " + REQ_PASSWORD_LENGTH + " characters long");
         }
 
-        // Update password
         admin.setPassword(passwordEncoder.encode(newPassword));
         adminRepository.save(admin);
 

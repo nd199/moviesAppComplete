@@ -37,33 +37,28 @@ public class TmdbService {
     // Cache for trailers to avoid repeated API calls
     private final Map<Long, List<TmdbVideoDto>> movieTrailerCache = new ConcurrentHashMap<>();
     private final Map<Long, List<TmdbVideoDto>> tvShowTrailerCache = new ConcurrentHashMap<>();
-    
-    // Cache timestamps for TTL-based invalidation
+
     private final Map<Long, Long> movieTrailerCacheTimestamps = new ConcurrentHashMap<>();
     private final Map<Long, Long> tvShowTrailerCacheTimestamps = new ConcurrentHashMap<>();
-    
-    // Cache TTL: 24 hours in milliseconds
+
     private static final long CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
     public TmdbService(@Value("${app.tmdb.api-key}") String apiKey, @Value("${app.tmdb.base-url}") String baseUrl, @Value("${app.tmdb.image-base-url}") String imageBaseUrl) {
         this.apiKey = apiKey;
         this.baseUrl = baseUrl;
         this.imageBaseUrl = imageBaseUrl;
-        
-        // Create connection provider with timeouts
+
         ConnectionProvider connectionProvider = ConnectionProvider.builder("tmdb-pool")
                 .maxConnections(50)
                 .maxIdleTime(Duration.ofSeconds(30))
                 .maxLifeTime(Duration.ofMinutes(5))
                 .pendingAcquireTimeout(Duration.ofSeconds(30))
                 .build();
-        
-        // Create HTTP client with timeouts and TLS configuration
+
         HttpClient httpClient = HttpClient.create(connectionProvider)
                 .responseTimeout(Duration.ofSeconds(30))
                 .secure();
-        
-        // TMDB API uses Bearer token (Read Access Token v4) in Authorization header
+
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
@@ -544,7 +539,6 @@ public class TmdbService {
             return Optional.empty();
         }
 
-        // Check if cache is valid (not expired)
         Long cacheTimestamp = movieTrailerCacheTimestamps.get(tmdbId);
         if (cacheTimestamp != null && (System.currentTimeMillis() - cacheTimestamp) < CACHE_TTL_MS) {
             List<TmdbVideoDto> cachedTrailers = movieTrailerCache.get(tmdbId);
@@ -553,7 +547,6 @@ public class TmdbService {
                 return Optional.of(cachedTrailers);
             }
         } else {
-            // Cache expired or not present, remove old entries
             movieTrailerCache.remove(tmdbId);
             movieTrailerCacheTimestamps.remove(tmdbId);
         }
@@ -588,7 +581,6 @@ public class TmdbService {
             return Optional.empty();
         }
 
-        // Check if cache is valid (not expired)
         Long cacheTimestamp = tvShowTrailerCacheTimestamps.get(tmdbId);
         if (cacheTimestamp != null && (System.currentTimeMillis() - cacheTimestamp) < CACHE_TTL_MS) {
             List<TmdbVideoDto> cachedTrailers = tvShowTrailerCache.get(tmdbId);
@@ -597,7 +589,6 @@ public class TmdbService {
                 return Optional.of(cachedTrailers);
             }
         } else {
-            // Cache expired or not present, remove old entries
             tvShowTrailerCache.remove(tmdbId);
             tvShowTrailerCacheTimestamps.remove(tmdbId);
         }
@@ -615,7 +606,6 @@ public class TmdbService {
 
             List<TmdbVideoDto> trailers = convertToVideoDtoList((List<Map<String, Object>>) response.get("results"));
 
-            // Cache the result
             tvShowTrailerCache.put(tmdbId, trailers);
             tvShowTrailerCacheTimestamps.put(tmdbId, System.currentTimeMillis());
             logger.debug("Cached trailers for TV show ID: {}", tmdbId);
@@ -627,24 +617,16 @@ public class TmdbService {
         }
     }
 
-    /**
-     * Refresh movie trailer cache by forcing a new fetch from TMDB
-     */
     public void refreshMovieTrailerCache(Long tmdbId) {
         logger.info("Refreshing movie trailer cache for ID: {}", tmdbId);
         movieTrailerCache.remove(tmdbId);
         movieTrailerCacheTimestamps.remove(tmdbId);
-        // The next call to getMovieVideos will fetch fresh data
     }
 
-    /**
-     * Refresh TV show trailer cache by forcing a new fetch from TMDB
-     */
     public void refreshTvShowTrailerCache(Long tmdbId) {
         logger.info("Refreshing TV show trailer cache for ID: {}", tmdbId);
         tvShowTrailerCache.remove(tmdbId);
         tvShowTrailerCacheTimestamps.remove(tmdbId);
-        // The next call to getTvShowVideos will fetch fresh data
     }
 
     /**

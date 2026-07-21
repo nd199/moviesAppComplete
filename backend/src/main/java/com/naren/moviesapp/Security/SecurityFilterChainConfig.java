@@ -87,7 +87,6 @@ public class SecurityFilterChainConfig {
                         "{\"message\":\"Unauthorized\",\"path\":\"" + uri + "\"}"
                 );
             } catch (IOException e) {
-                // If we can't write response, at least log the failure
                 logger.error("Failed to write 401 response body for uri={}", uri, e);
             }
         };
@@ -126,7 +125,10 @@ public class SecurityFilterChainConfig {
                                 "/",
                                 "/error",
                                 "/actuator/health",
-                                "/api/v1/auth/**",
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/logout",
+                                "/api/v1/auth/refresh-token",
+                                "/api/v1/auth/customers",
                                 "/api/v1/content-manager/**",
                                 "/api/v1/verify/email",
                                 "/api/v1/verify/email/exists",
@@ -163,6 +165,7 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(
                                 "/api/v1/customers/currentUser",
                                 "/api/v1/profile/**",
+                                "/api/v1/auth/change-password",
                                 "/api/v1/subscription/confirm",
                                 "/api/v1/payments/**",
                                 "/api/v1/video/**",
