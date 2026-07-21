@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ArrowBack, Notifications, Settings as SettingsIcon, Close, Logout } from "@mui/icons-material";
 import { logout } from "../../redux/userSlice";
+import { persistor } from "../../redux/store";
 import { clearAuth } from "../../authStore";
 
 const Settings = () => {
@@ -15,6 +16,7 @@ const Settings = () => {
   const handleLogout = () => {
     clearAuth();
     dispatch(logout());
+    persistor.purge();
     navigate("/login");
   };
 

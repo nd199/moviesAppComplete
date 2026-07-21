@@ -2,7 +2,9 @@ package com.naren.moviesapp.Auth;
 
 import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Record.CustomerRegistration;
+import com.naren.moviesapp.Record.PasswordChangeRequest;
 import com.naren.moviesapp.Repo.ContentManagerRepository;
+import com.naren.moviesapp.Service.AdminService;
 import com.naren.moviesapp.Service.CustomerService;
 import com.naren.moviesapp.Service.RefreshTokenService;
 import com.naren.moviesapp.Service.TokenBlacklistService;
@@ -14,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -34,6 +38,7 @@ public class AuthController {
     private final TokenBlacklistService tokenBlacklistService;
     private final JwtUtil jwtUtil;
     private final ContentManagerRepository contentManagerRepository;
+    private final AdminService adminService;
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
 
@@ -42,20 +47,19 @@ public class AuthController {
                           RefreshTokenService refreshTokenService,
                           TokenBlacklistService tokenBlacklistService,
                           JwtUtil jwtUtil,
-                          ContentManagerRepository contentManagerRepository) {
+                          ContentManagerRepository contentManagerRepository,
+                          AdminService adminService) {
         this.authService = authService;
         this.customerService = customerService;
         this.refreshTokenService = refreshTokenService;
         this.tokenBlacklistService = tokenBlacklistService;
         this.jwtUtil = jwtUtil;
         this.contentManagerRepository = contentManagerRepository;
+        this.adminService = adminService;
     }
 
-    /**
-     * Generate a device fingerprint from request headers.
-     * Hashes User-Agent + Accept-Language to create a unique device identifier.
-     * Different browsers/devices produce different fingerprints.
-     */
+    // Creates a device-specific hash from User-Agent + Accept-Language headers.
+    // Different browsers/devices produce different fingerprints for refresh token rotation.
     private String generateDeviceFingerprint(HttpServletRequest request) {
         try {
             String userAgent = request.getHeader("User-Agent") != null ? request.getHeader("User-Agent") : "";
@@ -194,5 +198,46 @@ public class AuthController {
                 "message", "Logged out successfully",
                 "status", "success"
         ));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @Valid @RequestBody PasswordChangeRequest passwordChangeRequest,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        logger.info("Password change request for user: {}", userDetails.getUsername());
+
+        try {
+            String email = userDetails.getUsername();
+
+            if (customerService.existsByEmail(email)) {
+                customerService.updatePasswordWithValidation(
+                        email,
+                        passwordChangeRequest.currentPassword(),
+                        passwordChangeRequest.newPassword()
+                );
+            } else if (adminService.adminExistsByEmail(email)) {
+                adminService.updateAdminPasswordWithValidation(
+                        email,
+                        passwordChangeRequest.currentPassword(),
+                        passwordChangeRequest.newPassword()
+                );
+            } else {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "message", "User not found",
+                        "status", "error"
+                ));
+            }
+
+            return ResponseEntity.ok().body(Map.of(
+                    "message", "Password changed successfully",
+                    "status", "success"
+            ));
+        } catch (Exception e) {
+            logger.error("Password change failed for user: {}", userDetails.getUsername(), e);
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", e.getMessage(),
+                    "status", "error"
+            ));
+        }
     }
 }

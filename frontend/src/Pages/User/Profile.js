@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { uploadToImgBB } from '../../ImgBB';
-import { changePassword, updateProfile, fetchUsers } from '../../Network/ApiCalls';
+import { changePassword, updateProfile } from '../../Network/ApiCalls';
 import { formatPhoneNumber, getPasswordStrength, validatePasswordForm, validateProfileForm } from '../../Utils/profileValidation';
 
 const Profile = () => {
@@ -48,8 +48,8 @@ const Profile = () => {
     try {
       let updatedImageUrl = imageUrl;
       if (avatar) updatedImageUrl = await uploadToImgBB(avatar, setUploadProgress);
-      const result = await updateProfile(dispatch, { name, email, phoneNumber, address, imageUrl: updatedImageUrl }, user.id);
-      if (result.success) { toast.success('Profile updated!'); fetchUsers(dispatch); }
+      await updateProfile(dispatch, { name, email, phoneNumber, address, imageUrl: updatedImageUrl }, user.id);
+      toast.success('Profile updated!');
     } catch (err) {
       const msg = err.message?.toLowerCase() || '';
       if (msg.includes('email already')) toast.error('Email already exists.');

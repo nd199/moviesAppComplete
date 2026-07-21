@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, Info, Movie, Tv, Bookmark, Close, Settings, CreditCard, History, Help, Logout } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/userSlice';
+import { persistor } from '../redux/store';
 import { clearAuth, getRefreshToken } from '../authStore';
 import api from '../AxiosMethods';
 
@@ -19,7 +20,10 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const handleLogout = async () => {
     try { await api.post('/auth/logout', { refreshToken: getRefreshToken() }); } catch {}
-    clearAuth(); dispatch(logout()); onClose();
+    clearAuth();
+    dispatch(logout());
+    persistor.purge();
+    onClose();
   };
 
   const nav = [

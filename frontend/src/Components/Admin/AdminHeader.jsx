@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { IoNotificationsOutline } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../redux/userSlice';
+import { persistor } from '../../redux/store';
 import { clearAuth } from '../../authStore';
 import axios from 'axios';
 
@@ -52,6 +53,7 @@ const AdminHeader = () => {
     } catch (e) {}
     clearAuth();
     dispatch(logout());
+    persistor.purge();
     navigate('/admin/login');
   };
 
