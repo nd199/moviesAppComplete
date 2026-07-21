@@ -29,8 +29,8 @@ const LoginForm = () => {
 
       const user = response?.user;
       const roles = user?.roles || [];
-      const isAdmin = roles.some(r => r === 'ROLE_ADMIN' || r?.name === 'ROLE_ADMIN');
-      const isCM = roles.some(r => r === 'ROLE_CONTENT_MANAGER' || r?.name === 'ROLE_CONTENT_MANAGER');
+      const isAdmin = roles.includes('ROLE_ADMIN');
+      const isCM = roles.includes('ROLE_CONTENT_MANAGER');
 
       setTimeout(() => {
         if (isAdmin || isCM) {

@@ -22,7 +22,7 @@ public class AdminDTOMapper implements Function<Admin, AdminDTO> {
                 admin.getAccessLevel(),
                 admin.getIsActive(),
                 admin.getRoles().stream()
-                        .map(role -> new RoleDTO(role.getId(), role.getName()))
+                        .map(role -> role.getName().name())
                         .toList(),
                 admin.getCreatedAt(),
                 admin.getUpdatedAt()

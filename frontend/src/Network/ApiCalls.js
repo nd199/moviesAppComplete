@@ -44,7 +44,6 @@ export const register = async (dispatch, customerInfo) => {
   try {
     const res = await userRequest().post('/auth/customers', customerInfo);
     dispatch(registerSuccess(res.data));
-    dispatch(setAuthStatus("authenticated"));
     return res.data;
   } catch (error) {
     const message = error.response?.data?.message || error.response?.data?.error || 'Failed to Register. Try again.';
@@ -63,7 +62,6 @@ export const login = async (dispatch, userInfo) => {
     setRefreshToken(refreshToken);
 
     dispatch(loginSuccess(res.data));
-    dispatch(setAuthStatus("authenticated"));
 
     return res.data;
   } catch (error) {

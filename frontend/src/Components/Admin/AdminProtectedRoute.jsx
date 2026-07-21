@@ -22,8 +22,8 @@ const AdminProtectedRoute = ({ children, requiredRole = null }) => {
   }
 
   const userRoles = currentUser?.roles || [];
-  const isAdmin = userRoles.some(r => r === 'ROLE_ADMIN' || r?.name === 'ROLE_ADMIN');
-  const isContentManager = userRoles.some(r => r === 'ROLE_CONTENT_MANAGER' || r?.name === 'ROLE_CONTENT_MANAGER');
+  const isAdmin = userRoles.includes('ROLE_ADMIN');
+  const isContentManager = userRoles.includes('ROLE_CONTENT_MANAGER');
 
   if (requiredRole === 'ROLE_ADMIN' && !isAdmin) {
     return <Navigate to="/admin/login" replace />;

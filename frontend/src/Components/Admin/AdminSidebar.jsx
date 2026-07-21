@@ -14,9 +14,7 @@ import { useSelector } from 'react-redux';
 const AdminSidebar = () => {
   const currentUser = useSelector((state) => state.user.currentUser);
   const userRoles = currentUser?.roles || [];
-  const isAdmin = userRoles.some(role =>
-    role === 'ROLE_ADMIN' || role?.name === 'ROLE_ADMIN'
-  );
+  const isAdmin = userRoles.includes('ROLE_ADMIN');
 
   const menuItems = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: HiHome, adminOnly: true },

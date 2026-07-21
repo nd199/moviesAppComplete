@@ -342,7 +342,7 @@ function ProtectedRoute({
     );
   }
 
-  const isAdmin = currentUser?.roles?.includes("ROLE_ADMIN");
+  const isAdmin = currentUser?.roles?.includes('ROLE_ADMIN');
 
   if (requireSubscription && isAdmin) {
     return children;

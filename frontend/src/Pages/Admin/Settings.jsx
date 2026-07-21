@@ -64,7 +64,7 @@ const Settings = () => {
               <div className="flex items-center gap-2 mt-2">
                 {(currentUser?.roles || ['ROLE_ADMIN']).map((role, i) => (
                   <span key={i} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/20 text-white backdrop-blur">
-                    {typeof role === 'string' ? role.replace('ROLE_', '') : role?.name?.replace('ROLE_', '') || 'Admin'}
+                    {role.replace('ROLE_', '')}
                   </span>
                 ))}
               </div>

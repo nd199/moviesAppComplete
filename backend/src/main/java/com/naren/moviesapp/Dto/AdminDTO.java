@@ -14,7 +14,7 @@ public record AdminDTO(
         String department,
         Integer accessLevel,
         Boolean isActive,
-        List<RoleDTO> roles,
+        List<String> roles,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {

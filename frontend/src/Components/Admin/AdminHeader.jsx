@@ -1,19 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IoNotificationsOutline } from 'react-icons/io5';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../redux/userSlice';
-import { persistor } from '../../redux/store';
-import { clearAuth } from '../../authStore';
-import axios from 'axios';
-
-const isLocalHost = () =>
-  window.location.hostname === 'localhost' ||
-  window.location.hostname === '127.0.0.1';
-
-const getBaseURL = () => {
-  if (isLocalHost()) return 'http://localhost:8080';
-  return process.env.REACT_APP_API_URL || 'https://nmoviesapi.duckdns.org';
-};
+import { useSelector } from 'react-redux';
+import { performLogout } from '../../utils/logout';
 
 const AdminHeader = () => {
   const location = useLocation();
@@ -45,15 +33,7 @@ const AdminHeader = () => {
   };
 
   const handleLogout = async () => {
-    try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (refreshToken) {
-        await axios.post(`${getBaseURL()}/api/v1/auth/logout`, { refreshToken });
-      }
-    } catch (e) {}
-    clearAuth();
-    dispatch(logout());
-    persistor.purge();
+    await performLogout();
     navigate('/admin/login');
   };
 

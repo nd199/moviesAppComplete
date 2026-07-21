@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ArrowBack, Notifications, Settings as SettingsIcon, Close, Logout } from "@mui/icons-material";
-import { logout } from "../../redux/userSlice";
-import { persistor } from "../../redux/store";
-import { clearAuth } from "../../authStore";
+import { performLogout } from "../../utils/logout";
 
 const Settings = () => {
   const dispatch = useDispatch();
@@ -13,10 +10,8 @@ const Settings = () => {
   const [darkMode, setDarkMode] = useState(true);
   const [language, setLanguage] = useState("en");
 
-  const handleLogout = () => {
-    clearAuth();
-    dispatch(logout());
-    persistor.purge();
+  const handleLogout = async () => {
+    await performLogout();
     navigate("/login");
   };
 

@@ -2,12 +2,10 @@ import { ArrowDropDown, Menu, Notifications, Person, Bookmark, History, CreditCa
 import { Badge } from "@mui/material";
 import { useCallback, useEffect, useState, useRef } from "react";
 import Lottie from "react-lottie";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { logout } from "../redux/userSlice";
-import { persistor } from "../redux/store";
 import api, { publicRequest } from "../AxiosMethods";
-import { clearAuth, getRefreshToken } from "../authStore";
+import { performLogout } from "../utils/logout";
 import popcornAnimation from "../Utils/animations/popcorn.json";
 
 const NavBar = ({ onMenuClick }) => {
@@ -22,7 +20,6 @@ const NavBar = ({ onMenuClick }) => {
   const searchTimerRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
   const user = useSelector((s) => s.user?.currentUser);
   const authStatus = useSelector((s) => s.user?.authStatus);
   const hideSignIn = location.pathname === '/login' || location.pathname === '/register';
@@ -80,15 +77,11 @@ const NavBar = ({ onMenuClick }) => {
 
   const lottie = { loop: true, autoplay: true, animationData: popcornAnimation, rendererSettings: { preserveAspectRatio: "xMidYMid slice" } };
 
-  const handleLogout = useCallback(() => {
-    const token = getRefreshToken();
-    clearAuth();
-    dispatch(logout());
-    persistor.purge();
+  const handleLogout = useCallback(async () => {
+    await performLogout();
     navigate("/login");
     setOpen(false);
-    api.post('/auth/logout', { refreshToken: token }).catch(() => {});
-  }, [dispatch, navigate]);
+  }, [navigate]);
 
   const handleSearch = useCallback((e) => {
     e.preventDefault();

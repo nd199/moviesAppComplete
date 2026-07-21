@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { loginStart, loginFailure, setAuthStatus, fetchCurrentSuccess } from '../../redux/userSlice';
+import { loginStart, loginFailure, fetchCurrentSuccess } from '../../redux/userSlice';
 import { setAccessToken, setRefreshToken } from '../../authStore';
 import { fetchCurrentUserDetails } from '../../Network/ApiCalls';
 import { adminLogin } from '../../services/adminApi';
@@ -25,7 +25,6 @@ const AdminLogin = () => {
       const { accessToken, refreshToken } = response;
       setAccessToken(accessToken);
       if (refreshToken) setRefreshToken(refreshToken);
-      dispatch(setAuthStatus('authenticated'));
       await fetchCurrentUserDetails(dispatch);
       toast.success('Login successful!');
       navigate('/admin/dashboard');
