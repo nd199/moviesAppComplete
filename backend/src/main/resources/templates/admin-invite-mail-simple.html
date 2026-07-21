@@ -1,141 +1,196 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Invitation - CN.io</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>Admin Invitation</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:AllowPNG/>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #050810;
-            padding: 0;
-            margin: 0;
-            -webkit-font-smoothing: antialiased;
-        }
-        .wrapper { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
-        .card {
-            background: #0a0e1a;
-            border-radius: 24px;
-            overflow: hidden;
-            border: 1px solid rgba(124,58,237,0.15);
-            box-shadow: 0 25px 80px rgba(0,0,0,0.5), 0 0 60px rgba(124,58,237,0.08);
-        }
-        .hero {
-            position: relative; height: 220px;
-            background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=400&fit=crop') center/cover;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .hero::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(180deg, rgba(5,8,16,0.3) 0%, rgba(10,14,26,0.95) 100%);
-        }
-        .hero-content { position: relative; z-index: 1; text-align: center; }
-        .logo {
-            font-size: 28px; font-weight: 800;
-            background: linear-gradient(135deg, #7c3aed, #06b6d4);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .hero-tagline { color: rgba(255,255,255,0.6); font-size: 13px; margin-top: 4px; font-weight: 500; }
-        .body-content { padding: 40px 40px 20px; }
-        .greeting { color: #e2e8f0; font-size: 22px; font-weight: 700; margin: 0 0 12px; }
-        .description { color: #8892b0; font-size: 14px; line-height: 1.7; margin: 0 0 20px; }
-        .highlight-box {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(124,58,237,0.12);
-            border-left: 4px solid #7c3aed; border-radius: 12px; padding: 24px; margin: 25px 0;
-        }
-        .highlight-box h3 { color: #e2e8f0; font-size: 16px; font-weight: 700; margin: 0 0 10px; }
-        .features-list { list-style: none; padding: 0; margin: 12px 0 0; }
-        .features-list li {
-            padding: 6px 0 6px 24px; position: relative; color: #8892b0; font-size: 13px; line-height: 1.6;
-        }
-        .features-list li::before {
-            content: '\2713'; position: absolute; left: 0; color: #06b6d4; font-weight: bold;
-        }
-        .btn-wrapper { text-align: center; margin: 30px 0; }
-        .btn-accept {
-            display: inline-block; padding: 16px 48px;
-            background: linear-gradient(135deg, #7c3aed, #06b6d4);
-            color: #ffffff !important; text-decoration: none; border-radius: 14px;
-            font-weight: 700; font-size: 15px; box-shadow: 0 8px 30px rgba(124,58,237,0.35);
-        }
-        .link-fallback {
-            margin: 20px 0; padding: 16px 20px; background: rgba(255,255,255,0.03);
-            border: 1px dashed rgba(124,58,237,0.2); border-radius: 12px; word-break: break-all;
-        }
-        .link-fallback-label { color: #4a5568; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 8px; }
-        .link-fallback a { color: #7c3aed; font-size: 12px; text-decoration: none; font-family: 'SF Mono', Consolas, monospace; }
-        .security-box {
-            background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.15);
-            border-left: 4px solid #fbbf24; border-radius: 12px; padding: 20px; margin: 25px 0;
-        }
-        .security-box h4 { color: #fbbf24; font-size: 14px; font-weight: 700; margin: 0 0 8px; }
-        .security-box p, .security-box li { color: #8892b0; font-size: 13px; line-height: 1.6; }
-        .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(124,58,237,0.2), transparent); margin: 30px 0; }
-        .footer {
-            background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.05);
-            padding: 30px 40px; text-align: center;
-        }
-        .footer-text { color: #3b4560; font-size: 11px; margin: 4px 0; }
-        .footer-brand { color: #5a6380; font-weight: 600; }
     </style>
 </head>
-<body>
-<div class="wrapper">
-    <div class="card">
-        <div class="hero">
-            <div class="hero-content">
-                <div class="logo">CN.io</div>
-                <div class="hero-tagline">Admin Panel Access</div>
-            </div>
-        </div>
-
-        <div class="body-content">
-            <h1 class="greeting">Admin Invitation</h1>
-            <p class="description">
-                You've been invited to join <strong style="color:#e2e8f0;">CN.io</strong> as an administrator.
-                This invitation was sent to <strong style="color:#e2e8f0;" th:text="${toEmail}"></strong>.
-            </p>
-
-            <div class="highlight-box">
-                <h3>Your Admin Capabilities</h3>
-                <p style="color:#8892b0; font-size:13px; margin:0;">As an admin, you'll have access to powerful management tools:</p>
-                <ul class="features-list">
-                    <li>Manage movies, shows, and content library</li>
-                    <li>Oversee user accounts and subscriptions</li>
-                    <li>Access analytics and platform reports</li>
-                    <li>Invite and manage other admins</li>
-                    <li>Configure platform settings</li>
-                </ul>
-            </div>
-
-            <div class="btn-wrapper">
-                <a class="btn-accept" th:href="${inviteLink}">Accept Invitation</a>
-            </div>
-
-            <div class="link-fallback">
-                <div class="link-fallback-label">Or copy this link</div>
-                <a th:href="${inviteLink}" th:text="${inviteLink}"></a>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="security-box">
-                <h4>Security Notice</h4>
-                <p>This invitation link is valid for <strong>24 hours</strong>. Please:</p>
-                <ul class="features-list" style="margin-top:8px;">
-                    <li>Never share this link with anyone</li>
-                    <li>Set a strong, unique password</li>
-                    <li>Contact us if you didn't expect this invitation</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p class="footer-text">Best regards, <span class="footer-brand">The CN.io Team</span></p>
-            <p class="footer-text">&copy; 2025 <span class="footer-brand">CN.io</span> &mdash; All rights reserved</p>
-        </div>
+<body style="margin:0;padding:0;background-color:#050810;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+    <!-- Preheader text (hidden) -->
+    <div style="display:none;font-size:1px;color:#050810;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
+      You've been invited to join CN.io as an Administrator. Accept your invitation to get started.
     </div>
-</div>
+
+    <!-- Outer wrapper -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#050810;">
+        <tr>
+            <td align="center" style="padding:40px 20px;">
+                <!-- Card -->
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#0a0e1a;border-radius:24px;overflow:hidden;border:1px solid rgba(124,58,237,0.15);">
+                    <!-- Hero -->
+                    <tr>
+                        <td align="center" valign="middle" style="height:220px;background:linear-gradient(135deg,#1a0533 0%,#0a0e1a 50%,#0a1628 100%);position:relative;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="center" style="padding:20px;">
+                                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;background:radial-gradient(circle,rgba(124,58,237,0.2) 0%,transparent 70%);border-radius:50%;"></div>
+                                        <div style="position:relative;z-index:1;">
+                                            <div style="font-size:32px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">
+                                                <span style="background:linear-gradient(135deg,#7c3aed,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">CN</span><span style="color:#ffffff;">.io</span>
+                                            </div>
+                                            <div style="color:rgba(255,255,255,0.5);font-size:13px;margin-top:6px;font-weight:500;letter-spacing:3px;text-transform:uppercase;">ADMIN PANEL ACCESS</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding:40px 40px 20px;">
+                            <h1 style="margin:0 0 16px;font-size:24px;font-weight:700;color:#e2e8f0;">Admin Invitation</h1>
+                            <p style="margin:0 0 0;font-size:15px;line-height:1.7;color:#8892b0;">
+                                You've been invited to join <strong style="color:#e2e8f0;">CN.io</strong> as an <strong style="color:#e2e8f0;">Administrator</strong>. This invitation was sent to <strong style="color:#e2e8f0;" th:text="${toEmail}"></strong>.
+                            </p>
+                        </td>
+                    </tr>
+                    <!-- Capabilities box -->
+                    <tr>
+                        <td style="padding:10px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="padding:24px;background-color:rgba(255,255,255,0.03);border:1px solid rgba(124,58,237,0.12);border-left:4px solid #7c3aed;border-radius:12px;">
+                                        <div style="font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:8px;">Your Admin Capabilities</div>
+                                        <p style="margin:0 0 12px;font-size:13px;color:#8892b0;">As an admin, you'll have access to powerful management tools:</p>
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="padding:6px 0 6px 28px;font-size:13px;color:#8892b0;line-height:1.6;">
+                                                    <span style="color:#06b6d4;font-weight:bold;margin-right:8px;">&#10003;</span> Manage movies, shows, and content library
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:6px 0 6px 28px;font-size:13px;color:#8892b0;line-height:1.6;">
+                                                    <span style="color:#06b6d4;font-weight:bold;margin-right:8px;">&#10003;</span> Oversee user accounts and subscriptions
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:6px 0 6px 28px;font-size:13px;color:#8892b0;line-height:1.6;">
+                                                    <span style="color:#06b6d4;font-weight:bold;margin-right:8px;">&#10003;</span> Access analytics and platform reports
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:6px 0 6px 28px;font-size:13px;color:#8892b0;line-height:1.6;">
+                                                    <span style="color:#06b6d4;font-weight:bold;margin-right:8px;">&#10003;</span> Invite and manage other admins
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:6px 0 6px 28px;font-size:13px;color:#8892b0;line-height:1.6;">
+                                                    <span style="color:#06b6d4;font-weight:bold;margin-right:8px;">&#10003;</span> Configure platform settings
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- CTA Button -->
+                    <tr>
+                        <td style="padding:30px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="center">
+                                        <!--[if mso]>
+                                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" th:href="${inviteLink}" style="height:52px;v-text-anchor:middle;width:260px;" arcsize="27%" strokecolor="#7c3aed" fillcolor="#7c3aed">
+                                        <w:anchorlock/>
+                                        <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;">Accept Invitation</center>
+                                        </v:roundrect>
+                                        <![endif]-->
+                                        <!--[if !mso]><!-->
+                                        <a th:href="${inviteLink}" style="display:inline-block;padding:16px 48px;background:linear-gradient(135deg,#7c3aed,#06b6d4);color:#ffffff;text-decoration:none;border-radius:14px;font-weight:700;font-size:15px;letter-spacing:0.3px;box-shadow:0 8px 30px rgba(124,58,237,0.35);">Accept Invitation</a>
+                                        <!--<![endif]-->
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Fallback link -->
+                    <tr>
+                        <td style="padding:0 40px 10px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="padding:16px 20px;background-color:rgba(255,255,255,0.03);border:1px dashed rgba(124,58,237,0.2);border-radius:12px;">
+                                        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#4a5568;margin-bottom:8px;">Or copy this link</div>
+                                        <a th:href="${inviteLink}" style="color:#7c3aed;font-size:12px;text-decoration:none;font-family:'SF Mono','Cascadia Code',Consolas,monospace;word-break:break-all;" th:text="${inviteLink}"></a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Security notice -->
+                    <tr>
+                        <td style="padding:20px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="padding:20px;background-color:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.15);border-left:4px solid #fbbf24;border-radius:12px;">
+                                        <div style="font-size:14px;font-weight:700;color:#fbbf24;margin-bottom:8px;">&#9888; Security Notice</div>
+                                        <p style="margin:0 0 8px;font-size:13px;line-height:1.7;color:#8892b0;">
+                                            This invitation link is valid for <strong style="color:#e2e8f0;">7 days</strong>. Please:
+                                        </p>
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="padding:4px 0 4px 28px;font-size:13px;color:#8892b0;line-height:1.6;">
+                                                    <span style="color:#06b6d4;font-weight:bold;margin-right:8px;">&#10003;</span> Never share this link with anyone
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:4px 0 4px 28px;font-size:13px;color:#8892b0;line-height:1.6;">
+                                                    <span style="color:#06b6d4;font-weight:bold;margin-right:8px;">&#10003;</span> Set a strong, unique password
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:4px 0 4px 28px;font-size:13px;color:#8892b0;line-height:1.6;">
+                                                    <span style="color:#06b6d4;font-weight:bold;margin-right:8px;">&#10003;</span> Contact us if you didn't expect this invitation
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Divider -->
+                    <tr>
+                        <td style="padding:10px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.25),transparent);"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding:30px 40px;background-color:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.05);text-align:center;">
+                            <p style="margin:0 0 8px;font-size:11px;color:#3b4560;">
+                                Best regards,<strong style="color:#5a6380;"> The CN.io Team</strong>
+                            </p>
+                            <p style="margin:0 0 8px;font-size:11px;color:#3b4560;">
+                                &copy; 2025 <strong style="color:#5a6380;">CN.io</strong> &mdash; All rights reserved
+                            </p>
+                            <p style="margin:0;font-size:11px;color:#3b4560;">
+                                Made with care in Chennai, India
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
