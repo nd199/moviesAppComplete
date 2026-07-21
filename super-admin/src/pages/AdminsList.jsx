@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { systemAPI } from '../services/api';
+import { HiUsers, HiArrowDownTray } from 'react-icons/hi2';
+
+const roleBadgeColors = {
+  ROLE_ADMIN: 'bg-red-50 text-red-700 ring-red-600/20',
+  ROLE_SUPPORT: 'bg-blue-50 text-blue-700 ring-blue-600/20',
+  ROLE_CONTENT_MANAGER: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  ROLE_SUPER_ADMIN: 'bg-purple-50 text-purple-700 ring-purple-600/20',
+};
 
 const AdminsList = () => {
   const [admins, setAdmins] = useState([]);
@@ -18,7 +26,7 @@ const AdminsList = () => {
       const response = await systemAPI.getAdmins();
       setAdmins(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      console.error('Failed to fetch admins:', error);
+      // silently handle
     } finally {
       setLoading(false);
     }
@@ -28,12 +36,28 @@ const AdminsList = () => {
     setResending(email);
     try {
       await systemAPI.resendInvite({ email });
-      toast.success(`Invite resent to ${email}`);
+      toast.success('Invite resent');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to resend invite');
+      toast.error('Failed to resend invite');
     } finally {
       setResending(null);
     }
+  };
+
+  const handleExport = () => {
+    const headers = ['Name', 'Email', 'Department', 'Status', 'Joined'];
+    const rows = filtered.map(a => [
+      a.name, a.email, a.department || 'N/A', a.isActive ? 'Active' : 'Inactive',
+      a.createdAt ? new Date(a.createdAt).toLocaleDateString() : 'N/A'
+    ]);
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'admins.csv';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const filtered = admins.filter(a =>
@@ -61,10 +85,21 @@ const AdminsList = () => {
     });
   };
 
+  const getPrimaryRole = (roles) => {
+    if (!roles || roles.length === 0) return null;
+    return roles[0]?.name?.replace('ROLE_', '').replace(/_/g, ' ') || null;
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="space-y-6">
+        <div className="h-24 bg-gray-200 rounded-2xl animate-pulse" />
+        <div className="h-12 bg-gray-200 rounded-xl animate-pulse" />
+        <div className="space-y-2">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-16 bg-gray-200 rounded-xl animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -74,25 +109,55 @@ const AdminsList = () => {
       {/* Header */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 p-6 text-white">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
-        <div className="relative z-10">
-          <h2 className="text-2xl font-bold">Administrators</h2>
-          <p className="text-gray-400 mt-1">Manage admin accounts and invitations</p>
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Administrators</h2>
+            <p className="text-gray-400 mt-1">Manage admin accounts and invitations</p>
+          </div>
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition-colors"
+          >
+            <HiArrowDownTray className="w-4 h-4" />
+            Export CSV
+          </button>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{admins.length}</p>
+        <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+              <HiUsers className="w-5 h-5 text-gray-600" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</p>
+              <p className="text-2xl font-bold text-gray-900">{admins.length}</p>
+            </div>
+          </div>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wide">Active</p>
-          <p className="text-2xl font-bold text-emerald-700 mt-1">{activeCount}</p>
+        <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
+              <div className="w-3 h-3 bg-emerald-500 rounded-full" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wide">Active</p>
+              <p className="text-2xl font-bold text-emerald-700">{activeCount}</p>
+            </div>
+          </div>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-xs font-semibold text-red-600 uppercase tracking-wide">Inactive</p>
-          <p className="text-2xl font-bold text-red-700 mt-1">{inactiveCount}</p>
+        <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
+              <div className="w-3 h-3 bg-red-500 rounded-full" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-red-600 uppercase tracking-wide">Inactive</p>
+              <p className="text-2xl font-bold text-red-700">{inactiveCount}</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -119,8 +184,15 @@ const AdminsList = () => {
                       <span className="text-white text-sm font-bold">{admin.name?.charAt(0)?.toUpperCase()}</span>
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-sm font-semibold text-gray-900 truncate">{admin.name}</p>
+                        {admin.roles?.[0] && (
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ring-1 ring-inset ${
+                            roleBadgeColors[admin.roles[0].name] || 'bg-gray-50 text-gray-700 ring-gray-600/20'
+                          }`}>
+                            {getPrimaryRole(admin.roles)}
+                          </span>
+                        )}
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ring-1 ring-inset ${
                           admin.isActive
                             ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
@@ -143,7 +215,7 @@ const AdminsList = () => {
                         disabled={resending === admin.email}
                         className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
                       >
-                        {resending === admin.email ? 'Sending...' : 'Resend Invite'}
+                        {resending === admin.email ? 'Sending...' : 'Resend'}
                       </button>
                     )}
                   </div>
@@ -160,7 +232,6 @@ const AdminsList = () => {
           onClick={() => setSelectedAdmin(null)}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}>
-            {/* Modal Header */}
             <div className="p-6 border-b border-gray-100">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
@@ -170,6 +241,15 @@ const AdminsList = () => {
                   <div>
                     <h3 className="text-lg font-bold text-gray-900">{selectedAdmin.name}</h3>
                     <p className="text-sm text-gray-500">{selectedAdmin.email}</p>
+                    <div className="flex gap-1.5 mt-1.5">
+                      {selectedAdmin.roles?.map(role => (
+                        <span key={role.name} className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ring-1 ring-inset ${
+                          roleBadgeColors[role.name] || 'bg-gray-50 text-gray-700 ring-gray-600/20'
+                        }`}>
+                          {role.name?.replace('ROLE_', '').replace(/_/g, ' ')}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <button onClick={() => setSelectedAdmin(null)}
@@ -181,9 +261,7 @@ const AdminsList = () => {
               </div>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6 space-y-4">
-              {/* Status */}
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                 <span className="text-sm font-medium text-gray-600">Status</span>
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ring-1 ring-inset ${
@@ -195,19 +273,16 @@ const AdminsList = () => {
                 </span>
               </div>
 
-              {/* Details */}
               <div className="space-y-3">
                 <DetailRow label="Phone" value={selectedAdmin.phoneNumber} />
                 <DetailRow label="Address" value={selectedAdmin.address} />
                 <DetailRow label="Department" value={selectedAdmin.department} />
                 <DetailRow label="Access Level" value={selectedAdmin.accessLevel} />
                 <DetailRow label="Email Verified" value={selectedAdmin.isEmailVerified ? 'Yes' : 'No'} />
-                <DetailRow label="Roles" value={selectedAdmin.roles?.map(r => r.name?.replace('ROLE_', '')).join(', ') || 'N/A'} />
                 <DetailRow label="Joined" value={formatDate(selectedAdmin.createdAt)} />
                 <DetailRow label="Last Updated" value={formatDate(selectedAdmin.updatedAt)} />
               </div>
 
-              {/* Actions */}
               {!selectedAdmin.isActive && (
                 <div className="pt-2">
                   <button
