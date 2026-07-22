@@ -2,10 +2,12 @@ import { ArrowDropDown, Menu, Notifications, Person, Bookmark, History, CreditCa
 import { Badge } from "@mui/material";
 import { useCallback, useEffect, useState, useRef } from "react";
 import Lottie from "react-lottie";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { publicRequest } from "../AxiosMethods";
 import { performLogout } from "../Utils/logout";
+import { fetchUnreadCount } from "../redux/notificationRedux";
+import NotificationDropdown from "./NotificationDropdown";
 import popcornAnimation from "../Utils/animations/popcorn.json";
 
 const NavBar = ({ onMenuClick }) => {
@@ -20,8 +22,11 @@ const NavBar = ({ onMenuClick }) => {
   const searchTimerRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const user = useSelector((s) => s.user?.currentUser);
   const authStatus = useSelector((s) => s.user?.authStatus);
+  const unreadCount = useSelector((s) => s.notification?.unreadCount || 0);
+  const [notifOpen, setNotifOpen] = useState(false);
   const hideSignIn = location.pathname === '/login' || location.pathname === '/register';
 
   useEffect(() => {
@@ -35,6 +40,12 @@ const NavBar = ({ onMenuClick }) => {
       searchInputRef.current.focus();
     }
   }, [searchOpen]);
+
+  useEffect(() => {
+    if (user && authStatus === 'authenticated') {
+      dispatch(fetchUnreadCount());
+    }
+  }, [user, authStatus, dispatch]);
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -210,11 +221,12 @@ const NavBar = ({ onMenuClick }) => {
               )
             )}
 
-            <Badge badgeContent={3} color="secondary" className="!cursor-pointer">
-              <button className="w-9 h-9 rounded-xl glass flex items-center justify-center text-[#8892b0] hover:text-white hover:bg-white/10 transition-all cursor-pointer border-none">
+            <Badge badgeContent={unreadCount} color="secondary" className="!cursor-pointer">
+              <button onClick={() => setNotifOpen(!notifOpen)} className="w-9 h-9 rounded-xl glass flex items-center justify-center text-[#8892b0] hover:text-white hover:bg-white/10 transition-all cursor-pointer border-none">
                 <Notifications sx={{ fontSize: 18 }} />
               </button>
             </Badge>
+            <NotificationDropdown open={notifOpen} onClose={() => setNotifOpen(false)} />
 
             <button onClick={onMenuClick} aria-label="Menu" className="lg:hidden w-9 h-9 rounded-xl glass flex items-center justify-center text-[#8892b0] hover:text-white hover:bg-white/10 transition-all cursor-pointer border-none">
               <Menu sx={{ fontSize: 18 }} />

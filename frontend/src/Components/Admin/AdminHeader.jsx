@@ -1,13 +1,23 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IoNotificationsOutline } from 'react-icons/io5';
 import { HiBars3 } from 'react-icons/hi2';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
 import { performLogout } from '../../Utils/logout';
+import { fetchUnreadCount } from '../../redux/notificationRedux';
+import NotificationDropdown from '../NotificationDropdown';
 
 const AdminHeader = ({ onMenuToggle }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector(s => s?.user?.currentUser);
+  const unreadCount = useSelector(s => s?.notification?.unreadCount || 0);
+  const [notifOpen, setNotifOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchUnreadCount());
+  }, [dispatch]);
 
   const getPageTitle = () => {
     const path = location.pathname.replace('/admin', '');
@@ -68,10 +78,18 @@ const AdminHeader = ({ onMenuToggle }) => {
           <span className="text-xs font-medium text-white">{user?.name || 'Admin'}</span>
         </div>
 
-        <button className="relative p-2 sm:p-2.5 text-surface-500 hover:text-white hover:bg-surface-800 rounded-xl transition-all duration-200">
+        <button
+          onClick={() => setNotifOpen(!notifOpen)}
+          className="relative p-2 sm:p-2.5 text-surface-500 hover:text-white hover:bg-surface-800 rounded-xl transition-all duration-200"
+        >
           <IoNotificationsOutline className="h-5 w-5" />
-          <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full ring-2 ring-surface-900"></span>
+          {unreadCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold ring-2 ring-surface-900">
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
         </button>
+        <NotificationDropdown open={notifOpen} onClose={() => setNotifOpen(false)} />
 
         <button onClick={handleLogout}
           className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-2 text-xs sm:text-sm font-medium text-surface-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-200">
