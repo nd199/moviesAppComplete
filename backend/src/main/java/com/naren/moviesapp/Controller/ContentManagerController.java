@@ -61,15 +61,16 @@ public class ContentManagerController {
     }
 
     @PostMapping("/register")
+    @PreAuthorize("hasAuthority('SYSTEM_CONFIG')")
     public ResponseEntity<ContentManager> register(@Valid @RequestBody ContentManagerRegistration registration) {
         logger.info("Content manager registration request: {}", registration.email());
         ContentManager contentManager = contentManagerService.register(registration);
         return new ResponseEntity<>(contentManager, HttpStatus.CREATED);
     }
 
-    // Content Manager CRUD endpoints
+    // Content Manager CRUD endpoints - Admin only
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('CONTENT_MANAGER') and #id == authentication.principal.id)")
+    @PreAuthorize("hasAuthority('SYSTEM_CONFIG')")
     public ResponseEntity<ContentManager> getContentManagerById(@PathVariable("id") Long id) {
         logger.debug("Fetching content manager by ID: {}", id);
         ContentManager contentManager = contentManagerService.getContentManagerById(id);
@@ -77,7 +78,7 @@ public class ContentManagerController {
     }
 
     @GetMapping("/email/{email}")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('CONTENT_MANAGER') and #email == authentication.principal.username)")
+    @PreAuthorize("hasAuthority('SYSTEM_CONFIG')")
     public ResponseEntity<ContentManager> getContentManagerByEmail(@PathVariable("email") String email) {
         logger.debug("Fetching content manager by email: {}", email);
         ContentManager contentManager = contentManagerService.getContentManagerByEmail(email);
@@ -93,7 +94,7 @@ public class ContentManagerController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('CONTENT_MANAGER') and #id == authentication.principal.id)")
+    @PreAuthorize("hasAuthority('SYSTEM_CONFIG')")
     public ResponseEntity<ContentManager> updateContentManager(@PathVariable("id") Long id,
                                                                @RequestBody ContentManagerUpdateRequest update) {
         logger.info("Updating content manager with ID: {}", id);
@@ -117,9 +118,9 @@ public class ContentManagerController {
         return ResponseEntity.ok().build();
     }
 
-    // Movie Management endpoints
+    // Movie Management endpoints - content managers can manage all content
     @PostMapping("/{contentManagerId}/movies")
-    @PreAuthorize("hasRole('CONTENT_MANAGER') and #contentManagerId == authentication.principal.id")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<Movie> addMovie(@PathVariable("contentManagerId") Long contentManagerId,
                                           @RequestBody Movie movie) {
         logger.info("Content manager {} adding movie: {}", contentManagerId, movie.getName());
@@ -128,7 +129,7 @@ public class ContentManagerController {
     }
 
     @PutMapping("/{contentManagerId}/movies/{movieId}")
-    @PreAuthorize("hasRole('CONTENT_MANAGER') and #contentManagerId == authentication.principal.id")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<Void> updateMovie(@PathVariable("contentManagerId") Long contentManagerId,
                                             @PathVariable("movieId") Long movieId,
                                             @RequestBody Movie movie) {
@@ -138,7 +139,7 @@ public class ContentManagerController {
     }
 
     @DeleteMapping("/{contentManagerId}/movies/{movieId}")
-    @PreAuthorize("hasRole('CONTENT_MANAGER') and #contentManagerId == authentication.principal.id")
+    @PreAuthorize("hasAuthority('MOVIE_DELETE')")
     public ResponseEntity<Void> deleteMovie(@PathVariable("contentManagerId") Long contentManagerId,
                                             @PathVariable("movieId") Long movieId) {
         logger.info("Content manager {} deleting movie: {}", contentManagerId, movieId);
@@ -147,16 +148,16 @@ public class ContentManagerController {
     }
 
     @GetMapping("/{contentManagerId}/movies")
-    @PreAuthorize("hasRole('CONTENT_MANAGER') and #contentManagerId == authentication.principal.id")
+    @PreAuthorize("hasAuthority('MOVIE_READ')")
     public ResponseEntity<List<Movie>> getMoviesByContentManager(@PathVariable("contentManagerId") Long contentManagerId) {
         logger.debug("Fetching movies for content manager: {}", contentManagerId);
         List<Movie> movies = contentManagerService.getMoviesByContentManager(contentManagerId);
         return ResponseEntity.ok(movies);
     }
 
-    // Show Management endpoints
+    // Show Management endpoints - content managers can manage all content
     @PostMapping("/{contentManagerId}/shows")
-    @PreAuthorize("hasRole('CONTENT_MANAGER') and #contentManagerId == authentication.principal.id")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<Show> addShow(@PathVariable("contentManagerId") Long contentManagerId,
                                         @RequestBody Show show) {
         logger.info("Content manager {} adding show: {}", contentManagerId, show.getName());
@@ -165,7 +166,7 @@ public class ContentManagerController {
     }
 
     @PutMapping("/{contentManagerId}/shows/{showId}")
-    @PreAuthorize("hasRole('CONTENT_MANAGER') and #contentManagerId == authentication.principal.id")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<Void> updateShow(@PathVariable("contentManagerId") Long contentManagerId,
                                            @PathVariable("showId") Long showId,
                                            @RequestBody Show show) {
@@ -175,7 +176,7 @@ public class ContentManagerController {
     }
 
     @DeleteMapping("/{contentManagerId}/shows/{showId}")
-    @PreAuthorize("hasRole('CONTENT_MANAGER') and #contentManagerId == authentication.principal.id")
+    @PreAuthorize("hasAuthority('MOVIE_DELETE')")
     public ResponseEntity<Void> deleteShow(@PathVariable("contentManagerId") Long contentManagerId,
                                            @PathVariable("showId") Long showId) {
         logger.info("Content manager {} deleting show: {}", contentManagerId, showId);
@@ -184,7 +185,7 @@ public class ContentManagerController {
     }
 
     @GetMapping("/{contentManagerId}/shows")
-    @PreAuthorize("hasRole('CONTENT_MANAGER') and #contentManagerId == authentication.principal.id")
+    @PreAuthorize("hasAuthority('MOVIE_READ')")
     public ResponseEntity<List<Show>> getShowsByContentManager(@PathVariable("contentManagerId") Long contentManagerId) {
         logger.debug("Fetching shows for content manager: {}", contentManagerId);
         List<Show> shows = contentManagerService.getShowsByContentManager(contentManagerId);
@@ -193,7 +194,7 @@ public class ContentManagerController {
 
     // Analytics endpoints
     @GetMapping("/{contentManagerId}/analytics")
-    @PreAuthorize("hasRole('CONTENT_MANAGER') and #contentManagerId == authentication.principal.id")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<Map<String, Object>> getContentManagerAnalytics(@PathVariable("contentManagerId") Long contentManagerId) {
         logger.debug("Fetching analytics for content manager: {}", contentManagerId);
         Long movieCount = contentManagerService.getMovieCountByContentManager(contentManagerId);

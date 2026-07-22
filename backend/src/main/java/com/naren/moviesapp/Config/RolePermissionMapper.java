@@ -27,7 +27,8 @@ public class RolePermissionMapper {
                     .collect(Collectors.toSet());
             case ROLE_CONTENT_MANAGER -> Set.of(
                     Permission.MOVIE_READ,
-                    Permission.MOVIE_WRITE
+                    Permission.MOVIE_WRITE,
+                    Permission.MOVIE_DELETE
             );
             case ROLE_SUPPORT -> Set.of(
                     Permission.MOVIE_READ,

@@ -103,7 +103,6 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         String deviceFingerprint = generateDeviceFingerprint(httpRequest);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(contentManager, deviceFingerprint);
 
-        // Build user data
         Map<String, Object> userMap = new java.util.HashMap<>();
         userMap.put("id", contentManager.getId());
         userMap.put("name", contentManager.getName());
@@ -132,15 +131,11 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         logger.info("Registering new content manager: {}", registration.email());
 
         if (contentManagerRepository.existsByEmail(registration.email())) {
-            String errorMessage = "Content manager with email %s already exists".formatted(registration.email());
-            logger.warn("Registration failed: {}", errorMessage);
-            throw new ResourceAlreadyExists(errorMessage);
+            throw new ResourceAlreadyExists("Content manager with email %s already exists".formatted(registration.email()));
         }
 
         if (contentManagerRepository.existsByPhoneNumber(registration.phoneNumber())) {
-            String errorMessage = "Content manager with phone number %s already exists".formatted(registration.phoneNumber());
-            logger.warn("Registration failed: {}", errorMessage);
-            throw new ResourceAlreadyExists(errorMessage);
+            throw new ResourceAlreadyExists("Content manager with phone number %s already exists".formatted(registration.phoneNumber()));
         }
 
         ContentManager contentManager = new ContentManager(
@@ -152,18 +147,16 @@ public class ContentManagerService implements ContentManagerServiceInterface {
                 registration.specialization()
         );
 
-        // Assign default role
         Role contentManagerRole = roleService.findRoleByName(RoleName.ROLE_CONTENT_MANAGER);
         contentManager.addRole(contentManagerRole);
 
         ContentManager savedContentManager = contentManagerRepository.save(contentManager);
-        logger.info("Content manager registered successfully: {}", registration.email());
+        logger.info("Content manager registered: {}", registration.email());
         return savedContentManager;
     }
 
     @Override
     public void logout(String token) {
-        // Token blacklisting logic would be implemented here
         logger.info("Content manager logged out");
     }
 
@@ -278,12 +271,9 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         ContentManager contentManager = getContentManagerById(contentManagerId);
 
         if (!"movies".equals(contentManager.getSpecialization()) && !"both".equals(contentManager.getSpecialization())) {
-            logger.warn("Content manager {} not authorized to update movies", contentManagerId);
             throw new ResourceNotFoundException("Content manager not authorized to manage movies");
         }
 
-        movie.setContentManager(contentManager);
-        // Update the existing movie with new data
         Movie existingMovie = movieService.getMovieById(movieId);
         existingMovie.setName(movie.getName());
         existingMovie.setRating(movie.getRating());
@@ -297,7 +287,6 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         existingMovie.setCategory(movie.getCategory());
         existingMovie.setContentManager(contentManager);
 
-        // Save the updated movie
         movieService.addMovie(existingMovie);
     }
 
@@ -340,12 +329,9 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         ContentManager contentManager = getContentManagerById(contentManagerId);
 
         if (!"shows".equals(contentManager.getSpecialization()) && !"both".equals(contentManager.getSpecialization())) {
-            logger.warn("Content manager {} not authorized to update shows", contentManagerId);
             throw new ResourceNotFoundException("Content manager not authorized to manage shows");
         }
 
-        show.setContentManager(contentManager);
-        // Update the existing show with new data
         Show existingShow = showService.getShowById(showId);
         existingShow.setName(show.getName());
         existingShow.setRating(show.getRating());
@@ -359,7 +345,6 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         existingShow.setCategory(show.getCategory());
         existingShow.setContentManager(contentManager);
 
-        // Save the updated show
         showService.addShow(existingShow);
     }
 
@@ -402,24 +387,11 @@ public class ContentManagerService implements ContentManagerServiceInterface {
 
     public void updateContentManagerPassword(String email, String newPassword) {
         logger.info("Setting password for content manager: {}", email);
-        ContentManager contentManager = contentManagerRepository.findByEmail(email).orElse(null);
-
-        if (contentManager == null) {
-            contentManager = new ContentManager();
-            contentManager.setName(email.split("@")[0]);
-            contentManager.setEmail(email);
-            contentManager.setPhoneNumber("");
-            contentManager.setDepartment("Content");
-            contentManager.setSpecialization("both");
-            contentManager.setIsActive(true);
-            contentManager.setIsEmailVerified(true);
-            contentManager.setAccessLevel(1);
-
-            Role cmRole = roleService.findRoleByName(RoleName.ROLE_CONTENT_MANAGER);
-            if (cmRole != null) {
-                contentManager.addRole(cmRole);
-            }
-        }
+        ContentManager contentManager = contentManagerRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    logger.warn("Content manager not found for password reset: {}", email);
+                    return new ResourceNotFoundException("Content manager not found with email: " + email);
+                });
 
         contentManager.setPassword(passwordEncoder.encode(newPassword));
         contentManagerRepository.save(contentManager);
