@@ -9,6 +9,10 @@ import com.naren.moviesapp.Record.MovieUpdation;
 import com.naren.moviesapp.Repo.MovieRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,8 +87,17 @@ public class MovieService implements MovieServiceInterface {
     @Override
     public List<Movie> getMovieList() {
         logger.debug("Fetching all movies");
-        List<Movie> movies = movieRepository.findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
-        return movies;
+        return movieRepository.findAll(PageRequest.of(0, 20)).getContent();
+    }
+
+    public Page<Movie> getMovieList(Pageable pageable) {
+        logger.debug("Fetching movies with pagination: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
+        return movieRepository.findAll(pageable);
+    }
+
+    public Page<Movie> searchMovies(String query, Pageable pageable) {
+        logger.debug("Searching movies with query: {}", query);
+        return movieRepository.findByNameContainingIgnoreCase(query, pageable);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.naren.moviesapp.Repo;
 
 import com.naren.moviesapp.Entity.Movie;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -9,6 +11,8 @@ import java.util.List;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     boolean existsByName(String name);
+
+    Page<Movie> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     Movie findByName(String name);
 

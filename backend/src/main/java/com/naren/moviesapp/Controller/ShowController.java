@@ -6,6 +6,9 @@ import com.naren.moviesapp.Record.ShowUpdation;
 import com.naren.moviesapp.Service.ShowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,6 +50,29 @@ public class ShowController {
     public ResponseEntity<List<Show>> showList() {
         logger.debug("Fetching all shows");
         List<Show> shows = showService.getShowList();
+        return new ResponseEntity<>(shows, HttpStatus.OK);
+    }
+
+    @GetMapping("/shows/paginated")
+    public ResponseEntity<Page<Show>> showListPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "show_id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        logger.debug("Fetching shows with pagination: page={}, size={}, sortBy={}, sortDir={}", page, size, sortBy, sortDir);
+        Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        Page<Show> shows = showService.getShowList(pageRequest);
+        return new ResponseEntity<>(shows, HttpStatus.OK);
+    }
+
+    @GetMapping("/shows/search")
+    public ResponseEntity<Page<Show>> searchShows(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        logger.debug("Searching shows with query: {}", query);
+        Page<Show> shows = showService.searchShows(query, PageRequest.of(page, size));
         return new ResponseEntity<>(shows, HttpStatus.OK);
     }
 

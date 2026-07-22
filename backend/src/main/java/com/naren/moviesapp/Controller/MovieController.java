@@ -6,6 +6,9 @@ import com.naren.moviesapp.Record.MovieUpdation;
 import com.naren.moviesapp.Service.MovieService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,6 +49,29 @@ public class MovieController {
     public ResponseEntity<List<Movie>> movieList() {
         logger.debug("Fetching all movies");
         List<Movie> movies = movieService.getMovieList();
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @GetMapping("/movies/paginated")
+    public ResponseEntity<Page<Movie>> movieListPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        logger.debug("Fetching movies with pagination: page={}, size={}, sortBy={}, sortDir={}", page, size, sortBy, sortDir);
+        Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        Page<Movie> movies = movieService.getMovieList(pageRequest);
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @GetMapping("/movies/search")
+    public ResponseEntity<Page<Movie>> searchMovies(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        logger.debug("Searching movies with query: {}", query);
+        Page<Movie> movies = movieService.searchMovies(query, PageRequest.of(page, size));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 

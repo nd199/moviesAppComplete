@@ -9,6 +9,10 @@ import com.naren.moviesapp.Record.ShowUpdation;
 import com.naren.moviesapp.Repo.ShowRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,8 +98,17 @@ public class ShowService implements ShowServiceInterface {
     @Override
     public List<Show> getShowList() {
         logger.debug("Fetching all shows");
-        List<Show> shows = showRepository.findAll(org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
-        return shows;
+        return showRepository.findAll(PageRequest.of(0, 20)).getContent();
+    }
+
+    public Page<Show> getShowList(Pageable pageable) {
+        logger.debug("Fetching shows with pagination: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
+        return showRepository.findAll(pageable);
+    }
+
+    public Page<Show> searchShows(String query, Pageable pageable) {
+        logger.debug("Searching shows with query: {}", query);
+        return showRepository.findByNameContainingIgnoreCase(query, pageable);
     }
 
     @Override
