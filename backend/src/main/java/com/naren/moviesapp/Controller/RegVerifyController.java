@@ -18,7 +18,6 @@ import java.util.Map;
 public class RegVerifyController {
 
     private static final Logger logger = LoggerFactory.getLogger(RegVerifyController.class);
-    public static boolean getOtpResult = false;
     private final CustomerService customerService;
     private final OtpService otpService;
 
@@ -27,7 +26,6 @@ public class RegVerifyController {
         this.otpService = otpService;
     }
 
-    // Check if email already exists in the database
     @PostMapping("/api/v1/verify/email/exists")
     public ResponseEntity<?> checkEmailExists(@RequestBody EmailVerificationRequest request) {
         logger.info("Checking if email exists: {}", request.email());
@@ -53,23 +51,14 @@ public class RegVerifyController {
         }
     }
 
-    // Handle both /api/v1/verify/email and /verify/email (for frontend compatibility)
-    // Use checkUserExists parameter to decide whether to check if user exists
-    // Default is true for backward compatibility
     @PostMapping(value = {"/api/v1/verify/email", "/verify/email"})
     public ResponseEntity<?> sendEmailToCustomer(@RequestBody EmailVerificationRequest emailVerificationRequest) {
-        logger.info("=== EMAIL VERIFICATION ENDPOINT CALLED ===");
-        logger.info("Request received for email: {}", emailVerificationRequest.email());
-        logger.info("Request body: {}", emailVerificationRequest);
-        
-        // Default to true for backward compatibility
-        boolean shouldCheckUserExists = emailVerificationRequest.checkUserExists() != null 
-            ? emailVerificationRequest.checkUserExists() 
+        logger.info("Email verification request for: {}", emailVerificationRequest.email());
+
+        boolean shouldCheckUserExists = emailVerificationRequest.checkUserExists() != null
+            ? emailVerificationRequest.checkUserExists()
             : true;
-        
-        logger.info("checkUserExists flag: {}", shouldCheckUserExists);
-        
-        // Only check if email already exists if checkUserExists is true (default behavior)
+
         String email = emailVerificationRequest.email() != null ? emailVerificationRequest.email().trim().toLowerCase() : null;
         if (shouldCheckUserExists && email != null && customerService.existsByEmail(email)) {
             logger.warn("Email already exists: {}", email);
@@ -86,27 +75,18 @@ public class RegVerifyController {
         return ResponseEntity.ok("OTP sent to email: " + emailVerificationRequest.email());
     }
 
-    // Pre-subscription email verification - does NOT check if user exists
     @PostMapping("/api/v1/verify/email/subscription")
     public ResponseEntity<?> sendEmailForSubscription(@RequestBody EmailVerificationRequest emailVerificationRequest) {
-        logger.info("=== SUBSCRIPTION EMAIL VERIFICATION ENDPOINT CALLED ===");
-        logger.info("Request received for subscription email: {}", emailVerificationRequest.email());
-        
-        // DO NOT check if email exists - this is for pre-subscription verification only
-        // The user may or may not be registered - we just verify the email is valid
+        logger.info("Subscription email verification for: {}", emailVerificationRequest.email());
         customerService.generateAndSendMailOtp(emailVerificationRequest);
-        logger.info("OTP sent successfully for subscription to email: {}", emailVerificationRequest.email());
         return ResponseEntity.ok("OTP sent to email for subscription verification: " + emailVerificationRequest.email());
     }
 
-    // OTP validation for subscription - separate endpoint
     @PostMapping("/api/v1/validate/otp/subscription")
     public ResponseEntity<?> verifySubscriptionOtp(@RequestBody VerifyOtpRequest request) {
-        // Support both old format (email, otp) and new format (customerEmail, enteredOTP)
         String email = request.customerEmail() != null ? request.customerEmail().trim().toLowerCase() : null;
         String enteredOtp = request.enteredOTP() != null ? request.enteredOTP().trim() : null;
-        
-        // Fallback to old field names for backward compatibility
+
         if (email == null && request.email() != null) {
             email = request.email().trim().toLowerCase();
         }
@@ -114,7 +94,7 @@ public class RegVerifyController {
             enteredOtp = request.otp().trim();
         }
 
-        logger.debug("Verifying subscription OTP for email: '{}' OTP: '{}'", email, enteredOtp);
+        logger.debug("Verifying subscription OTP for email: {}", email);
 
         if (email == null || enteredOtp == null) {
             return ResponseEntity.badRequest().body("Email and OTP must be provided");
@@ -124,33 +104,29 @@ public class RegVerifyController {
             boolean isOtpValid = otpService.validateOtp(email, enteredOtp);
 
             if (isOtpValid) {
-                logger.info("Subscription OTP verified successfully for email: {}", email);
+                logger.info("Subscription OTP verified for email: {}", email);
                 return ResponseEntity.ok("OTP verified successfully");
             } else {
-                logger.warn("Invalid or expired subscription OTP for email: {}", email);
+                logger.warn("Invalid subscription OTP for email: {}", email);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("Invalid OTP or OTP expired");
             }
         } catch (Exception e) {
-            logger.error("Exception during subscription OTP verification for email {}: {}", email, e.getMessage(), e);
+            logger.error("Subscription OTP verification failed for {}: {}", email, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(
                             "statusCode", 500,
                             "errorCode", "INTERNAL_ERROR",
-                            "message", "Something went wrong on our side. Please try again later.",
-                            "path", "/validate/otp/subscription",
-                            "localDateTime", java.time.LocalDateTime.now().toString()
+                            "message", "Something went wrong. Please try again later."
                     ));
         }
     }
 
     @PostMapping(value = {"/api/v1/validate/Otp", "/validate/Otp", "/validate/otp", "/api/v1/validate/otp"})
     public ResponseEntity<?> verifyEmailOtp(@RequestBody VerifyOtpRequest request) {
-        // Support both old format (email, otp) and new format (customerEmail, enteredOTP)
         String email = request.customerEmail() != null ? request.customerEmail().trim().toLowerCase() : null;
         String enteredOtp = request.enteredOTP() != null ? request.enteredOTP().trim() : null;
-        
-        // Fallback to old field names for backward compatibility
+
         if (email == null && request.email() != null) {
             email = request.email().trim().toLowerCase();
         }
@@ -158,7 +134,7 @@ public class RegVerifyController {
             enteredOtp = request.otp().trim();
         }
 
-        logger.debug("Verifying OTP for email: '{}' OTP: '{}'", email, enteredOtp);
+        logger.debug("Verifying OTP for email: {}", email);
 
         if (email == null || enteredOtp == null) {
             return ResponseEntity.badRequest().body("Email and OTP must be provided");
@@ -168,22 +144,20 @@ public class RegVerifyController {
             boolean isOtpValid = otpService.validateOtp(email, enteredOtp);
 
             if (isOtpValid) {
-                logger.info("OTP verified successfully for email: {}", email);
+                logger.info("OTP verified for email: {}", email);
                 return ResponseEntity.ok("OTP verified successfully");
             } else {
-                logger.warn("Invalid or expired OTP for email: {}", email);
+                logger.warn("Invalid OTP for email: {}", email);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("Invalid OTP or OTP expired");
             }
         } catch (Exception e) {
-            logger.error("Exception during OTP verification for email {}: {}", email, e.getMessage(), e);
+            logger.error("OTP verification failed for {}: {}", email, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(
                             "statusCode", 500,
                             "errorCode", "INTERNAL_ERROR",
-                            "message", "Something went wrong on our side. Please try again later.",
-                            "path", "/validate/Otp",
-                            "localDateTime", java.time.LocalDateTime.now().toString()
+                            "message", "Something went wrong. Please try again later."
                     ));
         }
     }

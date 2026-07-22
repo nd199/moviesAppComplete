@@ -72,13 +72,6 @@ public class CustomerController {
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/customers/currentAdmin/{email}")
-    public ResponseEntity<?> getAdminByEmail(@PathVariable("email") String email) {
-        logger.debug("Fetching admin by email: {}", email);
-        CustomerDTO customerDTO = customerService.getCustomerByEmail(email);
-        return new ResponseEntity<>(customerDTO, HttpStatus.OK);
-    }
-
     @GetMapping("/customers/byPhone")
     public ResponseEntity<CustomerDTO> getCustomerByPhoneNumber(@RequestParam String phoneNumber) {
         logger.debug("Fetching customer by phone number: {}", phoneNumber);
@@ -186,18 +179,5 @@ public class CustomerController {
         logger.info("Updating profile for customer ID: {}", id);
         CustomerDTO customerDTO = customerService.updateCustomer(customerUpdateRequest, id);
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
-    }
-
-    @GetMapping("/customers/userRequest")
-    public ResponseEntity<List<CustomerDTO>> customers(@RequestParam(name = "new", required = false)
-                                                       Boolean isNew) {
-        logger.debug("Fetching customer list (userRequest), isNew: {}", isNew);
-        List<CustomerDTO> customers;
-        if (Boolean.TRUE.equals(isNew)) {
-            customers = customerService.getLatestCustomerList();
-        } else {
-            customers = customerService.getAllCustomers();
-        }
-        return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 }
