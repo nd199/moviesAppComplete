@@ -38,6 +38,9 @@ class PaymentServiceTest {
     @Mock
     private SubscriptionPlanRepository subscriptionPlanRepository;
 
+    @Mock
+    private NotificationService notificationService;
+
     @Captor
     private ArgumentCaptor<Payment> paymentArgumentCaptor;
 
@@ -49,7 +52,8 @@ class PaymentServiceTest {
                 paymentRepository,
                 userPlanInfoRepository,
                 customerRepository,
-                subscriptionPlanRepository
+                subscriptionPlanRepository,
+                notificationService
         );
     }
 
