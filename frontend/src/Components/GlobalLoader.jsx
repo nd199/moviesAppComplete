@@ -7,13 +7,18 @@ const GlobalLoader = ({ open = true, message = "Loading..." }) => (
       zIndex: (t) => t.zIndex.drawer + 1,
       backgroundColor: "rgba(5,8,16,0.92)",
       backdropFilter: "blur(12px)",
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
     }}>
     <div className="flex flex-col items-center gap-5">
-      <div className="relative">
-        <div className="absolute inset-0 w-16 h-16 rounded-full animate-glow" />
+      <div className="relative w-16 h-16 flex items-center justify-center">
+        <div className="absolute inset-0 rounded-full animate-glow" />
         <CircularProgress size={52} thickness={3}
           sx={{
             color: "#7c3aed",

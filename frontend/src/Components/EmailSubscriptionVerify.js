@@ -207,13 +207,13 @@ const EmailSubscriptionVerify = ({ onEmailUpdate, onEmailVerified, onEmailError 
       )}
 
       {/* Success/Error messages */}
-      {msg === 'OTP verified successfully' && (
+      {(msg === 'OTP verified successfully' || (msg && msg.toLowerCase().includes('otp sent'))) && !error && (
         <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 animate-fade-in">
           <Lottie options={tick} style={{ width: 28, height: 28, flexShrink: 0 }} />
-          <span className="text-emerald-400 text-sm font-medium">Email verified successfully!</span>
+          <span className="text-emerald-400 text-sm font-medium">{msg === 'OTP verified successfully' ? 'Email verified successfully!' : msg}</span>
         </div>
       )}
-      {(error || (msg && msg !== 'OTP verified successfully')) && (
+      {(error || (msg && msg !== 'OTP verified successfully' && !msg.toLowerCase().includes('otp sent'))) && (
         <div className="flex items-center gap-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20 animate-fade-in">
           <Lottie options={cross} style={{ width: 28, height: 28, flexShrink: 0 }} />
           <span className="text-red-400 text-sm">{error || msg}</span>
