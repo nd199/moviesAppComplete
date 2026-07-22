@@ -40,7 +40,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        logger.info("JWT FILTER EXECUTING: {}", path);
+        logger.debug("Processing request for URI: {}", path);
 
         // Skip JWT validation for OTP endpoints - these are public
         // Use lowercase comparison for case-insensitive matching
@@ -54,35 +54,35 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 // Also handle paths without api/v1 prefix (when frontend omits it)
                 pathLower.equals("/verify/email") ||
                 pathLower.equals("/validate/otp") ||
-                // Subscription-specific endpoints
-                pathLower.contains("subscription")) {
-            logger.info("SKIPPING JWT FILTER - PUBLIC ENDPOINT: {}", path);
+                // Subscription-specific endpoints (exact prefix match only)
+                pathLower.startsWith("/api/v1/subscription")) {
+            logger.debug("Skipping JWT filter for public endpoint: {}", path);
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = null;
         final String authHeader = request.getHeader("Authorization");
-        final String requestURI = request.getRequestURI();
 
-        logger.debug("Processing request for URI: {}", requestURI);
+        logger.debug("Processing request for URI: {}", path);
         logger.debug("Auth header present: {}", authHeader != null);
-        logger.debug("Auth header value: {}", authHeader);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            logger.debug("Token extracted from Authorization header: {}", token.substring(0, Math.min(20, token.length())));
         }
 
         if (token == null) {
-            logger.debug("No token found in request for URI: {}", requestURI);
+            logger.debug("No token found in request for URI: {}", path);
             filterChain.doFilter(request, response);
             return;
         }
 
         if (tokenBlacklistService.isTokenBlacklisted(token)) {
-            logger.debug("Token is blacklisted");
-            filterChain.doFilter(request, response);
+            logger.debug("Token is blacklisted, returning 401");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"message\":\"Token has been revoked\"}");
             return;
         }
 
@@ -91,11 +91,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             userName = jwtUtil.getSubject(token);
             logger.debug("Extracted username from token: {}", userName);
         } catch (ExpiredJwtException e) {
-            logger.debug("JWT token is expired for URI: {}. Continuing without authentication.", requestURI);
+            logger.debug("JWT token is expired for URI: {}. Continuing without authentication.", path);
             filterChain.doFilter(request, response);
             return;
         } catch (MalformedJwtException | SignatureException | IllegalArgumentException e) {
-            logger.debug("Invalid JWT token for URI: {}. Continuing without authentication. Error: {}", requestURI, e.getMessage());
+            logger.debug("Invalid JWT token for URI: {}. Continuing without authentication. Error: {}", path, e.getMessage());
             filterChain.doFilter(request, response);
             return;
         }

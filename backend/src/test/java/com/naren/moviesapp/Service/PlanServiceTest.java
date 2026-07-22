@@ -26,8 +26,7 @@ class PlanServiceTest {
 
     @BeforeEach
     void setUp() {
-        underTest = new PlanService();
-        underTest.planRepository = planRepository;
+        underTest = new PlanService(planRepository);
     }
 
     @Test

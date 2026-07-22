@@ -1,7 +1,10 @@
 package com.naren.moviesapp.Record;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public record PasswordResetRequest(
-        String token,
-        String newPassword
+        @NotBlank String token,
+        @NotBlank @Size(min = 8) String newPassword
 ) {
 }

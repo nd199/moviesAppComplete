@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 import java.util.Map;
 
 @RestController
@@ -35,7 +37,7 @@ public class PasswordResetController {
     }
 
     @PostMapping("/reset")
-    public ResponseEntity<String> resetPassword(@RequestBody PasswordResetRequest passwordResetRequest) {
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody PasswordResetRequest passwordResetRequest) {
         logger.info("Password reset attempt with token");
         passwordResetService.resetPassword(passwordResetRequest);
         logger.info("Password reset successful");

@@ -13,6 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +33,7 @@ public class WatchlistController {
     @PostMapping
     public ResponseEntity<WatchlistItem> addToWatchlist(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody AddToWatchlistRequest request) {
+            @Valid @RequestBody AddToWatchlistRequest request) {
         
         Customer customer = getCustomer(userDetails);
         WatchlistItem item = watchlistService.addToWatchlist(customer.getId(), request);

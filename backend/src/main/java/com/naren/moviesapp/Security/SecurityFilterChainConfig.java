@@ -83,8 +83,9 @@ public class SecurityFilterChainConfig {
             response.setCharacterEncoding("UTF-8");
 
             try {
+                String escapedUri = uri.replace("\\", "\\\\").replace("\"", "\\\"");
                 response.getWriter().write(
-                        "{\"message\":\"Unauthorized\",\"path\":\"" + uri + "\"}"
+                        "{\"message\":\"Unauthorized\",\"path\":\"" + escapedUri + "\"}"
                 );
             } catch (IOException e) {
                 logger.error("Failed to write 401 response body for uri={}", uri, e);
@@ -129,7 +130,6 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/auth/logout",
                                 "/api/v1/auth/refresh-token",
                                 "/api/v1/auth/customers",
-                                "/api/v1/content-manager/**",
                                 "/api/v1/verify/email",
                                 "/api/v1/verify/email/exists",
                                 "/api/v1/validate/Otp",
@@ -146,20 +146,14 @@ public class SecurityFilterChainConfig {
                                 "/health/**",
                                 "/api/v1/test-data/status",
                                 "/api/v1/streaming/**",
-                                "/api/v1/subscription/status",
                                 "/api/v1/admins/health",
                                 "/api/v1/verify/email/subscription",
                                 "/api/v1/validate/otp/subscription"
                         ).permitAll()
 
                         .requestMatchers(
-                                "/api/v1/movies/**",
-                                "/api/v1/shows/**",
-                                "/api/v1/products/**",
-                                "/api/v1/about",
-                                "/api/v1/tmdb/**",
-                                "/api/v1/local/**",
-                                "/api/v1/public/**"
+                                "/api/v1/content-manager/login",
+                                "/api/v1/content-manager/register"
                         ).permitAll()
 
                         .requestMatchers(
@@ -167,7 +161,6 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/profile/**",
                                 "/api/v1/auth/change-password",
                                 "/api/v1/subscription/confirm",
-                                "/api/v1/payments/**",
                                 "/api/v1/video/**",
                                 "/api/v1/bookings/**",
                                 "/api/v1/reviews/**",
@@ -224,7 +217,7 @@ public class SecurityFilterChainConfig {
                         .contentSecurityPolicy(csp -> csp
                                 .policyDirectives(
                                         "default-src 'self'; " +
-                                                "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                                                "script-src 'self'; " +
                                                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
                                                 "font-src 'self' https://fonts.gstatic.com; " +
                                                 "img-src 'self' data: https: https://i.ibb.co https://api.imgbb.com; " +
@@ -236,7 +229,6 @@ public class SecurityFilterChainConfig {
                                                 "base-uri 'self';"
                                 )
                         )
-                        .xssProtection(HeadersConfigurer.XXssConfig::disable)
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
                 )
 

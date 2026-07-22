@@ -12,7 +12,11 @@ public class PlanService implements PlanServiceInterface {
 
     private static final Logger logger = LoggerFactory.getLogger(PlanService.class);
 
-    public SubscriptionPlanRepository planRepository;
+    private final SubscriptionPlanRepository planRepository;
+
+    public PlanService(SubscriptionPlanRepository planRepository) {
+        this.planRepository = planRepository;
+    }
 
     @Override
     public SubscriptionPlan findById(Long id) {

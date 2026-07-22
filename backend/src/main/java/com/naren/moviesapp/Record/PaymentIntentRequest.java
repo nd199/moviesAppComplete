@@ -1,4 +1,6 @@
 package com.naren.moviesapp.Record;
 
-public record PaymentIntentRequest(Long planId) {
+import jakarta.validation.constraints.NotNull;
+
+public record PaymentIntentRequest(@NotNull Long planId) {
 }

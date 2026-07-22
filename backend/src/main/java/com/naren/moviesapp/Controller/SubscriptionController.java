@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 import java.util.Map;
 
 @RestController
@@ -34,7 +36,7 @@ public class SubscriptionController {
 
     @PostMapping("/intent/")
     public ResponseEntity<?> createIntent(
-            @RequestBody PaymentIntentRequest request,
+            @Valid @RequestBody PaymentIntentRequest request,
             Authentication authentication
     ) {
         Customer customer = (Customer) authentication.getPrincipal();

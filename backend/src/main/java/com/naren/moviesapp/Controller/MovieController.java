@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 @RestController
@@ -25,7 +27,7 @@ public class MovieController {
     }
 
     @PostMapping("/movies")
-    public ResponseEntity<Movie> createMovie(@RequestBody MovieRegistration registration) {
+    public ResponseEntity<Movie> createMovie(@Valid @RequestBody MovieRegistration registration) {
         logger.info("Creating new movie: {}", registration.name());
         movieService.addMovie(registration);
         return new ResponseEntity<>(HttpStatus.CREATED);

@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +37,7 @@ public class ContentManagerController {
 
     // Authentication endpoint-s
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody ContentManagerLogin login,
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody ContentManagerLogin login,
                                                      jakarta.servlet.http.HttpServletRequest httpRequest) {
         logger.info("Content manager login request: {}", login.email());
 
@@ -59,7 +61,7 @@ public class ContentManagerController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ContentManager> register(@RequestBody ContentManagerRegistration registration) {
+    public ResponseEntity<ContentManager> register(@Valid @RequestBody ContentManagerRegistration registration) {
         logger.info("Content manager registration request: {}", registration.email());
         ContentManager contentManager = contentManagerService.register(registration);
         return new ResponseEntity<>(contentManager, HttpStatus.CREATED);

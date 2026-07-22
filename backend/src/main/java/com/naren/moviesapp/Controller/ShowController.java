@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 @RestController
@@ -26,7 +28,7 @@ public class ShowController {
     }
 
     @PostMapping("/shows")
-    public ResponseEntity<Show> createShow(@RequestBody ShowRegistration registration) {
+    public ResponseEntity<Show> createShow(@Valid @RequestBody ShowRegistration registration) {
         logger.info("Creating new show: {}", registration.name());
         showService.addShow(registration);
         return new ResponseEntity<>(HttpStatus.CREATED);
