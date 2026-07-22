@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/submitPayment")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public ResponseEntity<?> submitPayment(@RequestBody Map<String, Object> requestBody) {
         logger.info("Submit payment request received");
         try {
@@ -53,6 +55,7 @@ public class PaymentController {
     }
 
     @PostMapping("/api/auth/payment")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public ResponseEntity<?> processPayment(@RequestBody Map<String, Object> requestBody) {
         logger.info("Process payment request received");
         try {
@@ -84,6 +87,7 @@ public class PaymentController {
     }
 
     @GetMapping("/paymentDetails")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<Object> getPaymentDetails(@RequestParam String email) {
         logger.debug("Fetching payment details for email: {}", email);
         try {
@@ -108,6 +112,7 @@ public class PaymentController {
     }
 
     @PostMapping("/updateFinalUser")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public ResponseEntity<?> updateFinalUser(@RequestBody Map<String, Object> requestBody) {
         logger.info("Update final user subscription request received");
         try {
@@ -151,6 +156,7 @@ public class PaymentController {
     }
 
     @GetMapping("/history")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<?> getPaymentHistory(@RequestParam String email) {
         logger.debug("Fetching payment history for email: {}", email);
         try {

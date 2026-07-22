@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -28,6 +29,7 @@ public class ShowController {
     }
 
     @PostMapping("/shows")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<Show> createShow(@Valid @RequestBody ShowRegistration registration) {
         logger.info("Creating new show: {}", registration.name());
         showService.addShow(registration);
@@ -49,6 +51,7 @@ public class ShowController {
     }
 
     @PutMapping("/shows/{id}")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<Show> updateShow(@RequestBody ShowUpdation update,
                                            @PathVariable("id") Long showId) {
         logger.info("Updating show with ID: {}", showId);
@@ -57,6 +60,7 @@ public class ShowController {
     }
 
     @DeleteMapping("/shows/{id}")
+    @PreAuthorize("hasAuthority('MOVIE_DELETE')")
     public void deleteShow(@PathVariable("id") Long showId) {
         logger.info("Deleting show with ID: {}", showId);
         showService.removeShow(showId);

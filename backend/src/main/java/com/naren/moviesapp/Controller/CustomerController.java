@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@PreAuthorize("hasAuthority('USER_MANAGE')")
 public class CustomerController {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomerController.class);
@@ -56,6 +58,7 @@ public class CustomerController {
     }
 
     @GetMapping("/customers/currentUser")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         logger.info("getCurrentUser request received for user: {}", userDetails != null ? userDetails.getUsername() : "null");
         if (userDetails == null) {
@@ -141,15 +144,11 @@ public class CustomerController {
     }
 
     @GetMapping("/customers/stats")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<List<CustomerStatsDTO>> getCustomerStats() {
         logger.debug("Fetching customer statistics");
-        try {
-            List<CustomerStatsDTO> customerStats = customerService.getCustomerStats();
-            return ResponseEntity.ok(customerStats);
-        } catch (Exception e) {
-            logger.error("Failed to retrieve customer statistics", e);
-            throw new RuntimeException("Failed to retrieve customer statistics", e);
-        }
+        List<CustomerStatsDTO> customerStats = customerService.getCustomerStats();
+        return ResponseEntity.ok(customerStats);
     }
 
     @GetMapping("/products/AllProducts")

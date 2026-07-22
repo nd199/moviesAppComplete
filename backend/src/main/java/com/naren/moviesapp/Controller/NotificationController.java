@@ -3,6 +3,7 @@ package com.naren.moviesapp.Controller;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Notification;
 import com.naren.moviesapp.Repo.CustomerRepository;
+import com.naren.moviesapp.Repo.NotificationRepository;
 import com.naren.moviesapp.Service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final CustomerRepository customerRepository;
+    private final NotificationRepository notificationRepository;
 
     @GetMapping
     public ResponseEntity<?> getNotifications(Authentication authentication) {
@@ -59,9 +61,17 @@ public class NotificationController {
     }
 
     @PutMapping("/{id}/read")
-    public ResponseEntity<?> markAsRead(@PathVariable Long id) {
+    public ResponseEntity<?> markAsRead(@PathVariable Long id, Authentication authentication) {
         try {
+            Customer customer = getCustomer(authentication);
             Notification notification = notificationService.markAsRead(id);
+
+            if (!notification.getCustomer().getId().equals(customer.getId())) {
+                return ResponseEntity.status(403).body(Map.<String, Object>of(
+                        "message", "Access denied: notification does not belong to you"
+                ));
+            }
+
             return ResponseEntity.ok(Map.<String, Object>of(
                     "message", "Notification marked as read",
                     "data", notification
@@ -91,8 +101,18 @@ public class NotificationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteNotification(@PathVariable Long id) {
+    public ResponseEntity<?> deleteNotification(@PathVariable Long id, Authentication authentication) {
         try {
+            Customer customer = getCustomer(authentication);
+            Notification notification = notificationRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Notification not found"));
+
+            if (!notification.getCustomer().getId().equals(customer.getId())) {
+                return ResponseEntity.status(403).body(Map.<String, Object>of(
+                        "message", "Access denied: notification does not belong to you"
+                ));
+            }
+
             notificationService.deleteNotification(id);
             return ResponseEntity.ok(Map.<String, Object>of(
                     "message", "Notification deleted"

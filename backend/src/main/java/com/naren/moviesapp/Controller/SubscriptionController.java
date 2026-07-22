@@ -11,6 +11,7 @@ import com.naren.moviesapp.Service.SubscriptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +36,7 @@ public class SubscriptionController {
     }
 
     @PostMapping("/intent/")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public ResponseEntity<?> createIntent(
             @Valid @RequestBody PaymentIntentRequest request,
             Authentication authentication
@@ -47,6 +49,7 @@ public class SubscriptionController {
     }
 
     @GetMapping("/intent/{token}")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<?> getIntent(@PathVariable String token) {
         logger.debug("Fetching subscription intent with token: {}", token);
         SubscriptionIntent intent =

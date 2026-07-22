@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -108,6 +109,7 @@ public class ProfileController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     public ResponseEntity<CustomerDTO> getProfileById(@PathVariable("id") Long customerId) {
         logger.debug("Fetching profile by ID: {}", customerId);
         CustomerDTO customerDTO = customerService.getCustomerById(customerId);

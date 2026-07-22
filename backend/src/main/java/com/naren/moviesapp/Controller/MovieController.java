@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ public class MovieController {
     }
 
     @PostMapping("/movies")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<Movie> createMovie(@Valid @RequestBody MovieRegistration registration) {
         logger.info("Creating new movie: {}", registration.name());
         movieService.addMovie(registration);
@@ -48,6 +50,7 @@ public class MovieController {
     }
 
     @PutMapping("/movies/{id}")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<Movie> updateMovie(@RequestBody MovieUpdation update,
                                              @PathVariable("id") Long movieId) {
         logger.info("Updating movie with ID: {}", movieId);
@@ -56,6 +59,7 @@ public class MovieController {
     }
 
     @DeleteMapping("/movies/{id}")
+    @PreAuthorize("hasAuthority('MOVIE_DELETE')")
     public void deleteMovie(@PathVariable("id") Long movieId) {
         logger.info("Deleting movie with ID: {}", movieId);
         movieService.removeMovie(movieId);
