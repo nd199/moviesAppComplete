@@ -37,13 +37,13 @@ const NewShow = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="min-w-0">
           <h1 className="text-xl font-bold text-white">Create New Show</h1>
           <p className="text-sm text-surface-500 mt-0.5">Add a new TV show or series to your catalog</p>
         </div>
         <button onClick={() => navigate('/admin/shows')}
-          className="inline-flex items-center gap-2 rounded-xl border border-surface-700 bg-surface-800 px-4 py-2 text-sm font-semibold text-surface-500 hover:text-white hover:border-surface-600 transition-colors">
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-surface-700 bg-surface-800 px-4 py-2 text-sm font-semibold text-surface-500 hover:text-white hover:border-surface-600 transition-colors shrink-0">
           <HiArrowLeft className="h-4 w-4" />
           Back to Shows
         </button>
