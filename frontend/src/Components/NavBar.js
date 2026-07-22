@@ -4,8 +4,8 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import Lottie from "react-lottie";
 import { useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import api, { publicRequest } from "../AxiosMethods";
-import { performLogout } from "../utils/logout";
+import { publicRequest } from "../AxiosMethods";
+import { performLogout } from "../Utils/logout";
 import popcornAnimation from "../Utils/animations/popcorn.json";
 
 const NavBar = ({ onMenuClick }) => {

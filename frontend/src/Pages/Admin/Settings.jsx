@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { HiUser, HiShieldCheck, HiKey, HiExclamationTriangle } from 'react-icons/hi2';
+import { HiUser, HiKey, HiExclamationTriangle } from 'react-icons/hi2';
 
 const Settings = () => {
   const currentUser = useSelector((state) => state.user.currentUser);

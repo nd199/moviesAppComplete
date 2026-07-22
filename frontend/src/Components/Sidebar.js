@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Info, Movie, Tv, Bookmark, Close, Settings, CreditCard, History, Help, Logout } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { performLogout } from '../utils/logout';
+import { useSelector } from 'react-redux';
+import { performLogout } from '../Utils/logout';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
-  const dispatch = useDispatch();
   const user = useSelector((s) => s.user?.currentUser);
   const auth = useSelector((s) => s.user?.authStatus);
 
