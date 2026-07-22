@@ -107,16 +107,16 @@ const AdminsList = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 p-6 text-white">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 p-4 sm:p-6 text-white">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
-        <div className="relative z-10 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">Administrators</h2>
-            <p className="text-gray-400 mt-1">Manage admin accounts and invitations</p>
+        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-xl sm:text-2xl font-bold">Administrators</h2>
+            <p className="text-gray-400 mt-1 text-sm">Manage admin accounts and invitations</p>
           </div>
           <button
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition-colors shrink-0"
           >
             <HiArrowDownTray className="w-4 h-4" />
             Export CSV

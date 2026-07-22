@@ -54,15 +54,15 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 p-6 text-white">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 p-4 sm:p-6 text-white">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
         <div className="absolute bottom-0 left-1/3 w-40 h-40 bg-white/5 rounded-full translate-y-1/2" />
-        <div className="relative z-10 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">System Overview</h2>
-            <p className="text-gray-400 mt-1">Monitor your platform health and administrator accounts</p>
+        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-xl sm:text-2xl font-bold">System Overview</h2>
+            <p className="text-gray-400 mt-1 text-sm">Monitor your platform health and administrator accounts</p>
           </div>
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-xl ${
+          <div className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl flex-shrink-0 ${
             health === 'healthy'
               ? 'bg-emerald-500/10 border border-emerald-500/20'
               : health === 'unhealthy'

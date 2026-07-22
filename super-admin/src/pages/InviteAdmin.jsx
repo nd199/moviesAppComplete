@@ -40,11 +40,11 @@ const InviteAdmin = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 p-6 text-white">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 p-4 sm:p-6 text-white">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
         <div className="relative z-10">
-          <h2 className="text-2xl font-bold">Invite Administrator</h2>
-          <p className="text-gray-400 mt-1">Send an email invitation to create a new admin account</p>
+          <h2 className="text-xl sm:text-2xl font-bold">Invite Administrator</h2>
+          <p className="text-gray-400 mt-1 text-sm">Send an email invitation to create a new admin account</p>
         </div>
       </div>
 

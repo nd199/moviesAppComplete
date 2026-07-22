@@ -55,14 +55,14 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-600 via-brand-700 to-accent-600 p-6 text-white">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-600 via-brand-700 to-accent-600 p-4 sm:p-6 text-white">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3" />
         <div className="absolute bottom-0 left-1/3 w-40 h-40 bg-white/5 rounded-full translate-y-1/2" />
         <div className="absolute top-4 right-24 w-12 h-12 bg-white/10 rounded-2xl rotate-12" />
         <div className="absolute bottom-6 right-12 w-8 h-8 bg-white/10 rounded-xl -rotate-6" />
         <div className="relative z-10">
-          <h2 className="text-2xl font-bold">Welcome back, Admin</h2>
-          <p className="text-white/80 mt-1">Here's what's happening with your platform today.</p>
+          <h2 className="text-xl sm:text-2xl font-bold">Welcome back, Admin</h2>
+          <p className="text-white/80 mt-1 text-sm">Here's what's happening with your platform today.</p>
         </div>
       </div>
 

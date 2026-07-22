@@ -52,17 +52,17 @@ const Settings = () => {
     <div className="space-y-6 max-w-4xl">
       {/* Profile Header */}
       <div className="bg-surface-900 rounded-2xl border border-surface-700 overflow-hidden">
-        <div className="bg-gradient-to-r from-brand-600 via-brand-700 to-accent-600 px-6 py-8 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-brand-600 via-brand-700 to-accent-600 px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3" />
           <div className="absolute bottom-0 left-1/4 w-24 h-24 bg-white/5 rounded-full translate-y-1/2" />
-          <div className="relative z-10 flex items-center gap-5">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur shadow-xl">
-              <span className="text-white font-bold text-2xl">{currentUser?.name?.charAt(0)?.toUpperCase() || 'A'}</span>
+          <div className="relative z-10 flex items-center gap-4 sm:gap-5">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur shadow-xl flex-shrink-0">
+              <span className="text-white font-bold text-xl sm:text-2xl">{currentUser?.name?.charAt(0)?.toUpperCase() || 'A'}</span>
             </div>
-            <div className="text-white">
-              <h2 className="text-xl font-bold">{currentUser?.name || 'Admin'}</h2>
-              <p className="text-white/80 text-sm mt-0.5">{currentUser?.email || 'admin@cnio.dev'}</p>
-              <div className="flex items-center gap-2 mt-2">
+            <div className="text-white min-w-0">
+              <h2 className="text-lg sm:text-xl font-bold truncate">{currentUser?.name || 'Admin'}</h2>
+              <p className="text-white/80 text-xs sm:text-sm mt-0.5 truncate">{currentUser?.email || 'admin@cnio.dev'}</p>
+              <div className="flex flex-wrap items-center gap-2 mt-2">
                 {(currentUser?.roles || ['ROLE_ADMIN']).map((role, i) => (
                   <span key={i} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/20 text-white backdrop-blur">
                     {role.replace('ROLE_', '')}
@@ -161,12 +161,12 @@ const Settings = () => {
           </div>
           <p className="text-sm text-surface-500 mt-1">Irreversible and destructive actions</p>
         </div>
-        <div className="px-6 py-4 flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <p className="text-sm font-medium text-white">Delete account</p>
             <p className="text-xs text-surface-500 mt-0.5">Permanently remove your account and all associated data</p>
           </div>
-          <button className="px-4 py-2 bg-red-500/10 text-red-400 text-sm font-semibold rounded-xl border border-red-500/20 hover:bg-red-500/20 transition-colors">
+          <button className="w-full sm:w-auto px-4 py-2 bg-red-500/10 text-red-400 text-sm font-semibold rounded-xl border border-red-500/20 hover:bg-red-500/20 transition-colors">
             Delete Account
           </button>
         </div>
