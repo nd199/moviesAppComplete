@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowBack, Notifications, Settings as SettingsIcon, Close, Logout } from "@mui/icons-material";
+import { useDispatch } from "react-redux";
 import { performLogout } from "../../utils/logout";
 
 const Settings = () => {
