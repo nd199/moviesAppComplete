@@ -29,6 +29,7 @@ public class PaymentService {
     private final UserPlanInfoRepository userPlanInfoRepository;
     private final CustomerRepository customerRepository;
     private final SubscriptionPlanRepository subscriptionPlanRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public Payment processPayment(String email, Long planId, String paymentMethod) {
@@ -54,6 +55,14 @@ public class PaymentService {
 
             customer.setIsSubscribed(true);
             customerRepository.save(customer);
+
+            notificationService.createNotification(
+                    customer,
+                    "Payment Successful",
+                    "Your " + plan.getPlanName() + " subscription has been activated. Transaction ID: " + payment.getTransactionId(),
+                    "SUBSCRIPTION",
+                    "PAYMENT"
+            );
 
             return savedPayment;
 
