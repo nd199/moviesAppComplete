@@ -11,6 +11,8 @@ import com.naren.moviesapp.Exception.ResourceAlreadyExists;
 import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Record.CustomerUpdateRequest;
+import com.naren.moviesapp.Repo.AdminRepository;
+import com.naren.moviesapp.Repo.ContentManagerRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Utils.OtpService;
@@ -48,6 +50,10 @@ class CustomerServiceImplTest {
     private MovieRepository movieRepository;
     @Mock
     private OtpService otpService;
+    @Mock
+    private AdminRepository adminRepository;
+    @Mock
+    private ContentManagerRepository contentManagerRepository;
 
     private CustomerDTOMapper customerDTOMapper;
     private CustomerService underTest;
@@ -57,7 +63,7 @@ class CustomerServiceImplTest {
         customerDTOMapper = new CustomerDTOMapper(customerRepository);
         underTest = new CustomerService(
                 customerRepository, passwordEncoder, customerDTOMapper, roleService,
-                movieRepository, jwtUtil, otpService);
+                movieRepository, jwtUtil, otpService, adminRepository, contentManagerRepository);
     }
 
     @Test

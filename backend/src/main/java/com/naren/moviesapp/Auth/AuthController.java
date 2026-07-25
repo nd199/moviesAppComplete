@@ -92,23 +92,20 @@ public class AuthController {
 
         String accessToken;
         RefreshToken refreshToken;
+        Map<String, Object> responseBody = new java.util.HashMap<>();
 
         if (authResponse instanceof CustomerAuthResponse customerAuth) {
             accessToken = authService.generateTokenForCustomer(customerAuth.customer());
             refreshToken = refreshTokenService.createRefreshToken(customerAuth.customer(), deviceFingerprint);
+            responseBody.put("accessToken", accessToken);
+            responseBody.put("refreshToken", refreshToken != null ? refreshToken.getToken() : null);
+            responseBody.put("user", customerAuth.customerDTO());
+            responseBody.put("userType", "CUSTOMER");
         } else {
             throw new RuntimeException("Unexpected auth response type for customer login");
         }
 
         logger.info("Customer login successful for username: {}", request.username());
-        Map<String, Object> responseBody = new java.util.HashMap<>();
-        responseBody.put("accessToken", accessToken);
-        responseBody.put("refreshToken", refreshToken != null ? refreshToken.getToken() : null);
-
-        if (authResponse instanceof CustomerAuthResponse customerAuth) {
-            responseBody.put("user", customerAuth.customerDTO());
-            responseBody.put("userType", "CUSTOMER");
-        }
         return ResponseEntity.ok(responseBody);
     }
 
