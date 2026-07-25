@@ -57,8 +57,8 @@ const Featured = () => {
               )}
 
               {/* Layered gradients for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-surface-950 via-surface-950/70 to-transparent z-[1]" />
-              <div className="absolute inset-0 bg-gradient-to-t from-surface-950 via-surface-950/30 to-black/30 z-[1]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-[1]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-[1]" />
 
               {/* Colored glow accents */}
               <div className="absolute bottom-0 left-[5%] w-[500px] h-[250px] bg-brand-500/10 blur-[120px] z-[1] pointer-events-none" />

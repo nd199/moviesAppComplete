@@ -1,10 +1,39 @@
 # Movies OTT Platform
 
+![Java](https://img.shields.io/badge/Java-21-b07219)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-6DB33F)
+![React](https://img.shields.io/badge/React-19-61DAFB)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1)
+![Redis](https://img.shields.io/badge/Redis-7.4-DC382D)
+![License](https://img.shields.io/badge/license-private-lightgrey)
+![Version](https://img.shields.io/badge/version-2.1.0-blue)
+
 A full-stack OTT streaming platform with **30 Flyway migrations**, **150+ REST endpoints**, **5 user roles**, and **3 separate frontend applications** — built with Spring Boot 3.4, React 19, PostgreSQL, and Redis.
 
-**Live Backend API**: `https://nmoviesapi.duckdns.org`  
-**Frontend**: `https://movies-app-complete.vercel.app`  
-**Super Admin**: deployed on Vercel
+| | |
+|---|---|
+| **Live Backend API** | `https://nmoviesapi.duckdns.org` |
+| **User & Admin Frontend** | `https://movies-app-complete.vercel.app` |
+| **Super Admin Frontend** | Separate Vite app, deployed on Vercel |
+| **Version** | 2.1.0 (July 2026) — see [Changelog](#changelog) |
+| **Maintainer** | Narendran ([naren06251999@gmail.com](mailto:naren06251999@gmail.com)) |
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [API Endpoints](#api-endpoints)
+- [Testing](#testing)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Database](#database)
+- [Email Templates](#email-templates)
+- [Changelog](#changelog)
+- [License](#license)
 
 ---
 
@@ -16,16 +45,19 @@ A full-stack OTT streaming platform with **30 Flyway migrations**, **150+ REST e
 - Password reset flow with time-limited tokens
 - Rate limiting: 5 failed attempts → 15 min lockout, 15+ → 1 hour lockout
 - Token blacklisting via Redis on logout
-- CSP headers, CORS configuration, CSRF disabled (stateless)
+- CSP headers, CORS configuration, CSRF disabled (stateless API)
 
 ### Role-Based Access Control
-| Role | Capabilities |
-|------|-------------|
-| **Super Admin** | Invite admins, system-level management, session timeout (15 min idle / 8 hr absolute) |
-| **Admin** | Full CRUD on users, movies, shows, admins, content managers. Dashboard with analytics |
-| **Content Manager** | Manage assigned movies/shows based on specialization. Analytics view |
-| **Support** | Read-only access (placeholder for future expansion) |
-| **User** | Browse, search, filter, watchlist, subscriptions, profile management |
+
+| Role | Permissions | Notes |
+|------|-------------|-------|
+| **Super Admin** | All 7 permissions | Invite admins, system-level config, session timeout (15 min idle / 8 hr absolute) |
+| **Admin** | `MOVIE_READ/WRITE/DELETE`, `USER_READ`, `USER_MANAGE`, `VIEW_REPORTS` | Full CRUD on users, movies, shows, admins, content managers; analytics dashboard |
+| **Content Manager** | `MOVIE_READ/WRITE/DELETE` | Manage assigned movies/shows based on specialization |
+| **Support** | `MOVIE_READ`, `USER_READ`, `VIEW_REPORTS` | Read access to catalog, users, and reports — no write access |
+| **User** | `MOVIE_READ` | Browse, search, filter, watchlist, subscriptions, profile management |
+
+> Role hierarchy: `canAssign(current, target)` requires `currentLevel > targetLevel`; `canModify(current, target)` requires `currentLevel >= targetLevel`.
 
 ### Content Management
 - Movie and show CRUD with poster upload, genre tags, age ratings, categories
@@ -37,13 +69,13 @@ A full-stack OTT streaming platform with **30 Flyway migrations**, **150+ REST e
 - 3 subscription plans (Monthly / 6-Month / Yearly)
 - Email verification before payment
 - Payment processing with transaction tracking
-- **Automated subscription expiry system**: daily cron jobs detect expired subscriptions, deactivate them, and send email + in-app notification warnings 3 days before expiry
+- **Automated subscription expiry system**: daily cron jobs detect expired subscriptions, deactivate them, and send an expiry email + in-app notification; a separate job warns subscriptions expiring within 3 days
 
 ### User Features
 - Watchlist: add/remove/check with paginated views
-- **Recently Viewed**: automatic tracking of viewed content, displayed on home page
+- **Recently Viewed**: automatic tracking of viewed content, displayed on the home page
 - **Share**: share movie/show links via WhatsApp, Twitter, Facebook, or copy link
-- Notifications: in-app notification system with read/unread states
+- Notifications: in-app system with read/unread states, mark-all-read
 - Profile management with avatar upload (ImgBB)
 - Password strength validation
 
@@ -54,7 +86,7 @@ A full-stack OTT streaming platform with **30 Flyway migrations**, **150+ REST e
 - System status monitoring
 
 ### Super Admin Panel
-- Invite new admins via email with multi-step form
+- Invite new admins via email with a multi-step form
 - Admin list with search, status toggle, CSV export, resend invite
 - System health check and overview
 
@@ -120,6 +152,8 @@ moviesAppComplete/
 └── dev-start.sh                      # Local dev orchestrator
 ```
 
+> **Note:** Redux slice files in `frontend/src/redux/` currently mix naming conventions (`userSlice.js`, `ProductsRedux.js`, `PaymentRedux.js`, `notificationRedux.js`). Standardizing on a single `*Slice.js` convention is a planned cleanup — see [Changelog](#changelog).
+
 ---
 
 ## Getting Started
@@ -160,6 +194,8 @@ Or use the all-in-one script:
 
 ### Default Credentials
 
+> These are seeded development credentials only. **Rotate or disable them before any production or public-facing deployment.**
+
 | Role | Email | Password |
 |------|-------|----------|
 | Super Admin | `superadmin@movies.com` | `ChangeMe123!` |
@@ -173,6 +209,22 @@ Or use the all-in-one script:
 | `http://localhost:3001` | Super Admin interface |
 | `http://localhost:8080/swagger-ui.html` | API documentation |
 | `http://localhost:8025` | Mailpit email testing UI |
+
+---
+
+## Environment Variables
+
+Key variables the backend expects (see `application*.yaml` for the full list and defaults per profile):
+
+| Variable | Purpose | Required In |
+|----------|---------|-------------|
+| `SPRING_PROFILES_ACTIVE` | Selects `dev` or `prod` config | All environments |
+| `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | PostgreSQL connection | All environments |
+| `REDIS_HOST`, `REDIS_PORT` | Redis connection | All environments |
+| `JWT_SECRET` | Signing key for access/refresh tokens | All environments |
+| `TMDB_API_KEY` | TMDB catalog integration | All environments |
+| `BREVO_API_KEY` | Transactional email in production | `prod` only |
+| `IMGBB_API_KEY` | Avatar/poster image hosting | All environments |
 
 ---
 
@@ -239,7 +291,7 @@ Or use the all-in-one script:
 </details>
 
 <details>
-<summary><strong>Admin, Super Admin, Health</strong></summary>
+<summary><strong>Admin, Super Admin, Health (8 endpoints)</strong></summary>
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -248,8 +300,8 @@ Or use the all-in-one script:
 | GET | `/api/v1/admin/stats/content` | Content stats |
 | POST | `/api/v1/system/superadmin/invite` | Invite admin |
 | POST | `/api/v1/system/superadmin/resend-invite` | Resend invite |
-| GET | `/api/v1/ping` | Health check |
-| GET | `/api/v1/health` | Detailed health |
+| GET | `/api/v1/ping` | Simple health check |
+| GET | `/api/v1/health` | Detailed health with DB status |
 
 </details>
 
@@ -264,7 +316,7 @@ mvn test
 # Run integration tests (requires Docker)
 mvn verify
 
-# Run specific test
+# Run a specific test
 mvn test -Dtest=CustomerServiceImplTest
 ```
 
@@ -280,9 +332,10 @@ mvn test -Dtest=CustomerServiceImplTest
 
 **GitHub Actions** (`.github/workflows/deploy.yml`):
 
-1. **Build** — JDK 21, `mvn clean verify`
-2. **Docker** — Build image, push to Docker Hub (SHA-tagged + latest)
-3. **Deploy** — SSH into EC2, pull image, recreate containers
+1. **Build** — JDK 21, `mvn clean verify` (compile + all 136 tests)
+2. **Docker** — Build image, push to Docker Hub (SHA-tagged + `latest`)
+3. **Deploy** — SSH into EC2, pull image, recreate containers with `docker-compose --force-recreate`
+4. **Cleanup** — `docker image prune -af` + `docker builder prune -af`
 
 Triggered on push to `main` when `backend/` or `docker-compose.yaml` changes.
 
@@ -318,6 +371,17 @@ Triggered on push to `main` when `backend/` or `docker-compose.yaml` changes.
 | Content Manager invite | Super admin invites CM |
 | Subscription expiry warning | 3 days before expiry (automated) |
 | Subscription expired | On expiry deactivation (automated) |
+
+---
+
+## Changelog
+
+| Version | Date | Summary |
+|---------|------|---------|
+| **2.1.0** | Jul 2026 | Documentation cleanup: corrected Support role description to match actual RBAC permissions, added environment variables reference, added table of contents, reconciled endpoint counts across docs |
+| **2.0.0** | Jun 2026 | Added View History and Notification modules (V29–V30); token family + reuse detection for refresh tokens (V28) |
+| **1.5.0** | Mar 2026 | Added Watchlist feature and Content Manager role; multi-user refresh token support |
+| **1.0.0** | Nov 2025 | Initial production release: core catalog, subscriptions, payments, admin panel |
 
 ---
 
