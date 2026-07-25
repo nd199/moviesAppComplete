@@ -22,12 +22,18 @@ const AdminLogin = () => {
     dispatch(loginStart());
     try {
       const response = await adminLogin({ username, password });
-      const { accessToken, refreshToken } = response;
+      const { accessToken, refreshToken, user, userType } = response;
       setAccessToken(accessToken);
       if (refreshToken) setRefreshToken(refreshToken);
       await fetchCurrentUserDetails(dispatch);
       toast.success('Login successful!');
-      navigate('/admin/dashboard');
+      if (userType === 'CONTENT_MANAGER') {
+        navigate('/admin/dashboard');
+      } else if (userType === 'ADMIN' || userType === 'SUPER_ADMIN') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please check your credentials.");
       dispatch(loginFailure(err.response?.data?.message || "Login failed"));

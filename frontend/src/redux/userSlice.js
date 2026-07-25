@@ -42,7 +42,7 @@ const userSlice = createSlice({
     },
     registerSuccess: (state, action) => {
       state.isFetching = false;
-      state.currentUser = action.payload;
+      state.currentUser = action.payload?.user || action.payload;
       state.authStatus = 'authenticated';
     },
     registerFailure: (state, action) => {
@@ -58,7 +58,7 @@ const userSlice = createSlice({
     loginSuccess: (state, action) => {
       state.isFetching = false;
       state.error = false;
-      state.currentUser = action.payload;
+      state.currentUser = action.payload?.user || action.payload;
       state.authStatus = 'authenticated';
     },
     loginFailure: (state, action) => {
