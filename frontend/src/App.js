@@ -30,8 +30,6 @@ import Sidebar from "./Components/Sidebar";
 import PaymentCheckout from "./Pages/Payment/PaymentCheckout";
 import Success from "./Pages/Payment/Success";
 
-import AdminLogin from "./Pages/Admin/AdminLogin";
-import ContentManagerLogin from "./Pages/Admin/ContentManagerLogin";
 import Dashboard from "./Pages/Admin/Dashboard";
 import UserList from "./Pages/Admin/UserList";
 import NewUser from "./Pages/Admin/NewUser";
@@ -200,9 +198,9 @@ function Layout({ sidebarOpen, setSidebarOpen }) {
   if (isAdminRoute) {
     return (
       <Routes>
-        {/* Admin login pages (no layout shell) */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/cm-login" element={<ContentManagerLogin />} />
+        {/* Admin login → redirect to user login (handles all roles) */}
+        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+        <Route path="/admin/cm-login" element={<Navigate to="/login" replace />} />
         <Route path="/admin/set-password" element={<SetPassword />} />
 
         {/* Admin pages with layout */}
