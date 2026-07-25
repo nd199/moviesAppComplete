@@ -41,7 +41,7 @@ const ColListItem = ({
   return (
     <div
       ref={cardRef}
-      className="cl-root group relative rounded-2xl overflow-hidden gradient-border bg-surface-800"
+      className="cl-root group relative rounded-2xl overflow-hidden gradient-border glass-card"
       style={{ transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease' }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -73,7 +73,7 @@ const ColListItem = ({
             </span>
           )}
           {displayRating && (
-            <span className="flex items-center gap-1 bg-surface-950/70 backdrop-blur-sm text-white text-[0.7rem] font-semibold px-2 py-1 rounded-lg border border-white/10 ml-auto">
+            <span className="flex items-center gap-1 glass text-white text-[0.7rem] font-semibold px-2 py-1 rounded-lg ml-auto">
               <span className="text-gold-400">★</span> {displayRating}
             </span>
           )}

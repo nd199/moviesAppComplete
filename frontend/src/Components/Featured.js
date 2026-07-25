@@ -34,7 +34,7 @@ const Featured = () => {
   );
 
   return (
-    <section className="relative w-full h-screen min-h-[min(560px,80vh)] max-h-[850px] bg-black -mt-16">
+    <section className="relative w-full h-screen min-h-[560px] bg-black -mt-16">
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         slidesPerView={1}
@@ -56,9 +56,9 @@ const Featured = () => {
                 <img src={item.poster} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
               )}
 
-              {/* Layered gradients for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-[1]" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-[1]" />
+              {/* Minimal gradient — just enough for text readability, video stays visible */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/5 to-transparent z-[1]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent z-[1]" />
 
               {/* Colored glow accents */}
               <div className="absolute bottom-0 left-[5%] w-[500px] h-[250px] bg-brand-500/10 blur-[120px] z-[1] pointer-events-none" />

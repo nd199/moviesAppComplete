@@ -69,7 +69,7 @@ const Settings = () => {
 
         <div className="space-y-4">
           {/* Notifications */}
-          <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-6">
+          <div className="glass-card p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center">
@@ -90,7 +90,7 @@ const Settings = () => {
           </div>
 
           {/* Appearance */}
-          <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-6">
+          <div className="glass-card p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center">
@@ -111,7 +111,7 @@ const Settings = () => {
           </div>
 
           {/* Language */}
-          <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-6">
+          <div className="glass-card p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center">
                 <Notifications sx={{ fontSize: 18, color: '#7c3aed' }} />

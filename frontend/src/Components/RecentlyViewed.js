@@ -25,7 +25,7 @@ const RecentlyViewed = () => {
             to={item.mediaType === 'movie' ? `/movie/${item.tmdbId}` : `/show/${item.tmdbId}`}
             className="shrink-0 w-[140px] group no-underline"
           >
-            <div className="relative rounded-xl overflow-hidden border border-white/10 group-hover:border-white/20 transition-all">
+            <div className="relative rounded-xl overflow-hidden glass border-white/[0.08] group-hover:border-white/[0.15] transition-all">
               <img
                 src={item.posterPath || 'https://via.placeholder.com/140x210/111827/3b4560?text=No+Image'}
                 alt={item.title}

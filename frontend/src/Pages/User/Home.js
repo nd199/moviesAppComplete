@@ -26,7 +26,7 @@ const Home = () => {
         <Featured />
 
         {/* Gradient transition strip */}
-        <div className="relative h-32 -mt-1 bg-gradient-to-b from-surface-950 via-surface-900/50 to-surface-950">
+        <div className="relative h-16 -mt-1 bg-gradient-to-b from-surface-950 via-surface-900/30 to-surface-950">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/20 to-transparent" />
         </div>
 

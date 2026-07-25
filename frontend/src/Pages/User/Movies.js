@@ -58,7 +58,7 @@ const Movies = () => {
   return (
     <div className="min-h-screen bg-surface-950">
       <div className="relative pt-20 pb-8 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-500/5 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-white/[0.02] backdrop-blur-sm pointer-events-none" />
         <div className="absolute top-[10%] right-[5%] w-[400px] h-[400px] bg-brand-500/5 blur-[120px] pointer-events-none" />
         <div className="max-w-[1400px] mx-auto relative z-10">
           <h1 className="text-4xl sm:text-5xl font-black text-white m-0 mb-2 text-center tracking-tight">Movies</h1>

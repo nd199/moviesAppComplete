@@ -84,11 +84,11 @@ const Detail = () => {
       {/* Backdrop */}
       <div className="relative h-[50vh] min-h-[400px] overflow-hidden">
         <img src={backdropUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-surface-950 via-surface-950/60 to-surface-950/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-surface-950/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-surface-950 via-surface-950/50 to-surface-950/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-surface-950/70 via-transparent to-transparent" />
 
         {/* Back button */}
-        <Link to={-1} className="absolute top-6 left-6 z-20 w-10 h-10 rounded-xl bg-surface-950/50 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white no-underline hover:bg-surface-950/80 transition-all">
+        <Link to={-1} className="absolute top-6 left-6 z-20 w-10 h-10 rounded-xl glass flex items-center justify-center text-white no-underline hover:bg-white/10 transition-all">
           <ArrowBack sx={{ fontSize: 20 }} />
         </Link>
 
@@ -104,7 +104,7 @@ const Detail = () => {
 
               <div className="flex flex-wrap items-center gap-3 mb-4">
                 {displayRating && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surface-950/70 backdrop-blur-sm border border-white/10 text-sm">
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg glass text-sm">
                     <Star sx={{ fontSize: 16, color: '#f59e0b' }} />
                     <span className="text-white font-bold">{displayRating}</span>
                   </span>

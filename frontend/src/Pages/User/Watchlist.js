@@ -47,7 +47,7 @@ const Watchlist = () => {
     <div className="min-h-screen bg-surface-950">
       {/* Header */}
       <div className="relative pt-20 pb-6 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-500/5 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-white/[0.02] backdrop-blur-sm pointer-events-none" />
         <div className="max-w-[1400px] mx-auto relative z-10">
           <FilterNavbar sortBy={sortBy} setSortBy={setSortBy} searchQuery={searchQuery} setSearchQuery={setSearchQuery} genre={genre} setGenre={setGenre} year={year} setYear={setYear} rating={rating} setRating={setRating} />
         </div>

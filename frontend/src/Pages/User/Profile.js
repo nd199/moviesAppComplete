@@ -176,7 +176,7 @@ const Profile = () => {
             {/* Left: Info Cards */}
             <div className="space-y-4">
               {/* Personal Info */}
-              <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-6">
+              <div className="glass-card p-6">
                 <h3 className="text-sm font-semibold text-[#5a6380] uppercase tracking-wider m-0 mb-4">Personal Information</h3>
                 <div className="space-y-4">
                   {[
@@ -199,7 +199,7 @@ const Profile = () => {
               </div>
 
               {/* Quick Actions */}
-              <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-6">
+              <div className="glass-card p-6">
                 <h3 className="text-sm font-semibold text-[#5a6380] uppercase tracking-wider m-0 mb-4">Quick Actions</h3>
                 <div className="space-y-2">
                   <button
@@ -219,13 +219,13 @@ const Profile = () => {
             </div>
 
             {/* Right: Edit Form */}
-            <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-6">
+            <div className="glass-card p-6">
               <h3 className="text-lg font-bold text-white m-0 mb-1">Edit Profile</h3>
               <p className="text-[#5a6380] text-sm m-0 mb-6">Update your personal information</p>
 
               <form onSubmit={userUpdateHandler} className="flex flex-col gap-5">
                 {/* Avatar Upload */}
-                <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                <div className="flex items-center gap-4 p-4 rounded-xl glass">
                   <img src={imageUrl || PlaceholderImg} alt="" className="w-16 h-16 rounded-full object-cover border-2 border-white/10" />
                   <div>
                     <label htmlFor="form-file" className="text-sm text-[#8892b0] hover:text-white cursor-pointer transition-colors flex items-center gap-2">
@@ -279,7 +279,7 @@ const Profile = () => {
 
         {activeTab === 'security' && (
           <div className="max-w-[520px]">
-            <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-6">
+            <div className="glass-card p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center">
                   <Lock sx={{ fontSize: 18, color: '#7c3aed' }} />
@@ -327,7 +327,7 @@ const Profile = () => {
 
                 {/* Requirements */}
                 {newPassword && (
-                  <div className="rounded-xl bg-white/[0.03] border border-white/5 p-4">
+                  <div className="rounded-xl glass p-4">
                     <p className="text-[0.65rem] text-[#5a6380] mb-2 m-0 uppercase tracking-wider font-medium">Requirements</p>
                     <ul className="space-y-1.5 list-none p-0 m-0">
                       {[

@@ -27,7 +27,7 @@ const FilterNavbar = ({ sortBy, setSortBy, searchQuery, setSearchQuery, genre, s
             placeholder={`Search ${mediaType === 'tv' ? 'shows' : 'movies'}...`}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl bg-white/[0.06] border border-white/10 pl-10 pr-4 py-2.5 text-white text-sm placeholder:text-[#4a5568] focus:outline-none focus:border-brand-500/40 transition-all"
+            className="w-full rounded-xl glass pl-10 pr-4 py-2.5 text-white text-sm placeholder:text-[#4a5568] focus:outline-none focus:border-brand-500/40 transition-all"
           />
         </div>
         <button
@@ -90,7 +90,7 @@ const Select = ({ value, onChange, children }) => (
     <select
       value={value}
       onChange={onChange}
-      className="appearance-none rounded-xl bg-white/[0.06] border border-white/10 pl-3 pr-8 py-2.5 text-white text-sm cursor-pointer hover:border-white/20 focus:outline-none focus:border-brand-500/40 transition-all"
+      className="appearance-none rounded-xl glass pl-3 pr-8 py-2.5 text-white text-sm cursor-pointer hover:border-white/20 focus:outline-none focus:border-brand-500/40 transition-all"
     >
       {children}
     </select>

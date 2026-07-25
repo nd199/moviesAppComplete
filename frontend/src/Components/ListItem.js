@@ -28,7 +28,7 @@ const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType, genr
   return (
     <div
       ref={cardRef}
-      className="li-root group relative rounded-2xl overflow-hidden cursor-pointer snap-start shrink-0 w-[210px] max-lg:w-[180px] max-sm:w-[150px]"
+      className="li-root group relative rounded-2xl overflow-hidden cursor-pointer snap-start shrink-0 w-[210px] max-lg:w-[180px] max-sm:w-[150px] border border-white/[0.04] hover:border-white/[0.08] transition-colors duration-300"
       style={{ transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease' }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -54,7 +54,7 @@ const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType, genr
 
         {/* Rating — always visible */}
         {displayRating && (
-          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-surface-950/70 backdrop-blur-sm rounded-lg px-2 py-0.5 border border-white/10 z-10">
+          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 glass rounded-lg px-2 py-0.5 z-10">
             <span className="text-gold-400 text-[0.65rem]">★</span>
             <span className="text-white text-[0.7rem] font-bold">{displayRating}</span>
           </div>
@@ -63,7 +63,7 @@ const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType, genr
         {/* Genre tag — always visible on mobile, hover on desktop */}
         {genre && (
           <div className="absolute top-2.5 left-2.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 z-10">
-            <span className="px-2 py-0.5 rounded-lg bg-surface-950/70 backdrop-blur-sm border border-white/10 text-white text-[0.6rem] font-medium">
+            <span className="px-2 py-0.5 rounded-lg glass border-white/10 text-white text-[0.6rem] font-medium">
               {genre.split(',')[0]}
             </span>
           </div>

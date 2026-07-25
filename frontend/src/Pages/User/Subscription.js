@@ -53,7 +53,7 @@ const Subscription = () => {
       <div className="min-h-screen bg-surface-950">
         {/* Hero header */}
         <div className="relative pt-24 pb-12 px-6 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-500/5 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-white/[0.02] backdrop-blur-sm pointer-events-none" />
           <div className="absolute top-[5%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-brand-500/8 blur-[120px] pointer-events-none" />
           <div className="absolute top-[15%] right-[10%] w-[300px] h-[300px] bg-accent-500/5 blur-[100px] pointer-events-none" />
 
@@ -66,7 +66,7 @@ const Subscription = () => {
                 return (
                   <div key={step.label} className="flex items-center gap-2">
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[0.7rem] font-medium transition-all duration-300
-                      ${isActive ? 'bg-brand-500/20 text-brand-300 border border-brand-500/30' : 'bg-white/5 text-[#4a5568] border border-white/5'}`}>
+                      ${isActive ? 'glass text-brand-300 border-brand-500/30' : 'glass border-white/5 text-[#4a5568]'}`}>
                       <Icon sx={{ fontSize: 14 }} />
                       <span className="hidden sm:inline">{step.label}</span>
                     </div>
@@ -110,7 +110,7 @@ const Subscription = () => {
             <div className="mt-8 glass-strong rounded-2xl p-6 animate-fade-in">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-brand-500/15 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl glass flex items-center justify-center">
                     <CheckCircle className="text-brand-400" />
                   </div>
                   <div>

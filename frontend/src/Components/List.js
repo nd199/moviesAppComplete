@@ -20,10 +20,10 @@ const fetchMap = {
 };
 
 const sectionThemes = [
-  { bg: 'bg-surface-900', bar: 'from-brand-500 to-accent-500' },
-  { bg: 'bg-surface-800/40', bar: 'from-accent-500 to-brand-400' },
-  { bg: 'bg-surface-900', bar: 'from-brand-400 to-gold-500' },
-  { bg: 'bg-surface-800/40', bar: 'from-accent-400 to-brand-500' },
+  { bg: 'bg-white/[0.02] glass-section', bar: 'from-brand-500 to-accent-500' },
+  { bg: 'bg-transparent glass-section', bar: 'from-accent-500 to-brand-400' },
+  { bg: 'bg-white/[0.02] glass-section', bar: 'from-brand-400 to-gold-500' },
+  { bg: 'bg-transparent glass-section', bar: 'from-accent-400 to-brand-500' },
 ];
 
 const List = ({ title, type = 'local', index = 0 }) => {

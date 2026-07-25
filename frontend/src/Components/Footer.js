@@ -39,13 +39,12 @@ const Footer = () => {
   };
 
   return (
-    <footer ref={footerRef} className="reveal relative bg-surface-900 text-white pt-16 pb-8 px-6 max-md:px-4 max-md:pt-10 max-md:pb-6">
+    <footer ref={footerRef} className="reveal relative text-white pt-16 pb-8 px-6 max-md:px-4 max-md:pt-10 max-md:pb-6 glass-section">
       <div className="section-divider absolute top-0 inset-x-0" />
 
       {/* Newsletter section */}
       <div className="max-w-[1200px] mx-auto mb-12">
-        <div className="relative rounded-2xl overflow-hidden p-8 sm:p-10 text-center"
-          style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(6,182,212,0.06) 100%)', border: '1px solid rgba(124,58,237,0.12)' }}>
+        <div className="relative rounded-2xl overflow-hidden glass-card p-8 sm:p-10 text-center">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-brand-500/8 blur-[80px] pointer-events-none" />
           <h3 className="text-xl font-bold text-white m-0 mb-2 relative z-10">Stay in the Loop</h3>
           <p className="text-[#5a6380] text-sm mb-5 m-0 relative z-10">Get notified about new releases and exclusive content.</p>
