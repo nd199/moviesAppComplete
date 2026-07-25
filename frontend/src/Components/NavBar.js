@@ -186,7 +186,7 @@ const NavBar = ({ onMenuClick }) => {
                         {[
                           { icon: Person, label: "Profile", action: () => { navigate("/profile"); setOpen(false); } },
                           { icon: Bookmark, label: "My List", action: () => { navigate("/watchlist"); setOpen(false); } },
-                          { icon: History, label: "History", action: () => setOpen(false) },
+                          { icon: History, label: "Watchlist", action: () => { navigate("/watchlist"); setOpen(false); } },
                         ].map(({ icon: Icon, label, action }) => (
                           <button key={label} onClick={action} className="w-full flex items-center gap-3 px-5 py-2.5 text-[#8892b0] hover:text-white hover:bg-white/5 transition-all text-sm cursor-pointer bg-transparent border-none">
                             <Icon sx={{ fontSize: 18 }} /> {label}
@@ -195,11 +195,11 @@ const NavBar = ({ onMenuClick }) => {
                       </div>
                       <div className="border-t border-white/5 py-1.5">
                         {[
-                          { icon: CreditCard, label: "Subscription" },
-                          { icon: Settings, label: "Settings" },
-                          { icon: Help, label: "Help" },
-                        ].map(({ icon: Icon, label }) => (
-                          <button key={label} onClick={() => setOpen(false)} className="w-full flex items-center gap-3 px-5 py-2.5 text-[#8892b0] hover:text-white hover:bg-white/5 transition-all text-sm cursor-pointer bg-transparent border-none">
+                          { icon: CreditCard, label: "Subscription", action: () => { navigate("/subscription"); setOpen(false); } },
+                          { icon: Settings, label: "Settings", action: () => { navigate("/settings"); setOpen(false); } },
+                          { icon: Help, label: "Help", action: () => { navigate("/about"); setOpen(false); } },
+                        ].map(({ icon: Icon, label, action }) => (
+                          <button key={label} onClick={action} className="w-full flex items-center gap-3 px-5 py-2.5 text-[#8892b0] hover:text-white hover:bg-white/5 transition-all text-sm cursor-pointer bg-transparent border-none">
                             <Icon sx={{ fontSize: 18 }} /> {label}
                           </button>
                         ))}

@@ -1,10 +1,17 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { HiUser, HiKey, HiExclamationTriangle } from 'react-icons/hi2';
+import api from '../../AxiosMethods';
+import { logout } from '../../redux/userSlice';
+import { persistor } from '../../redux/store';
+import { clearAuth } from '../../authStore';
 
 const Settings = () => {
   const currentUser = useSelector((state) => state.user.currentUser);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [profile, setProfile] = useState({
     name: currentUser?.name || '',
@@ -21,16 +28,24 @@ const Settings = () => {
 
   const [saving, setSaving] = useState(false);
 
-  const handleProfileSave = (e) => {
+  const handleProfileSave = async (e) => {
     e.preventDefault();
     setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
+    try {
+      await api.put(`/profile/${currentUser.id}`, {
+        name: profile.name,
+        phoneNumber: profile.phone,
+        address: profile.address,
+      });
       toast.success('Profile updated successfully');
-    }, 800);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update profile');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = async (e) => {
     e.preventDefault();
     if (passwords.newPass !== passwords.confirm) {
       toast.error('Passwords do not match');
@@ -41,11 +56,32 @@ const Settings = () => {
       return;
     }
     setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
+    try {
+      await api.post('/auth/change-password', {
+        currentPassword: passwords.current,
+        newPassword: passwords.newPass,
+      });
       setPasswords({ current: '', newPass: '', confirm: '' });
       toast.success('Password changed successfully');
-    }, 800);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to change password');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) return;
+    try {
+      await api.delete(`/customers/${currentUser.id}`);
+      clearAuth();
+      dispatch(logout());
+      persistor.purge();
+      toast.success('Account deleted');
+      navigate('/login');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete account');
+    }
   };
 
   return (
@@ -166,7 +202,8 @@ const Settings = () => {
             <p className="text-sm font-medium text-white">Delete account</p>
             <p className="text-xs text-surface-500 mt-0.5">Permanently remove your account and all associated data</p>
           </div>
-          <button className="w-full sm:w-auto px-4 py-2 bg-red-500/10 text-red-400 text-sm font-semibold rounded-xl border border-red-500/20 hover:bg-red-500/20 transition-colors">
+          <button onClick={handleDeleteAccount}
+            className="w-full sm:w-auto px-4 py-2 bg-red-500/10 text-red-400 text-sm font-semibold rounded-xl border border-red-500/20 hover:bg-red-500/20 transition-colors">
             Delete Account
           </button>
         </div>

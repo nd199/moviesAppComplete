@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import * as Yup from "yup";
+import toast from "react-hot-toast";
 import { savePayment } from "../../redux/PaymentRedux";
 import { updateUserSuccess } from "../../redux/userSlice";
 import { updateFinalUserApi, markUserAsSubscribed } from "../../Network/ApiCalls";
@@ -28,15 +29,7 @@ const PaymentCheckout = () => {
       else dispatch(updateUserSuccess({ ...currentUser, ...finalUser, isSubscribed: true }));
       nav("/payment/success", { state: { paymentData: { success: true, transactionId, plan, user: subRes.data || { ...currentUser, ...finalUser, isSubscribed: true } } } });
     } catch (err) {
-      try {
-        await new Promise(r => setTimeout(r, 2000));
-        try { await markUserAsSubscribed(); } catch {}
-        dispatch(updateUserSuccess({ ...currentUser, ...finalUser, isSubscribed: true }));
-        if (window.paymentSuccess) window.paymentSuccess();
-        nav("/payment/success", { state: { paymentData: { success: true, transactionId, plan, user: finalUser } } });
-      } catch {
-        alert(err || "Payment failed");
-      }
+      toast.error(err?.response?.data?.message || err || "Payment failed. Please try again.");
     } finally { setSubmitting(false); }
   };
 

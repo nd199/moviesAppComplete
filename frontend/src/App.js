@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes, Navigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import ErrorBoundary from "./Components/ErrorBoundary";
 
 import { setAuthStatus, logout } from "./redux/userSlice";
 import { persistor } from "./redux/store";
@@ -135,7 +136,7 @@ function AppWithNavigation() {
           dispatch(setAuthStatus('authenticated'));
           await fetchCurrentUserDetails(dispatch);
         } catch (error) {
-          console.log('Token refresh failed:', error.message);
+          console.warn('Token refresh failed:', error.message);
           clearAuth();
           dispatch(logout());
           persistor.purge();
@@ -146,7 +147,7 @@ function AppWithNavigation() {
           await fetchCurrentUserDetails(dispatch);
           dispatch(setAuthStatus('authenticated'));
         } catch (error) {
-          console.log('Access token invalid:', error.message);
+          console.warn('Access token invalid:', error.message);
           clearAuth();
           dispatch(logout());
           persistor.purge();
@@ -355,4 +356,10 @@ function ProtectedRoute({
   return children;
 }
 
-export default AppWithHealthCheck;
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <AppWithHealthCheck />
+    </ErrorBoundary>
+  );
+}

@@ -1,18 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from '../../AxiosMethods';
 
 const SystemStatus = () => {
-  const [services] = useState([
-    { name: 'API Server', status: 'online', description: 'Main application server', responseTime: 45 },
-    { name: 'Database', status: 'online', description: 'PostgreSQL database connection', responseTime: 12 },
-    { name: 'Cache Service', status: 'online', description: 'Redis cache service', responseTime: 8 },
+  const [services, setServices] = useState([
+    { name: 'API Server', status: 'checking', description: 'Main application server', responseTime: null },
+    { name: 'Database', status: 'checking', description: 'PostgreSQL database connection', responseTime: null },
+    { name: 'Cache Service', status: 'checking', description: 'Redis cache service', responseTime: null },
   ]);
+
+  useEffect(() => {
+    const checkServices = async () => {
+      const results = [];
+
+      // Check API Server
+      try {
+        const start = Date.now();
+        await api.get('/health-check', { timeout: 5000 });
+        results.push({ name: 'API Server', status: 'online', description: 'Main application server', responseTime: Date.now() - start });
+      } catch {
+        results.push({ name: 'API Server', status: 'offline', description: 'Main application server', responseTime: null });
+      }
+
+      // Check Database (via health endpoint)
+      try {
+        const start = Date.now();
+        const res = await api.get('/health', { timeout: 5000 });
+        const dbStatus = res.data?.database === 'UP' ? 'online' : 'issues';
+        results.push({ name: 'Database', status: dbStatus, description: 'PostgreSQL database connection', responseTime: Date.now() - start });
+      } catch {
+        results.push({ name: 'Database', status: 'offline', description: 'PostgreSQL database connection', responseTime: null });
+      }
+
+      // Check Cache (Redis) — inferred from health endpoint
+      try {
+        const start = Date.now();
+        const res = await api.get('/health', { timeout: 5000 });
+        const cacheStatus = res.data?.redis === 'UP' ? 'online' : 'issues';
+        results.push({ name: 'Cache Service', status: cacheStatus, description: 'Redis cache service', responseTime: Date.now() - start });
+      } catch {
+        results.push({ name: 'Cache Service', status: 'offline', description: 'Redis cache service', responseTime: null });
+      }
+
+      setServices(results);
+    };
+
+    checkServices();
+    const interval = setInterval(checkServices, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const getStatusConfig = (status) => {
     switch (status) {
       case 'online': return { dot: 'bg-emerald-400', ring: 'ring-emerald-400/30', label: 'Operational', labelBg: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' };
       case 'issues': return { dot: 'bg-amber-400', ring: 'ring-amber-400/30', label: 'Degraded', labelBg: 'bg-amber-500/15 text-amber-400 border border-amber-500/20' };
       case 'offline': return { dot: 'bg-red-400', ring: 'ring-red-400/30', label: 'Down', labelBg: 'bg-red-500/15 text-red-400 border border-red-500/20' };
-      default: return { dot: 'bg-gray-400', ring: 'ring-gray-400/30', label: 'Unknown', labelBg: 'bg-gray-500/15 text-gray-400 border border-gray-500/20' };
+      default: return { dot: 'bg-gray-400', ring: 'ring-gray-400/30', label: 'Checking...', labelBg: 'bg-gray-500/15 text-gray-400 border border-gray-500/20' };
     }
   };
 
@@ -46,7 +88,9 @@ const SystemStatus = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-surface-500 font-mono">{service.responseTime}ms</span>
+                {service.responseTime !== null && (
+                  <span className="text-xs text-surface-500 font-mono">{service.responseTime}ms</span>
+                )}
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${config.labelBg}`}>
                   {config.label}
                 </span>
