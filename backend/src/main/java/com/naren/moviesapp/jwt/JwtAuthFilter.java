@@ -50,12 +50,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 pathLower.startsWith("/verify/email") ||
                 pathLower.startsWith("/validate/otp") ||
                 pathLower.startsWith("/api/v1/auth/set-password") ||
-                pathLower.startsWith("/set-password") ||
-                // Also handle paths without api/v1 prefix (when frontend omits it)
-                pathLower.equals("/verify/email") ||
-                pathLower.equals("/validate/otp") ||
-                // Subscription-specific endpoints (exact prefix match only)
-                pathLower.startsWith("/api/v1/subscription")) {
+                pathLower.startsWith("/set-password")) {
             logger.debug("Skipping JWT filter for public endpoint: {}", path);
             filterChain.doFilter(request, response);
             return;

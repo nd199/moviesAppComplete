@@ -60,9 +60,6 @@ public class Role {
         return "Role{" +
                 "id=" + id +
                 ", name=" + name +
-                ", customers=" + customers.size() +
-                ", admins=" + admins.size() +
-                ", contentManagers=" + contentManagers.size() +
                 '}';
     }
 }

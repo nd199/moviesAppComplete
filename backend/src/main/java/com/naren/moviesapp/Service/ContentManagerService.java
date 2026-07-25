@@ -287,7 +287,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         existingMovie.setCategory(movie.getCategory());
         existingMovie.setContentManager(contentManager);
 
-        movieService.addMovie(existingMovie);
+        movieService.saveMovie(existingMovie);
     }
 
     @Override
@@ -345,7 +345,7 @@ public class ContentManagerService implements ContentManagerServiceInterface {
         existingShow.setCategory(show.getCategory());
         existingShow.setContentManager(contentManager);
 
-        showService.addShow(existingShow);
+        showService.saveShow(existingShow);
     }
 
     @Override

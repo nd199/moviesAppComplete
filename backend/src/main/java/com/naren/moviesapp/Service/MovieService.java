@@ -56,6 +56,11 @@ public class MovieService implements MovieServiceInterface {
         return savedMovie;
     }
 
+    public Movie saveMovie(Movie movie) {
+        logger.info("Saving movie: {}", movie.getName());
+        return movieRepository.save(movie);
+    }
+
     private Movie createMovie(MovieRegistration registration) {
         String category = registration.category() != null ? registration.category() : "General";
         return new Movie(

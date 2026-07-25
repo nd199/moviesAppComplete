@@ -209,9 +209,9 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <configuration>
-                    <url>jdbc:postgresql://localhost:5332/movieott</url>
-                    <user>codeNaren</user>
-                    <password>password</password>
+                    <url>${env.FLYWAY_URL:jdbc:postgresql://localhost:5332/movieott}</url>
+                    <user>${env.FLYWAY_USER:postgres}</user>
+                    <password>${env.FLYWAY_PASSWORD:password}</password>
                     <locations>
                         <location>classpath:db/migration</location>
                     </locations>

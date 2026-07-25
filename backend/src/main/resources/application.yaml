@@ -4,15 +4,13 @@ server:
   port: 8080
 
 spring:
-  profiles:
-    active: dev
   jpa:
     open-in-view: false
 
 logging:
   level:
-    org.springframework.security: TRACE
-    com.naren.moviesapp: DEBUG
+    org.springframework.security: WARN
+    com.naren.moviesapp: INFO
 
 app:
   data-initialization:

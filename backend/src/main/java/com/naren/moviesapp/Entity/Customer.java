@@ -120,14 +120,11 @@ public class Customer extends BaseUser {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", phoneNumber=" + phoneNumber +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", isEmailVerified=" + isEmailVerified +
                 ", address='" + address + '\'' +
                 ", isSubscribed=" + isSubscribed +
-                ", movies=" + movies +
-                ", roles=" + roles +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

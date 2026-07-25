@@ -43,13 +43,13 @@ done
 # Step 3: Start frontend dev servers
 echo ""
 echo "[4/4] Starting frontend dev servers..."
-cd frontend && npm start &
+(cd frontend && npm start) &
 FRONTEND_PID=$!
 echo "Frontend (admin) starting on port 3000..."
 
-cd ../super-admin && VITE_API_URL=http://localhost:8080 npm run dev &
+(cd super-admin && VITE_API_URL=http://localhost:8080 npm run dev) &
 SUPERADMIN_PID=$!
-echo "Super-admin starting on port 5173..."
+echo "Super-admin starting on port 3001..."
 
 echo ""
 echo "========================================="
@@ -58,7 +58,7 @@ echo "========================================="
 echo ""
 echo "  Backend:      http://localhost:8080"
 echo "  Admin Panel:  http://localhost:3000"
-echo "  Super Admin:  http://localhost:5173"
+echo "  Super Admin:  http://localhost:3001"
 echo "  PostgreSQL:   localhost:5342"
 echo "  Redis:        localhost:6379"
 echo ""

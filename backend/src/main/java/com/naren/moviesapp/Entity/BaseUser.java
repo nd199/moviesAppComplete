@@ -21,6 +21,7 @@ public abstract class BaseUser {
     @Column(name = "email", columnDefinition = "TEXT", nullable = false)
     protected String email;
 
+    @ToString.Exclude
     @Column(name = "password", columnDefinition = "TEXT", nullable = false)
     protected String password;
 

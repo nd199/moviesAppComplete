@@ -107,7 +107,6 @@ public class Admin extends BaseUser {
                 ", department='" + department + '\'' +
                 ", accessLevel=" + accessLevel +
                 ", isActive=" + isActive +
-                ", roles=" + roles +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

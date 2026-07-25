@@ -5,13 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Random;
+import java.security.SecureRandom;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class OtpService {
 
     private static final Logger logger = LoggerFactory.getLogger(OtpService.class);
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final long OTP_EXPIRE_INTERVAL_MIN = 5; // 5 minutes
 
     private final EmailService emailService;
@@ -37,13 +38,12 @@ public class OtpService {
             if (redisTemplate.hasKey(key)) {
                 logger.warn("OTP already sent and still valid for email: {}. Resending same OTP.", email);
                 String existingOtp = redisTemplate.opsForValue().get(key);
-                logger.debug("Retrieved existing OTP from Redis: {}", existingOtp);
                 emailService.sendOTPEmail(email, existingOtp);
                 return;
             }
 
             String otp = generateOtp();
-            logger.debug("Generated new OTP: {} for email: {}", otp, email);
+            logger.debug("Generating new OTP for email: {}", email);
 
             redisTemplate.opsForValue().set(key, otp, OTP_EXPIRE_INTERVAL_MIN, TimeUnit.MINUTES);
             logger.debug("Stored OTP in Redis with expiration: {} minutes", OTP_EXPIRE_INTERVAL_MIN);
@@ -65,16 +65,13 @@ public class OtpService {
         String key = generateKey(normalizedEmail);
         String savedOtp = redisTemplate.opsForValue().get(key);
 
-        logger.debug("Retrieved saved OTP from Redis: {} for key: {}", savedOtp, key);
-
         if (savedOtp == null) {
             logger.warn("OTP validation failed: OTP expired or not found for email: {}", email);
             return false;
         }
 
         if (!savedOtp.equals(enteredOtp)) {
-            logger.warn("OTP validation failed: Invalid OTP for email: {}. Expected: {}, Got: {}",
-                    email, savedOtp, enteredOtp);
+            logger.warn("OTP validation failed: Invalid OTP for email: {}", email);
             return false;
         }
 
@@ -92,9 +89,8 @@ public class OtpService {
     }
 
     private String generateOtp() {
-        Random random = new Random();
-        String otp = String.valueOf(100000 + random.nextInt(900000)); // 6-digit OTP
-        logger.debug("Generated 6-digit OTP: {}", otp);
+        String otp = String.valueOf(100000 + SECURE_RANDOM.nextInt(900000)); // 6-digit OTP
+        logger.debug("Generated 6-digit OTP");
         return otp;
     }
 }

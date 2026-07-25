@@ -8,12 +8,14 @@ import com.naren.moviesapp.Repo.SubscriptionIntentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class SubscriptionService implements SubscriptionServiceInterface {
 
     private static final Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
@@ -49,9 +51,6 @@ public class SubscriptionService implements SubscriptionServiceInterface {
         logger.info("Updating intent status for token: {}, new status: {}", intentToken, status);
         SubscriptionIntent intent = subscriptionIntentRepository.findByIntentToken(intentToken)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid intent token"));
-        if (intent == null) {
-            throw new ResourceNotFoundException("Invalid intent token");
-        }
         if (Objects.nonNull(intent.getStatus()) && !intent.getStatus().equals(status)) {
             intent.setStatus(status);
         }

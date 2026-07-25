@@ -56,6 +56,11 @@ public class ShowService implements ShowServiceInterface {
         return saved;
     }
 
+    public Show saveShow(Show show) {
+        logger.info("Saving show: {}", show.getName());
+        return showRepository.save(show);
+    }
+
     private Show createShow(ShowRegistration registration) {
         String category = registration.category() != null ? registration.category() : "General";
         return new Show(

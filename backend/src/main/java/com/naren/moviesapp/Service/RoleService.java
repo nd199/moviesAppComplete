@@ -4,10 +4,12 @@ import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.Repo.RoleRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class RoleService {
 
     private final RoleRepository roleRepository;
@@ -20,10 +22,6 @@ public class RoleService {
         if (!roleRepository.existsByName(role.getName())) {
             roleRepository.save(role);
         }
-    }
-
-    void setAddress(String RoleName) {
-
     }
 
     Role findRoleById(Long roleId) {

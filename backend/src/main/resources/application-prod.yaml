@@ -52,10 +52,10 @@ app:
 logging:
   level:
     root: WARN
-    com.naren.moviesapp: DEBUG
+    com.naren.moviesapp: INFO
     org.springframework.security: WARN
-    org.springframework.mail: DEBUG
-    jakarta.mail: DEBUG
-    org.springframework.web: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql: TRACE
+    org.springframework.mail: INFO
+    jakarta.mail: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql: WARN

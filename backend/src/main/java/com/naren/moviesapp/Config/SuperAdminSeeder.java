@@ -1,9 +1,9 @@
 package com.naren.moviesapp.Config;
 
-import com.naren.moviesapp.Entity.Customer;
+import com.naren.moviesapp.Entity.Admin;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;
-import com.naren.moviesapp.Repo.CustomerRepository;
+import com.naren.moviesapp.Repo.AdminRepository;
 import com.naren.moviesapp.Repo.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SuperAdminSeeder {
 
-    private final CustomerRepository customerRepository;
+    private final AdminRepository adminRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -32,26 +32,28 @@ public class SuperAdminSeeder {
         Role superRole = roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN)
                 .orElseThrow(() -> new RuntimeException("ROLE_SUPER_ADMIN not found. Make sure MoviesApplication.createRole() runs first."));
 
-        Customer existingSuperAdmin = customerRepository.findByEmail(superAdminEmail).orElse(null);
+        Admin existingSuperAdmin = adminRepository.findByEmail(superAdminEmail).orElse(null);
 
         if (existingSuperAdmin == null) {
-            Customer superAdmin = new Customer();
+            Admin superAdmin = new Admin();
             superAdmin.setName("Super Admin");
             superAdmin.setEmail(superAdminEmail);
             superAdmin.setPassword(passwordEncoder.encode(superAdminPassword));
             superAdmin.setPhoneNumber("0000000000");
             superAdmin.setAddress("System Default");
             superAdmin.setIsEmailVerified(true);
-            superAdmin.setIsSubscribed(false);
+            superAdmin.setIsActive(true);
+            superAdmin.setDepartment("System");
+            superAdmin.setAccessLevel(5);
             superAdmin.addRole(superRole);
-            customerRepository.save(superAdmin);
+            adminRepository.save(superAdmin);
         } else {
             boolean hasSuperRole = existingSuperAdmin.getRoles().stream()
                     .anyMatch(role -> role.getName() == RoleName.ROLE_SUPER_ADMIN);
 
             if (!hasSuperRole) {
                 existingSuperAdmin.addRole(superRole);
-                customerRepository.save(existingSuperAdmin);
+                adminRepository.save(existingSuperAdmin);
             }
         }
     }

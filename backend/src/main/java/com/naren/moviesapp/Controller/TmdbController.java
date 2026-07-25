@@ -9,6 +9,7 @@ import com.naren.moviesapp.Service.TmdbService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -579,6 +580,7 @@ public class TmdbController {
     }
 
     @PostMapping("/sync/movie/{tmdbId}")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<?> syncMovie(@PathVariable Long tmdbId) {
 
         if (!tmdbService.isConfigured()) {
@@ -644,6 +646,7 @@ public class TmdbController {
     }
 
     @PostMapping("/sync/tv/{tmdbId}")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<?> syncTvShow(@PathVariable Long tmdbId) {
 
         if (!tmdbService.isConfigured()) {
@@ -756,6 +759,7 @@ public class TmdbController {
     }
 
     @PostMapping("/cache/refresh/movie/{tmdbId}")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<?> refreshMovieTrailerCache(@PathVariable Long tmdbId) {
         logger.info("Received request to refresh movie trailer cache for ID: {}", tmdbId);
         tmdbService.refreshMovieTrailerCache(tmdbId);
@@ -766,6 +770,7 @@ public class TmdbController {
     }
 
     @PostMapping("/cache/refresh/show/{tmdbId}")
+    @PreAuthorize("hasAuthority('MOVIE_WRITE')")
     public ResponseEntity<?> refreshTvShowTrailerCache(@PathVariable Long tmdbId) {
         logger.info("Received request to refresh TV show trailer cache for ID: {}", tmdbId);
         tmdbService.refreshTvShowTrailerCache(tmdbId);
@@ -776,6 +781,7 @@ public class TmdbController {
     }
 
     @PostMapping("/cache/clear")
+    @PreAuthorize("hasAuthority('SYSTEM_CONFIG')")
     public ResponseEntity<?> clearAllTrailerCaches() {
         logger.info("Received request to clear all trailer caches");
         tmdbService.clearAllTrailerCaches();
