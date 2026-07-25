@@ -37,6 +37,16 @@ public class TestConfig {
             public void sendContentManagerInviteEmail(String toEmail, String inviteLink) {
                 System.out.println("Mock content manager invite email sent to: " + toEmail + " with link: " + inviteLink);
             }
+
+            @Override
+            public void sendSubscriptionExpiryWarningEmail(String toEmail, String planName, long daysRemaining) {
+                System.out.println("Mock expiry warning email sent to: " + toEmail + " for plan: " + planName + " (" + daysRemaining + " days)");
+            }
+
+            @Override
+            public void sendSubscriptionExpiredEmail(String toEmail, String planName) {
+                System.out.println("Mock expired email sent to: " + toEmail + " for plan: " + planName);
+            }
         };
     }
 
