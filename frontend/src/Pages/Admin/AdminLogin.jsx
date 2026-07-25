@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { loginStart, loginFailure } from '../../redux/userSlice';
-import { setAccessToken, setRefreshToken } from '../../authStore';
+import { loginStart, loginFailure, logout } from '../../redux/userSlice';
+import { setAccessToken, setRefreshToken, clearAuth } from '../../authStore';
 import { fetchCurrentUserDetails } from '../../Network/ApiCalls';
 import { adminLogin } from '../../services/adminApi';
 
@@ -22,18 +22,23 @@ const AdminLogin = () => {
     dispatch(loginStart());
     try {
       const response = await adminLogin({ username, password });
-      const { accessToken, refreshToken, user, userType } = response;
+      const { accessToken, refreshToken, user } = response;
+      const roles = user?.roles || [];
+      const isAdmin = roles.includes('ROLE_ADMIN') || roles.includes('ROLE_SUPER_ADMIN');
+
+      if (!isAdmin) {
+        clearAuth();
+        dispatch(logout());
+        setError("This account is not an admin. Please use the correct login page.");
+        dispatch(loginFailure("Not an admin account"));
+        return;
+      }
+
       setAccessToken(accessToken);
       if (refreshToken) setRefreshToken(refreshToken);
       await fetchCurrentUserDetails(dispatch);
       toast.success('Login successful!');
-      if (userType === 'CONTENT_MANAGER') {
-        navigate('/admin/dashboard');
-      } else if (userType === 'ADMIN' || userType === 'SUPER_ADMIN') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/');
-      }
+      navigate('/admin/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please check your credentials.");
       dispatch(loginFailure(err.response?.data?.message || "Login failed"));

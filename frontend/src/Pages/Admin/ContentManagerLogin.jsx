@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { loginStart, loginFailure } from '../../redux/userSlice';
-import { setAccessToken, setRefreshToken } from '../../authStore';
+import { loginStart, loginFailure, logout } from '../../redux/userSlice';
+import { setAccessToken, setRefreshToken, clearAuth } from '../../authStore';
 import { fetchCurrentUserDetails } from '../../Network/ApiCalls';
 import { contentManagerLogin } from '../../services/adminApi';
 
@@ -22,7 +22,18 @@ const ContentManagerLogin = () => {
     dispatch(loginStart());
     try {
       const response = await contentManagerLogin({ email, password });
-      const { accessToken, refreshToken } = response;
+      const { accessToken, refreshToken, user } = response;
+      const roles = user?.roles || [];
+      const isCM = roles.includes('ROLE_CONTENT_MANAGER');
+
+      if (!isCM) {
+        clearAuth();
+        dispatch(logout());
+        setError("This account is not a Content Manager. Please use the correct login page.");
+        dispatch(loginFailure("Not a content manager account"));
+        return;
+      }
+
       setAccessToken(accessToken);
       if (refreshToken) setRefreshToken(refreshToken);
       await fetchCurrentUserDetails(dispatch);

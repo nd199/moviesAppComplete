@@ -85,29 +85,55 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request,
                                    HttpServletRequest httpRequest) {
-        logger.info("Login request received for username: {}", request.username());
-        AuthResponse authResponse = authService.login(request);
+        logger.info("Customer login request received for username: {}", request.username());
+        AuthResponse authResponse = authService.loginCustomerOnly(request);
 
         String deviceFingerprint = generateDeviceFingerprint(httpRequest);
 
         String accessToken;
         RefreshToken refreshToken;
-        String normalizedEmail = request.username().toLowerCase().trim();
+
+        if (authResponse instanceof CustomerAuthResponse customerAuth) {
+            accessToken = authService.generateTokenForCustomer(customerAuth.customer());
+            refreshToken = refreshTokenService.createRefreshToken(customerAuth.customer(), deviceFingerprint);
+        } else {
+            throw new RuntimeException("Unexpected auth response type for customer login");
+        }
+
+        logger.info("Customer login successful for username: {}", request.username());
+        Map<String, Object> responseBody = new java.util.HashMap<>();
+        responseBody.put("accessToken", accessToken);
+        responseBody.put("refreshToken", refreshToken != null ? refreshToken.getToken() : null);
+
+        if (authResponse instanceof CustomerAuthResponse customerAuth) {
+            responseBody.put("user", customerAuth.customerDTO());
+            responseBody.put("userType", "CUSTOMER");
+        }
+        return ResponseEntity.ok(responseBody);
+    }
+
+    @PostMapping("/admin/login")
+    public ResponseEntity<?> loginAdmin(@Valid @RequestBody AuthRequest request,
+                                        HttpServletRequest httpRequest) {
+        logger.info("Admin login request received for username: {}", request.username());
+        AuthResponse authResponse = authService.loginAdminOnly(request);
+
+        String deviceFingerprint = generateDeviceFingerprint(httpRequest);
+
+        String accessToken;
+        RefreshToken refreshToken;
 
         if (authResponse instanceof AdminAuthResponse adminAuth) {
             accessToken = authService.generateTokenForAdmin(adminAuth.admin());
             refreshToken = refreshTokenService.createRefreshToken(adminAuth.admin(), deviceFingerprint);
-        } else if (authResponse instanceof CustomerAuthResponse customerAuth) {
-            accessToken = authService.generateTokenForCustomer(customerAuth.customer());
-            refreshToken = refreshTokenService.createRefreshToken(customerAuth.customer(), deviceFingerprint);
         } else if (authResponse instanceof ContentManagerAuthResponse cmAuth) {
             accessToken = authService.generateTokenForContentManager(cmAuth.contentManager());
             refreshToken = refreshTokenService.createRefreshToken(cmAuth.contentManager(), deviceFingerprint);
         } else {
-            throw new RuntimeException("Unknown auth response type");
+            throw new RuntimeException("Unexpected auth response type for admin login");
         }
 
-        logger.info("Login successful for username: {}", request.username());
+        logger.info("Admin login successful for username: {}", request.username());
         Map<String, Object> responseBody = new java.util.HashMap<>();
         responseBody.put("accessToken", accessToken);
         responseBody.put("refreshToken", refreshToken != null ? refreshToken.getToken() : null);
@@ -115,9 +141,6 @@ public class AuthController {
         if (authResponse instanceof AdminAuthResponse adminAuth) {
             responseBody.put("user", adminAuth.adminDTO());
             responseBody.put("userType", "ADMIN");
-        } else if (authResponse instanceof CustomerAuthResponse customerAuth) {
-            responseBody.put("user", customerAuth.customerDTO());
-            responseBody.put("userType", "CUSTOMER");
         } else if (authResponse instanceof ContentManagerAuthResponse cmAuth) {
             responseBody.put("user", cmAuth.contentManagerDTO());
             responseBody.put("userType", "CONTENT_MANAGER");

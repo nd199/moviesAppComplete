@@ -127,6 +127,7 @@ public class SecurityFilterChainConfig {
                                 "/error",
                                 "/actuator/health",
                                 "/api/v1/auth/login",
+                                "/api/v1/auth/admin/login",
                                 "/api/v1/auth/logout",
                                 "/api/v1/auth/refresh-token",
                                 "/api/v1/auth/customers",

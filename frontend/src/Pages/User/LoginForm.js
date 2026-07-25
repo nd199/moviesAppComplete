@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { forgotPasswordRequest, login } from "../../Network/ApiCalls";
-import { resetErrorMessage } from "../../redux/userSlice";
+import { resetErrorMessage, logout } from "../../redux/userSlice";
+import { clearAuth } from "../../authStore";
 import loginUserBg from "./loginUserBg.jpg";
 import { Mail, Lock, ArrowForward, Visibility, VisibilityOff } from "@mui/icons-material";
 
@@ -33,14 +34,15 @@ const LoginForm = () => {
       const isCM = roles.includes('ROLE_CONTENT_MANAGER');
       const isSuperAdmin = roles.includes('ROLE_SUPER_ADMIN');
 
-      setTimeout(() => {
-        if (isAdmin || isCM || isSuperAdmin) {
-          setPopup({ show: true, msg: "Admin accounts must use the Admin Login page." });
-          setLoading(false);
-          return;
-        }
-        navigate("/", { replace: true });
-      }, 800);
+      if (isAdmin || isCM || isSuperAdmin) {
+        clearAuth();
+        dispatch(logout());
+        setPopup({ show: true, msg: "Admin/CM accounts must use their designated login page." });
+        setLoading(false);
+        return;
+      }
+
+      navigate("/", { replace: true });
     } catch (err) {
       setPopup({ show: true, msg: err.response?.data?.message || err.response?.data?.error || 'Login failed.' });
     } finally { setLoading(false); }

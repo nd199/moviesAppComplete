@@ -1,7 +1,7 @@
 import api from '../AxiosMethods';
 
 export const adminLogin = async (credentials) => {
-  const response = await api.post('/auth/login', credentials);
+  const response = await api.post('/auth/admin/login', credentials);
   return response.data;
 };
 

@@ -188,6 +188,24 @@ public class AuthService {
         }
     }
 
+    @Transactional
+    public AuthResponse loginCustomerOnly(AuthRequest authRequest) {
+        AuthResponse response = login(authRequest);
+        if (response instanceof AdminAuthResponse || response instanceof ContentManagerAuthResponse) {
+            throw new InvalidCredentialsException("Invalid credentials");
+        }
+        return response;
+    }
+
+    @Transactional
+    public AuthResponse loginAdminOnly(AuthRequest authRequest) {
+        AuthResponse response = login(authRequest);
+        if (response instanceof CustomerAuthResponse) {
+            throw new InvalidCredentialsException("Invalid credentials");
+        }
+        return response;
+    }
+
     private void checkRateLimit(String key) {
         int[] state = failedAttempts.get(key);
         if (state == null) return;
