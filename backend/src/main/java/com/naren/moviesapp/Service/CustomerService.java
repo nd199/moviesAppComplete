@@ -9,6 +9,8 @@ import com.naren.moviesapp.Record.CustomerRegistration;
 import com.naren.moviesapp.Record.CustomerSubscription;
 import com.naren.moviesapp.Record.CustomerUpdateRequest;
 import com.naren.moviesapp.Record.EmailVerificationRequest;
+import com.naren.moviesapp.Repo.AdminRepository;
+import com.naren.moviesapp.Repo.ContentManagerRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Utils.OtpService;
@@ -39,10 +41,13 @@ public class CustomerService implements CustomerServiceInterface {
     private final MovieRepository movieRepository;
     private final JwtUtil jwtUtil;
     private final OtpService otpService;
+    private final AdminRepository adminRepository;
+    private final ContentManagerRepository contentManagerRepository;
 
     public CustomerService(CustomerRepository customerRepository, PasswordEncoder passwordEncoder,
                            CustomerDTOMapper customerDTOMapper, RoleService roleService,
-                           MovieRepository movieRepository, JwtUtil jwtUtil, OtpService otpService) {
+                           MovieRepository movieRepository, JwtUtil jwtUtil, OtpService otpService,
+                           AdminRepository adminRepository, ContentManagerRepository contentManagerRepository) {
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
         this.customerDTOMapper = customerDTOMapper;
@@ -50,6 +55,8 @@ public class CustomerService implements CustomerServiceInterface {
         this.movieRepository = movieRepository;
         this.jwtUtil = jwtUtil;
         this.otpService = otpService;
+        this.adminRepository = adminRepository;
+        this.contentManagerRepository = contentManagerRepository;
     }
 
     @Override
@@ -139,6 +146,12 @@ public class CustomerService implements CustomerServiceInterface {
             throw new PasswordInvalidException("Invalid password");
         }
         if (customerRepository.existsByEmail(customerRegistration.email())) {
+            throw new ResourceAlreadyExists("Email already taken");
+        }
+        if (adminRepository.findByEmail(customerRegistration.email()).isPresent()) {
+            throw new ResourceAlreadyExists("Email already taken");
+        }
+        if (contentManagerRepository.findByEmail(customerRegistration.email()).isPresent()) {
             throw new ResourceAlreadyExists("Email already taken");
         }
         if (customerRepository.existsByPhoneNumber(customerRegistration.phoneNumber())) {
