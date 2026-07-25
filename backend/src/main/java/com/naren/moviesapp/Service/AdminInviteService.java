@@ -2,6 +2,8 @@ package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.jwt.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class AdminInviteService {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminInviteService.class);
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -29,6 +32,7 @@ public class AdminInviteService {
 
         String token = jwtUtil.issueToken(email, claims);
         redisTemplate.opsForValue().set("invite:" + token, email, 7, TimeUnit.DAYS);
+        log.info("Generated admin invite token for email={}, role={}", email, role);
         return token;
     }
 
@@ -39,6 +43,7 @@ public class AdminInviteService {
 
     public void consumeInviteToken(String token) {
         redisTemplate.delete("invite:" + token);
+        log.info("Consumed admin invite token");
     }
 
     public String getEmailFromToken(String token) {

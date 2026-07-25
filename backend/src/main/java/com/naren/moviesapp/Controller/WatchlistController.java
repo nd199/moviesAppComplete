@@ -5,6 +5,8 @@ import com.naren.moviesapp.Entity.WatchlistItem;
 import com.naren.moviesapp.Record.AddToWatchlistRequest;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Service.WatchlistService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/watchlist")
 public class WatchlistController {
 
+    private static final Logger log = LoggerFactory.getLogger(WatchlistController.class);
     private final WatchlistService watchlistService;
     private final CustomerRepository customerRepository;
 
@@ -36,6 +39,7 @@ public class WatchlistController {
             @Valid @RequestBody AddToWatchlistRequest request) {
         
         Customer customer = getCustomer(userDetails);
+        log.info("Adding tmdbId={} ({}) to watchlist for customer={}", request.tmdbId(), request.mediaType(), customer.getId());
         WatchlistItem item = watchlistService.addToWatchlist(customer.getId(), request);
         return ResponseEntity.ok(item);
     }
@@ -68,6 +72,7 @@ public class WatchlistController {
             @PathVariable String mediaType) {
         
         Customer customer = getCustomer(userDetails);
+        log.info("Removing tmdbId={} ({}) from watchlist for customer={}", tmdbId, mediaType, customer.getId());
         watchlistService.removeFromWatchlist(customer.getId(), tmdbId, mediaType);
         return ResponseEntity.noContent().build();
     }

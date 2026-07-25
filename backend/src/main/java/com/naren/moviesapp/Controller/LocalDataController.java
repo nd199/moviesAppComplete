@@ -4,6 +4,8 @@ import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Show;
 import com.naren.moviesapp.Service.MovieService;
 import com.naren.moviesapp.Service.ShowService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.util.Map;
 @Profile("dev")
 public class LocalDataController {
 
+    private static final Logger log = LoggerFactory.getLogger(LocalDataController.class);
     private final MovieService movieService;
     private final ShowService showService;
 

@@ -2,6 +2,8 @@ package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Entity.SubscriptionPlan;
 import com.naren.moviesapp.Repo.SubscriptionPlanRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.List;
 @Service
 public class SubscriptionPlanService implements SubscriptionPlanServiceInterface {
 
+    private static final Logger log = LoggerFactory.getLogger(SubscriptionPlanService.class);
     private final SubscriptionPlanRepository planRepository;
 
     public SubscriptionPlanService(SubscriptionPlanRepository planRepository) {
@@ -23,6 +26,8 @@ public class SubscriptionPlanService implements SubscriptionPlanServiceInterface
 
     @Override
     public List<SubscriptionPlan> getAllPlans() {
-        return planRepository.findAll();
+        List<SubscriptionPlan> plans = planRepository.findAll();
+        log.debug("Fetched {} subscription plans", plans.size());
+        return plans;
     }
 }

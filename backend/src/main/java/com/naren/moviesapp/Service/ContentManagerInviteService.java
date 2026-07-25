@@ -2,6 +2,8 @@ package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Entity.RoleName;
 import com.naren.moviesapp.jwt.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ContentManagerInviteService {
 
+    private static final Logger log = LoggerFactory.getLogger(ContentManagerInviteService.class);
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -29,6 +32,7 @@ public class ContentManagerInviteService {
 
         String token = jwtUtil.issueToken(email, claims);
         redisTemplate.opsForValue().set("cm_invite:" + token, email, 24, TimeUnit.HOURS);
+        log.info("Generated content manager invite token for email={}, role={}", email, role);
         return token;
     }
 
@@ -39,6 +43,7 @@ public class ContentManagerInviteService {
 
     public void consumeInviteToken(String token) {
         redisTemplate.delete("cm_invite:" + token);
+        log.info("Consumed content manager invite token");
     }
 
     public String getEmailFromToken(String token) {

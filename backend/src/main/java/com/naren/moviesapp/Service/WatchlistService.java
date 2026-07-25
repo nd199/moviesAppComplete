@@ -6,6 +6,8 @@ import com.naren.moviesapp.Exception.ResourceNotFoundException;
 import com.naren.moviesapp.Record.AddToWatchlistRequest;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.WatchlistRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.List;
 @Service
 public class WatchlistService {
 
+    private static final Logger log = LoggerFactory.getLogger(WatchlistService.class);
     private final WatchlistRepository watchlistRepository;
     private final CustomerRepository customerRepository;
 
@@ -44,7 +47,9 @@ public class WatchlistService {
         item.setMediaType(request.mediaType());
         item.setAddedAt(LocalDateTime.now());
 
-        return watchlistRepository.save(item);
+        WatchlistItem saved = watchlistRepository.save(item);
+        log.info("Added watchlist item: tmdbId={} for customer={}", request.tmdbId(), customerId);
+        return saved;
     }
 
     public List<WatchlistItem> getWatchlist(Long customerId) {
@@ -58,6 +63,7 @@ public class WatchlistService {
     @Transactional
     public void removeFromWatchlist(Long customerId, Long tmdbId, String mediaType) {
         watchlistRepository.deleteByCustomerIdAndTmdbIdAndMediaType(customerId, tmdbId, mediaType);
+        log.info("Removed watchlist item: tmdbId={} ({}) for customer={}", tmdbId, mediaType, customerId);
     }
 
     public boolean isInWatchlist(Long customerId, Long tmdbId, String mediaType) {
