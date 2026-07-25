@@ -202,4 +202,35 @@ public class BrevoEmailService implements EmailService {
             throw new EmailSendingException("Failed to send content manager invite email to " + toEmail, e);
         }
     }
+
+    @Override
+    public void sendSubscriptionExpiryWarningEmail(String toEmail, String planName, long daysRemaining) {
+        try {
+            Context context = new Context();
+            context.setVariable("email", toEmail);
+            context.setVariable("planName", planName);
+            context.setVariable("daysRemaining", daysRemaining);
+            String htmlContent = templateEngine.process("subscription-expiry-warning", context);
+            sendViaBrevoAPI(toEmail, "Your Subscription is Expiring Soon", htmlContent);
+            logger.info("Subscription expiry warning email sent to {}", toEmail);
+        } catch (Exception e) {
+            logger.error("Failed to send subscription expiry warning email to {}: {}", toEmail, e.getMessage(), e);
+            throw new EmailSendingException("Failed to send subscription expiry warning email to " + toEmail, e);
+        }
+    }
+
+    @Override
+    public void sendSubscriptionExpiredEmail(String toEmail, String planName) {
+        try {
+            Context context = new Context();
+            context.setVariable("email", toEmail);
+            context.setVariable("planName", planName);
+            String htmlContent = templateEngine.process("subscription-expired", context);
+            sendViaBrevoAPI(toEmail, "Your Subscription Has Expired", htmlContent);
+            logger.info("Subscription expired email sent to {}", toEmail);
+        } catch (Exception e) {
+            logger.error("Failed to send subscription expired email to {}: {}", toEmail, e.getMessage(), e);
+            throw new EmailSendingException("Failed to send subscription expired email to " + toEmail, e);
+        }
+    }
 }

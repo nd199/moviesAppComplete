@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,4 +22,12 @@ public interface UserPlanInfoRepository extends JpaRepository<UserPlanInfo, Long
 
     @Query("SELECT COUNT(upi) FROM UserPlanInfo upi WHERE upi.isActive = true")
     long countActiveSubscriptions();
+
+    @Query("SELECT upi FROM UserPlanInfo upi WHERE upi.isActive = true AND " +
+            "upi.subscriptionEndDate < CURRENT_TIMESTAMP")
+    List<UserPlanInfo> findExpiredSubscriptions();
+
+    @Query("SELECT upi FROM UserPlanInfo upi WHERE upi.isActive = true AND " +
+            "upi.subscriptionEndDate BETWEEN CURRENT_TIMESTAMP AND :deadline")
+    List<UserPlanInfo> findSubscriptionsExpiringSoonBefore(@Param("deadline") java.time.LocalDateTime deadline);
 }

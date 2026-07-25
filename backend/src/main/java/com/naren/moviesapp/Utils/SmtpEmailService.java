@@ -121,4 +121,47 @@ public class SmtpEmailService implements EmailService {
             throw new EmailSendingException("Failed to send content manager invite email to " + toEmail, e);
         }
     }
+
+    @Override
+    public void sendSubscriptionExpiryWarningEmail(String toEmail, String planName, long daysRemaining) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("Your Subscription is Expiring Soon");
+            Context context = new Context();
+            context.setVariable("email", toEmail);
+            context.setVariable("planName", planName);
+            context.setVariable("daysRemaining", daysRemaining);
+            String htmlContent = templateEngine.process("subscription-expiry-warning", context);
+            helper.setText(htmlContent, true);
+            javaMailSender.send(message);
+            logger.info("Subscription expiry warning email sent to {}", toEmail);
+        } catch (MessagingException e) {
+            logger.error("Failed to send subscription expiry warning email to {}: {}", toEmail, e.getMessage(), e);
+            throw new EmailSendingException("Failed to send subscription expiry warning email to " + toEmail, e);
+        }
+    }
+
+    @Override
+    public void sendSubscriptionExpiredEmail(String toEmail, String planName) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("Your Subscription Has Expired");
+            Context context = new Context();
+            context.setVariable("email", toEmail);
+            context.setVariable("planName", planName);
+            String htmlContent = templateEngine.process("subscription-expired", context);
+            helper.setText(htmlContent, true);
+            javaMailSender.send(message);
+            logger.info("Subscription expired email sent to {}", toEmail);
+        } catch (MessagingException e) {
+            logger.error("Failed to send subscription expired email to {}: {}", toEmail, e.getMessage(), e);
+            throw new EmailSendingException("Failed to send subscription expired email to " + toEmail, e);
+        }
+    }
 }

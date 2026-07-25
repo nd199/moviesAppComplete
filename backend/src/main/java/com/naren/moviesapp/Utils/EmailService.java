@@ -8,4 +8,8 @@ public interface EmailService {
     void sendInviteEmail(String toEmail, String inviteLink);
 
     void sendContentManagerInviteEmail(String toEmail, String inviteLink);
+
+    void sendSubscriptionExpiryWarningEmail(String toEmail, String planName, long daysRemaining);
+
+    void sendSubscriptionExpiredEmail(String toEmail, String planName);
 }
