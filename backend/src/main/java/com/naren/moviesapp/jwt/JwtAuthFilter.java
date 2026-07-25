@@ -42,10 +42,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         logger.debug("Processing request for URI: {}", path);
 
-        // Skip JWT validation for OTP endpoints - these are public
-        // Use lowercase comparison for case-insensitive matching
+        // Skip JWT validation for public auth endpoints
         String pathLower = path.toLowerCase();
-        if (pathLower.startsWith("/api/v1/verify/email") ||
+        if (pathLower.startsWith("/api/v1/auth/login") ||
+                pathLower.startsWith("/api/v1/auth/admin/login") ||
+                pathLower.startsWith("/api/v1/auth/logout") ||
+                pathLower.startsWith("/api/v1/auth/refresh-token") ||
+                pathLower.startsWith("/api/v1/auth/customers") ||
+                pathLower.startsWith("/api/v1/verify/email") ||
                 pathLower.startsWith("/api/v1/validate/otp") ||
                 pathLower.startsWith("/verify/email") ||
                 pathLower.startsWith("/validate/otp") ||
