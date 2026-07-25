@@ -214,7 +214,6 @@ export const {
   fetchCurrentFailure,
 
   setAuthStatus,
-  setSubscriptionStatus,
 } = userSlice.actions;
 
 export default userSlice.reducer;

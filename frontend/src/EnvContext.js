@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext } from 'react';
 
 const isLocalHost = () =>
   window.location.hostname === 'localhost' ||
@@ -10,5 +10,3 @@ export const EnvProvider = ({ children }) => {
   const value = { isDev: isLocalHost() };
   return <EnvContext.Provider value={value}>{children}</EnvContext.Provider>;
 };
-
-export const useEnv = () => useContext(EnvContext);

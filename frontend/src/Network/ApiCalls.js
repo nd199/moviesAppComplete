@@ -7,9 +7,6 @@ import {
   fetchTmdbTrendingShowsStart,
   fetchTmdbTrendingShowsSuccess,
   fetchTmdbTrendingShowsFailure,
-  fetchTmdbSearchResultsStart,
-  fetchTmdbSearchResultsSuccess,
-  fetchTmdbSearchResultsFailure,
 } from '../redux/ProductsRedux';
 import {
   fetchCurrentFailure,
@@ -201,33 +198,6 @@ export const changePassword = async (dispatch, passwordData) => {
   }
 };
 
-export const updateUser = async (id, customer) => {
-  try {
-    const res = await userRequest().put(`/customers/${id}`, customer);
-    return res.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const deleteUser = async (id) => {
-  try {
-    await userRequest().delete(`/customers/${id}`);
-    return { success: true };
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const fetchUsers = async () => {
-  try {
-    const res = await userRequest().get('/admin/users');
-    return res.data || [];
-  } catch (error) {
-    return [];
-  }
-};
-
 export const fetchMovies = async () => {
   try {
     const res = await userRequest().get('/movies');
@@ -243,42 +213,6 @@ export const fetchShows = async () => {
     return res.data || [];
   } catch (error) {
     return [];
-  }
-};
-
-export const fetchProducts = async () => {
-  try {
-    const res = await userRequest().get('/products/AllProducts');
-    return [...res.data.movies, ...res.data.shows];
-  } catch (error) {
-    return [];
-  }
-};
-
-export const deleteProduct = async (id, type) => {
-  try {
-    await userRequest().delete(`/products/${id}/${type}`);
-    return { success: true };
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const updateProduct = async (id, type, product) => {
-  try {
-    const res = await userRequest().put(`/products/${id}/${type}`, product);
-    return res.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const addProduct = async (product) => {
-  try {
-    const res = await userRequest().post('/products', product);
-    return res.data;
-  } catch (error) {
-    throw error;
   }
 };
 
@@ -373,34 +307,6 @@ export const fetchTmdbSouthIndianMovies = async () => {
   }
 };
 
-export const searchTmdbMovies = async (dispatch, query, page = 1) => {
-  dispatch(fetchTmdbSearchResultsStart());
-  try {
-    const res = await publicRequest().get(`/tmdb/search/movies?query=${encodeURIComponent(query)}&page=${page}`);
-    const results = res.data?.results || [];
-    dispatch(fetchTmdbSearchResultsSuccess(results));
-    return results;
-  } catch (error) {
-    const message = error.response?.data?.message || 'Failed to search movies';
-    dispatch(fetchTmdbSearchResultsFailure({ message }));
-    return [];
-  }
-};
-
-export const searchTmdbShows = async (dispatch, query, page = 1) => {
-  dispatch(fetchTmdbSearchResultsStart());
-  try {
-    const res = await publicRequest().get(`/tmdb/search/shows?query=${encodeURIComponent(query)}&page=${page}`);
-    const results = res.data?.results || [];
-    dispatch(fetchTmdbSearchResultsSuccess(results));
-    return results;
-  } catch (error) {
-    const message = error.response?.data?.message || 'Failed to search shows';
-    dispatch(fetchTmdbSearchResultsFailure({ message }));
-    return [];
-  }
-};
-
 export const fetchMovieCast = async (tmdbId) => {
   try {
     const res = await publicRequest().get(`/tmdb/movie/${tmdbId}/cast`);
@@ -429,20 +335,6 @@ export const fetchSimilarTvShows = async (tmdbId) => {
   } catch { return []; }
 };
 
-export const fetchRecommendedMovies = async (tmdbId) => {
-  try {
-    const res = await publicRequest().get(`/tmdb/movie/${tmdbId}/recommended`);
-    return res.data?.results || [];
-  } catch { return []; }
-};
-
-export const fetchRecommendedTvShows = async (tmdbId) => {
-  try {
-    const res = await publicRequest().get(`/tmdb/tv/${tmdbId}/recommended`);
-    return res.data?.results || [];
-  } catch { return []; }
-};
-
 export const fetchMovieGenres = async () => {
   try {
     const res = await publicRequest().get('/tmdb/genres/movies');
@@ -455,24 +347,6 @@ export const fetchTvGenres = async () => {
     const res = await publicRequest().get('/tmdb/genres/tv');
     return res.data?.genres || [];
   } catch { return []; }
-};
-
-export const syncTmdbMovie = async (tmdbId) => {
-  try {
-    const res = await userRequest().post(`/tmdb/sync/movie/${tmdbId}`);
-    return { success: true, data: res.data };
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const syncTmdbTvShow = async (tmdbId) => {
-  try {
-    const res = await userRequest().post(`/tmdb/sync/tv/${tmdbId}`);
-    return { success: true, data: res.data };
-  } catch (error) {
-    throw error;
-  }
 };
 
 export const fetchTmdbMovieDetails = async (tmdbId) => {
@@ -512,86 +386,5 @@ export const pingSpringApi = async (email) => {
   try {
     await userRequest().post('/payments/ping', { email });
   } catch (error) {
-  }
-};
-
-export const getSubscriptionPlans = async () => {
-  try {
-    const res = await userRequest().get('/subscription/plans');
-    return res.data || [];
-  } catch (error) {
-    return [];
-  }
-};
-
-export const getCurrentSubscription = async () => {
-  try {
-    const res = await userRequest().get('/subscription/current');
-    return res.data;
-  } catch (error) {
-    return null;
-  }
-};
-
-export const createSubscriptionIntent = async (planId) => {
-  try {
-    const res = await userRequest().post('/subscription/intent/', { planId });
-    return res.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getMovieStreamUrl = async (movieId) => {
-  try {
-    const res = await userRequest().get(`/streaming/movie/${movieId}`);
-    return res.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getShowStreamUrl = async (showId, season, episode) => {
-  try {
-    const res = await userRequest().get(`/streaming/show/${showId}/season/${season}/episode/${episode}`);
-    return res.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getWatchHistory = async () => {
-  try {
-    const res = await userRequest().get('/streaming/history');
-    return res.data || [];
-  } catch (error) {
-    return [];
-  }
-};
-
-export const addToWatchlist = async (contentId, contentType) => {
-  try {
-    const res = await userRequest().post('/streaming/watchlist', { contentId, contentType });
-    return res.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getWatchlist = async () => {
-  try {
-    const res = await userRequest().get('/streaming/watchlist');
-    return res.data || [];
-  } catch (error) {
-    return [];
-  }
-};
-
-export const removeFromWatchlist = async (contentId) => {
-  try {
-    await userRequest().delete(`/streaming/watchlist/${contentId}`);
-    return { success: true };
-  } catch (error) {
-    throw error;
   }
 };
