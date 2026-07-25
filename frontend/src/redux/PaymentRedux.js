@@ -67,10 +67,15 @@ const PaymentRedux = createSlice({
   name: 'payment',
   initialState: {
     userInfoAndSelectedPlan: null,
+    paymentPlan: null,
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    setPaymentPlan: (state, action) => {
+      state.paymentPlan = action.payload;
+    },
+  },
   extraReducers: builder => {
     builder
       .addMatcher(

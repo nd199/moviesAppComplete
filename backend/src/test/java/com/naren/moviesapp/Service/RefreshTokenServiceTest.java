@@ -4,6 +4,7 @@ import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.RefreshToken;
 import com.naren.moviesapp.Entity.UserType;
 import com.naren.moviesapp.Repo.AdminRepository;
+import com.naren.moviesapp.Repo.ContentManagerRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.RefreshTokenRepository;
 import com.naren.moviesapp.TestData.TestDataFactory;
@@ -34,13 +35,15 @@ class RefreshTokenServiceTest {
     @Mock
     private AdminRepository adminRepository;
     @Mock
+    private ContentManagerRepository contentManagerRepository;
+    @Mock
     private JwtUtil jwtUtil;
 
     private RefreshTokenService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new RefreshTokenService(refreshTokenRepository, customerRepository, adminRepository, jwtUtil);
+        underTest = new RefreshTokenService(refreshTokenRepository, customerRepository, adminRepository, contentManagerRepository, jwtUtil);
     }
 
     @Test

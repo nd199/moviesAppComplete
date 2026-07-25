@@ -285,6 +285,10 @@ public class AuthService {
                             .getEmail()
             ).orElseThrow(() -> new RuntimeException("Admin not found"));
             return generateTokenForAdmin(admin);
+        } else if (UserType.CONTENT_MANAGER.equals(refreshToken.getUserType())) {
+            ContentManager contentManager = contentManagerRepository.findById(refreshToken.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Content Manager not found"));
+            return generateTokenForContentManager(contentManager);
         } else if (UserType.CUSTOMER.equals(refreshToken.getUserType())) {
             Customer customer = customerRepository.findById(refreshToken.getUserId())
                     .orElseThrow(() -> new RuntimeException("Customer not found"));

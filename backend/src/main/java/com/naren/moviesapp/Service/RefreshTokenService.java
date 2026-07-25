@@ -2,6 +2,7 @@ package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Entity.*;
 import com.naren.moviesapp.Repo.AdminRepository;
+import com.naren.moviesapp.Repo.ContentManagerRepository;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Repo.RefreshTokenRepository;
 import com.naren.moviesapp.jwt.JwtUtil;
@@ -23,6 +24,7 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final CustomerRepository customerRepository;
     private final AdminRepository adminRepository;
+    private final ContentManagerRepository contentManagerRepository;
     private final JwtUtil jwtUtil;
 
     @Value("${jwt.refresh-expiration-days:7}")
@@ -31,10 +33,12 @@ public class RefreshTokenService {
     public RefreshTokenService(RefreshTokenRepository refreshTokenRepository,
                                CustomerRepository customerRepository,
                                AdminRepository adminRepository,
+                               ContentManagerRepository contentManagerRepository,
                                JwtUtil jwtUtil) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.customerRepository = customerRepository;
         this.adminRepository = adminRepository;
+        this.contentManagerRepository = contentManagerRepository;
         this.jwtUtil = jwtUtil;
     }
 
@@ -47,7 +51,7 @@ public class RefreshTokenService {
     }
 
     public RefreshToken createRefreshToken(ContentManager contentManager, String deviceFingerprint) {
-        return createRefreshTokenInternal(contentManager.getId(), UserType.ADMIN, deviceFingerprint);
+        return createRefreshTokenInternal(contentManager.getId(), UserType.CONTENT_MANAGER, deviceFingerprint);
     }
 
     private RefreshToken createRefreshTokenInternal(Long userId, UserType userType, String deviceFingerprint) {
@@ -187,6 +191,10 @@ public class RefreshTokenService {
             Admin admin = adminRepository.findById(refreshToken.getUserId())
                     .orElseThrow(() -> new RuntimeException("Admin not found"));
             return jwtUtil.issueTokenWithRoleExpiration(admin.getEmail(), admin.getRoles());
+        } else if (UserType.CONTENT_MANAGER.equals(refreshToken.getUserType())) {
+            ContentManager contentManager = contentManagerRepository.findById(refreshToken.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Content Manager not found"));
+            return jwtUtil.issueTokenWithRoleExpiration(contentManager.getEmail(), contentManager.getRoles());
         } else if (UserType.CUSTOMER.equals(refreshToken.getUserType())) {
             Customer customer = customerRepository.findById(refreshToken.getUserId())
                     .orElseThrow(() -> new RuntimeException("Customer not found"));
