@@ -249,19 +249,17 @@ public class TmdbController {
 
     @GetMapping("/discover/movies")
     public ResponseEntity<?> discoverMovies(
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) Integer genreId,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Integer primaryReleaseYear,
-            @RequestParam(required = false) Integer voteCountGte,
+            @RequestParam(name = "sort_by", required = false) String sortBy,
+            @RequestParam(name = "with_genres", required = false) Integer genreId,
+            @RequestParam(name = "primary_release_year", required = false) Integer primaryReleaseYear,
+            @RequestParam(name = "vote_count.gte", required = false) Integer voteCountGte,
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
             return emptyOk();
         }
 
-        Integer effectiveYear = year != null ? year : primaryReleaseYear;
-        var response = tmdbService.discoverMovies(sortBy, genreId, effectiveYear, voteCountGte, page);
+        var response = tmdbService.discoverMovies(sortBy, genreId, primaryReleaseYear, voteCountGte, page);
 
         if (response.isEmpty()) {
             return ResponseEntity.ok(Map.of(
@@ -291,9 +289,10 @@ public class TmdbController {
 
     @GetMapping("/discover/shows")
     public ResponseEntity<?> discoverTvShows(
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) Integer genreId,
-            @RequestParam(required = false) Integer year,
+            @RequestParam(name = "sort_by", required = false) String sortBy,
+            @RequestParam(name = "with_genres", required = false) Integer genreId,
+            @RequestParam(name = "first_air_date_year", required = false) Integer year,
+            @RequestParam(name = "vote_count.gte", required = false) Integer voteCountGte,
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
