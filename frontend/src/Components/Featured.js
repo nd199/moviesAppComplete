@@ -34,7 +34,7 @@ const Featured = () => {
   );
 
   return (
-    <section className="relative w-full h-screen min-h-[560px] bg-black -mt-16">
+    <section className="relative w-full h-dvh min-h-[600px] bg-black">
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         slidesPerView={1}
@@ -56,17 +56,12 @@ const Featured = () => {
                 <img src={item.poster} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
               )}
 
-              {/* Minimal gradient — just enough for text readability, video stays visible */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/5 to-transparent z-[1]" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent z-[1]" />
+              {/* Subtle bottom gradient for depth — video stays fully visible */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-[1]" />
 
-              {/* Colored glow accents */}
-              <div className="absolute bottom-0 left-[5%] w-[500px] h-[250px] bg-brand-500/10 blur-[120px] z-[1] pointer-events-none" />
-              <div className="absolute top-[15%] right-[10%] w-[350px] h-[350px] bg-accent-500/8 blur-[140px] z-[1] pointer-events-none" />
-
-              {/* Content */}
-              <div className="relative z-[2] h-full flex items-end pb-24 px-[6vw] max-w-[1400px] mx-auto">
-                <div className="max-w-[560px] flex flex-col gap-4 animate-slide-left">
+              {/* Content — Apple-style frosted glass panel */}
+              <div className="relative z-[2] h-full flex items-end pb-20 px-[4vw] max-w-[1400px] mx-auto">
+                <div className="animate-slide-left bg-black/50 backdrop-blur-2xl border border-white/[0.08] rounded-2xl p-6 sm:p-8 max-w-[580px] flex flex-col gap-4 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
                   {/* Badges */}
                   <div className="flex items-center gap-2">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-widest bg-brand-500/20 text-brand-300 border border-brand-500/30 backdrop-blur-sm">
@@ -78,7 +73,7 @@ const Featured = () => {
                   </div>
 
                   {/* Title */}
-                  <h1 className="text-[clamp(2.8rem,5.5vw,5rem)] leading-[0.9] font-black text-white m-0 tracking-tight drop-shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+                  <h1 className="text-[clamp(2rem,5vw,3.5rem)] leading-[0.95] font-black text-white m-0 tracking-tight">
                     {item.title}
                   </h1>
 
@@ -98,10 +93,10 @@ const Featured = () => {
                   </div>
 
                   {/* Description */}
-                  <p className="text-[0.9rem] leading-relaxed text-[#8892b0] m-0 line-clamp-3">{item.description}</p>
+                  <p className="text-[0.85rem] leading-relaxed text-[#8892b0] m-0 line-clamp-3">{item.description}</p>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-3 mt-2">
+                  <div className="flex items-center gap-3 mt-1">
                     <Link to={`/video/${item.title}`} state={{ trailer: item.trailer }}
                       className="inline-flex items-center gap-2.5 px-8 py-3.5 max-md:px-6 max-md:py-3 rounded-xl btn-primary no-underline text-[0.9rem]">
                       <PlayArrowOutlined sx={{ fontSize: 22 }} /> Watch Now
