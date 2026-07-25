@@ -128,15 +128,6 @@ const ColListItem = ({
         )}
 
         <div className="flex items-center gap-2 pt-3 border-t border-white/5">
-          <Link
-            to={`/video/${name || 'unknown'}`}
-            state={{ trailer }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl btn-primary text-[0.7rem] !py-2 !px-4 no-underline"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <PlayArrow sx={{ fontSize: 16 }} /> Watch
-          </Link>
-
           {tmdbId && mediaType && (
             <Link
               to={`/${mediaType === 'tv' ? 'show' : 'movie'}/${tmdbId}`}
