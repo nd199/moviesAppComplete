@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import { ArrowBack, PlayArrow, Star, CalendarToday, Movie } from "@mui/icons-material";
-import { fetchTmdbMovieDetails, fetchTmdbTvShowDetails, fetchMovieCast, fetchTvShowCast, fetchSimilarMovies, fetchSimilarTvShows } from "../../Network/ApiCalls";
+import { fetchTmdbMovieDetails, fetchTmdbTvShowDetails, fetchMovieCast, fetchTvShowCast, fetchSimilarMovies, fetchSimilarTvShows, recordView } from "../../Network/ApiCalls";
 import { publicRequest } from "../../AxiosMethods";
 import WatchlistButton from "../../Components/WatchlistButton";
 import ListItem from "../../Components/ListItem";
 import GlobalLoader from "../../Components/GlobalLoader";
+import ShareButton from "../../Components/ShareButton";
 
 const Detail = () => {
   const { id } = useParams();
@@ -53,6 +54,14 @@ const Detail = () => {
     };
     load();
   }, [id, type]);
+
+  useEffect(() => {
+    if (item) {
+      const title = item.title || item.name;
+      const posterUrl = item.poster || '';
+      recordView(item.tmdbId, type, title, posterUrl);
+    }
+  }, [item, type]);
 
   if (loading) return <GlobalLoader open message="Loading..." />;
   if (!item) return (
@@ -150,6 +159,11 @@ const Detail = () => {
                     className="!px-5 !py-2.5"
                   />
                 )}
+                <ShareButton
+                  title={title}
+                  tmdbId={item.tmdbId}
+                  mediaType={type}
+                />
               </div>
             </div>
           </div>

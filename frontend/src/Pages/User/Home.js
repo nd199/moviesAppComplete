@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import Featured from "../../Components/Featured";
 import Footer from "../../Components/Footer";
 import List from "../../Components/List";
+import RecentlyViewed from "../../Components/RecentlyViewed";
 import { fetchCurrentUserDetails } from "../../Network/ApiCalls";
 import GlobalLoader from "../../Components/GlobalLoader";
 
@@ -32,6 +33,7 @@ const Home = () => {
         {/* Content Lists — interleaved movies and shows */}
         <div className="relative">
           <div className="particle-field" />
+          <RecentlyViewed />
           <List title="Trending Movies" type="tmdb-movies" index={0} />
           <List title="Trending TV Shows" type="tmdb-shows" index={1} />
           <List title="Popular Movies" type="tmdb-popular" index={2} />

@@ -388,3 +388,19 @@ export const pingSpringApi = async (email) => {
   } catch (error) {
   }
 };
+
+export const recordView = async (tmdbId, mediaType, title, posterPath) => {
+  try {
+    await userRequest().post('/view-history', { tmdbId, mediaType, title, posterPath });
+  } catch (error) {
+  }
+};
+
+export const getRecentViews = async () => {
+  try {
+    const res = await userRequest().get('/view-history');
+    return res.data || [];
+  } catch (error) {
+    return [];
+  }
+};
