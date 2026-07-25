@@ -61,7 +61,7 @@ const Featured = () => {
 
               {/* Content — Apple-style frosted glass panel */}
               <div className="relative z-[2] h-full flex items-end pb-20 px-[4vw] max-w-[1400px] mx-auto">
-                <div className="animate-slide-left bg-black/50 backdrop-blur-2xl border border-white/[0.08] rounded-2xl p-6 sm:p-8 max-w-[580px] flex flex-col gap-4 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+                <div className="animate-slide-left bg-black/35 backdrop-blur-md border border-white/[0.08] rounded-2xl p-4 sm:p-5 max-w-[580px] flex flex-col gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
                   {/* Badges */}
                   <div className="flex items-center gap-2">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-widest bg-brand-500/20 text-brand-300 border border-brand-500/30 backdrop-blur-sm">
