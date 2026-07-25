@@ -61,6 +61,9 @@ public class TmdbTvShowDto {
     @JsonProperty("genres")
     private List<TmdbGenreDto> genres;
 
+    @JsonProperty("genre_ids")
+    private List<Integer> genreIds;
+
     @JsonProperty("origin_country")
     private List<String> originCountry;
 

@@ -265,7 +265,7 @@ public class TmdbService {
         }
     }
 
-    public Optional<TmdbSearchResponse<TmdbMovieDto>> discoverMovies(String sortBy, Integer genreId, Integer year, Integer page) {
+    public Optional<TmdbSearchResponse<TmdbMovieDto>> discoverMovies(String sortBy, Integer genreId, Integer year, Integer voteCountGte, Integer page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
             return Optional.empty();
@@ -283,6 +283,9 @@ public class TmdbService {
                 }
                 if (year != null) {
                     builder.queryParam("primary_release_year", year);
+                }
+                if (voteCountGte != null) {
+                    builder.queryParam("vote_count.gte", voteCountGte);
                 }
 
                 return builder.build();

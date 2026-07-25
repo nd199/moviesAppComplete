@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -40,6 +41,29 @@ public class TmdbConvertedDto {
     private List<String> spokenLanguages;
     private String trailer;
 
+    private static final Map<Integer, String> GENRE_MAP = Map.ofEntries(
+            Map.entry(28, "Action"), Map.entry(12, "Adventure"), Map.entry(16, "Animation"),
+            Map.entry(35, "Comedy"), Map.entry(80, "Crime"), Map.entry(99, "Documentary"),
+            Map.entry(18, "Drama"), Map.entry(10751, "Family"), Map.entry(14, "Fantasy"),
+            Map.entry(36, "History"), Map.entry(27, "Horror"), Map.entry(10402, "Music"),
+            Map.entry(9648, "Mystery"), Map.entry(10749, "Romance"), Map.entry(878, "Sci-Fi"),
+            Map.entry(10770, "TV Movie"), Map.entry(53, "Thriller"), Map.entry(10752, "War"),
+            Map.entry(37, "Western"),
+            // TV genre IDs
+            Map.entry(10759, "Action & Adventure"), Map.entry(10762, "Kids"),
+            Map.entry(10763, "News"), Map.entry(10764, "Reality"),
+            Map.entry(10765, "Sci-Fi & Fantasy"), Map.entry(10766, "Soap"),
+            Map.entry(10767, "Talk"), Map.entry(10768, "War & Politics")
+    );
+
+    private static String resolveGenreIds(List<Integer> genreIds) {
+        if (genreIds == null || genreIds.isEmpty()) return "";
+        return genreIds.stream()
+                .map(id -> GENRE_MAP.getOrDefault(id, "Unknown"))
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("");
+    }
+
     public static TmdbConvertedDto fromMovie(TmdbMovieDto movie, TmdbService tmdbService) {
         if (movie == null) return null;
 
@@ -48,6 +72,8 @@ public class TmdbConvertedDto {
             genreStr = String.join(", ", movie.getGenres().stream()
                     .map(TmdbMovieDto.TmdbGenreDto::getName)
                     .toList());
+        } else if (movie.getGenreIds() != null && !movie.getGenreIds().isEmpty()) {
+            genreStr = resolveGenreIds(movie.getGenreIds());
         }
 
         Integer year = null;
@@ -149,6 +175,8 @@ public class TmdbConvertedDto {
             genreStr = String.join(", ", tvShow.getGenres().stream()
                     .map(TmdbTvShowDto.TmdbGenreDto::getName)
                     .toList());
+        } else if (tvShow.getGenreIds() != null && !tvShow.getGenreIds().isEmpty()) {
+            genreStr = resolveGenreIds(tvShow.getGenreIds());
         }
 
         Integer year = null;

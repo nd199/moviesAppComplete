@@ -55,6 +55,9 @@ public class TmdbMovieDto {
     @JsonProperty("genres")
     private List<TmdbGenreDto> genres;
 
+    @JsonProperty("genre_ids")
+    private List<Integer> genreIds;
+
     @JsonProperty("adult")
     private Boolean adult;
 

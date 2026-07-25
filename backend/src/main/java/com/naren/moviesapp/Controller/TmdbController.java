@@ -252,13 +252,16 @@ public class TmdbController {
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) Integer genreId,
             @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer primaryReleaseYear,
+            @RequestParam(required = false) Integer voteCountGte,
             @RequestParam(defaultValue = "1") int page) {
 
         if (!tmdbService.isConfigured()) {
             return emptyOk();
         }
 
-        var response = tmdbService.discoverMovies(sortBy, genreId, year, page);
+        Integer effectiveYear = year != null ? year : primaryReleaseYear;
+        var response = tmdbService.discoverMovies(sortBy, genreId, effectiveYear, voteCountGte, page);
 
         if (response.isEmpty()) {
             return ResponseEntity.ok(Map.of(
