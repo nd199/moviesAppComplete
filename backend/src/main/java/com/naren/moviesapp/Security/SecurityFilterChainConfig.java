@@ -171,6 +171,9 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/admins/**"
                         ).hasAuthority("USER_MANAGE")
 
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tmdb/**")
+                        .permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/v1/movies/**")
                         .permitAll()
 
