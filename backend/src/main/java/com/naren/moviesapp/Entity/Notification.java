@@ -40,6 +40,7 @@ public class Notification {
     private String messageType;
 
     @Column(name = "is_read")
+    @Builder.Default
     private boolean read = false;
 
     @CreatedDate
