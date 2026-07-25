@@ -31,13 +31,15 @@ const LoginForm = () => {
       const roles = user?.roles || [];
       const isAdmin = roles.includes('ROLE_ADMIN');
       const isCM = roles.includes('ROLE_CONTENT_MANAGER');
+      const isSuperAdmin = roles.includes('ROLE_SUPER_ADMIN');
 
       setTimeout(() => {
-        if (isAdmin || isCM) {
-          navigate("/admin/dashboard", { replace: true });
-        } else {
-          navigate("/", { replace: true });
+        if (isAdmin || isCM || isSuperAdmin) {
+          setPopup({ show: true, msg: "Admin accounts must use the Admin Login page." });
+          setLoading(false);
+          return;
         }
+        navigate("/", { replace: true });
       }, 800);
     } catch (err) {
       setPopup({ show: true, msg: err.response?.data?.message || err.response?.data?.error || 'Login failed.' });
