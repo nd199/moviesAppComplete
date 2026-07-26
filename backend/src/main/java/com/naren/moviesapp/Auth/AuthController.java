@@ -114,6 +114,7 @@ public class AuthController {
     public ResponseEntity<?> loginAdmin(@Valid @RequestBody AuthRequest request,
                                         HttpServletRequest httpRequest) {
         logger.info("Admin login request received for username: {}", request.username());
+        logger.info("Admin login endpoint hit for: {}", request.username());
         AuthResponse authResponse = authService.loginAdminOnly(request);
 
         String deviceFingerprint = generateDeviceFingerprint(httpRequest);
