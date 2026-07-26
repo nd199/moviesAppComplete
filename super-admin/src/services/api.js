@@ -41,7 +41,7 @@ export default api;
 
 export const authAPI = {
   login: async (credentials) => {
-    const response = await api.post('/api/v1/auth/login', credentials);
+    const response = await api.post('/api/v1/auth/admin/login', credentials);
     const { accessToken, refreshToken } = response.data;
     setAccessToken(accessToken);
     setRefreshToken(refreshToken);
