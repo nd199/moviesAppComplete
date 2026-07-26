@@ -191,7 +191,15 @@ public class AuthService {
     @Transactional
     public AuthResponse loginCustomerOnly(AuthRequest authRequest) {
         AuthResponse response = login(authRequest);
-        if (response instanceof AdminAuthResponse || response instanceof ContentManagerAuthResponse) {
+        if (response instanceof AdminAuthResponse adminAuth) {
+            boolean isSuperAdmin = adminAuth.admin().getRoles().stream()
+                    .anyMatch(role -> role.getName() == RoleName.ROLE_SUPER_ADMIN);
+            if (!isSuperAdmin) {
+                throw new InvalidCredentialsException("Invalid credentials");
+            }
+            return response;
+        }
+        if (response instanceof ContentManagerAuthResponse) {
             throw new InvalidCredentialsException("Invalid credentials");
         }
         return response;
