@@ -63,6 +63,7 @@ api.interceptors.response.use(
             setTokens(accessToken, newRefreshToken);
             return { accessToken, newRefreshToken };
           } catch (refreshError) {
+            console.warn('Token refresh failed, clearing auth');
             clearAuth();
             store.dispatch(logout());
             persistor.purge();
@@ -100,7 +101,7 @@ publicApi.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.warn('Public API auth error (expected for some endpoints)');
+      console.warn('Public API auth error (expected for some endpoints) on', error.config.url);
     }
     return Promise.reject(error);
   }
@@ -113,7 +114,7 @@ const passResetApi = axios.create({
 });
 
 const paymentApi = axios.create({
-  baseURL: `${getApiBaseUrl()}/payments`,
+  baseURL: `${getBaseUrl()}/payments`,
   timeout: 30000,
   withCredentials: true,
 });

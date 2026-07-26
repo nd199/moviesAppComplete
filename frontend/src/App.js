@@ -115,6 +115,7 @@ function AppWithNavigation() {
 
   useEffect(() => {
     const initializeAuth = async () => {
+      console.log('Initializing authentication flow...');
       const refreshToken = getRefreshToken();
       const accessToken = getAccessToken();
 
@@ -135,26 +136,31 @@ function AppWithNavigation() {
 
           dispatch(setAuthStatus('authenticated'));
           await fetchCurrentUserDetails(dispatch);
+          console.log('Auth status updated to authenticated');
         } catch (error) {
           console.warn('Token refresh failed:', error.message);
           clearAuth();
           dispatch(logout());
           persistor.purge();
+          console.log('Auth flow: tokens cleared and logged out');
         }
       }
       else if (accessToken) {
         try {
           await fetchCurrentUserDetails(dispatch);
           dispatch(setAuthStatus('authenticated'));
+          console.log('Auth status updated to authenticated via existing access token');
         } catch (error) {
           console.warn('Access token invalid:', error.message);
           clearAuth();
           dispatch(logout());
           persistor.purge();
+          console.log('Auth flow: tokens cleared due to invalid access token');
         }
       }
       else {
         dispatch(setAuthStatus('unauthenticated'));
+        console.log('Auth status set to unauthenticated');
       }
     };
 
@@ -182,7 +188,6 @@ function AppWithNavigation() {
       window.paymentSuccess = null;
     };
   }, [dispatch]);
-
 
   return (
     <Router>
@@ -271,7 +276,7 @@ function Layout({ sidebarOpen, setSidebarOpen }) {
         <Route path="/payment/:userId" element={<PaymentCheckout />} />
         <Route path="/success" element={<Success />} />
 
-        {/* Protected Routes - Require Authentication */}
+        {/* Protected Routes - Require Subscription */}
         <Route
           path="/profile"
           element={
@@ -297,6 +302,7 @@ function Layout({ sidebarOpen, setSidebarOpen }) {
           }
         />
 
+        {/* Protected Routes - Require Authentication and Subscription */}
         <Route
           path="/video/:id"
           element={
@@ -335,6 +341,7 @@ function ProtectedRoute({
   }
 
   if (authStatus !== 'authenticated') {
+    console.log('ProtectedRoute: User not authenticated, redirecting');
     return (
       <Navigate
         to={redirectToRegister ? "/register" : "/login"}
