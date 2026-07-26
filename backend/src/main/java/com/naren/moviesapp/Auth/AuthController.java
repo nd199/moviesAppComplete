@@ -102,6 +102,13 @@ public class AuthController {
             responseBody.put("refreshToken", refreshToken != null ? refreshToken.getToken() : null);
             responseBody.put("user", customerAuth.customerDTO());
             responseBody.put("userType", "CUSTOMER");
+        } else if (authResponse instanceof AdminAuthResponse adminAuth) {
+            accessToken = authService.generateTokenForAdmin(adminAuth.admin());
+            refreshToken = refreshTokenService.createRefreshToken(adminAuth.admin(), deviceFingerprint);
+            responseBody.put("accessToken", accessToken);
+            responseBody.put("refreshToken", refreshToken != null ? refreshToken.getToken() : null);
+            responseBody.put("user", adminAuth.adminDTO());
+            responseBody.put("userType", "SUPER_ADMIN");
         } else {
             throw new RuntimeException("Unexpected auth response type for customer login");
         }
