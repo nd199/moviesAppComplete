@@ -23,7 +23,7 @@ const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType, genr
     card.style.transform = 'perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)';
   }, []);
 
-  const displayRating = rating != null ? Number(rating).toFixed(1) : null;
+  const displayRating = rating != null ? (Math.floor(rating * 100) / 100).toFixed(2) : null;
 
   return (
     <div

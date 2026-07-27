@@ -162,7 +162,7 @@ const MovieList = () => {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
                         <span className="text-amber-400 text-sm">★</span>
-                        <span className="text-white font-medium">{movie.rating || '—'}</span>
+                        <span className="text-white font-medium">{movie.rating != null ? (Math.floor(movie.rating * 100) / 100).toFixed(2) : '—'}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-surface-500">{movie.year || '—'}</td>
@@ -234,7 +234,7 @@ const MovieList = () => {
                     <div className="font-semibold text-white truncate">{movie.name}</div>
                     <div className="flex items-center gap-1 text-xs text-surface-500">
                       <span className="text-amber-400">★</span>
-                      <span>{movie.rating || '—'}</span>
+                      <span>{movie.rating != null ? (Math.floor(movie.rating * 100) / 100).toFixed(2) : '—'}</span>
                       <span className="mx-1">·</span>
                       <span>{movie.year || '—'}</span>
                     </div>

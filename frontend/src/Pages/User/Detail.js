@@ -74,7 +74,7 @@ const Detail = () => {
   );
 
   const title = item.title || item.name;
-  const displayRating = item.rating != null ? Number(item.rating).toFixed(1) : null;
+  const displayRating = item.rating != null ? (Math.floor(item.rating * 100) / 100).toFixed(2) : null;
   const posterUrl = item.poster || 'https://via.placeholder.com/400x600/111827/3b4560?text=No+Image';
   const backdropUrl = item.backdrop || item.poster;
   const genres = item.genre ? item.genre.split(',').map(g => g.trim()).slice(0, 4) : [];
