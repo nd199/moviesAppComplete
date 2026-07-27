@@ -66,6 +66,7 @@ const AdminList = () => {
   const totalAdmins = admins.length;
   const activeAdmins = admins.filter(a => a.isActive).length;
   const superAdmins = admins.filter(a => a.roles?.some(r => (r.name || r) === 'ROLE_SUPER_ADMIN')).length;
+  const hasSuperAdmin = superAdmins.length > 0;
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -114,13 +115,13 @@ const AdminList = () => {
                 <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Status</th>
                 <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Created</th>
                 <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Last Login</th>
-                <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Actions</th>
+                {!hasSuperAdmin && <th className="px-4 py-3.5 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-800">
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center">
+                  <td colSpan={hasSuperAdmin ? 7 : 8} className="px-4 py-12 text-center">
                     <div className="flex items-center justify-center gap-3 text-surface-500">
                       <div className="w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
                       <span className="text-sm">Loading admins...</span>
@@ -129,7 +130,7 @@ const AdminList = () => {
                 </tr>
               ) : admins.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center">
+                  <td colSpan={hasSuperAdmin ? 7 : 8} className="px-4 py-12 text-center">
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-12 h-12 bg-surface-800 rounded-full flex items-center justify-center">
                         <HiShieldCheck className="h-6 w-6 text-surface-500" />
@@ -164,11 +165,10 @@ const AdminList = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2.5 py-1 text-xs rounded-full font-semibold ${
-                        admin.isActive
-                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
-                          : 'bg-red-500/15 text-red-400 border border-red-500/20'
-                      }`}>
+                      <span className={`px-2.5 py-1 text-xs rounded-full font-semibold ${admin.isActive
+                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-red-500/15 text-red-400 border border-red-500/20'
+                        }`}>
                         {admin.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
@@ -178,31 +178,32 @@ const AdminList = () => {
                     <td className="px-4 py-3 text-surface-500 text-xs">
                       {admin.lastLogin ? new Date(admin.lastLogin).toLocaleDateString() : 'Never'}
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1.5">
-                        <Link to={`/admin/admins/edit/${admin.id}`}>
-                          <button className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-surface-800 border border-surface-700 text-surface-500 hover:text-white hover:border-surface-600 transition-colors">
-                            <FaEdit className="h-3.5 w-3.5" />
-                          </button>
-                        </Link>
-                        <button
-                          onClick={() => toggleStatusHandler(admin.id)}
-                          className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${
-                            admin.isActive
+                    {!hasSuperAdmin && (
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1.5">
+                          <Link to={`/admin/admins/edit/${admin.id}`}>
+                            <button className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-surface-800 border border-surface-700 text-surface-500 hover:text-white hover:border-surface-600 transition-colors">
+                              <FaEdit className="h-3.5 w-3.5" />
+                            </button>
+                          </Link>
+                          <button
+                            onClick={() => toggleStatusHandler(admin.id)}
+                            className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${admin.isActive
                               ? 'bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20'
                               : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20'
-                          }`}
-                        >
-                          {admin.isActive ? <FaToggleOff className="h-3.5 w-3.5" /> : <FaToggleOn className="h-3.5 w-3.5" />}
-                        </button>
-                        <button
-                          onClick={() => deleteAdminHandler(admin.id)}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
-                        >
-                          <FaTrash className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </td>
+                              }`}
+                          >
+                            {admin.isActive ? <FaToggleOff className="h-3.5 w-3.5" /> : <FaToggleOn className="h-3.5 w-3.5" />}
+                          </button>
+                          <button
+                            onClick={() => deleteAdminHandler(admin.id)}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
+                          >
+                            <FaTrash className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}
@@ -243,27 +244,21 @@ const AdminList = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
-                  <Link to={`/admin/admins/edit/${admin.id}`}>
-                    <button className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-surface-800 border border-surface-700 text-surface-500 hover:text-white hover:border-surface-600 transition-colors">
-                      <FaEdit className="h-3.5 w-3.5" />
-                    </button>
-                  </Link>
-                  <button
-                    onClick={() => toggleStatusHandler(admin.id)}
-                    className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${
-                      admin.isActive
-                        ? 'bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20'
-                        : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20'
-                    }`}
-                  >
-                    {admin.isActive ? <FaToggleOff className="h-3.5 w-3.5" /> : <FaToggleOn className="h-3.5 w-3.5" />}
-                  </button>
-                  <button
-                    onClick={() => deleteAdminHandler(admin.id)}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
-                  >
-                    <FaTrash className="h-3.5 w-3.5" />
-                  </button>
+                  {!hasSuperAdmin && (
+                    <>
+                      <Link to={`/admin/admins/edit/${admin.id}`}>
+                        <button className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-surface-800 border border-surface-700 text-surface-500 hover:text-white hover:border-surface-600 transition-colors">
+                          <FaEdit className="h-3.5 w-3.5" />
+                        </button>
+                      </Link>
+                      <button
+                        onClick={() => deleteAdminHandler(admin.id)}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
+                      >
+                        <FaTrash className="h-3.5 w-3.5" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="flex flex-wrap gap-1.5 mb-2">
@@ -272,11 +267,10 @@ const AdminList = () => {
                     {role}
                   </span>
                 ))}
-                <span className={`px-2 py-1 text-xs rounded-full font-semibold ${
-                  admin.isActive
-                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
-                    : 'bg-red-500/15 text-red-400 border border-red-500/20'
-                }`}>
+                <span className={`px-2 py-1 text-xs rounded-full font-semibold ${admin.isActive
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                  : 'bg-red-500/15 text-red-400 border border-red-500/20'
+                  }`}>
                   {admin.isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
