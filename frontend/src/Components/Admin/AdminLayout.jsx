@@ -5,6 +5,7 @@ import AdminSidebar from './AdminSidebar';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     if (sidebarOpen) {
@@ -14,6 +15,14 @@ const AdminLayout = () => {
     }
     return () => { document.body.style.overflow = ''; };
   }, [sidebarOpen]);
+
+  const handleMenuToggle = () => {
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(prev => !prev);
+    } else {
+      setCollapsed(prev => !prev);
+    }
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-surface-950">
@@ -25,18 +34,19 @@ const AdminLayout = () => {
         />
       )}
 
-      {/* Sidebar — hidden on mobile by default, shown via toggle */}
+      {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out
         lg:relative lg:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        ${collapsed ? 'w-16' : 'w-64'}
       `}>
-        <AdminSidebar onNavigate={() => setSidebarOpen(false)} />
+        <AdminSidebar collapsed={collapsed} onNavigate={() => setSidebarOpen(false)} />
       </div>
 
       {/* Main content */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <AdminHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <AdminHeader onMenuToggle={handleMenuToggle} collapsed={collapsed} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           <Outlet />
         </main>

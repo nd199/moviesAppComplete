@@ -1,13 +1,13 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IoNotificationsOutline, IoSearchOutline } from 'react-icons/io5';
-import { HiBars3, HiChevronDown } from 'react-icons/hi2';
+import { HiBars3, HiXMark, HiChevronDown } from 'react-icons/hi2';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState, useRef } from 'react';
 import { performLogout } from '../../Utils/logout';
 import { fetchUnreadCount } from '../../redux/notificationRedux';
 import NotificationDropdown from '../NotificationDropdown';
 
-const AdminHeader = ({ onMenuToggle }) => {
+const AdminHeader = ({ onMenuToggle, collapsed }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -71,9 +71,9 @@ const AdminHeader = ({ onMenuToggle }) => {
       <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={onMenuToggle}
-          className="lg:hidden p-2 text-surface-500 hover:text-white hover:bg-surface-800 rounded-xl transition-all"
+          className="p-2 text-surface-500 hover:text-white hover:bg-surface-800 rounded-xl transition-all"
         >
-          <HiBars3 className="h-5 w-5" />
+          {collapsed ? <HiXMark className="h-5 w-5" /> : <HiBars3 className="h-5 w-5" />}
         </button>
         <div className="min-w-0">
           <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight truncate">{getPageTitle()}</h1>
