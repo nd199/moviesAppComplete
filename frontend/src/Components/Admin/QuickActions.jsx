@@ -1,30 +1,44 @@
 import { Link } from 'react-router-dom';
-import { HiFilm, HiTv, HiUserGroup, HiUser } from 'react-icons/hi2';
+import { HiFilm, HiTv, HiUserGroup, HiUser, HiArrowRight } from 'react-icons/hi2';
 
 const actions = [
-  { name: 'Add Movie', href: '/admin/movies/new', icon: HiFilm, color: 'from-brand-600 to-brand-700' },
-  { name: 'Add Show', href: '/admin/shows/new', icon: HiTv, color: 'from-accent-600 to-accent-700' },
-  { name: 'Add User', href: '/admin/users/new', icon: HiUserGroup, color: 'from-emerald-600 to-teal-600' },
-  { name: 'Add Admin', href: '/admin/admins/new', icon: HiUser, color: 'from-amber-600 to-orange-600' },
+  { name: 'Add Movie', href: '/admin/movies/new', icon: HiFilm, gradient: 'from-brand-500 to-purple-600', desc: 'Upload a new movie' },
+  { name: 'Add Show', href: '/admin/shows/new', icon: HiTv, gradient: 'from-accent-500 to-pink-600', desc: 'Create a TV series' },
+  { name: 'Add User', href: '/admin/users/new', icon: HiUserGroup, gradient: 'from-emerald-500 to-teal-600', desc: 'Register a new user' },
+  { name: 'Add Admin', href: '/admin/admins/new', icon: HiUser, gradient: 'from-amber-500 to-orange-600', desc: 'Invite an admin' },
 ];
 
 const QuickActions = () => {
   return (
-    <div className="bg-surface-900 rounded-2xl border border-surface-700 p-5">
-      <h3 className="text-base font-semibold text-white mb-4">Quick Actions</h3>
-      <div className="grid grid-cols-2 gap-3">
-        {actions.map((action) => (
-          <Link
-            key={action.name}
-            to={action.href}
-            className="flex items-center gap-3 p-3 rounded-xl bg-surface-800 border border-surface-700 hover:border-surface-600 transition-all duration-200 no-underline group"
-          >
-            <div className={`w-10 h-10 bg-gradient-to-br ${action.color} rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform`}>
-              <action.icon className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-sm font-medium text-surface-500 group-hover:text-white transition-colors">{action.name}</span>
-          </Link>
-        ))}
+    <div className="bg-surface-900 rounded-2xl border border-surface-700 overflow-hidden">
+      <div className="px-5 py-4 border-b border-surface-700">
+        <h3 className="text-base font-semibold text-white">Quick Actions</h3>
+        <p className="text-xs text-surface-500 mt-0.5">Common admin tasks</p>
+      </div>
+      <div className="p-5">
+        <div className="grid grid-cols-2 gap-3">
+          {actions.map((action) => (
+            <Link
+              key={action.name}
+              to={action.href}
+              className="group relative flex flex-col items-start gap-2.5 p-4 rounded-xl bg-surface-800/80 border border-surface-700 hover:border-surface-600 hover:bg-surface-800 transition-all duration-200 no-underline"
+            >
+              {/* Icon */}
+              <div className={`w-10 h-10 bg-gradient-to-br ${action.gradient} rounded-xl flex items-center justify-center shadow-lg shadow-black/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                <action.icon className="h-5 w-5 text-white" />
+              </div>
+              {/* Text */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-white group-hover:text-brand-300 transition-colors">{action.name}</p>
+                <p className="text-[11px] text-surface-500 mt-0.5">{action.desc}</p>
+              </div>
+              {/* Arrow */}
+              <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-surface-700/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <HiArrowRight className="h-3 w-3 text-surface-400" />
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

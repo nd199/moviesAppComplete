@@ -1,38 +1,44 @@
 import { useState } from 'react';
 import AdvancedCharts from './AdvancedCharts';
+import { HiChartBar, HiChartPie, HiChartSquareBar } from 'react-icons/hi';
+
+const chartTypes = [
+  { id: 'line', name: 'Line', icon: HiChartBar },
+  { id: 'bar', name: 'Bar', icon: HiChartSquareBar },
+  { id: 'area', name: 'Area', icon: HiChartBar },
+  { id: 'pie', name: 'Pie', icon: HiChartPie },
+  { id: 'multiLine', name: 'Multi', icon: HiChartSquareBar },
+];
 
 const ChartSelector = ({ data, title }) => {
   const [selectedChart, setSelectedChart] = useState('line');
 
-  const chartTypes = [
-    { id: 'line', name: 'Line' },
-    { id: 'bar', name: 'Bar' },
-    { id: 'area', name: 'Area' },
-    { id: 'pie', name: 'Pie' },
-    { id: 'multiLine', name: 'Multi' },
-  ];
-
   return (
-    <div className="bg-surface-900 rounded-2xl border border-surface-700 p-5">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold text-white">{title}</h3>
-        <div className="flex bg-surface-800 rounded-lg p-0.5 border border-surface-700">
+    <div className="bg-surface-900 rounded-2xl border border-surface-700 overflow-hidden">
+      <div className="px-5 py-4 border-b border-surface-700 flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h3 className="text-base font-semibold text-white">{title}</h3>
+          <p className="text-xs text-surface-500 mt-0.5">Monthly user activity overview</p>
+        </div>
+        <div className="flex bg-surface-800 rounded-xl p-0.5 border border-surface-700 gap-0.5">
           {chartTypes.map(chart => (
             <button
               key={chart.id}
               onClick={() => setSelectedChart(chart.id)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                selectedChart === chart.id
-                  ? 'bg-brand-600 text-white shadow-sm'
-                  : 'text-surface-500 hover:text-white'
-              }`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${selectedChart === chart.id
+                  ? 'bg-brand-600 text-white shadow-sm shadow-brand-500/20'
+                  : 'text-surface-500 hover:text-white hover:bg-surface-700'
+                }`}
             >
+              <chart.icon className="h-3.5 w-3.5" />
               {chart.name}
             </button>
           ))}
         </div>
       </div>
-      <AdvancedCharts data={data} chartType={selectedChart} title={title} />
+      <div className="p-5">
+        <AdvancedCharts data={data} chartType={selectedChart} title={title} height={320} />
+      </div>
     </div>
   );
 };
