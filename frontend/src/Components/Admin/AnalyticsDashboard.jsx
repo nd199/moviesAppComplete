@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import AdvancedCharts from './AdvancedCharts';
 import { adminAPI } from '../../AxiosMethods';
+import { HiCurrencyRupee, HiChartBar, HiFilm, HiUser } from 'react-icons/hi2';
 
 const TABS = [
-  { id: 'userAnalytics', label: 'Users' },
-  { id: 'revenue', label: 'Revenue' },
-  { id: 'content', label: 'Content' },
-  { id: 'overview', label: 'Overview' },
+  { id: 'userAnalytics', label: 'Users', icon: HiUser },
+  { id: 'revenue', label: 'Revenue', icon: HiCurrencyRupee },
+  { id: 'content', label: 'Content', icon: HiFilm },
+  { id: 'overview', label: 'Overview', icon: HiChartBar },
 ];
 
 const AnalyticsDashboard = () => {
@@ -28,11 +29,11 @@ const AnalyticsDashboard = () => {
         const users = userStatsRes.data || [];
         const formattedUserStats = users.map(m => ({
           name: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m.month - 1] || `M${m.month}`,
-          'Active User': m.total || 0,
+          'Active Users': m.total || 0,
           'New Users': Math.floor((m.total || 0) * 0.3),
         }));
         setUserStats(formattedUserStats.length > 0 ? formattedUserStats : [
-          { name: 'Jan', 'Active User': 0, 'New Users': 0 },
+          { name: 'Jan', 'Active Users': 0, 'New Users': 0 },
         ]);
 
         const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
@@ -55,7 +56,7 @@ const AnalyticsDashboard = () => {
           { name: 'Total Users', users: users.reduce((s, m) => s + (m.total || 0), 0), revenue: 0 },
         ]);
       } catch {
-        setUserStats([{ name: 'No Data', 'Active User': 0, 'New Users': 0 }]);
+        setUserStats([{ name: 'No Data', 'Active Users': 0, 'New Users': 0 }]);
       }
       setLoading(false);
     };
@@ -77,10 +78,10 @@ const AnalyticsDashboard = () => {
         return (
           <div className="space-y-4">
             <AdvancedCharts data={userStats} chartType="area" title="User Analytics" height={280} />
-            <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
               <div className="p-3 rounded-xl bg-surface-800/60 border border-surface-700/50">
                 <p className="text-lg font-bold text-white">
-                  {userStats.reduce((s, m) => s + (m['Active User'] || 0), 0).toLocaleString()}
+                  {userStats.reduce((s, m) => s + (m['Active Users'] || 0), 0).toLocaleString()}
                 </p>
                 <p className="text-[10px] text-surface-500">Total Active Users</p>
               </div>
@@ -92,7 +93,7 @@ const AnalyticsDashboard = () => {
               </div>
               <div className="p-3 rounded-xl bg-surface-800/60 border border-surface-700/50">
                 <p className="text-lg font-bold text-white">
-                  {userStats.length > 0 ? ((userStats[userStats.length - 1]['Active User'] || 0) - (userStats[0]?.['Active User'] || 0) > 0 ? '+' : '') + ((userStats[userStats.length - 1]['Active User'] || 0) - (userStats[0]?.['Active User'] || 0)).toLocaleString() : '0'}
+                  {userStats.length > 0 ? ((userStats[userStats.length - 1]['Active Users'] || 0) - (userStats[0]?.['Active Users'] || 0) > 0 ? '+' : '') + ((userStats[userStats.length - 1]['Active Users'] || 0) - (userStats[0]?.['Active Users'] || 0)).toLocaleString() : '0'}
                 </p>
                 <p className="text-[10px] text-surface-500">Growth</p>
               </div>
@@ -103,7 +104,7 @@ const AnalyticsDashboard = () => {
         return (
           <div className="space-y-4">
             <AdvancedCharts data={revenueData} chartType="bar" title="Revenue Analytics" height={280} />
-            <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
               <div className="p-3 rounded-xl bg-surface-800/60 border border-surface-700/50">
                 <p className="text-lg font-bold text-white">
                   ₹{revenueData.reduce((s, m) => s + (m.revenue || 0), 0).toLocaleString()}
@@ -142,15 +143,15 @@ const AnalyticsDashboard = () => {
         return (
           <div className="space-y-4">
             <AdvancedCharts data={userStats} chartType="line" title="User Growth" height={200} />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 { label: 'Total Movies', value: movieStats[0]?.count || 0, color: 'from-brand-500 to-purple-600' },
                 { label: 'Total Shows', value: movieStats[1]?.count || 0, color: 'from-accent-500 to-pink-600' },
                 { label: 'Active Subs', value: subscriptionData[0]?.users || 0, color: 'from-emerald-500 to-teal-600' },
                 { label: 'Total Users', value: subscriptionData[1]?.users || 0, color: 'from-blue-500 to-cyan-600' },
               ].map(item => (
-                <div key={item.label} className={`p-4 rounded-xl bg-gradient-to-br ${item.color} bg-surface-800 border border-surface-700`}>
-                  <p className="text-2xl font-bold text-white">{item.value.toLocaleString()}</p>
+                <div key={item.label} className={`p-3 rounded-xl bg-gradient-to-br ${item.color} bg-surface-800 border border-surface-700`}>
+                  <p className="text-xl font-bold text-white">{item.value.toLocaleString()}</p>
                   <p className="text-xs text-white/70 mt-1">{item.label}</p>
                 </div>
               ))}
@@ -171,17 +172,17 @@ const AnalyticsDashboard = () => {
             <p className="text-xs text-surface-500 mt-0.5">In-depth platform analysis</p>
           </div>
         </div>
-        {/* Tabs */}
         <div className="flex gap-1 mt-4 bg-surface-800 rounded-xl p-0.5 border border-surface-700 w-fit">
           {TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${activeTab === tab.id
-                  ? 'bg-brand-600 text-white shadow-sm shadow-brand-500/20'
+              className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === tab.id
+                  ? 'bg-gradient-to-r from-brand-600 to-purple-600 text-white shadow-sm shadow-brand-500/20'
                   : 'text-surface-500 hover:text-white'
                 }`}
             >
+              <tab.icon className="h-3.5 w-3.5" />
               {tab.label}
             </button>
           ))}

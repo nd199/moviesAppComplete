@@ -1,28 +1,29 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../AxiosMethods';
+import { HiUser, HiCog6Tooth, HiChartBar, HiMusicalNote, HiStar } from 'react-icons/hi2';
 
-const MetricRing = ({ label, value, max = 100, color = 'text-brand-400', icon }) => {
-  const percentage = max > 0 ? Math.min((parseFloat(value) / max) * 100, 100) : 0;
-  const radius = 28;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
+const MetricCard = ({ label, value, change, icon: Icon, color }) => {
+  const isPositive = parseFloat(change) > 0;
 
   return (
-    <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-800/60 border border-surface-700/50">
-      <div className="relative">
-        <svg width="70" height="70" className="-rotate-90">
-          <circle cx="35" cy="35" r={radius} fill="none" stroke="#334155" strokeWidth="5" />
-          <circle cx="35" cy="35" r={radius} fill="none" stroke="currentColor" strokeWidth="5"
-            strokeDasharray={circumference} strokeDashoffset={offset}
-            strokeLinecap="round" className={color} />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          {icon}
+    <div className="p-4 rounded-xl bg-surface-800/60 border border-surface-700/50 hover:border-surface-600 transition-all duration-200">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium text-surface-500 uppercase tracking-wide">{label}</p>
+          <p className="text-xl font-bold text-white mt-1 truncate">{value}</p>
+          {change && (
+            <div className="flex items-center mt-2">
+              {isPositive ? (
+                <span className="text-xs text-emerald-400 font-semibold">+{change}%</span>
+              ) : (
+                <span className="text-xs text-red-400 font-semibold">{change}%</span>
+              )}
+            </div>
+          )}
         </div>
-      </div>
-      <div className="text-center min-w-0">
-        <p className="text-sm font-bold text-white truncate max-w-[80px]">{value}</p>
-        <p className="text-[10px] text-surface-500 truncate max-w-[80px]">{label}</p>
+        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center flex-shrink-0`}>
+          <Icon className="h-5 w-5 text-white" />
+        </div>
       </div>
     </div>
   );
@@ -36,6 +37,9 @@ const PlatformMetrics = () => {
     peakHour: '9:00 PM',
     topGenre: 'Action',
     avgRating: '4.2',
+    totalUsers: 0,
+    totalContent: 0,
+    activeSubs: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -69,18 +73,35 @@ const PlatformMetrics = () => {
     fetchMetrics();
   }, []);
 
-  const metricItems = [
-    { label: 'Avg. Session', value: metrics.avgSessionDuration, max: 30, color: 'text-brand-400' },
-    { label: 'Bounce Rate', value: metrics.bounceRate, max: 100, color: 'text-accent-400' },
-    { label: 'Pages/Session', value: metrics.pagesPerSession, max: 10, color: 'text-emerald-400' },
-    { label: 'Avg. Rating', value: metrics.avgRating, max: 5, color: 'text-purple-400' },
-  ];
-
-  const statItems = [
-    { label: 'Users', value: metrics.totalUsers?.toLocaleString() || '0', color: 'from-blue-500 to-cyan-600' },
-    { label: 'Content', value: metrics.totalContent?.toLocaleString() || '0', color: 'from-amber-500 to-orange-600' },
-    { label: 'Subscriptions', value: metrics.activeSubs?.toLocaleString() || '0', color: 'from-emerald-500 to-teal-600' },
-    { label: 'Peak Hour', value: metrics.peakHour, color: 'from-rose-500 to-pink-600' },
+  const primaryMetrics = [
+    { 
+      label: 'Total Users', 
+      value: metrics.totalUsers.toLocaleString(), 
+      change: '+12.5', 
+      icon: HiUser, 
+      color: 'from-blue-500 to-cyan-600' 
+    },
+    { 
+      label: 'Total Content', 
+      value: metrics.totalContent.toLocaleString(), 
+      change: '+8.3', 
+      icon: HiMusicalNote, 
+      color: 'from-amber-500 to-orange-600' 
+    },
+    { 
+      label: 'Active Subscriptions', 
+      value: metrics.activeSubs.toLocaleString(), 
+      change: '+15.2', 
+      icon: HiStar, 
+      color: 'from-emerald-500 to-teal-600' 
+    },
+    { 
+      label: 'Avg. Session', 
+      value: metrics.avgSessionDuration, 
+      change: null, 
+      icon: HiChartBar, 
+      color: 'from-purple-500 to-pink-600' 
+    },
   ];
 
   return (
@@ -89,67 +110,24 @@ const PlatformMetrics = () => {
         <h3 className="text-base font-semibold text-white">Platform Metrics</h3>
         <p className="text-xs text-surface-500 mt-0.5">Key engagement indicators</p>
       </div>
-      <div className="p-5 space-y-4">
+      <div className="p-5">
         {loading ? (
           <div className="flex justify-center py-8">
             <div className="w-6 h-6 border-2 border-surface-600 border-t-brand-500 rounded-full animate-spin" />
           </div>
         ) : (
-          <>
-            {/* Mini stat cards */}
-            <div className="grid grid-cols-2 gap-2">
-              {statItems.map((item) => (
-                <div key={item.label} className={`p-3 rounded-xl bg-gradient-to-br ${item.color} bg-surface-800 border border-surface-700`}>
-                  <p className="text-lg font-bold text-white">{item.value}</p>
-                  <p className="text-[10px] text-white/70 mt-0.5">{item.label}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Ring metrics */}
-            <div className="grid grid-cols-2 gap-2">
-              {metricItems.slice(0, 2).map((item) => (
-                <MetricRing key={item.label} label={item.label} value={item.value} max={item.max} color={item.color}
-                  icon={<span className="text-xs font-bold text-white">{item.value}</span>} />
-              ))}
-            </div>
-
-            {/* Row: Top Genre + Next two metrics */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="col-span-2 flex items-center gap-3 p-3 rounded-xl bg-surface-800/60 border border-surface-700/50">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-500 to-pink-600 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-sm text-surface-400">Top Genre</p>
-                  <p className="text-base font-bold text-white">{metrics.topGenre}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Engagement line items */}
-            <div className="space-y-2 pt-1">
-              {[
-                { label: 'Bounce Rate', value: metrics.bounceRate, pct: parseFloat(metrics.bounceRate) },
-                { label: 'Pages/Session', value: metrics.pagesPerSession, pct: (parseFloat(metrics.pagesPerSession) / 10) * 100 },
-                { label: 'Avg. Rating', value: metrics.avgRating, pct: (parseFloat(metrics.avgRating) / 5) * 100 },
-              ].map((item) => (
-                <div key={item.label} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-surface-500">{item.label}</span>
-                    <span className="font-semibold text-white">{item.value}</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-surface-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-brand-500 to-accent-500 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min(item.pct, 100)}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {primaryMetrics.map((item) => (
+              <MetricCard
+                key={item.label}
+                label={item.label}
+                value={item.value}
+                change={item.change}
+                icon={item.icon}
+                color={item.color}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>

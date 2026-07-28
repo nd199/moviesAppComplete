@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { adminAPI } from '../../AxiosMethods';
 import { HiUser, HiEllipsisHorizontal } from 'react-icons/hi2';
 
@@ -11,7 +11,6 @@ const avatarColors = [
 ];
 
 const UserActivity = ({ user }) => {
-  // Simulate activity level (1-5) based on random or some heuristic
   const activityLevel = user.isActive !== false ? Math.floor(Math.random() * 3) + 3 : 1;
   return (
     <div className="flex gap-0.5 items-end h-6">
@@ -46,8 +45,8 @@ const WidgetsLarge = () => {
             <h3 className="text-base font-semibold text-white">Recent Users</h3>
             <p className="text-xs text-surface-500 mt-0.5">Latest registered users</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-brand-500/15 flex items-center justify-center">
-            <HiUser className="h-5 w-5 text-brand-400" />
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
+            <HiUser className="h-5 w-5 text-white" />
           </div>
         </div>
       </div>

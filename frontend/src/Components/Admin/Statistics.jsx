@@ -13,7 +13,6 @@ const StatCard = ({ title, value, change, gradient, icon, prefix = '' }) => {
     if (hasAnimated.current) return;
     hasAnimated.current = true;
 
-    // Parse numeric value for animation
     const numericValue = typeof value === 'string'
       ? parseFloat(value.replace(/[₹,]/g, ''))
       : (typeof value === 'number' ? value : 0);
@@ -26,7 +25,7 @@ const StatCard = ({ title, value, change, gradient, icon, prefix = '' }) => {
     const interval = setInterval(() => {
       step++;
       const progress = step / steps;
-      const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+      const eased = 1 - Math.pow(1 - progress, 3);
       setDisplayValue(Math.round(numericValue * eased));
       setDisplayChange(parseFloat((changeVal * eased).toFixed(1)));
 
@@ -56,20 +55,18 @@ const StatCard = ({ title, value, change, gradient, icon, prefix = '' }) => {
     : displayValue.toLocaleString();
 
   return (
-    <div ref={cardRef} className="relative overflow-hidden rounded-2xl bg-surface-900 border border-surface-700 p-5 group hover:border-surface-600 transition-all duration-300">
-      {/* Gradient accent bar */}
+    <div ref={cardRef} className="relative group overflow-hidden rounded-2xl bg-surface-900 border border-surface-700 p-5 hover:border-surface-600 transition-all duration-300">
       <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${gradient}`} />
-      {/* Glass reflection */}
       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-surface-400">{title}</span>
+          <span className="text-xs font-medium text-surface-400 uppercase tracking-wide">{title}</span>
           <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg shadow-black/20 group-hover:scale-110 transition-transform duration-300`}>
             {icon}
           </div>
         </div>
-        <p className="text-3xl font-bold text-white tracking-tight">{prefix}{formattedDisplay}</p>
-        <div className="flex items-center mt-2.5">
+        <p className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{prefix}{formattedDisplay}</p>
+        <div className="flex items-center mt-2">
           {isPositive ? (
             <HiArrowTrendingUp className="h-4 w-4 text-emerald-400 mr-1" />
           ) : (
@@ -131,9 +128,9 @@ const Statistics = () => {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map(i => (
-          <div key={i} className="bg-surface-900 border border-surface-700 rounded-2xl p-5 animate-pulse">
+          <div key={i} className="bg-surface-800 border border-surface-700 rounded-2xl p-5 animate-pulse">
             <div className="h-3 bg-surface-700 rounded w-2/3 mb-4" />
             <div className="h-8 bg-surface-700 rounded w-1/2 mb-3" />
             <div className="h-3 bg-surface-700 rounded w-1/3" />
@@ -144,11 +141,11 @@ const Statistics = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <StatCard title="Revenue" value={stats.revenue?.current || 0} change={stats.revenue?.change || 0} prefix="₹" gradient="from-brand-500 via-brand-600 to-indigo-600"
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <StatCard title="Revenue" value={stats.revenue?.current || 0} change={stats.revenue?.change || 0} prefix="₹" gradient="from-brand-500 via-purple-600 to-fuchsia-600"
         icon={<svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
       />
-      <StatCard title="Total Users" value={stats.users?.current || 0} change={stats.users?.change || 0} gradient="from-blue-500 via-blue-600 to-cyan-600"
+      <StatCard title="Total Users" value={stats.users?.current || 0} change={stats.users?.change || 0} gradient="from-blue-500 via-cyan-600 to-teal-500"
         icon={<svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
       />
       <StatCard title="Movies & Shows" value={stats.movies?.current || 0} change={stats.movies?.change || 0} gradient="from-amber-500 via-orange-500 to-rose-500"

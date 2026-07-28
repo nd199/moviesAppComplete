@@ -1,34 +1,39 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../../AxiosMethods';
+import { HiCheck, HiX, HiClock, HiServer } from 'react-icons/hi2';
 
 const STATUS_CONFIGS = {
   online: {
     dot: 'bg-emerald-400',
     ring: 'shadow-emerald-400/30',
-    label: 'Operational',
+    label: 'Online',
     badge: 'bg-emerald-500/10 text-emerald-400',
     bar: 'bg-gradient-to-r from-emerald-500 to-emerald-400',
+    icon: HiCheck,
   },
   issues: {
     dot: 'bg-amber-400',
     ring: 'shadow-amber-400/30',
-    label: 'Degraded',
+    label: 'Warning',
     badge: 'bg-amber-500/10 text-amber-400',
     bar: 'bg-gradient-to-r from-amber-500 to-amber-400',
+    icon: HiClock,
   },
   offline: {
     dot: 'bg-red-400',
     ring: 'shadow-red-400/30',
-    label: 'Down',
+    label: 'Offline',
     badge: 'bg-red-500/10 text-red-400',
     bar: 'bg-gradient-to-r from-red-500 to-red-400',
+    icon: HiX,
   },
   checking: {
     dot: 'bg-surface-500',
     ring: 'shadow-surface-500/30',
-    label: 'Checking...',
+    label: 'Checking',
     badge: 'bg-surface-500/10 text-surface-400',
     bar: 'bg-surface-600',
+    icon: HiServer,
   },
 };
 
@@ -41,6 +46,8 @@ const ServiceCard = ({ name, description, status, responseTime }) => {
     const t = setTimeout(() => setPulse(false), 500);
     return () => clearTimeout(t);
   }, [status]);
+
+  const Icon = config.icon;
 
   return (
     <div className={`flex items-center justify-between p-3 rounded-xl bg-surface-800/60 border border-surface-700/50 hover:border-surface-600 transition-all duration-300 ${pulse ? 'scale-[1.02]' : ''}`}>
@@ -56,13 +63,14 @@ const ServiceCard = ({ name, description, status, responseTime }) => {
           <p className="text-[11px] text-surface-500 truncate">{description}</p>
         </div>
       </div>
-      <div className="flex items-center gap-2.5 flex-shrink-0 ml-2">
+      <div className="flex items-center gap-2 flex-shrink-0 ml-2">
         {responseTime !== null && (
           <span className="text-[11px] text-surface-500 font-mono bg-surface-700/50 px-2 py-0.5 rounded-md">
             {responseTime}ms
           </span>
         )}
         <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${config.badge}`}>
+          <Icon className="h-3 w-3 mr-0.5 flex-shrink-0" />
           {config.label}
         </span>
       </div>
@@ -81,7 +89,6 @@ const SystemStatus = () => {
   const checkServices = useCallback(async () => {
     const results = [];
 
-    // Check API Server
     try {
       const start = Date.now();
       await api.get('/health-check', { timeout: 5000 });
@@ -90,7 +97,6 @@ const SystemStatus = () => {
       results.push({ name: 'API Server', status: 'offline', description: 'Main application server', responseTime: null, uptime: 0 });
     }
 
-    // Check Database
     try {
       const start = Date.now();
       const res = await api.get('/health', { timeout: 5000 });
@@ -100,7 +106,6 @@ const SystemStatus = () => {
       results.push({ name: 'Database', status: 'offline', description: 'PostgreSQL database connection', responseTime: null, uptime: 0 });
     }
 
-    // Check Cache
     try {
       const start = Date.now();
       const res = await api.get('/health', { timeout: 5000 });
@@ -130,7 +135,7 @@ const SystemStatus = () => {
           <div>
             <h3 className="text-base font-semibold text-white">System Status</h3>
             <p className="text-xs text-surface-500 mt-0.5 flex items-center gap-1.5">
-              <span className={`w-1.5 h-1.5 rounded-full ${onlineCount === services.length ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+              <HiCheck className={`h-3 w-3 ${onlineCount === services.length ? 'text-emerald-400' : 'text-amber-400'}`} />
               {onlineCount}/{services.length} services operational
             </p>
           </div>

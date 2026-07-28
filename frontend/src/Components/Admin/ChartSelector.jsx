@@ -7,7 +7,7 @@ const chartTypes = [
   { id: 'bar', name: 'Bar', icon: HiChartSquareBar },
   { id: 'area', name: 'Area', icon: HiChartBar },
   { id: 'pie', name: 'Pie', icon: HiChartPie },
-  { id: 'multiLine', name: 'Multi', icon: HiChartSquareBar },
+  { id: 'column', name: 'Column', icon: HiChartSquareBar },
 ];
 
 const ChartSelector = ({ data, title }) => {
@@ -26,7 +26,7 @@ const ChartSelector = ({ data, title }) => {
               key={chart.id}
               onClick={() => setSelectedChart(chart.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${selectedChart === chart.id
-                  ? 'bg-brand-600 text-white shadow-sm shadow-brand-500/20'
+                  ? 'bg-gradient-to-r from-brand-600 to-purple-600 text-white shadow-sm shadow-brand-500/20'
                   : 'text-surface-500 hover:text-white hover:bg-surface-700'
                 }`}
             >

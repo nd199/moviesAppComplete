@@ -6,6 +6,7 @@ import SystemStatus from '../../Components/Admin/SystemStatus';
 import WidgetsLarge from '../../Components/Admin/WidgetsLarge';
 import QuickActions from '../../Components/Admin/QuickActions';
 import PlatformMetrics from '../../Components/Admin/PlatformMetrics';
+import RevenueSummary from '../../Components/Admin/RevenueSummary';
 import { fetchUserStats } from '../../services/adminApi';
 
 const Dashboard = () => {
@@ -29,7 +30,7 @@ const Dashboard = () => {
         }, {});
         const formattedData = Object.values(aggregatedData).map((item) => ({
           name: MONTHS[item.month - 1],
-          "Active User": item.total,
+          "Active Users": item.total,
         }));
         setUserStats(formattedData);
       } catch (error) {
@@ -44,18 +45,21 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        {/* Skeleton welcome */}
-        <div className="h-32 bg-surface-800 rounded-2xl" />
-        {/* Skeleton stat cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <div className="h-48 bg-surface-800 rounded-2xl" />
+          </div>
+          <div className="space-y-4">
+            <div className="h-32 bg-surface-800 rounded-2xl" />
+            <div className="h-32 bg-surface-800 rounded-2xl" />
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map(i => <div key={i} className="h-28 bg-surface-800 rounded-2xl" />)}
         </div>
-        {/* Skeleton chart */}
-        <div className="h-80 bg-surface-800 rounded-2xl" />
-        {/* Skeleton bottom row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 h-64 bg-surface-800 rounded-2xl" />
-          <div className="h-64 bg-surface-800 rounded-2xl" />
+          <div className="lg:col-span-2 h-80 bg-surface-800 rounded-2xl" />
+          <div className="h-80 bg-surface-800 rounded-2xl" />
         </div>
       </div>
     );
@@ -63,42 +67,50 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Banner — refined with subtle pattern */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-900 p-6 sm:p-8 text-white shadow-xl shadow-brand-500/10">
-        {/* Decorative elements */}
-        <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-accent-500/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/3 w-0.5 h-32 bg-white/10 -translate-y-1/2 rotate-45" />
-        <div className="absolute bottom-4 right-16 w-12 h-12 border border-white/10 rounded-2xl rotate-12" />
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Welcome back, Admin</h2>
-            <p className="text-white/70 mt-1.5 text-sm sm:text-base">Here's what's happening with your platform today.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl text-sm font-medium">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              System Online
-            </span>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            Dashboard
+          </h1>
+          <p className="text-sm text-surface-500 mt-1">
+            Welcome back! Here's your platform overview
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 text-sm font-medium rounded-xl">
+            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+            System Operational
+          </span>
         </div>
       </div>
-
-      <Statistics />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <ChartSelector data={userStats} title="User Analytics" />
+          <Statistics />
         </div>
-        <QuickActions />
+        <div className="space-y-6">
+          <RevenueSummary />
+          <QuickActions />
+        </div>
       </div>
 
-      <AnalyticsDashboard />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <ChartSelector data={userStats} title="User Activity Trends" />
+        </div>
+        <div className="space-y-6">
+          <AnalyticsDashboard />
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <WidgetsLarge />
-        <PlatformMetrics />
-        <SystemStatus />
+        <div className="lg:col-span-2">
+          <WidgetsLarge />
+        </div>
+        <div className="space-y-6">
+          <PlatformMetrics />
+          <SystemStatus />
+        </div>
       </div>
     </div>
   );
