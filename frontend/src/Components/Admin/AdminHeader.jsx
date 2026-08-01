@@ -73,7 +73,7 @@ const AdminHeader = ({ onMenuToggle, collapsed }) => {
           onClick={onMenuToggle}
           className="p-2 text-surface-500 hover:text-white hover:bg-surface-800 rounded-xl transition-all"
         >
-          {collapsed ? <HiBars3 className="h-5 w-5" /> : <HiXMark className="h-5 w-5" />}
+          {collapsed ? <HiChevronDown className="h-5 w-5" /> : <HiBars3 className="h-5 w-5" />}
         </button>
         <div className="min-w-0">
           <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight truncate">{getPageTitle()}</h1>
