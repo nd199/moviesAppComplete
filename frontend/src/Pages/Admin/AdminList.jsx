@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaPlus } from 'react-icons/fa';
-import { HiShieldCheck, HiCheckCircle, HiXCircle } from 'react-icons/hi2';
+import { ShieldCheck, CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { fetchAdmins, deleteAdmin, toggleAdminStatus } from '../../services/adminApi';
 
@@ -73,10 +73,10 @@ const AdminList = () => {
       {/* Summary Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
-          { label: 'Total Admins', value: totalAdmins, icon: HiShieldCheck, color: 'from-brand-600 to-brand-700' },
-          { label: 'Active', value: activeAdmins, icon: HiCheckCircle, color: 'from-emerald-500 to-teal-500' },
-          { label: 'Inactive', value: totalAdmins - activeAdmins, icon: HiXCircle, color: 'from-red-500 to-rose-500' },
-          { label: 'Super Admins', value: superAdmins, icon: HiShieldCheck, color: 'from-amber-500 to-orange-500' },
+          { label: 'Total Admins', value: totalAdmins, icon: ShieldCheck, color: 'from-brand-600 to-brand-700' },
+          { label: 'Active', value: activeAdmins, icon: CheckCircle, color: 'from-emerald-500 to-teal-500' },
+          { label: 'Inactive', value: totalAdmins - activeAdmins, icon: XCircle, color: 'from-red-500 to-rose-500' },
+          { label: 'Super Admins', value: superAdmins, icon: ShieldCheck, color: 'from-amber-500 to-orange-500' },
         ].map((stat) => (
           <div key={stat.label} className="bg-surface-900 border border-surface-700 rounded-2xl p-3 sm:p-4">
             <div className="flex items-center justify-between">
@@ -133,7 +133,7 @@ const AdminList = () => {
                   <td colSpan={hasSuperAdmin ? 7 : 8} className="px-4 py-12 text-center">
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-12 h-12 bg-surface-800 rounded-full flex items-center justify-center">
-                        <HiShieldCheck className="h-6 w-6 text-surface-500" />
+                        <ShieldCheck className="h-6 w-6 text-surface-500" />
                       </div>
                       <p className="text-surface-500 text-sm">No admins found</p>
                     </div>
@@ -225,7 +225,7 @@ const AdminList = () => {
           <div className="bg-surface-900 border border-surface-700 rounded-2xl p-6 text-center">
             <div className="flex flex-col items-center gap-3">
               <div className="w-12 h-12 bg-surface-800 rounded-full flex items-center justify-center">
-                <HiShieldCheck className="h-6 w-6 text-surface-500" />
+                <ShieldCheck className="h-6 w-6 text-surface-500" />
               </div>
               <p className="text-surface-500 text-sm">No admins found</p>
             </div>

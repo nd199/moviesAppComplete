@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
-import { HiUserGroup, HiUser, HiCheckCircle, HiXCircle } from 'react-icons/hi2';
+import { Users, User, CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { fetchUsers, deleteUser } from '../../services/adminApi';
 
@@ -74,10 +74,10 @@ const UserList = () => {
       {/* Summary Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
-          { label: 'Total Users', value: totalUsers, icon: HiUserGroup, color: 'from-brand-600 to-brand-700' },
-          { label: 'Verified', value: verifiedUsers, icon: HiCheckCircle, color: 'from-emerald-500 to-teal-500' },
-          { label: 'Subscribed', value: subscribedUsers, icon: HiUser, color: 'from-accent-600 to-accent-700' },
-          { label: 'Showing', value: filteredUsers.length, icon: HiXCircle, color: 'from-amber-500 to-orange-500' },
+          { label: 'Total Users', value: totalUsers, icon: Users, color: 'from-brand-600 to-brand-700' },
+          { label: 'Verified', value: verifiedUsers, icon: CheckCircle, color: 'from-emerald-500 to-teal-500' },
+          { label: 'Subscribed', value: subscribedUsers, icon: User, color: 'from-accent-600 to-accent-700' },
+          { label: 'Showing', value: filteredUsers.length, icon: XCircle, color: 'from-amber-500 to-orange-500' },
         ].map((stat) => (
           <div key={stat.label} className="bg-surface-900 border border-surface-700 rounded-2xl p-3 sm:p-4">
             <div className="flex items-center justify-between">
@@ -144,7 +144,7 @@ const UserList = () => {
                   <td colSpan={8} className="px-4 py-12 text-center">
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-12 h-12 bg-surface-800 rounded-full flex items-center justify-center">
-                        <HiUserGroup className="h-6 w-6 text-surface-500" />
+                        <Users className="h-6 w-6 text-surface-500" />
                       </div>
                       <p className="text-surface-500 text-sm">No users found</p>
                     </div>
@@ -210,7 +210,7 @@ const UserList = () => {
           <div className="bg-surface-900 border border-surface-700 rounded-2xl p-6 text-center">
             <div className="flex flex-col items-center gap-3">
               <div className="w-12 h-12 bg-surface-800 rounded-full flex items-center justify-center">
-                <HiUserGroup className="h-6 w-6 text-surface-500" />
+                <Users className="h-6 w-6 text-surface-500" />
               </div>
               <p className="text-surface-500 text-sm">No users found</p>
             </div>

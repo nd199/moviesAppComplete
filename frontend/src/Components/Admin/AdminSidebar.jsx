@@ -7,7 +7,7 @@ import {
   ShieldCheck,
   Tv,
   User,
-  ArrowTopRightOnSquare,
+  ExternalLink,
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
@@ -76,7 +76,7 @@ const AdminSidebar = ({ collapsed = false }) => {
       <div className={`${collapsed ? 'px-2 pb-2' : 'px-3 pb-2'}`}>
         <a href="/" target="_blank" rel="noopener noreferrer" title={collapsed ? 'View Site' : undefined}
           className={`flex items-center ${collapsed ? 'justify-center p-2' : 'gap-2.5 px-3 py-2.5'} rounded-xl text-sm font-medium text-surface-500 hover:text-white hover:bg-surface-800 transition-all duration-200 no-underline`}>
-          <ArrowTopRightOnSquare className="h-4 w-4" />
+          <ExternalLink className="h-4 w-4" />
           {!collapsed && 'View Site'}
         </a>
       </div>

@@ -1,7 +1,7 @@
 import { Box, LinearProgress } from "@mui/material";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { HiCamera, HiLocationMarker, HiLockClosed, HiOutlinePhone, HiOutlineUser } from "react-icons/hi";
+import { Camera, MapPin, Lock, Phone, User } from "lucide-react";
 import PasswordStrengthBar from "react-password-strength-bar";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -82,7 +82,7 @@ const RegistrationForm = () => {
               {/* Avatar column */}
               <div className="flex flex-col items-center gap-4 max-md:order-[-1]">
                 <label className="flex flex-col items-center gap-3 p-8 rounded-2xl border-2 border-dashed border-white/10 text-[#8892b0] cursor-pointer hover:border-brand-500/30 hover:text-white transition-all w-full group">
-                  <HiCamera className="text-3xl group-hover:scale-110 transition-transform" />
+                  <Camera className="text-3xl group-hover:scale-110 transition-transform" />
                   <span className="text-xs font-medium">Upload Photo</span>
                   <span className="text-[0.65rem] text-[#4a5568]">JPG, PNG · Max 5MB</span>
                   <input type="file" className="hidden" accept="image/*" onChange={e => handleAvatar(e, setFieldValue)} />
@@ -111,7 +111,7 @@ const RegistrationForm = () => {
                   <Field name="name">
                     {({ field }) => (
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-[#8892b0] uppercase tracking-wider flex items-center gap-1.5"><HiOutlineUser /> Name</label>
+                        <label className="text-xs font-semibold text-[#8892b0] uppercase tracking-wider flex items-center gap-1.5"><User /> Name</label>
                         <input {...field} placeholder="John Doe" className={touched.name && errors.name ? inputError : inputClass} />
                         <ErrorMessage name="name" component="p" className="text-red-400 text-xs m-0" />
                       </div>
@@ -123,7 +123,7 @@ const RegistrationForm = () => {
                   <Field name="phoneNumber">
                     {({ field }) => (
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-[#8892b0] uppercase tracking-wider flex items-center gap-1.5"><HiOutlinePhone /> Phone</label>
+                        <label className="text-xs font-semibold text-[#8892b0] uppercase tracking-wider flex items-center gap-1.5"><Phone /> Phone</label>
                         <input {...field} placeholder="10-digit number" className={touched.phoneNumber && errors.phoneNumber ? inputError : inputClass} />
                         <ErrorMessage name="phoneNumber" component="p" className="text-red-400 text-xs m-0" />
                       </div>
@@ -132,7 +132,7 @@ const RegistrationForm = () => {
                   <Field name="address">
                     {({ field }) => (
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-[#8892b0] uppercase tracking-wider flex items-center gap-1.5"><HiLocationMarker /> Address</label>
+                        <label className="text-xs font-semibold text-[#8892b0] uppercase tracking-wider flex items-center gap-1.5"><MapPin /> Address</label>
                         <input {...field} placeholder="City, Country" className={touched.address && errors.address ? inputError : inputClass} />
                         <ErrorMessage name="address" component="p" className="text-red-400 text-xs m-0" />
                       </div>
@@ -143,7 +143,7 @@ const RegistrationForm = () => {
                   <Field name="password">
                     {({ field }) => (
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-[#8892b0] uppercase tracking-wider flex items-center gap-1.5"><HiLockClosed /> Password</label>
+                        <label className="text-xs font-semibold text-[#8892b0] uppercase tracking-wider flex items-center gap-1.5"><Lock /> Password</label>
                         <input type="password" placeholder="Min 8 characters" {...field} className={inputClass} />
                         {values.password && <PasswordStrengthBar password={values.password} />}
                         <ErrorMessage name="password" component="p" className="text-red-400 text-xs m-0" />

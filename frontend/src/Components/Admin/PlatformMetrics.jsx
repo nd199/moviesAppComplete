@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../AxiosMethods';
-import { HiUser, HiCog6Tooth, HiChartBar, HiMusicalNote, HiStar } from 'react-icons/hi2';
+import { User, BarChart3, Music, Star } from 'lucide-react';
 
 const MetricCard = ({ label, value, change, icon: Icon, color }) => {
   const isPositive = parseFloat(change) > 0;
@@ -78,28 +78,28 @@ const PlatformMetrics = () => {
       label: 'Total Users', 
       value: metrics.totalUsers.toLocaleString(), 
       change: '+12.5', 
-      icon: HiUser, 
+      icon: User, 
       color: 'from-blue-500 to-cyan-600' 
     },
     { 
       label: 'Total Content', 
       value: metrics.totalContent.toLocaleString(), 
       change: '+8.3', 
-      icon: HiMusicalNote, 
+      icon: Music, 
       color: 'from-amber-500 to-orange-600' 
     },
     { 
       label: 'Active Subscriptions', 
       value: metrics.activeSubs.toLocaleString(), 
       change: '+15.2', 
-      icon: HiStar, 
+      icon: Star, 
       color: 'from-emerald-500 to-teal-600' 
     },
     { 
       label: 'Avg. Session', 
       value: metrics.avgSessionDuration, 
       change: null, 
-      icon: HiChartBar, 
+      icon: BarChart3, 
       color: 'from-purple-500 to-pink-600' 
     },
   ];

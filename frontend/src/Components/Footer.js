@@ -1,6 +1,6 @@
 import { Facebook, Instagram, MailOutlined, PlaceOutlined, Twitter, WhatsApp, Send } from '@mui/icons-material';
 import { useState } from 'react';
-import { HiOutlinePhone } from 'react-icons/hi';
+import { Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../Utils/useScrollReveal';
 
@@ -20,7 +20,7 @@ const links = [
 
 const contacts = [
   { icon: <PlaceOutlined sx={{ fontSize: 18 }} />, text: "Chennai, Tamil Nadu" },
-  { icon: <HiOutlinePhone size={18} />, text: "+91 8072205480" },
+  { icon: <Phone size={18} />, text: "+91 8072205480" },
   { icon: <MailOutlined sx={{ fontSize: 18 }} />, text: "naren06251999@gmail.com" },
 ];
 

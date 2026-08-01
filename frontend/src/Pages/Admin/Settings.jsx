@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { HiUser, HiKey, HiExclamationTriangle } from 'react-icons/hi2';
+import { User, Key, AlertTriangle } from 'lucide-react';
 import api from '../../AxiosMethods';
 import { logout } from '../../redux/userSlice';
 import { persistor } from '../../redux/store';
@@ -112,7 +112,7 @@ const Settings = () => {
         {/* Profile Form */}
         <form onSubmit={handleProfileSave} className="p-6 space-y-5">
           <div className="flex items-center gap-2 mb-2">
-            <HiUser className="h-5 w-5 text-brand-400" />
+            <User className="h-5 w-5 text-brand-400" />
             <h3 className="text-base font-semibold text-white">Personal Information</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -153,7 +153,7 @@ const Settings = () => {
       <div className="bg-surface-900 rounded-2xl border border-surface-700 overflow-hidden">
         <div className="px-6 py-5 border-b border-surface-700">
           <div className="flex items-center gap-2">
-            <HiKey className="h-5 w-5 text-brand-400" />
+            <Key className="h-5 w-5 text-brand-400" />
             <h3 className="text-base font-semibold text-white">Change Password</h3>
           </div>
           <p className="text-sm text-surface-500 mt-1">Update your password to keep your account secure</p>
@@ -192,7 +192,7 @@ const Settings = () => {
       <div className="bg-surface-900 rounded-2xl border border-red-500/20 overflow-hidden">
         <div className="px-6 py-5 border-b border-red-500/20">
           <div className="flex items-center gap-2">
-            <HiExclamationTriangle className="h-5 w-5 text-red-400" />
+            <AlertTriangle className="h-5 w-5 text-red-400" />
             <h3 className="text-base font-semibold text-red-400">Danger Zone</h3>
           </div>
           <p className="text-sm text-surface-500 mt-1">Irreversible and destructive actions</p>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaCalendar, FaMapMarkerAlt, FaEnvelope, FaUser, FaPhone, FaUpload } from 'react-icons/fa';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { HiArrowLeft } from 'react-icons/hi2';
+import { ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { fetchUsers, updateUser } from '../../services/adminApi';
@@ -84,7 +84,7 @@ const UserEdit = () => {
           </Link>
           <button onClick={() => navigate('/admin/users')}
             className="inline-flex items-center gap-2 rounded-xl border border-surface-700 bg-surface-800 px-4 py-2 text-sm font-semibold text-surface-500 hover:text-white hover:border-surface-600 transition-colors">
-            <HiArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4" />
             Back
           </button>
         </div>

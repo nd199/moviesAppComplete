@@ -15,7 +15,7 @@
     "axios": "^1.18.1",
     "date-fns": "^4.4.0",
     "formik": "^2.4.9",
-    "lucide-react": "^1.24.0",
+    "lucide-react": "^1.28.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-hot-toast": "^2.6.0",

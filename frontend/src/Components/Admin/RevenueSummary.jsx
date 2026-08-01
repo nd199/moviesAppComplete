@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../AxiosMethods';
-import { IndianRupee, BarChart3, ArrowUpBig } from 'lucide-react';
+import { IndianRupee, TrendingUp } from 'lucide-react';
 
 const RevenueSummary = () => {
   const [revenue, setRevenue] = useState({
@@ -62,7 +62,7 @@ const RevenueSummary = () => {
             <p className="text-2xl font-bold text-white mb-1">₹{revenue.total.toLocaleString()}</p>
             <div className="flex items-center gap-2 text-xs text-surface-500">
               <span className="text-emerald-400 font-semibold">
-                <ArrowUpBig className="h-3 w-3 inline mr-0.5" />
+                <TrendingUp className="h-3 w-3 inline mr-0.5" />
                 +{revenue.growth}%
               </span>
               <span>This month</span>

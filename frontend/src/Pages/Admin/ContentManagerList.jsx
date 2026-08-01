@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
-import { HiUser, HiCheckCircle, HiXCircle } from 'react-icons/hi2';
+import { User, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { fetchContentManagers, deleteContentManager as deleteContentManagerApi } from '../../services/adminApi';
@@ -61,10 +61,10 @@ const ContentManagerList = () => {
       {/* Summary Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
-          { label: 'Total CMs', value: totalCMs, icon: HiUser, color: 'from-brand-600 to-brand-700' },
-          { label: 'Active', value: activeCMs, icon: HiCheckCircle, color: 'from-emerald-500 to-teal-500' },
-          { label: 'Inactive', value: totalCMs - activeCMs, icon: HiXCircle, color: 'from-red-500 to-rose-500' },
-          { label: 'Showing', value: filtered.length, icon: HiUser, color: 'from-accent-600 to-accent-700' },
+          { label: 'Total CMs', value: totalCMs, icon: User, color: 'from-brand-600 to-brand-700' },
+          { label: 'Active', value: activeCMs, icon: CheckCircle, color: 'from-emerald-500 to-teal-500' },
+          { label: 'Inactive', value: totalCMs - activeCMs, icon: XCircle, color: 'from-red-500 to-rose-500' },
+          { label: 'Showing', value: filtered.length, icon: User, color: 'from-accent-600 to-accent-700' },
         ].map((stat) => (
           <div key={stat.label} className="bg-surface-900 border border-surface-700 rounded-2xl p-3 sm:p-4">
             <div className="flex items-center justify-between">
@@ -131,7 +131,7 @@ const ContentManagerList = () => {
                   <td colSpan={8} className="px-4 py-12 text-center">
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-12 h-12 bg-surface-800 rounded-full flex items-center justify-center">
-                        <HiUser className="h-6 w-6 text-surface-500" />
+                        <User className="h-6 w-6 text-surface-500" />
                       </div>
                       <p className="text-surface-500 text-sm">No content managers found</p>
                     </div>
@@ -203,7 +203,7 @@ const ContentManagerList = () => {
           <div className="bg-surface-900 border border-surface-700 rounded-2xl p-6 text-center">
             <div className="flex flex-col items-center gap-3">
               <div className="w-12 h-12 bg-surface-800 rounded-full flex items-center justify-center">
-                <HiUser className="h-6 w-6 text-surface-500" />
+                <User className="h-6 w-6 text-surface-500" />
               </div>
               <p className="text-surface-500 text-sm">No content managers found</p>
             </div>

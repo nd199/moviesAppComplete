@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HiArrowLeft, HiCheckCircle, HiXCircle } from 'react-icons/hi2';
+import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 import { createContentManager } from '../../services/adminApi';
 
 const NewContentManager = () => {
@@ -40,7 +40,7 @@ const NewContentManager = () => {
         </div>
         <button onClick={() => navigate('/admin/content-managers')}
           className="inline-flex items-center justify-center gap-2 rounded-xl border border-surface-700 bg-surface-800 px-4 py-2 text-sm font-semibold text-surface-500 hover:text-white hover:border-surface-600 transition-colors shrink-0">
-          <HiArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-4 w-4" />
           Back
         </button>
       </div>
@@ -73,7 +73,7 @@ const NewContentManager = () => {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-surface-900 border border-surface-700 rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl">
             <div className="flex items-center justify-center mb-4">
-              {popupData.success ? <HiCheckCircle className="h-12 w-12 text-emerald-400" /> : <HiXCircle className="h-12 w-12 text-red-400" />}
+              {popupData.success ? <CheckCircle className="h-12 w-12 text-emerald-400" /> : <XCircle className="h-12 w-12 text-red-400" />}
             </div>
             <h3 className={`text-lg font-semibold text-center mb-2 ${popupData.success ? 'text-white' : 'text-red-400'}`}>
               {popupData.success ? 'Success!' : 'Error!'}

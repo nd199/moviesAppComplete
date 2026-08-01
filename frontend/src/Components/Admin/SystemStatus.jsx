@@ -9,7 +9,7 @@ const STATUS_CONFIGS = {
     label: 'Online',
     badge: 'bg-emerald-500/10 text-emerald-400',
     bar: 'bg-gradient-to-r from-emerald-500 to-emerald-400',
-    icon: HiCheck,
+    icon: Check,
   },
   issues: {
     dot: 'bg-amber-400',
@@ -17,7 +17,7 @@ const STATUS_CONFIGS = {
     label: 'Warning',
     badge: 'bg-amber-500/10 text-amber-400',
     bar: 'bg-gradient-to-r from-amber-500 to-amber-400',
-    icon: HiClock,
+    icon: Clock,
   },
   offline: {
     dot: 'bg-red-400',
@@ -25,7 +25,7 @@ const STATUS_CONFIGS = {
     label: 'Offline',
     badge: 'bg-red-500/10 text-red-400',
     bar: 'bg-gradient-to-r from-red-500 to-red-400',
-    icon: HiX,
+    icon: X,
   },
   checking: {
     dot: 'bg-surface-500',
@@ -33,7 +33,7 @@ const STATUS_CONFIGS = {
     label: 'Checking',
     badge: 'bg-surface-500/10 text-surface-400',
     bar: 'bg-surface-600',
-    icon: HiServer,
+    icon: Server,
   },
 };
 
@@ -135,7 +135,7 @@ const SystemStatus = () => {
           <div>
             <h3 className="text-base font-semibold text-white">System Status</h3>
             <p className="text-xs text-surface-500 mt-0.5 flex items-center gap-1.5">
-              <HiCheck className={`h-3 w-3 ${onlineCount === services.length ? 'text-emerald-400' : 'text-amber-400'}`} />
+              <Check className={`h-3 w-3 ${onlineCount === services.length ? 'text-emerald-400' : 'text-amber-400'}`} />
               {onlineCount}/{services.length} services operational
             </p>
           </div>
