@@ -127,7 +127,7 @@ const LoginForm = () => {
             </span>
           </p>
           <div className="mt-3 p-3 glass rounded-xl text-[#8892b0] text-xs font-medium">
-            Demo: demo@example.com / Demo123456
+            Demo: demo@moviesapp.com / Demo1234567
           </div>
         </div>
       </div>
