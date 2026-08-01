@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IoNotificationsOutline, IoSearchOutline } from 'react-icons/io5';
-import { HiBars3, HiXMark, HiChevronDown } from 'react-icons/hi2';
+import { HiBars3, HiChevronDown } from 'react-icons/hi2';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState, useRef } from 'react';
 import { performLogout } from '../../Utils/logout';
