@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { HiArrowTrendingUp, HiArrowTrendingDown } from 'react-icons/hi2';
+import { ArrowUpBig, ArrowDownBig } from 'lucide-react';
 import { adminAPI } from '../../AxiosMethods';
 
 const StatCard = ({ title, value, change, gradient, icon, prefix = '' }) => {
@@ -68,9 +68,9 @@ const StatCard = ({ title, value, change, gradient, icon, prefix = '' }) => {
         <p className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{prefix}{formattedDisplay}</p>
         <div className="flex items-center mt-2">
           {isPositive ? (
-            <HiArrowTrendingUp className="h-4 w-4 text-emerald-400 mr-1" />
+            <ArrowUpBig className="h-4 w-4 text-emerald-400 mr-1" />
           ) : (
-            <HiArrowTrendingDown className="h-4 w-4 text-red-400 mr-1" />
+            <ArrowDownBig className="h-4 w-4 text-red-400 mr-1" />
           )}
           <span className={`text-sm font-semibold ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
             {Math.abs(displayChange)}%

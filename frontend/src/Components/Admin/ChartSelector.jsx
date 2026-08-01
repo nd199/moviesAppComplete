@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import AdvancedCharts from './AdvancedCharts';
-import { HiChartBar, HiChartPie, HiChartSquareBar } from 'react-icons/hi';
+import { BarChart3, PieChart, BarChart4 } from 'lucide-react';
 
 const chartTypes = [
-  { id: 'line', name: 'Line', icon: HiChartBar },
-  { id: 'bar', name: 'Bar', icon: HiChartSquareBar },
-  { id: 'area', name: 'Area', icon: HiChartBar },
-  { id: 'pie', name: 'Pie', icon: HiChartPie },
-  { id: 'column', name: 'Column', icon: HiChartSquareBar },
+  { id: 'line', name: 'Line', icon: BarChart3 },
+  { id: 'bar', name: 'Bar', icon: BarChart4 },
+  { id: 'area', name: 'Area', icon: BarChart3 },
+  { id: 'pie', name: 'Pie', icon: PieChart },
+  { id: 'column', name: 'Column', icon: BarChart4 },
 ];
 
 const ChartSelector = ({ data, title }) => {

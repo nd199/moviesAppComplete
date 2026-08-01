@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../../AxiosMethods';
-import { HiCheck, HiX, HiClock, HiServer } from 'react-icons/hi2';
+import { Check, X, Clock, Server } from 'lucide-react';
 
 const STATUS_CONFIGS = {
   online: {

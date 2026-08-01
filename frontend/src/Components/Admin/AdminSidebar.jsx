@@ -1,14 +1,14 @@
 import { NavLink } from 'react-router-dom';
 import {
-  HiHome,
-  HiUserGroup,
-  HiFilm,
-  HiCog6Tooth,
-  HiShieldCheck,
-  HiTv,
-  HiUser,
-  HiArrowTopRightOnSquare,
-} from 'react-icons/hi2';
+  Home,
+  Users,
+  Film,
+  Settings,
+  ShieldCheck,
+  Tv,
+  User,
+  ArrowTopRightOnSquare,
+} from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 const AdminSidebar = ({ collapsed = false }) => {
@@ -17,13 +17,13 @@ const AdminSidebar = ({ collapsed = false }) => {
   const isAdmin = userRoles.includes('ROLE_ADMIN');
 
   const menuItems = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: HiHome, adminOnly: true },
-    { name: 'Users', href: '/admin/users', icon: HiUserGroup, adminOnly: true },
-    { name: 'Admins', href: '/admin/admins', icon: HiShieldCheck, adminOnly: true },
-    { name: 'Movies', href: '/admin/movies', icon: HiFilm, adminOnly: false },
-    { name: 'Shows', href: '/admin/shows', icon: HiTv, adminOnly: false },
-    { name: 'Content Managers', href: '/admin/content-managers', icon: HiUser, adminOnly: true },
-    { name: 'Settings', href: '/admin/settings', icon: HiCog6Tooth, adminOnly: true },
+    { name: 'Dashboard', href: '/admin/dashboard', icon: Home, adminOnly: true },
+    { name: 'Users', href: '/admin/users', icon: Users, adminOnly: true },
+    { name: 'Admins', href: '/admin/admins', icon: ShieldCheck, adminOnly: true },
+    { name: 'Movies', href: '/admin/movies', icon: Film, adminOnly: false },
+    { name: 'Shows', href: '/admin/shows', icon: Tv, adminOnly: false },
+    { name: 'Content Managers', href: '/admin/content-managers', icon: User, adminOnly: true },
+    { name: 'Settings', href: '/admin/settings', icon: Settings, adminOnly: true },
   ];
 
   const filteredItems = menuItems.filter(item => !item.adminOnly || isAdmin);
@@ -76,7 +76,7 @@ const AdminSidebar = ({ collapsed = false }) => {
       <div className={`${collapsed ? 'px-2 pb-2' : 'px-3 pb-2'}`}>
         <a href="/" target="_blank" rel="noopener noreferrer" title={collapsed ? 'View Site' : undefined}
           className={`flex items-center ${collapsed ? 'justify-center p-2' : 'gap-2.5 px-3 py-2.5'} rounded-xl text-sm font-medium text-surface-500 hover:text-white hover:bg-surface-800 transition-all duration-200 no-underline`}>
-          <HiArrowTopRightOnSquare className="h-4 w-4" />
+          <ArrowTopRightOnSquare className="h-4 w-4" />
           {!collapsed && 'View Site'}
         </a>
       </div>

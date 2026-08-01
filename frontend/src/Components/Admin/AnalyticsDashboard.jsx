@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import AdvancedCharts from './AdvancedCharts';
 import { adminAPI } from '../../AxiosMethods';
-import { HiCurrencyRupee, HiChartBar, HiFilm, HiUser } from 'react-icons/hi2';
+import { IndianRupee, BarChart3, Film, User } from 'lucide-react';
 
 const TABS = [
-  { id: 'userAnalytics', label: 'Users', icon: HiUser },
-  { id: 'revenue', label: 'Revenue', icon: HiCurrencyRupee },
-  { id: 'content', label: 'Content', icon: HiFilm },
-  { id: 'overview', label: 'Overview', icon: HiChartBar },
+  { id: 'userAnalytics', label: 'Users', icon: User },
+  { id: 'revenue', label: 'Revenue', icon: IndianRupee },
+  { id: 'content', label: 'Content', icon: Film },
+  { id: 'overview', label: 'Overview', icon: BarChart3 },
 ];
 
 const AnalyticsDashboard = () => {

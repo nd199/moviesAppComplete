@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../AxiosMethods';
-import { HiCurrencyRupee, HiChartBar, HiArrowTrendingUp } from 'react-icons/hi2';
+import { IndianRupee, BarChart3, ArrowUpBig } from 'lucide-react';
 
 const RevenueSummary = () => {
   const [revenue, setRevenue] = useState({
@@ -53,7 +53,7 @@ const RevenueSummary = () => {
       <div className="p-5">
         <div className="flex items-center gap-2 mb-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center">
-            <HiCurrencyRupee className="h-4 w-4 text-white" />
+            <IndianRupee className="h-4 w-4 text-white" />
           </div>
           <h3 className="text-sm font-semibold text-surface-300 uppercase tracking-wide">Revenue</h3>
         </div>
@@ -62,7 +62,7 @@ const RevenueSummary = () => {
             <p className="text-2xl font-bold text-white mb-1">₹{revenue.total.toLocaleString()}</p>
             <div className="flex items-center gap-2 text-xs text-surface-500">
               <span className="text-emerald-400 font-semibold">
-                <HiArrowTrendingUp className="h-3 w-3 inline mr-0.5" />
+                <ArrowUpBig className="h-3 w-3 inline mr-0.5" />
                 +{revenue.growth}%
               </span>
               <span>This month</span>

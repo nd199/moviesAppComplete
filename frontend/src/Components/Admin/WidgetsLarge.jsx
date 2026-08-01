@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../AxiosMethods';
-import { HiUser, HiEllipsisHorizontal } from 'react-icons/hi2';
+import { User, MoreHorizontal } from 'lucide-react';
 
 const avatarColors = [
   'from-brand-500 to-indigo-500',
@@ -46,7 +46,7 @@ const WidgetsLarge = () => {
             <p className="text-xs text-surface-500 mt-0.5">Latest registered users</p>
           </div>
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
-            <HiUser className="h-5 w-5 text-white" />
+            <User className="h-5 w-5 text-white" />
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@ const WidgetsLarge = () => {
                     {user.isActive !== false ? 'Active' : 'Inactive'}
                   </span>
                   <button className="w-6 h-6 rounded-lg flex items-center justify-center text-surface-600 hover:text-surface-400 hover:bg-surface-700 opacity-0 group-hover:opacity-100 transition-all">
-                    <HiEllipsisHorizontal className="h-4 w-4" />
+                    <MoreHorizontal className="h-4 w-4" />
                   </button>
                 </div>
               </div>
@@ -96,7 +96,7 @@ const WidgetsLarge = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-10 text-surface-600">
-            <HiUser className="h-10 w-10 mb-2" />
+            <User className="h-10 w-10 mb-2" />
             <p className="text-sm font-medium">No users found</p>
           </div>
         )}

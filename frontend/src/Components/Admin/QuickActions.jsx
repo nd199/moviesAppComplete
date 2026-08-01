@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
-import { HiFilm, HiTv, HiUserGroup, HiUser, HiChartBar, HiCalendar, HiCurrencyRupee, HiUserMinus } from 'react-icons/hi2';
+import { Film, Tv, Users, User, BarChart3, IndianRupee } from 'lucide-react';
 
 const actions = [
-  { name: 'Add Movie', href: '/admin/movies/new', icon: HiFilm, gradient: 'from-brand-500 to-purple-600', desc: 'Upload a new movie to the platform' },
-  { name: 'Add Show', href: '/admin/shows/new', icon: HiTv, gradient: 'from-accent-500 to-pink-600', desc: 'Create a new TV series' },
-  { name: 'Add User', href: '/admin/users/new', icon: HiUserGroup, gradient: 'from-emerald-500 to-teal-600', desc: 'Register a new user account' },
-  { name: 'Add Admin', href: '/admin/admins/new', icon: HiUser, gradient: 'from-amber-500 to-orange-600', desc: 'Invite a new admin user' },
-  { name: 'View Analytics', href: '/admin/dashboard', icon: HiChartBar, gradient: 'from-cyan-500 to-blue-600', desc: 'View platform analytics' },
-  { name: 'Manage Subscriptions', href: '/admin/users', icon: HiCurrencyRupee, gradient: 'from-emerald-500 to-green-600', desc: 'View and manage subscriptions' },
+  { name: 'Add Movie', href: '/admin/movies/new', icon: Film, gradient: 'from-brand-500 to-purple-600', desc: 'Upload a new movie to the platform' },
+  { name: 'Add Show', href: '/admin/shows/new', icon: Tv, gradient: 'from-accent-500 to-pink-600', desc: 'Create a new TV series' },
+  { name: 'Add User', href: '/admin/users/new', icon: Users, gradient: 'from-emerald-500 to-teal-600', desc: 'Register a new user account' },
+  { name: 'Add Admin', href: '/admin/admins/new', icon: User, gradient: 'from-amber-500 to-orange-600', desc: 'Invite a new admin user' },
+  { name: 'View Analytics', href: '/admin/dashboard', icon: BarChart3, gradient: 'from-cyan-500 to-blue-600', desc: 'View platform analytics' },
+  { name: 'Manage Subscriptions', href: '/admin/users', icon: IndianRupee, gradient: 'from-emerald-500 to-green-600', desc: 'View and manage subscriptions' },
 ];
 
 const QuickActions = () => {
