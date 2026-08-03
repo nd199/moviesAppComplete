@@ -74,7 +74,7 @@ const DislikeButton = ({ tmdbId, mediaType, title, size = 'medium', showLabel = 
   }
 
   return (
-    <button onClick={toggle} disabled={loading}
+    <button onClick={toggle} disabled={loading} title={disliked ? 'Remove dislike' : 'Dislike'}
       className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer disabled:opacity-50 border
         ${disliked
           ? 'bg-sky-500/20 border-sky-500/40 text-sky-300 hover:bg-sky-500/30 hover:border-sky-500/50 shadow-[0_0_15px_rgba(14,165,233,0.15)]'

@@ -74,7 +74,7 @@ const LikeButton = ({ tmdbId, mediaType, title, size = 'medium', showLabel = tru
   }
 
   return (
-    <button onClick={toggle} disabled={loading}
+    <button onClick={toggle} disabled={loading} title={liked ? 'Unlike' : 'Like'}
       className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer disabled:opacity-50 border
         ${liked
           ? 'bg-rose-500/20 border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.15)]'
