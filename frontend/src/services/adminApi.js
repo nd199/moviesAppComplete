@@ -144,3 +144,8 @@ export const fetchLatestSubscriptions = async () => {
   const response = await api.get('/subscription/latest');
   return response.data;
 };
+
+export const fetchReactionStats = async () => {
+  const response = await api.get('/admin/stats/reactions');
+  return response.data;
+};

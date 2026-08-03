@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Favorite, FavoriteBorder } from '@mui/icons-material';
+import { ThumbUp, ThumbUpOffAlt } from '@mui/icons-material';
 import { likesAPI } from '../AxiosMethods';
 
 const LikeButton = ({ tmdbId, mediaType, title, size = 'medium', showLabel = true, showCount = false, className = '', onSuccess, onError }) => {
@@ -51,12 +51,12 @@ const LikeButton = ({ tmdbId, mediaType, title, size = 'medium', showLabel = tru
   const isCompact = className.includes('!w-9') || className.includes('!w-8') || className.includes('col-action') || className.includes('rounded-xl') || className.includes('rounded-lg') || className.includes('rounded');
 
   const heart = liked
-    ? <Favorite sx={{ fontSize: 16 }} className="text-rose-400" />
-    : <FavoriteBorder sx={{ fontSize: 16 }} />;
+    ? <ThumbUp sx={{ fontSize: 16 }} className="text-rose-400" />
+    : <ThumbUpOffAlt sx={{ fontSize: 16 }} />;
 
   const heartLarge = liked
-    ? <Favorite sx={{ fontSize: 18 }} className="text-rose-400" />
-    : <FavoriteBorder sx={{ fontSize: 18 }} />;
+    ? <ThumbUp sx={{ fontSize: 18 }} className="text-rose-400" />
+    : <ThumbUpOffAlt sx={{ fontSize: 18 }} />;
 
   if (isCompact) {
     return (

@@ -7,6 +7,7 @@ import WidgetsLarge from '../../Components/Admin/WidgetsLarge';
 import QuickActions from '../../Components/Admin/QuickActions';
 import PlatformMetrics from '../../Components/Admin/PlatformMetrics';
 import RevenueSummary from '../../Components/Admin/RevenueSummary';
+import ReactionStats from '../../Components/Admin/ReactionStats';
 import { fetchUserStats } from '../../services/adminApi';
 
 const Dashboard = () => {
@@ -112,6 +113,8 @@ const Dashboard = () => {
           <SystemStatus />
         </div>
       </div>
+
+      <ReactionStats />
     </div>
   );
 };
