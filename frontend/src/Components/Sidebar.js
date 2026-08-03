@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Info, Movie, Tv, Bookmark, Close, Settings, CreditCard, History, Help, Logout } from '@mui/icons-material';
+import { Home, Info, Movie, Tv, Bookmark, Favorite, Close, Settings, CreditCard, History, Help, Logout } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { performLogout } from '../Utils/logout';
 
@@ -25,6 +25,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { path: '/movies', label: 'Movies', icon: Movie },
     { path: '/shows', label: 'TV Shows', icon: Tv },
     { path: '/watchlist', label: 'Watchlist', icon: Bookmark },
+    { path: '/liked', label: 'Liked', icon: Favorite },
   ];
 
   return (

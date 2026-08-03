@@ -4,6 +4,7 @@ import { ArrowBack, PlayArrow, Star, CalendarToday, Movie } from "@mui/icons-mat
 import { fetchTmdbMovieDetails, fetchTmdbTvShowDetails, fetchMovieCast, fetchTvShowCast, fetchSimilarMovies, fetchSimilarTvShows, recordView } from "../../Network/ApiCalls";
 import { publicRequest } from "../../AxiosMethods";
 import WatchlistButton from "../../Components/WatchlistButton";
+import LikeButton from "../../Components/LikeButton";
 import ListItem from "../../Components/ListItem";
 import GlobalLoader from "../../Components/GlobalLoader";
 import ShareButton from "../../Components/ShareButton";
@@ -157,6 +158,15 @@ const Detail = () => {
                     title={title}
                     posterPath={posterUrl}
                     className="!px-5 !py-2.5"
+                  />
+                )}
+                {item.tmdbId && (
+                  <LikeButton
+                    tmdbId={item.tmdbId}
+                    mediaType={type}
+                    title={title}
+                    className="!px-5 !py-2.5"
+                    showCount
                   />
                 )}
                 <ShareButton

@@ -1,4 +1,4 @@
-import { ArrowDropDown, Menu, Notifications, Person, Bookmark, History, CreditCard, Settings, Help, Search, Close, MovieFilter, Tv } from "@mui/icons-material";
+import { ArrowDropDown, Menu, Notifications, Person, Bookmark, Favorite, CreditCard, Settings, Help, Search, Close, MovieFilter, Tv } from "@mui/icons-material";
 import { Badge } from "@mui/material";
 import { useCallback, useEffect, useState, useRef } from "react";
 import Lottie from "react-lottie";
@@ -122,7 +122,10 @@ const NavBar = ({ onMenuClick }) => {
     { to: "/about", label: "About" },
     { to: "/movies", label: "Movies" },
     { to: "/shows", label: "Shows" },
-    ...(user ? [{ to: "/watchlist", label: "Watchlist" }] : []),
+    ...(user ? [
+      { to: "/watchlist", label: "Watchlist" },
+      { to: "/liked", label: "Liked" },
+    ] : []),
   ];
 
   const getPoster = (item) => {
@@ -186,7 +189,7 @@ const NavBar = ({ onMenuClick }) => {
                         {[
                           { icon: Person, label: "Profile", action: () => { navigate("/profile"); setOpen(false); } },
                           { icon: Bookmark, label: "My List", action: () => { navigate("/watchlist"); setOpen(false); } },
-                          { icon: History, label: "Watchlist", action: () => { navigate("/watchlist"); setOpen(false); } },
+                          { icon: Favorite, label: "Liked", action: () => { navigate("/liked"); setOpen(false); } },
                         ].map(({ icon: Icon, label, action }) => (
                           <button key={label} onClick={action} className="w-full flex items-center gap-3 px-5 py-2.5 text-[#8892b0] hover:text-white hover:bg-white/5 transition-all text-sm cursor-pointer bg-transparent border-none">
                             <Icon sx={{ fontSize: 18 }} /> {label}

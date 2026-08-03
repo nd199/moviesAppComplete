@@ -23,6 +23,7 @@ import AboutUs from "./Pages/User/AboutUs";
 import Movies from "./Pages/User/Movies";
 import Shows from "./Pages/User/Shows";
 import Watchlist from "./Pages/User/Watchlist";
+import Liked from "./Pages/User/Liked";
 import Profile from "./Pages/User/Profile";
 import NavBar from "./Components/NavBar";
 import Sidebar from "./Components/Sidebar";
@@ -267,6 +268,14 @@ function Layout({ sidebarOpen, setSidebarOpen }) {
           element={
             <ProtectedRoute>
               <Watchlist />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/liked"
+          element={
+            <ProtectedRoute>
+              <Liked />
             </ProtectedRoute>
           }
         />

@@ -2,6 +2,7 @@ import { PlayArrow, BookmarkAdd, Info } from '@mui/icons-material';
 import { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import WatchlistButton from './WatchlistButton';
+import LikeButton from './LikeButton';
 
 const ColListItem = ({
   name, desc, year, img, ageRating, rating, runtime, genre, trailer,
@@ -139,15 +140,25 @@ const ColListItem = ({
           )}
 
           {tmdbId && mediaType ? (
-            <WatchlistButton
-              tmdbId={tmdbId}
-              mediaType={mediaType}
-              title={name}
-              posterPath={img}
-              size="small"
-              showLabel={false}
-              className="!w-9 !h-9 !min-w-[36px] !p-0 !rounded-xl !bg-white/5 !border-white/10 hover:!bg-brand-500/15 hover:!border-brand-500/30"
-            />
+            <>
+              <WatchlistButton
+                tmdbId={tmdbId}
+                mediaType={mediaType}
+                title={name}
+                posterPath={img}
+                size="small"
+                showLabel={false}
+                className="!w-9 !h-9 !min-w-[36px] !p-0 !rounded-xl !bg-white/5 !border-white/10 hover:!bg-brand-500/15 hover:!border-brand-500/30"
+              />
+              <LikeButton
+                tmdbId={tmdbId}
+                mediaType={mediaType}
+                title={name}
+                size="small"
+                showLabel={false}
+                className="!w-9 !h-9 !min-w-[36px] !p-0 !rounded-xl !bg-white/5 !border-white/10 hover:!bg-rose-500/15 hover:!border-rose-500/30"
+              />
+            </>
           ) : (
             <button className="flex items-center justify-center w-8 h-8 rounded-xl bg-white/5 border border-white/10 text-[#5a6380] cursor-default">
               <BookmarkAdd sx={{ fontSize: 16 }} />

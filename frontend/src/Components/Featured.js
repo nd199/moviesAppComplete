@@ -10,6 +10,7 @@ import VideoPlayer from './VideoPlayer';
 import { FeaturedSkeleton } from './GlobalLoader';
 import { publicRequest } from '../AxiosMethods';
 import WatchlistButton from './WatchlistButton';
+import LikeButton from './LikeButton';
 
 const Featured = () => {
   const [data, setData] = useState([]);
@@ -108,6 +109,14 @@ const Featured = () => {
                       posterPath={item.poster}
                       className="!rounded-xl !bg-white/5 !border-white/10 !text-white hover:!bg-white/10 hover:!border-brand-500/30 backdrop-blur-sm !px-6 !py-3"
                       showLabel={true}
+                    />
+                    <LikeButton
+                      tmdbId={item.tmdbId}
+                      mediaType="movie"
+                      title={item.title}
+                      className="!rounded-xl !bg-white/5 !border-white/10 !text-white hover:!bg-white/10 hover:!border-rose-500/30 backdrop-blur-sm !px-6 !py-3"
+                      showLabel={true}
+                      showCount
                     />
                   </div>
                 </div>

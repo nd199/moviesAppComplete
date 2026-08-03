@@ -151,6 +151,16 @@ export const watchlistAPI = {
   getWatchlistCount: () => api.get('/watchlist/count'),
 };
 
+export const likesAPI = {
+  like: (likeData) => api.post('/likes', likeData),
+  unlike: (tmdbId, mediaType) => api.delete(`/likes/${tmdbId}/${mediaType}`),
+  getLikes: () => api.get('/likes'),
+  getLikesPaginated: (page = 0, size = 20) => api.get('/likes/paginated', { params: { page, size } }),
+  checkLiked: (tmdbId, mediaType) => api.get(`/likes/check/${tmdbId}/${mediaType}`),
+  getLikeCount: () => api.get('/likes/count'),
+  getTotalLikes: (tmdbId, mediaType) => api.get(`/likes/total/${tmdbId}/${mediaType}`),
+};
+
 export const adminAPI = {
   getAllUsers: () => api.get('/admin/users'),
   createUser: (userData) => api.post('/admin/users', userData),

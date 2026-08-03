@@ -32,7 +32,6 @@ public class WatchlistItem {
     @Column(name = "added_at", nullable = false)
     private LocalDateTime addedAt;
 
-    // Constructors
     public WatchlistItem() {}
 
     public WatchlistItem(Customer customer, Long tmdbId, String title, String posterPath, String mediaType) {
@@ -44,7 +43,6 @@ public class WatchlistItem {
         this.addedAt = LocalDateTime.now();
     }
 
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

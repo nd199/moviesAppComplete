@@ -2,6 +2,7 @@ import { PlayArrow, Info } from '@mui/icons-material';
 import { useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import WatchlistButton from './WatchlistButton';
+import LikeButton from './LikeButton';
 
 const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType, genre }) => {
   const cardRef = useRef(null);
@@ -100,6 +101,14 @@ const ListItem = ({ name, year, rating, poster, tmdbId, trailer, mediaType, genr
               size="small"
               showLabel={false}
               className="!w-9 !h-9 !min-w-[36px] !p-0 !rounded-lg !bg-surface-950/70 backdrop-blur-sm !border-white/15 hover:!bg-brand-500 hover:!border-brand-500"
+            />
+            <LikeButton
+              tmdbId={tmdbId}
+              mediaType={mediaType}
+              title={name}
+              size="small"
+              showLabel={false}
+              className="!w-9 !h-9 !min-w-[36px] !p-0 !rounded-lg !bg-surface-950/70 backdrop-blur-sm !border-white/15 hover:!bg-rose-500 hover:!border-rose-500"
             />
           </div>
         )}

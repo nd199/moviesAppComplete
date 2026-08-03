@@ -163,6 +163,7 @@ public class SecurityFilterChainConfig {
                                 "/api/v1/bookings/**",
                                 "/api/v1/reviews/**",
                                 "/api/v1/watchlist/**",
+                                "/api/v1/likes/**",
                                 "/api/v1/notifications/**"
                         ).authenticated()
 
