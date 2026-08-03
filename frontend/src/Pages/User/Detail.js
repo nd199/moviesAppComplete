@@ -5,6 +5,7 @@ import { fetchTmdbMovieDetails, fetchTmdbTvShowDetails, fetchMovieCast, fetchTvS
 import { publicRequest } from "../../AxiosMethods";
 import WatchlistButton from "../../Components/WatchlistButton";
 import LikeButton from "../../Components/LikeButton";
+import DislikeButton from "../../Components/DislikeButton";
 import ListItem from "../../Components/ListItem";
 import GlobalLoader from "../../Components/GlobalLoader";
 import ShareButton from "../../Components/ShareButton";
@@ -162,6 +163,15 @@ const Detail = () => {
                 )}
                 {item.tmdbId && (
                   <LikeButton
+                    tmdbId={item.tmdbId}
+                    mediaType={type}
+                    title={title}
+                    className="!px-5 !py-2.5"
+                    showCount
+                  />
+                )}
+                {item.tmdbId && (
+                  <DislikeButton
                     tmdbId={item.tmdbId}
                     mediaType={type}
                     title={title}

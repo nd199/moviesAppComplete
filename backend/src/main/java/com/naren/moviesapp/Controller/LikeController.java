@@ -2,7 +2,6 @@ package com.naren.moviesapp.Controller;
 
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Like;
-import com.naren.moviesapp.Entity.LikeStatus;
 import com.naren.moviesapp.Record.AddToLikeRequest;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Service.LikeService;
@@ -34,21 +33,24 @@ public class LikeController {
     }
 
     @PostMapping
-    public ResponseEntity<?> toggleLike(
+    public ResponseEntity<Like> setReaction(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody AddToLikeRequest request) {
 
         Customer customer = getCustomer(userDetails);
-
-        if (request.likeStatus() == LikeStatus.UNLIKE) {
-            log.info("Unliking tmdbId={} ({}) for customer={}", request.tmdbId(), request.mediaType(), customer.getId());
-            likeService.unlike(customer.getId(), request.tmdbId(), request.mediaType());
-            return ResponseEntity.noContent().build();
-        }
-
-        log.info("Liking tmdbId={} ({}) for customer={}", request.tmdbId(), request.mediaType(), customer.getId());
-        Like like = likeService.like(customer.getId(), request);
+        Like like = likeService.setReaction(customer.getId(), request);
         return ResponseEntity.ok(like);
+    }
+
+    @DeleteMapping("/{tmdbId}/{mediaType}")
+    public ResponseEntity<Void> clearReaction(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long tmdbId,
+            @PathVariable String mediaType) {
+
+        Customer customer = getCustomer(userDetails);
+        likeService.clearReaction(customer.getId(), tmdbId, mediaType);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
@@ -56,8 +58,15 @@ public class LikeController {
             @AuthenticationPrincipal UserDetails userDetails) {
 
         Customer customer = getCustomer(userDetails);
-        List<Like> likes = likeService.getLikes(customer.getId());
-        return ResponseEntity.ok(likes);
+        return ResponseEntity.ok(likeService.getLikes(customer.getId()));
+    }
+
+    @GetMapping("/disliked")
+    public ResponseEntity<List<Like>> getDislikes(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Customer customer = getCustomer(userDetails);
+        return ResponseEntity.ok(likeService.getDislikes(customer.getId()));
     }
 
     @GetMapping("/paginated")
@@ -68,30 +77,28 @@ public class LikeController {
 
         Customer customer = getCustomer(userDetails);
         Pageable pageable = PageRequest.of(page, size);
-        Page<Like> likes = likeService.getLikesPaginated(customer.getId(), pageable);
-        return ResponseEntity.ok(likes);
+        return ResponseEntity.ok(likeService.getLikesPaginated(customer.getId(), pageable));
     }
 
-    @DeleteMapping("/{tmdbId}/{mediaType}")
-    public ResponseEntity<Void> removeLike(
+    @GetMapping("/disliked/paginated")
+    public ResponseEntity<Page<Like>> getDislikesPaginated(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long tmdbId,
-            @PathVariable String mediaType) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
 
         Customer customer = getCustomer(userDetails);
-        likeService.unlike(customer.getId(), tmdbId, mediaType);
-        return ResponseEntity.noContent().build();
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(likeService.getDislikesPaginated(customer.getId(), pageable));
     }
 
     @GetMapping("/check/{tmdbId}/{mediaType}")
-    public ResponseEntity<Map<String, Boolean>> checkLiked(
+    public ResponseEntity<Map<String, Boolean>> checkReaction(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long tmdbId,
             @PathVariable String mediaType) {
 
         Customer customer = getCustomer(userDetails);
-        boolean liked = likeService.isLiked(customer.getId(), tmdbId, mediaType);
-        return ResponseEntity.ok(Map.of("liked", liked));
+        return ResponseEntity.ok(likeService.getReaction(customer.getId(), tmdbId, mediaType));
     }
 
     @GetMapping("/count")
@@ -104,12 +111,11 @@ public class LikeController {
     }
 
     @GetMapping("/total/{tmdbId}/{mediaType}")
-    public ResponseEntity<Map<String, Long>> getTotalLikes(
+    public ResponseEntity<Map<String, Long>> getTotalReactions(
             @PathVariable Long tmdbId,
             @PathVariable String mediaType) {
 
-        long total = likeService.getTotalLikes(tmdbId, mediaType);
-        return ResponseEntity.ok(Map.of("totalLikes", total));
+        return ResponseEntity.ok(likeService.getTotalReactions(tmdbId, mediaType));
     }
 
     private Customer getCustomer(UserDetails userDetails) {

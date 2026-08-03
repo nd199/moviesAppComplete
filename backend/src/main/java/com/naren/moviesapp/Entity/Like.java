@@ -38,7 +38,7 @@ public class Like {
     private String title;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "like_status", nullable = false)
+    @Column(name = "like_status")
     private LikeStatus likeStatus;
 
     @Column(name = "media_type", nullable = false)

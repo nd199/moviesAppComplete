@@ -11,6 +11,7 @@ import { FeaturedSkeleton } from './GlobalLoader';
 import { publicRequest } from '../AxiosMethods';
 import WatchlistButton from './WatchlistButton';
 import LikeButton from './LikeButton';
+import DislikeButton from './DislikeButton';
 
 const Featured = () => {
   const [data, setData] = useState([]);
@@ -115,6 +116,14 @@ const Featured = () => {
                       mediaType="movie"
                       title={item.title}
                       className="!rounded-xl !bg-white/5 !border-white/10 !text-white hover:!bg-white/10 hover:!border-rose-500/30 backdrop-blur-sm !px-6 !py-3"
+                      showLabel={true}
+                      showCount
+                    />
+                    <DislikeButton
+                      tmdbId={item.tmdbId}
+                      mediaType="movie"
+                      title={item.title}
+                      className="!rounded-xl !bg-white/5 !border-white/10 !text-white hover:!bg-white/10 hover:!border-sky-500/30 backdrop-blur-sm !px-6 !py-3"
                       showLabel={true}
                       showCount
                     />

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -31,13 +32,13 @@ public class LikeService {
     }
 
     @Transactional
-    public Like like(Long customerId, AddToLikeRequest request) {
+    public Like setReaction(Long customerId, AddToLikeRequest request) {
         Optional<Like> existing = likeRepository.findByCustomerIdAndTmdbIdAndMediaType(
                 customerId, request.tmdbId(), request.mediaType());
 
         if (existing.isPresent()) {
             Like like = existing.get();
-            like.setLikeStatus(LikeStatus.LIKE);
+            like.setLikeStatus(request.likeStatus());
             like.setTitle(request.title());
             like.setLikedAt(LocalDateTime.now());
             return likeRepository.save(like);
@@ -51,37 +52,54 @@ public class LikeService {
         like.setTmdbId(request.tmdbId());
         like.setTitle(request.title());
         like.setMediaType(request.mediaType());
-        like.setLikeStatus(LikeStatus.LIKE);
+        like.setLikeStatus(request.likeStatus());
         like.setLikedAt(LocalDateTime.now());
 
         Like saved = likeRepository.save(like);
-        log.info("Liked tmdbId={} ({}) for customer={}", request.tmdbId(), request.mediaType(), customerId);
+        log.info("{} tmdbId={} ({}) for customer={}", request.likeStatus(), request.tmdbId(), request.mediaType(), customerId);
         return saved;
     }
 
     @Transactional
-    public void unlike(Long customerId, Long tmdbId, String mediaType) {
+    public void clearReaction(Long customerId, Long tmdbId, String mediaType) {
         likeRepository.deleteByCustomerIdAndTmdbIdAndMediaType(customerId, tmdbId, mediaType);
-        log.info("Unliked tmdbId={} ({}) for customer={}", tmdbId, mediaType, customerId);
+        log.info("Cleared reaction tmdbId={} ({}) for customer={}", tmdbId, mediaType, customerId);
     }
 
     public List<Like> getLikes(Long customerId) {
         return likeRepository.findByCustomerIdAndLikeStatusOrderByLikedAtDesc(customerId, LikeStatus.LIKE);
     }
 
+    public List<Like> getDislikes(Long customerId) {
+        return likeRepository.findByCustomerIdAndLikeStatusOrderByLikedAtDesc(customerId, LikeStatus.DISLIKE);
+    }
+
     public Page<Like> getLikesPaginated(Long customerId, Pageable pageable) {
         return likeRepository.findByCustomerIdAndLikeStatusOrderByLikedAtDesc(customerId, LikeStatus.LIKE, pageable);
     }
 
-    public boolean isLiked(Long customerId, Long tmdbId, String mediaType) {
-        return likeRepository.existsByCustomerIdAndTmdbIdAndMediaType(customerId, tmdbId, mediaType);
+    public Page<Like> getDislikesPaginated(Long customerId, Pageable pageable) {
+        return likeRepository.findByCustomerIdAndLikeStatusOrderByLikedAtDesc(customerId, LikeStatus.DISLIKE, pageable);
+    }
+
+    public Map<String, Boolean> getReaction(Long customerId, Long tmdbId, String mediaType) {
+        Optional<Like> like = likeRepository.findByCustomerIdAndTmdbIdAndMediaType(customerId, tmdbId, mediaType);
+        if (like.isEmpty()) {
+            return Map.of("liked", false, "disliked", false);
+        }
+        return Map.of(
+                "liked", like.get().getLikeStatus() == LikeStatus.LIKE,
+                "disliked", like.get().getLikeStatus() == LikeStatus.DISLIKE
+        );
     }
 
     public long getLikeCount(Long customerId) {
         return likeRepository.countByCustomerIdAndLikeStatus(customerId, LikeStatus.LIKE);
     }
 
-    public long getTotalLikes(Long tmdbId, String mediaType) {
-        return likeRepository.countByTmdbIdAndMediaTypeAndLikeStatus(tmdbId, mediaType, LikeStatus.LIKE);
+    public Map<String, Long> getTotalReactions(Long tmdbId, String mediaType) {
+        long liked = likeRepository.countByTmdbIdAndMediaTypeAndLikeStatus(tmdbId, mediaType, LikeStatus.LIKE);
+        long disliked = likeRepository.countByTmdbIdAndMediaTypeAndLikeStatus(tmdbId, mediaType, LikeStatus.DISLIKE);
+        return Map.of("liked", liked, "disliked", disliked);
     }
 }

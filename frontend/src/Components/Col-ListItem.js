@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import WatchlistButton from './WatchlistButton';
 import LikeButton from './LikeButton';
+import DislikeButton from './DislikeButton';
 
 const ColListItem = ({
   name, desc, year, img, ageRating, rating, runtime, genre, trailer,
@@ -157,6 +158,14 @@ const ColListItem = ({
                 size="small"
                 showLabel={false}
                 className="!w-9 !h-9 !min-w-[36px] !p-0 !rounded-xl !bg-white/5 !border-white/10 hover:!bg-rose-500/15 hover:!border-rose-500/30"
+              />
+              <DislikeButton
+                tmdbId={tmdbId}
+                mediaType={mediaType}
+                title={name}
+                size="small"
+                showLabel={false}
+                className="!w-9 !h-9 !min-w-[36px] !p-0 !rounded-xl !bg-white/5 !border-white/10 hover:!bg-sky-500/15 hover:!border-sky-500/30"
               />
             </>
           ) : (
