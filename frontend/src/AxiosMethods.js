@@ -8,7 +8,7 @@ const isLocalHost = () =>
   window.location.hostname === '127.0.0.1';
 
 const getBaseUrl = () => {
-  if (isLocalHost()) return 'http://localhost:8080';
+  if (isLocalHost()) return process.env.REACT_APP_API_URL || 'http://localhost:8081';
   return process.env.REACT_APP_API_URL || 'https://nmoviesapi.duckdns.org';
 };
 

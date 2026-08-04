@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes, Navigate, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -63,51 +63,41 @@ const isLocalHost = () =>
   window.location.hostname === '127.0.0.1';
 
 const getBaseURL = () => {
-  if (isLocalHost()) return 'http://localhost:8080';
+  if (isLocalHost()) return process.env.REACT_APP_API_URL || 'http://localhost:8081';
   return process.env.REACT_APP_API_URL || 'https://nmoviesapi.duckdns.org';
 };
 
 const API_URL = getBaseURL();
 
-function AppWithHealthCheck() {
-  const [serverStatus, setServerStatus] = useState('checking');
-  const [retryCount, setRetryCount] = useState(0);
-
-  const checkServerHealth = useCallback(async () => {
-    try {
-      await axios.get(`${API_URL}/api/v1/ping`, { timeout: 5000 });
-      setServerStatus('up');
-    } catch (error) {
-      console.warn('Backend health check failed:', error.message);
-      setServerStatus('down');
-    }
-  }, []);
+function ServerStatusBanner() {
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
-    checkServerHealth();
-
-    let retryInterval;
-    if (serverStatus === 'down' && retryCount < 5) {
-      retryInterval = setInterval(() => {
-        setRetryCount(prev => prev + 1);
-        checkServerHealth();
-      }, 10000);
-    }
-
-    return () => {
-      if (retryInterval) clearInterval(retryInterval);
+    let cancelled = false;
+    const check = async () => {
+      try {
+        await axios.get(`${API_URL}/api/v1/ping`, { timeout: 5000 });
+        if (!cancelled) setOffline(false);
+      } catch {
+        if (!cancelled) setOffline(true);
+      }
     };
-  }, [serverStatus, retryCount, checkServerHealth]);
+    check();
+    const id = setInterval(check, 10000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
 
-  if (serverStatus === 'checking') {
-    return <ServerConnection />;
-  }
-  
-  if (serverStatus === 'down') {
-    return <Fallback retryCount={retryCount} onRetry={() => setServerStatus('checking')} />;
-  }
+  if (!offline) return null;
 
-  return <AppWithNavigation />;
+  return (
+    <div className="fixed bottom-4 right-4 z-[100] glass-strong rounded-2xl px-4 py-3 flex items-center gap-3 shadow-2xl animate-fade-in max-w-[320px]">
+      <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
+      <div className="text-xs">
+        <p className="m-0 text-white font-semibold">Server is starting up</p>
+        <p className="m-0 text-[#5a6380]">Retrying automatically…</p>
+      </div>
+    </div>
+  );
 }
 
 function AppWithNavigation() {
@@ -191,9 +181,12 @@ function AppWithNavigation() {
   }, [dispatch]);
 
   return (
-    <Router>
-      <Layout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-    </Router>
+    <>
+      <Router>
+        <Layout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      </Router>
+      <ServerStatusBanner />
+    </>
   );
 }
 
@@ -375,7 +368,7 @@ function ProtectedRoute({
 export default function App() {
   return (
     <ErrorBoundary>
-      <AppWithHealthCheck />
+      <AppWithNavigation />
     </ErrorBoundary>
   );
 }

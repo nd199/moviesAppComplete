@@ -166,6 +166,7 @@ const Detail = () => {
                     tmdbId={item.tmdbId}
                     mediaType={type}
                     title={title}
+                    posterPath={posterUrl}
                     className="!px-5 !py-2.5"
                     showCount
                   />
@@ -175,6 +176,7 @@ const Detail = () => {
                     tmdbId={item.tmdbId}
                     mediaType={type}
                     title={title}
+                    posterPath={posterUrl}
                     className="!px-5 !py-2.5"
                     showCount
                   />

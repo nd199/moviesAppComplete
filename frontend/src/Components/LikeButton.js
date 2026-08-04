@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ThumbUp, ThumbUpOffAlt } from '@mui/icons-material';
 import { likesAPI } from '../AxiosMethods';
 
-const LikeButton = ({ tmdbId, mediaType, title, size = 'medium', showLabel = true, showCount = false, className = '', onSuccess, onError }) => {
+const LikeButton = ({ tmdbId, mediaType, title, posterPath, size = 'medium', showLabel = true, showCount = false, className = '', onSuccess, onError }) => {
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ const LikeButton = ({ tmdbId, mediaType, title, size = 'medium', showLabel = tru
         setCount(c => (c === null ? c : Math.max(0, c - 1)));
         onSuccess?.('Removed');
       } else {
-        await likesAPI.setReaction({ tmdbId, title: title || '', mediaType, likeStatus: 'LIKE' });
+        await likesAPI.setReaction({ tmdbId, title: title || '', posterPath: posterPath || '', mediaType, likeStatus: 'LIKE' });
         setLiked(true);
         setCount(c => (c === null ? c : c + 1));
         onSuccess?.('Liked');

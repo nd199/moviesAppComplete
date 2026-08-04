@@ -34,12 +34,15 @@ const List = ({ title, type = 'local', index = 0 }) => {
   const tmdbShows = useSelector(s => s?.product?.tmdbTrendingShows);
   const [loading, setLoading] = useState(true);
   const [extra, setExtra] = useState([]);
+  const [error, setError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const sectionRef = useScrollReveal({ threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
 
   useEffect(() => {
     let cancel = false;
     const run = async () => {
       setLoading(true);
+      setError(false);
       try {
         if (type === 'local') await Promise.all([fetchMovies(dispatch), fetchShows(dispatch)]);
         else if (fetchMap[type]) await fetchMap[type](dispatch);
@@ -47,12 +50,14 @@ const List = ({ title, type = 'local', index = 0 }) => {
           const map = { 'tmdb-popular': fetchTmdbPopularMovies, 'tmdb-top-rated': fetchTmdbTopRatedMovies, 'tmdb-now-playing': fetchTmdbNowPlayingMovies, 'tmdb-upcoming': fetchTmdbUpcomingMovies, 'tmdb-popular-shows': fetchTmdbPopularShows, 'tmdb-top-rated-shows': fetchTmdbTopRatedShows };
           if (map[type]) { const r = await map[type](); if (!cancel) setExtra(r || []); }
         }
-      } catch {}
+      } catch (err) {
+        if (!cancel) setError(true);
+      }
       if (!cancel) setLoading(false);
     };
     run();
     return () => { cancel = true; };
-  }, [dispatch, type]);
+  }, [dispatch, type, attempt]);
 
   const items = type === 'local' ? (title === 'Movies' ? movies : shows)
     : type === 'tmdb-movies' ? tmdbMovies
@@ -63,6 +68,15 @@ const List = ({ title, type = 'local', index = 0 }) => {
   const format = (item) => ({ id: item.tmdbId, tmdbId: item.tmdbId, name: item.title || item.name, desc: item.description, year: item.year, ageRating: item.ageRating, rating: item.rating, runtime: item.runtime, genre: item.genre, poster: item.poster, trailer: item.trailer, mediaType: isShow ? 'tv' : 'movie' });
 
   if (loading) return <MovieListSkeleton count={5} />;
+  if (error) return (
+    <section ref={sectionRef} className={`reveal w-full py-20 px-[3.5vw] ${sectionThemes[index % 4].bg}`}>
+      <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
+        <h2 className="text-xl font-bold text-white m-0">Can't reach the server</h2>
+        <p className="text-[#8892b0] text-sm m-0">This section couldn't be loaded.</p>
+        <button onClick={() => setAttempt(a => a + 1)} className="btn-secondary rounded-xl cursor-pointer">Retry</button>
+      </div>
+    </section>
+  );
   if (!items?.length) return null;
 
   const theme = sectionThemes[index % 4];

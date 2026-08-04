@@ -12,6 +12,9 @@ const Liked = () => {
   const [likes, setLikes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [sortBy, setSortBy] = useState("popularity");
   const [searchQuery, setSearchQuery] = useState("");
   const [genre, setGenre] = useState("");
@@ -20,11 +23,26 @@ const Liked = () => {
   const gridRef = useScrollReveal({ threshold: 0.05 });
 
   useEffect(() => {
-    likesAPI.getLikes().then(r => { setLikes(r.data || []); setLoading(false); })
-      .catch(() => { setError('Failed to load likes.'); setLoading(false); });
+    likesAPI.getLikesPaginated(0, 24).then(r => {
+      setLikes(r.data.content || []);
+      setHasMore(!r.data.last);
+      setPage(0);
+      setLoading(false);
+    }).catch(() => { setError('Failed to load likes.'); setLoading(false); });
   }, []);
 
-  const getPoster = () => 'https://via.placeholder.com/300x450/111/333?text=No+Poster';
+  const loadMore = () => {
+    setLoadingMore(true);
+    const next = page + 1;
+    likesAPI.getLikesPaginated(next, 24).then(r => {
+      setLikes(prev => [...prev, ...(r.data.content || [])]);
+      setHasMore(!r.data.last);
+      setPage(next);
+      setLoadingMore(false);
+    }).catch(() => setLoadingMore(false));
+  };
+
+  const getPoster = (p) => p?.startsWith('http') ? p : p ? `https://image.tmdb.org/t/p/w500${p}` : 'https://via.placeholder.com/300x450/111/333?text=No+Poster';
 
   const filtered = likes.filter(item => {
     if (searchQuery.trim() && !item.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
@@ -35,7 +53,7 @@ const Liked = () => {
     setLikes(prev => prev.filter(item => !(item.tmdbId === tmdbId && item.mediaType === mediaType)));
   };
 
-  if (loading) return <><GlobalLoader open message="Loading likes..." /><div className="min-h-screen bg-surface-950 pt-20"><FilterNavbar sortBy={sortBy} setSortBy={setSortBy} searchQuery={searchQuery} setSearchQuery={setSearchQuery} genre={genre} setGenre={setGenre} year={year} setYear={setYear} rating={rating} setRating={setRating} /></div></>;
+  if (loading) return <><GlobalLoader open message="Loading favorites..." /><div className="min-h-screen bg-surface-950 pt-20"><FilterNavbar sortBy={sortBy} setSortBy={setSortBy} searchQuery={searchQuery} setSearchQuery={setSearchQuery} genre={genre} setGenre={setGenre} year={year} setYear={setYear} rating={rating} setRating={setRating} /></div></>;
 
   if (error) return (
     <div className="min-h-screen bg-surface-950 pt-20">
@@ -60,7 +78,7 @@ const Liked = () => {
       <div className="max-w-[1400px] mx-auto px-5">
         <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/10">
           <Favorite className="text-rose-500" />
-          <h1 className="text-2xl font-bold text-white m-0">My Likes</h1>
+          <h1 className="text-2xl font-bold text-white m-0">My Favorites</h1>
           <span className="glass text-[#8892b0] px-2.5 py-1 rounded-xl text-xs font-medium">{filtered.length} items</span>
         </div>
 
@@ -82,7 +100,7 @@ const Liked = () => {
             {filtered.map(item => (
               <div key={`${item.tmdbId}-${item.mediaType}`} className="group glass rounded-2xl overflow-hidden hover:border-white/15 transition-all duration-300 hover:shadow-[0_12px_50px_-10px_rgba(244,63,94,0.3)]">
                 <div className="relative aspect-[2/3] overflow-hidden">
-                  <img src={getPoster()} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <img src={getPoster(item.posterPath)} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-black/0 sm:bg-black/0 sm:group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100">
                     <button onClick={async (e) => { e.preventDefault(); const d = item.mediaType === 'movie' ? await fetchTmdbMovieDetails(item.tmdbId) : await fetchTmdbTvShowDetails(item.tmdbId); window.location.href = d?.trailer ? `/video/${item.title}?trailer=${encodeURIComponent(d.trailer)}` : `/video/${item.title}`; }}
                       className="w-11 h-11 rounded-full btn-primary flex items-center justify-center border-none cursor-pointer !p-0">
@@ -102,6 +120,14 @@ const Liked = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {hasMore && (
+          <div className="flex justify-center py-10">
+            <button onClick={loadMore} disabled={loadingMore} className="btn-secondary rounded-xl cursor-pointer disabled:opacity-50">
+              {loadingMore ? 'Loading...' : 'Load more'}
+            </button>
           </div>
         )}
       </div>

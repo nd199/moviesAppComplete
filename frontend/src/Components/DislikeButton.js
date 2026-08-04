@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ThumbDown, ThumbDownOffAlt } from '@mui/icons-material';
 import { likesAPI } from '../AxiosMethods';
 
-const DislikeButton = ({ tmdbId, mediaType, title, size = 'medium', showLabel = true, showCount = false, className = '', onSuccess, onError }) => {
+const DislikeButton = ({ tmdbId, mediaType, title, posterPath, size = 'medium', showLabel = true, showCount = false, className = '', onSuccess, onError }) => {
   const [disliked, setDisliked] = useState(false);
   const [count, setCount] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ const DislikeButton = ({ tmdbId, mediaType, title, size = 'medium', showLabel = 
         setCount(c => (c === null ? c : Math.max(0, c - 1)));
         onSuccess?.('Removed');
       } else {
-        await likesAPI.setReaction({ tmdbId, title: title || '', mediaType, likeStatus: 'DISLIKE' });
+        await likesAPI.setReaction({ tmdbId, title: title || '', posterPath: posterPath || '', mediaType, likeStatus: 'DISLIKE' });
         setDisliked(true);
         setCount(c => (c === null ? c : c + 1));
         onSuccess?.('Disliked');

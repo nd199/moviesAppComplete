@@ -37,6 +37,9 @@ public class Like {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "poster_path")
+    private String posterPath;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "like_status")
     private LikeStatus likeStatus;

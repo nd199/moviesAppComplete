@@ -16,15 +16,31 @@ import DislikeButton from './DislikeButton';
 const Featured = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(false);
     publicRequest().get('/tmdb/south-indian/movies?page=1')
-      .then(r => setData(r.data.results?.slice(0, 10) || []))
-      .catch(() => setData([]))
-      .finally(() => setLoading(false));
-  }, []);
+      .then(r => { if (!cancelled) setData(r.data.results?.slice(0, 10) || []); })
+      .catch(() => { if (!cancelled) { setData([]); setError(true); } })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [attempt]);
 
   if (loading) return <FeaturedSkeleton />;
+  if (error) return (
+    <section className="relative w-full h-screen bg-surface-900 flex items-center justify-center">
+      <div className="absolute inset-0 particle-field" />
+      <div className="text-center relative z-10 flex flex-col items-center gap-4">
+        <h2 className="text-3xl font-black text-white m-0">Can't reach the server</h2>
+        <p className="text-[#8892b0] text-sm m-0">This section couldn't be loaded.</p>
+        <button onClick={() => setAttempt(a => a + 1)} className="btn-primary inline-flex no-underline">Retry</button>
+      </div>
+    </section>
+  );
   if (!data.length) return (
     <section className="relative w-full h-screen bg-surface-900 flex items-center justify-center">
       <div className="absolute inset-0 particle-field" />
@@ -115,6 +131,7 @@ const Featured = () => {
                       tmdbId={item.tmdbId}
                       mediaType="movie"
                       title={item.title}
+                      posterPath={item.poster}
                       className="!rounded-xl !bg-white/5 !border-white/10 !text-white hover:!bg-white/10 hover:!border-rose-500/30 backdrop-blur-sm !px-6 !py-3"
                       showLabel={true}
                       showCount
@@ -123,6 +140,7 @@ const Featured = () => {
                       tmdbId={item.tmdbId}
                       mediaType="movie"
                       title={item.title}
+                      posterPath={item.poster}
                       className="!rounded-xl !bg-white/5 !border-white/10 !text-white hover:!bg-white/10 hover:!border-sky-500/30 backdrop-blur-sm !px-6 !py-3"
                       showLabel={true}
                       showCount

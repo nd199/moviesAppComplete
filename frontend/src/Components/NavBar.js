@@ -124,7 +124,7 @@ const NavBar = ({ onMenuClick }) => {
     { to: "/shows", label: "Shows" },
     ...(user ? [
       { to: "/watchlist", label: "Watchlist" },
-      { to: "/liked", label: "Liked" },
+      { to: "/liked", label: "Your favorites" },
     ] : []),
   ];
 
@@ -189,7 +189,7 @@ const NavBar = ({ onMenuClick }) => {
                         {[
                           { icon: Person, label: "Profile", action: () => { navigate("/profile"); setOpen(false); } },
                           { icon: Bookmark, label: "My List", action: () => { navigate("/watchlist"); setOpen(false); } },
-                          { icon: Favorite, label: "Liked", action: () => { navigate("/liked"); setOpen(false); } },
+                          { icon: Favorite, label: "Your favorites", action: () => { navigate("/liked"); setOpen(false); } },
                         ].map(({ icon: Icon, label, action }) => (
                           <button key={label} onClick={action} className="w-full flex items-center gap-3 px-5 py-2.5 text-[#8892b0] hover:text-white hover:bg-white/5 transition-all text-sm cursor-pointer bg-transparent border-none">
                             <Icon sx={{ fontSize: 18 }} /> {label}

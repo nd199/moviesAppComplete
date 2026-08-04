@@ -40,6 +40,7 @@ public class LikeService {
             Like like = existing.get();
             like.setLikeStatus(request.likeStatus());
             like.setTitle(request.title());
+            like.setPosterPath(request.posterPath());
             like.setLikedAt(LocalDateTime.now());
             return likeRepository.save(like);
         }
@@ -51,6 +52,7 @@ public class LikeService {
         like.setCustomer(customer);
         like.setTmdbId(request.tmdbId());
         like.setTitle(request.title());
+        like.setPosterPath(request.posterPath());
         like.setMediaType(request.mediaType());
         like.setLikeStatus(request.likeStatus());
         like.setLikedAt(LocalDateTime.now());

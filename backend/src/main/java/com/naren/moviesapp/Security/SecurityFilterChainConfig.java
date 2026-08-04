@@ -176,6 +176,9 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/tmdb/**")
                         .permitAll()
 
+                        .requestMatchers(HttpMethod.GET, "/api/v1/local/**")
+                        .permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/v1/movies/**")
                         .permitAll()
 

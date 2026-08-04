@@ -36,7 +36,7 @@ echo "Backend PID: $BACKEND_PID"
 # Wait for backend to start
 echo "Waiting for backend..."
 for i in $(seq 1 30); do
-    curl -s http://localhost:8080/api/v1/ping > /dev/null 2>&1 && echo "Backend ready" && break
+    curl -s http://localhost:8081/api/v1/ping > /dev/null 2>&1 && echo "Backend ready" && break
     sleep 2
 done
 
@@ -56,7 +56,7 @@ echo "========================================="
 echo "  All services started!"
 echo "========================================="
 echo ""
-echo "  Backend:      http://localhost:8080"
+echo "  Backend:      http://localhost:8081"
 echo "  Admin Panel:  http://localhost:3000"
 echo "  Super Admin:  http://localhost:3001"
 echo "  PostgreSQL:   localhost:5342"

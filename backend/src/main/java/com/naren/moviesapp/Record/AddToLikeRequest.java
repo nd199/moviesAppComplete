@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 public record AddToLikeRequest(
         @NotNull Long tmdbId,
         @NotBlank String title,
+        String posterPath,
         @NotBlank String mediaType,
         @NotNull LikeStatus likeStatus
 ) {
