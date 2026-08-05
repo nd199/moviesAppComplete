@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import FaEdit from 'react-icons/fa/FaEdit';
-import FaTrash from 'react-icons/fa/FaTrash';
-import FaToggleOn from 'react-icons/fa/FaToggleOn';
-import FaToggleOff from 'react-icons/fa/FaToggleOff';
-import FaPlus from 'react-icons/fa/FaPlus';
+import { FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaPlus } from 'react-icons/fa';
 import { ShieldCheck, CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { fetchAdmins, deleteAdmin, toggleAdminStatus } from '../../services/adminApi';

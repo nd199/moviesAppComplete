@@ -5,6 +5,7 @@ import paymentReducer from './PaymentRedux';
 import productReducer from './ProductsRedux';
 import userReducer from './userSlice';
 import notificationReducer from './notificationRedux';
+import { apiSlice } from './apiSlice';
 
 const persistConfig = {
   key: 'root',
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   product: productReducer,
   user: userReducer,
   notification: notificationReducer,
+  [apiSlice.reducerPath]: apiSlice.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -29,7 +31,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
+    }).concat(apiSlice.middleware),
 });
 
 export const persistor = persistStore(store);

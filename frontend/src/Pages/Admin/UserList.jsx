@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import FaEdit from 'react-icons/fa/FaEdit';
-import FaTrash from 'react-icons/fa/FaTrash';
-import FaPlus from 'react-icons/fa/FaPlus';
-import FaSearch from 'react-icons/fa/FaSearch';
+import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
 import { Users, User, CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { fetchUsers, deleteUser } from '../../services/adminApi';
+import { useGetUsersQuery, useDeleteUserMutation } from '../../redux/apiSlice';
 
 const avatarGradients = [
   'from-brand-500 to-indigo-500',
@@ -17,28 +14,17 @@ const avatarGradients = [
 ];
 
 const UserList = () => {
-  const [users, setUsers] = useState([]);
+  const { data: allUsers = [], isLoading: loading } = useGetUsersQuery();
+  const [deleteUser] = useDeleteUserMutation();
+
+  const users = allUsers.filter(user => user.roles?.[0] !== 'ROLE_ADMIN');
+
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const fetchUserList = async () => {
-      setLoading(true);
-      try {
-        const usersData = await fetchUsers();
-        const filteredUsers = usersData.filter(user => user.roles?.[0] !== 'ROLE_ADMIN');
-        setUsers(filteredUsers);
-        setFilteredUsers(filteredUsers);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        toast.error('Failed to fetch users');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUserList();
-  }, []);
+    setFilteredUsers(users);
+  }, [users]);
 
   useEffect(() => {
     if (searchTerm.trim() === '') {
@@ -57,10 +43,7 @@ const UserList = () => {
 
   const deleteUserHandler = async (id) => {
     try {
-      await deleteUser(id);
-      const updatedUsers = users.filter(user => user.id !== id);
-      setUsers(updatedUsers);
-      setFilteredUsers(updatedUsers);
+      await deleteUser(id).unwrap();
       toast.success('User deleted successfully');
     } catch (err) {
       console.error("Failed to delete user:", err);

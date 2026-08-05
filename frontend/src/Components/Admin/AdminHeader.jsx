@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import IoNotificationsOutline from 'react-icons/io5/IoNotificationsOutline';
-import IoSearchOutline from 'react-icons/io5/IoSearchOutline';
+import { IoNotificationsOutline, IoSearchOutline } from 'react-icons/io5';
 import { Menu, ChevronDown, X } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState, useRef } from 'react';

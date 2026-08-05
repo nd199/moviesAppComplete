@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { systemAPI } from '../services/api';
-import HiUserPlus from 'react-icons/hi2/HiUserPlus';
-import HiUsers from 'react-icons/hi2/HiUsers';
-import HiShieldCheck from 'react-icons/hi2/HiShieldCheck';
-import HiClock from 'react-icons/hi2/HiClock';
+import { HiUserPlus, HiUsers, HiShieldCheck, HiClock } from 'react-icons/hi2';
 
 const Dashboard = () => {
   const navigate = useNavigate();

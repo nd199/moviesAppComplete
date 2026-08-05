@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { systemAPI } from '../services/api';
-import HiUsers from 'react-icons/hi2/HiUsers';
-import HiArrowDownTray from 'react-icons/hi2/HiArrowDownTray';
+import { HiUsers, HiArrowDownTray } from 'react-icons/hi2';
 
 const roleBadgeColors = {
   ROLE_ADMIN: 'bg-red-50 text-red-700 ring-red-600/20',

@@ -1,9 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
-import FaEdit from 'react-icons/fa/FaEdit';
-import FaTrash from 'react-icons/fa/FaTrash';
-import FaPlus from 'react-icons/fa/FaPlus';
-import FaSearch from 'react-icons/fa/FaSearch';
+import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
 import {Star, Tv} from 'lucide-react';
 import toast from 'react-hot-toast';
 import {deleteShow, fetchShows} from '../../services/adminApi';

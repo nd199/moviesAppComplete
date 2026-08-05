@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import FaCalendar from 'react-icons/fa/FaCalendar';
-import FaMapMarkerAlt from 'react-icons/fa/FaMapMarkerAlt';
-import FaEnvelope from 'react-icons/fa/FaEnvelope';
-import FaUser from 'react-icons/fa/FaUser';
-import FaPhone from 'react-icons/fa/FaPhone';
-import FaUpload from 'react-icons/fa/FaUpload';
+import { FaCalendar, FaMapMarkerAlt, FaEnvelope, FaUser, FaPhone, FaUpload } from 'react-icons/fa';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
-import { fetchUsers, updateUser } from '../../services/adminApi';
+import { useGetUserByIdQuery, useUpdateUserMutation } from '../../redux/apiSlice';
 
 const UserEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const userId = Number(id);
 
-  const [user, setUser] = useState(null);
+  const { data: user, isError, isLoading } = useGetUserByIdQuery(userId);
+  const [updateUser] = useUpdateUserMutation();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -25,30 +22,22 @@ const UserEdit = () => {
   const [createdAt, setCreatedAt] = useState("");
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const users = await fetchUsers();
-        const currentUser = users.find(u => u.id === userId);
-        if (currentUser) {
-          setUser(currentUser);
-          setName(currentUser.name || "");
-          setEmail(currentUser.email || "");
-          setPhoneNumber(currentUser.phoneNumber || "");
-          setImageUrl(currentUser.imageUrl || "");
-          setAddress(currentUser.address || "");
-          setCreatedAt(currentUser.createdAt || "");
-        } else {
-          toast.error('User not found');
-          navigate('/admin/users');
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        toast.error('Failed to fetch user');
-        navigate('/admin/users');
-      }
-    };
-    fetchUserData();
-  }, [userId, navigate]);
+    if (user) {
+      setName(user.name || "");
+      setEmail(user.email || "");
+      setPhoneNumber(user.phoneNumber || "");
+      setImageUrl(user.imageUrl || "");
+      setAddress(user.address || "");
+      setCreatedAt(user.createdAt || "");
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isError) {
+      toast.error('Failed to fetch user');
+      navigate('/admin/users');
+    }
+  }, [isError, navigate]);
 
   const userUpdateHandler = async (e) => {
     e.preventDefault();
@@ -57,7 +46,7 @@ const UserEdit = () => {
         name, email, phoneNumber, address, imageUrl: null,
         isEmailVerified: true, isLogged: true, isRegistered: true
       };
-      await updateUser(userId, userData);
+      await updateUser({ id: userId, ...userData }).unwrap();
       toast.success('User updated successfully!');
       navigate('/admin/users');
     } catch (err) {

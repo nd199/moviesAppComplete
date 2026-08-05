@@ -1,18 +1,16 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
-import FaEdit from 'react-icons/fa/FaEdit';
-import FaTrash from 'react-icons/fa/FaTrash';
-import FaPlus from 'react-icons/fa/FaPlus';
-import FaSearch from 'react-icons/fa/FaSearch';
+import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
 import {Calendar, Clock, Film, Star} from 'lucide-react';
 import toast from 'react-hot-toast';
-import {deleteMovie, fetchMovies} from '../../services/adminApi';
+import {useDeleteMovieMutation, useGetMoviesQuery} from '../../redux/apiSlice';
 import debounce from 'lodash.debounce';
 
 const MovieList = () => {
-    const [movies, setMovies] = useState([]);
+
+    const {data: movies = [], isLoading: loading} = useGetMoviesQuery();
+    const [deleteMovie] = useDeleteMovieMutation();
     const [filteredMovies, setFilteredMovies] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 15;
@@ -28,21 +26,10 @@ const MovieList = () => {
     }, [filteredMovies.length, itemsPerPage]);
 
     useEffect(() => {
-        const fetchMovieList = async () => {
-            setLoading(true);
-            try {
-                const moviesData = await fetchMovies();
-                setMovies(moviesData);
-                setFilteredMovies(moviesData);
-            } catch (error) {
-                console.error("Error fetching movies:", error);
-                toast.error('Failed to fetch movies');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchMovieList();
-    }, []);
+        if (movies?.length > 0) {
+            setFilteredMovies(movies);
+        }
+    }, [movies]);
 
     const debouncedSearch = useMemo(
         () => debounce((term, allMovies) => {
@@ -73,10 +60,7 @@ const MovieList = () => {
     const deleteMovieHandler = async (movieId) => {
         if (!movieId) return;
         try {
-            await deleteMovie(movieId);
-            const updatedMovies = movies.filter(movie => movie.id !== movieId);
-            setMovies(updatedMovies);
-            setFilteredMovies(updatedMovies);
+            await deleteMovie(movieId).unwrap();
             toast.success('Movie deleted successfully');
         } catch (err) {
             console.error("Error deleting movie:", err);

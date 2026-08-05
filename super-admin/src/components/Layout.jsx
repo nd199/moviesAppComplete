@@ -1,12 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import HiHome from 'react-icons/hi2/HiHome';
-import HiUserPlus from 'react-icons/hi2/HiUserPlus';
-import HiUsers from 'react-icons/hi2/HiUsers';
-import HiShieldCheck from 'react-icons/hi2/HiShieldCheck';
-import HiArrowRightOnRectangle from 'react-icons/hi2/HiArrowRightOnRectangle';
-import HiSun from 'react-icons/hi2/HiSun';
-import HiMoon from 'react-icons/hi2/HiMoon';
-import HiBars3 from 'react-icons/hi2/HiBars3';
+import { HiHome, HiUserPlus, HiUsers, HiShieldCheck, HiArrowRightOnRectangle, HiSun, HiMoon, HiBars3 } from 'react-icons/hi2';
 import { authAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import { useState, useEffect, useCallback } from 'react';

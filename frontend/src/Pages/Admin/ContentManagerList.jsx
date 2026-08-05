@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import FaEdit from 'react-icons/fa/FaEdit';
-import FaTrash from 'react-icons/fa/FaTrash';
-import FaPlus from 'react-icons/fa/FaPlus';
-import FaSearch from 'react-icons/fa/FaSearch';
+import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
 import { User, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
