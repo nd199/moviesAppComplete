@@ -35,26 +35,26 @@ const Profile = lazy(() => import("./Pages/User/Profile"));
 const PaymentCheckout = lazy(() => import("./Pages/Payment/PaymentCheckout"));
 const Success = lazy(() => import("./Pages/Payment/Success"));
 
-const AdminLogin = lazy(() => import("./Pages/Admin/AdminLogin"));
-const ContentManagerLogin = lazy(() => import("./Pages/Admin/ContentManagerLogin"));
-const Dashboard = lazy(() => import("./Pages/Admin/Dashboard"));
-const UserList = lazy(() => import("./Pages/Admin/UserList"));
-const NewUser = lazy(() => import("./Pages/Admin/NewUser"));
-const UserEdit = lazy(() => import("./Pages/Admin/UserEdit"));
-const MovieList = lazy(() => import("./Pages/Admin/MovieList"));
-const NewMovie = lazy(() => import("./Pages/Admin/NewMovie"));
-const MovieEdit = lazy(() => import("./Pages/Admin/MovieEdit"));
-const ShowList = lazy(() => import("./Pages/Admin/ShowList"));
-const NewShow = lazy(() => import("./Pages/Admin/NewShow"));
-const ShowEdit = lazy(() => import("./Pages/Admin/ShowEdit"));
-const AdminList = lazy(() => import("./Pages/Admin/AdminList"));
-const NewAdmin = lazy(() => import("./Pages/Admin/NewAdmin"));
-const AdminEdit = lazy(() => import("./Pages/Admin/AdminEdit"));
-const ContentManagerList = lazy(() => import("./Pages/Admin/ContentManagerList"));
-const NewContentManager = lazy(() => import("./Pages/Admin/NewContentManager"));
-const ContentManagerEdit = lazy(() => import("./Pages/Admin/ContentManagerEdit"));
-const Settings = lazy(() => import("./Pages/Admin/Settings"));
-const SetPassword = lazy(() => import("./Pages/Admin/SetPassword"));
+const AdminLogin = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/AdminLogin"));
+const ContentManagerLogin = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/ContentManagerLogin"));
+const Dashboard = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/Dashboard"));
+const UserList = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/UserList"));
+const NewUser = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/NewUser"));
+const UserEdit = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/UserEdit"));
+const MovieList = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/MovieList"));
+const NewMovie = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/NewMovie"));
+const MovieEdit = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/MovieEdit"));
+const ShowList = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/ShowList"));
+const NewShow = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/NewShow"));
+const ShowEdit = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/ShowEdit"));
+const AdminList = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/AdminList"));
+const NewAdmin = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/NewAdmin"));
+const AdminEdit = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/AdminEdit"));
+const ContentManagerList = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/ContentManagerList"));
+const NewContentManager = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/NewContentManager"));
+const ContentManagerEdit = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/ContentManagerEdit"));
+const Settings = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/Settings"));
+const SetPassword = lazy(() => import(/* webpackChunkName: "admin" */ "./Pages/Admin/SetPassword"));
 
 const isLocalHost = () =>
     window.location.hostname === 'localhost' ||

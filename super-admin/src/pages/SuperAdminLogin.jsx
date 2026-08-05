@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { authAPI } from '../services/api';
-import { HiEye, HiEyeSlash } from 'react-icons/hi2';
+import HiEye from 'react-icons/hi2/HiEye';
+import HiEyeSlash from 'react-icons/hi2/HiEyeSlash';
 
 const SuperAdminLogin = () => {
   const navigate = useNavigate();

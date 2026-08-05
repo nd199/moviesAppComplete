@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { FaUpload } from 'react-icons/fa';
+import FaUpload from 'react-icons/fa/FaUpload';
 import { ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { fetchMovies, updateMovie } from '../../services/adminApi';

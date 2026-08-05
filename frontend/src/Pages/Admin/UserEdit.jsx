@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { FaCalendar, FaMapMarkerAlt, FaEnvelope, FaUser, FaPhone, FaUpload } from 'react-icons/fa';
+import FaCalendar from 'react-icons/fa/FaCalendar';
+import FaMapMarkerAlt from 'react-icons/fa/FaMapMarkerAlt';
+import FaEnvelope from 'react-icons/fa/FaEnvelope';
+import FaUser from 'react-icons/fa/FaUser';
+import FaPhone from 'react-icons/fa/FaPhone';
+import FaUpload from 'react-icons/fa/FaUpload';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
