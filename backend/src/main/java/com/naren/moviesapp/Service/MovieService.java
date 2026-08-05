@@ -9,10 +9,12 @@ import com.naren.moviesapp.Record.MovieUpdation;
 import com.naren.moviesapp.Repo.MovieRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ public class MovieService implements MovieServiceInterface {
     }
 
     @Override
+    @CacheEvict(value = {"movies", "movieCategories"}, allEntries = true)
     public Movie addMovie(MovieRegistration registration) {
         logger.info("Adding new movie: {}", registration.name());
         Movie movie = createMovie(registration);
@@ -77,6 +80,10 @@ public class MovieService implements MovieServiceInterface {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "movies", key = "#id"),
+            @CacheEvict(value = "movieCategories", allEntries = true)
+    })
     public void removeMovie(Long id) {
         logger.info("Removing movie with ID: {}", id);
         Movie movie = movieRepository.findById(id)
@@ -106,6 +113,7 @@ public class MovieService implements MovieServiceInterface {
     }
 
     @Override
+    @Cacheable(value = "movies", key = "#id")
     public Movie getMovieById(Long id) {
         logger.debug("Fetching movie by ID: {}", id);
         return movieRepository.findById(id)
@@ -117,6 +125,10 @@ public class MovieService implements MovieServiceInterface {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "movies", key = "#movieId"),
+            @CacheEvict(value = "movieCategories", allEntries = true)
+    })
     public Movie updateMovie(MovieUpdation update, Long movieId) {
         logger.info("Updating movie with ID: {}", movieId);
         Movie movie = getMovieById(movieId);
@@ -254,7 +266,9 @@ public class MovieService implements MovieServiceInterface {
     }
 
     @Override
+    @Cacheable(value = "movieCategories", key = "#root.methodName")
     public List<String> getAllDistinctCategories() {
+        logger.debug("Fetching all distinct categories (from DB, cache miss)");
         return movieRepository.findAllDistinctCategories();
     }
 

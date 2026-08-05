@@ -4,6 +4,7 @@ import com.naren.moviesapp.Entity.Show;
 import com.naren.moviesapp.Record.ShowRegistration;
 import com.naren.moviesapp.Record.ShowUpdation;
 import com.naren.moviesapp.Service.ShowService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -14,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
-
 import java.util.List;
 
 @RestController
@@ -24,6 +23,8 @@ import java.util.List;
 public class ShowController {
 
     private static final Logger logger = LoggerFactory.getLogger(ShowController.class);
+
+    private static final int MAX_PAGE_SIZE = 100;
 
     private final ShowService showService;
 
@@ -59,9 +60,10 @@ public class ShowController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "show_id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
-        logger.debug("Fetching shows with pagination: page={}, size={}, sortBy={}, sortDir={}", page, size, sortBy, sortDir);
+logger.debug("Fetching shows with pagination: page={}, size={}, sortBy={}, sortDir={}", page, size, sortBy, sortDir);
+        int cappedSize = Math.min(size, MAX_PAGE_SIZE);
         Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        PageRequest pageRequest = PageRequest.of(page, cappedSize, sort);
         Page<Show> shows = showService.getShowList(pageRequest);
         return new ResponseEntity<>(shows, HttpStatus.OK);
     }
@@ -72,7 +74,8 @@ public class ShowController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         logger.debug("Searching shows with query: {}", query);
-        Page<Show> shows = showService.searchShows(query, PageRequest.of(page, size));
+        int cappedSize = Math.min(size, MAX_PAGE_SIZE);
+        Page<Show> shows = showService.searchShows(query, PageRequest.of(page, cappedSize));
         return new ResponseEntity<>(shows, HttpStatus.OK);
     }
 

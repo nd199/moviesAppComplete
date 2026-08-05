@@ -1,27 +1,22 @@
-  package com.naren.moviesapp.Service;
+package com.naren.moviesapp.Service;
 
-import com.naren.moviesapp.Dto.TmdbCastMemberDto;
-import com.naren.moviesapp.Dto.TmdbConvertedDto;
-import com.naren.moviesapp.Dto.TmdbMovieDto;
-import com.naren.moviesapp.Dto.TmdbSearchResponse;
-import com.naren.moviesapp.Dto.TmdbTvShowDto;
-import com.naren.moviesapp.Dto.TmdbVideoDto;
+import com.naren.moviesapp.Dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import reactor.netty.http.client.HttpClient;
-import reactor.netty.resources.ConnectionProvider;
 
 @Service
 @SuppressWarnings("unchecked")
@@ -43,7 +38,9 @@ public class TmdbService {
 
     private static final long CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
-    public TmdbService(@Value("${app.tmdb.api-key}") String apiKey, @Value("${app.tmdb.base-url}") String baseUrl, @Value("${app.tmdb.image-base-url}") String imageBaseUrl) {
+    public TmdbService(@Value("${app.tmdb.api-key}") String apiKey,
+                       @Value("${app.tmdb.base-url}") String baseUrl,
+                       @Value("${app.tmdb.image-base-url}") String imageBaseUrl) {
         this.apiKey = apiKey;
         this.baseUrl = baseUrl;
         this.imageBaseUrl = imageBaseUrl;
@@ -73,7 +70,9 @@ public class TmdbService {
         }
 
         try {
-            Map<String, Object> response = webClient.get().uri(uriBuilder -> uriBuilder.path("/search/movie").queryParam("query", query).queryParam("page", page).queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
+            Map<String, Object> response = webClient.get().uri(uriBuilder ->
+                    uriBuilder.path("/search/movie").queryParam("query", query).queryParam("page", page)
+                            .queryParam("api_key", apiKey).build()).retrieve().bodyToMono(Map.class).block();
 
             return Optional.of(convertToMovieSearchResponse(response));
         } catch (WebClientResponseException e) {
@@ -130,6 +129,7 @@ public class TmdbService {
         }
     }
 
+    @Cacheable(value = "tmdb", key = "#page")
     public Optional<TmdbSearchResponse<TmdbMovieDto>> getTrendingMovies(int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -146,6 +146,7 @@ public class TmdbService {
         }
     }
 
+    @Cacheable(value = "tmdb", key = "#page")
     public Optional<TmdbSearchResponse<TmdbMovieDto>> getTopRatedMovies(int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -162,6 +163,7 @@ public class TmdbService {
         }
     }
 
+    @Cacheable(value = "tmdb", key = "#page")
     public Optional<TmdbSearchResponse<TmdbMovieDto>> getNowPlayingMovies(int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -178,6 +180,7 @@ public class TmdbService {
         }
     }
 
+    @Cacheable(value = "tmdb", key = "#page")
     public Optional<TmdbSearchResponse<TmdbMovieDto>> getUpcomingMovies(int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -194,6 +197,7 @@ public class TmdbService {
         }
     }
 
+    @Cacheable(value = "tmdb", key = "#page")
     public Optional<TmdbSearchResponse<TmdbTvShowDto>> getPopularTvShows(int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -210,6 +214,7 @@ public class TmdbService {
         }
     }
 
+    @Cacheable(value = "tmdb", key = "#page")
     public Optional<TmdbSearchResponse<TmdbTvShowDto>> getTopRatedTvShows(int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -226,6 +231,7 @@ public class TmdbService {
         }
     }
 
+    @Cacheable(value = "tmdb", key = "#page")
     public Optional<TmdbSearchResponse<TmdbMovieDto>> getSouthIndianMovies(int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -249,6 +255,7 @@ public class TmdbService {
         }
     }
 
+    @Cacheable(value = "tmdb", key = "#page")
     public Optional<TmdbSearchResponse<TmdbTvShowDto>> getTrendingTvShows(int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -265,7 +272,9 @@ public class TmdbService {
         }
     }
 
-    public Optional<TmdbSearchResponse<TmdbMovieDto>> discoverMovies(String sortBy, Integer genreId, Integer year, Integer voteCountGte, Integer page) {
+    @Cacheable(value = "tmdb", key = "{#sortBy, #genreId, #year, #voteCountGte, #page}")
+    public Optional<TmdbSearchResponse<TmdbMovieDto>> discoverMovies(String sortBy, Integer genreId, Integer year,
+                                                                     Integer voteCountGte, Integer page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
             return Optional.empty();
@@ -298,6 +307,7 @@ public class TmdbService {
         }
     }
 
+    @Cacheable(value = "tmdb", key = "{#sortBy, #genreId, #firstAirDateYear, #page}")
     public Optional<TmdbSearchResponse<TmdbTvShowDto>> discoverTvShows(String sortBy, Integer genreId, Integer firstAirDateYear, Integer page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -793,6 +803,7 @@ public class TmdbService {
     }
 
     @SuppressWarnings("unchecked")
+    @Cacheable(value = "tmdb", key = "#root.methodName")
     public List<Map<String, Object>> getMovieGenres() {
         if (apiKey == null || apiKey.isBlank()) return List.of();
         try {
@@ -808,6 +819,7 @@ public class TmdbService {
     }
 
     @SuppressWarnings("unchecked")
+    @Cacheable(value = "tmdb", key = "#root.methodName")
     public List<Map<String, Object>> getTvGenres() {
         if (apiKey == null || apiKey.isBlank()) return List.of();
         try {

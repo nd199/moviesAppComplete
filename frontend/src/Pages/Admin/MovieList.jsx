@@ -1,13 +1,12 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
-import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
+import {FaEdit, FaPlus, FaSearch, FaTrash} from 'react-icons/fa';
 import {Calendar, Clock, Film, Star} from 'lucide-react';
 import toast from 'react-hot-toast';
-import {useDeleteMovieMutation, useGetMoviesQuery} from '../../redux/apiSlice';
+import {useGetMoviesQuery, useDeleteMovieMutation} from '../../redux/apiSlice';
 import debounce from 'lodash.debounce';
 
 const MovieList = () => {
-
     const {data: movies = [], isLoading: loading} = useGetMoviesQuery();
     const [deleteMovie] = useDeleteMovieMutation();
     const [filteredMovies, setFilteredMovies] = useState([]);

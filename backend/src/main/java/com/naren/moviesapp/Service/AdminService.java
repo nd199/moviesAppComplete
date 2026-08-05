@@ -1,11 +1,7 @@
 package com.naren.moviesapp.Service;
 
 import com.naren.moviesapp.Config.RoleHierarchyPolicy;
-import com.naren.moviesapp.Dto.AdminDTO;
-import com.naren.moviesapp.Dto.AdminDTOMapper;
-import com.naren.moviesapp.Dto.AdminInviteDTO;
-import com.naren.moviesapp.Dto.AdminInviteDTOMapper;
-import com.naren.moviesapp.Dto.AdminStatsDTO;
+import com.naren.moviesapp.Dto.*;
 import com.naren.moviesapp.Entity.Admin;
 import com.naren.moviesapp.Entity.Role;
 import com.naren.moviesapp.Entity.RoleName;
@@ -27,7 +23,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class AdminService implements AdminServiceInterface {

@@ -24,6 +24,19 @@ spring:
     redis:
       url: ${SPRING_DATA_REDIS_URL}
 
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterAccess=60m
+    cache-names: movies, movieCategories, shows, showCategories
+
+jwt:
+  secret: ${JWT_SECRET}
+  issuer: ${JWT_ISSUER}
+  expiration-minutes: ${JWT_EXPIRATION_MINUTES:15}
+  refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:7}
+  superadmin-expiration-minutes: ${JWT_SUPERADMIN_EXPIRATION:5}
+
 app:
   superadmin:
     email: ${SUPER_ADMIN_EMAIL}

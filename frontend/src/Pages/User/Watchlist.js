@@ -12,6 +12,9 @@ const Watchlist = () => {
   const [watchlist, setWatchlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [sortBy, setSortBy] = useState("popularity");
   const [searchQuery, setSearchQuery] = useState("");
   const [genre, setGenre] = useState("");
@@ -20,9 +23,24 @@ const Watchlist = () => {
   const gridRef = useScrollReveal({ threshold: 0.05 });
 
   useEffect(() => {
-    watchlistAPI.getWatchlist().then(r => { setWatchlist(r.data || []); setLoading(false); })
-      .catch(() => { setError('Failed to load watchlist.'); setLoading(false); });
+    watchlistAPI.getWatchlistPaginated(0, 24).then(r => {
+      setWatchlist(r.data.content || []);
+      setHasMore(!r.data.last);
+      setPage(0);
+      setLoading(false);
+    }).catch(() => { setError('Failed to load watchlist.'); setLoading(false); });
   }, []);
+
+  const loadMore = () => {
+    setLoadingMore(true);
+    const next = page + 1;
+    watchlistAPI.getWatchlistPaginated(next, 24).then(r => {
+      setWatchlist(prev => [...prev, ...(r.data.content || [])]);
+      setHasMore(!r.data.last);
+      setPage(next);
+      setLoadingMore(false);
+    }).catch(() => setLoadingMore(false));
+  };
 
   const getPoster = (p) => p?.startsWith('http') ? p : p ? `https://image.tmdb.org/t/p/w500${p}` : 'https://via.placeholder.com/300x450/111/333?text=No+Poster';
 
@@ -97,6 +115,14 @@ const Watchlist = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {hasMore && (
+          <div className="flex justify-center py-10">
+            <button onClick={loadMore} disabled={loadingMore} className="btn-secondary rounded-xl cursor-pointer disabled:opacity-50">
+              {loadingMore ? 'Loading...' : 'Load more'}
+            </button>
           </div>
         )}
       </div>

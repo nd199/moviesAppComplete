@@ -12,9 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class ShowService implements ShowServiceInterface {
     }
 
     @Override
+    @CacheEvict(value = {"shows", "showCategories"}, allEntries = true)
     public Show addShow(ShowRegistration registration) {
         logger.info("Adding new show: {}", registration.name());
         Show show = createShow(registration);
@@ -77,6 +80,10 @@ public class ShowService implements ShowServiceInterface {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "shows", key = "#id"),
+            @CacheEvict(value = "showCategories", allEntries = true)
+    })
     public void removeShow(Long id) {
         logger.info("Removing show with ID: {}", id);
         Show show = showRepository.findById(id)
@@ -90,6 +97,7 @@ public class ShowService implements ShowServiceInterface {
     }
 
     @Override
+    @Cacheable(value = "shows", key = "#id")
     public Show getShowById(Long id) {
         logger.debug("Fetching show by ID: {}", id);
         return showRepository.findById(id)
@@ -117,6 +125,10 @@ public class ShowService implements ShowServiceInterface {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "shows", key = "#showId"),
+            @CacheEvict(value = "showCategories", allEntries = true)
+    })
     public Show updateShow(ShowUpdation update, Long showId) {
         logger.info("Updating show with ID: {}", showId);
         Show show = showRepository.findById(showId)
@@ -256,6 +268,7 @@ public class ShowService implements ShowServiceInterface {
     }
 
     @Override
+    @Cacheable(value = "showCategories", key = "#root.methodName")
     public List<String> getAllDistinctCategories() {
         return showRepository.findAllDistinctCategories();
     }

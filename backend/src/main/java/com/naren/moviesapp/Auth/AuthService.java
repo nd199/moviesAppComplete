@@ -34,7 +34,7 @@ public class AuthService {
     private static final long LONG_LOCKOUT_MS = 60 * 60 * 1000L;   // 1 hour
     private static final int LONG_LOCKOUT_THRESHOLD = 15;
 
-    private final ConcurrentHashMap<String, int[]> failedAttempts = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, long[]> failedAttempts = new ConcurrentHashMap<>();
 
     private final AuthenticationManager authenticationManager;
     private final CustomerDTOMapper customerDTOMapper;
@@ -207,10 +207,10 @@ public class AuthService {
     }
 
     private void checkRateLimit(String key) {
-        int[] state = failedAttempts.get(key);
+        long[] state = failedAttempts.get(key);
         if (state == null) return;
 
-        int attempts = state[0];
+        int attempts = (int) state[0];
         long lockoutUntil = state[1];
 
         if (attempts >= MAX_FAILED_ATTEMPTS) {
@@ -229,7 +229,7 @@ public class AuthService {
 
     private void recordFailedAttempt(String key) {
         failedAttempts.compute(key, (k, existing) -> {
-            int attempts = existing != null ? existing[0] + 1 : 1;
+            int attempts = existing != null ? (int) existing[0] + 1 : 1;
             long now = System.currentTimeMillis();
             long lockoutUntil = existing != null ? existing[1] : 0;
 
@@ -240,7 +240,7 @@ public class AuthService {
             }
 
             logger.info("Failed attempt #{} for {}", attempts, k);
-            return new int[]{attempts, (int) (lockoutUntil & 0xFFFFFFFFL)};
+            return new long[]{attempts, lockoutUntil};
         });
     }
 

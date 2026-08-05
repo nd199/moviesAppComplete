@@ -66,7 +66,7 @@ const AdminList = () => {
   const totalAdmins = admins.length;
   const activeAdmins = admins.filter(a => a.isActive).length;
   const superAdmins = admins.filter(a => a.roles?.some(r => (r.name || r) === 'ROLE_SUPER_ADMIN')).length;
-  const hasSuperAdmin = superAdmins.length > 0;
+  const hasSuperAdmin = superAdmins > 0;
 
   return (
     <div className="space-y-4 sm:space-y-6">

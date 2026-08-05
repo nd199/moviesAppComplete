@@ -1,6 +1,5 @@
 package com.naren.moviesapp.Config;
 
-import net.datafaker.Faker;
 import com.naren.moviesapp.Entity.Customer;
 import com.naren.moviesapp.Entity.Movie;
 import com.naren.moviesapp.Entity.Show;
@@ -9,6 +8,7 @@ import com.naren.moviesapp.Repo.MovieRepository;
 import com.naren.moviesapp.Repo.ShowRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.datafaker.Faker;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -23,7 +23,8 @@ import java.util.Map;
 @RequestMapping("/api/v1/likes")
 public class LikeController {
 
-    private static final Logger log = LoggerFactory.getLogger(LikeController.class);
+private static final Logger log = LoggerFactory.getLogger(LikeController.class);
+    private static final int MAX_PAGE_SIZE = 100;
     private final LikeService likeService;
     private final CustomerRepository customerRepository;
 
@@ -75,8 +76,9 @@ public class LikeController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
-        Customer customer = getCustomer(userDetails);
-        Pageable pageable = PageRequest.of(page, size);
+Customer customer = getCustomer(userDetails);
+        int cappedSize = Math.min(size, MAX_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(page, cappedSize);
         return ResponseEntity.ok(likeService.getLikesPaginated(customer.getId(), pageable));
     }
 
@@ -87,7 +89,8 @@ public class LikeController {
             @RequestParam(defaultValue = "20") int size) {
 
         Customer customer = getCustomer(userDetails);
-        Pageable pageable = PageRequest.of(page, size);
+        int cappedSize = Math.min(size, MAX_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(page, cappedSize);
         return ResponseEntity.ok(likeService.getDislikesPaginated(customer.getId(), pageable));
     }
 

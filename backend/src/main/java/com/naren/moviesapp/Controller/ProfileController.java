@@ -1,6 +1,5 @@
 package com.naren.moviesapp.Controller;
 
-import com.naren.moviesapp.Dto.AdminDTO;
 import com.naren.moviesapp.Dto.CustomerDTO;
 import com.naren.moviesapp.Record.CustomerUpdateRequest;
 import com.naren.moviesapp.Record.PasswordChangeRequest;

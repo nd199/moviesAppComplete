@@ -5,6 +5,7 @@ import com.naren.moviesapp.Entity.WatchlistItem;
 import com.naren.moviesapp.Record.AddToWatchlistRequest;
 import com.naren.moviesapp.Repo.CustomerRepository;
 import com.naren.moviesapp.Service.WatchlistService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -15,8 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
-
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,8 @@ import java.util.Map;
 @RequestMapping("/api/v1/watchlist")
 public class WatchlistController {
 
-    private static final Logger log = LoggerFactory.getLogger(WatchlistController.class);
+private static final Logger log = LoggerFactory.getLogger(WatchlistController.class);
+    private static final int MAX_PAGE_SIZE = 100;
     private final WatchlistService watchlistService;
     private final CustomerRepository customerRepository;
 
@@ -59,8 +59,9 @@ public class WatchlistController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         
-        Customer customer = getCustomer(userDetails);
-        Pageable pageable = PageRequest.of(page, size);
+Customer customer = getCustomer(userDetails);
+        int cappedSize = Math.min(size, MAX_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(page, cappedSize);
         Page<WatchlistItem> watchlist = watchlistService.getWatchlistPaginated(customer.getId(), pageable);
         return ResponseEntity.ok(watchlist);
     }
