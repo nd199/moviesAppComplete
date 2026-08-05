@@ -20,6 +20,7 @@ const NavBar = ({ onMenuClick }) => {
   const [activeTab, setActiveTab] = useState("all");
   const searchInputRef = useRef(null);
   const searchTimerRef = useRef(null);
+  const activeSearchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -69,21 +70,27 @@ const NavBar = ({ onMenuClick }) => {
     setSearching(true);
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     searchTimerRef.current = setTimeout(async () => {
+      const controller = new AbortController();
+      activeSearchRef.current = controller;
       try {
         const [moviesRes, showsRes] = await Promise.allSettled([
-          publicRequest().get(`/tmdb/search/movies?query=${encodeURIComponent(searchQuery.trim())}&page=1`),
-          publicRequest().get(`/tmdb/search/shows?query=${encodeURIComponent(searchQuery.trim())}&page=1`),
+          publicRequest().get(`/tmdb/search/movies?query=${encodeURIComponent(searchQuery.trim())}&page=1&lite=true`, { signal: controller.signal }),
+          publicRequest().get(`/tmdb/search/shows?query=${encodeURIComponent(searchQuery.trim())}&page=1&lite=true`, { signal: controller.signal }),
         ]);
+        if (controller.signal.aborted) return;
         setSearchResults({
           movies: moviesRes.status === 'fulfilled' ? (moviesRes.value.data?.results || []).slice(0, 5) : [],
           shows: showsRes.status === 'fulfilled' ? (showsRes.value.data?.results || []).slice(0, 5) : [],
         });
       } catch {
-        setSearchResults({ movies: [], shows: [] });
+        if (!controller.signal.aborted) setSearchResults({ movies: [], shows: [] });
       }
       setSearching(false);
     }, 350);
-    return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
+    return () => {
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+      if (activeSearchRef.current) activeSearchRef.current.abort();
+    };
   }, [searchQuery]);
 
   const lottie = { loop: true, autoplay: true, animationData: popcornAnimation, rendererSettings: { preserveAspectRatio: "xMidYMid slice" } };

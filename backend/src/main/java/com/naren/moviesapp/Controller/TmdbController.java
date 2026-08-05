@@ -52,11 +52,70 @@ public class TmdbController {
         return ResponseEntity.ok(EMPTY_RESPONSE);
     }
 
+    private List<TmdbConvertedDto> toLiteMovieResults(TmdbSearchResponse<TmdbMovieDto> searchResponse) {
+        List<TmdbConvertedDto> results = new ArrayList<>();
+        if (searchResponse.getResults() != null) {
+            for (TmdbMovieDto movie : searchResponse.getResults()) {
+                if (movie == null) continue;
+                Integer year = null;
+                if (movie.getReleaseDate() != null && movie.getReleaseDate().length() >= 4) {
+                    try {
+                        year = Integer.parseInt(movie.getReleaseDate().substring(0, 4));
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+                results.add(TmdbConvertedDto.builder()
+                        .tmdbId(movie.getTmdbId())
+                        .title(movie.getTitle())
+                        .originalTitle(movie.getOriginalTitle())
+                        .rating(movie.getVoteAverage() != null ? Math.round(movie.getVoteAverage() * 10.0) / 10.0 : null)
+                        .description(movie.getOverview())
+                        .poster(tmdbService.getFullPosterPath(movie.getPosterPath()))
+                        .backdrop(tmdbService.getFullBackdropPath(movie.getBackdropPath()))
+                        .year(year)
+                        .type("movies")
+                        .releaseDate(movie.getReleaseDate())
+                        .build());
+            }
+        }
+        return results;
+    }
+
+    private List<TmdbConvertedDto> toLiteTvShowResults(TmdbSearchResponse<TmdbTvShowDto> searchResponse) {
+        List<TmdbConvertedDto> results = new ArrayList<>();
+        if (searchResponse.getResults() != null) {
+            for (TmdbTvShowDto tvShow : searchResponse.getResults()) {
+                if (tvShow == null) continue;
+                Integer year = null;
+                if (tvShow.getFirstAirDate() != null && tvShow.getFirstAirDate().length() >= 4) {
+                    try {
+                        year = Integer.parseInt(tvShow.getFirstAirDate().substring(0, 4));
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+                results.add(TmdbConvertedDto.builder()
+                        .tmdbId(tvShow.getTmdbId())
+                        .title(tvShow.getName())
+                        .originalTitle(tvShow.getOriginalName())
+                        .rating(tvShow.getVoteAverage() != null ? Math.round(tvShow.getVoteAverage() * 10.0) / 10.0 : null)
+                        .description(tvShow.getOverview())
+                        .poster(tmdbService.getFullPosterPath(tvShow.getPosterPath()))
+                        .backdrop(tmdbService.getFullBackdropPath(tvShow.getBackdropPath()))
+                        .year(year)
+                        .type("shows")
+                        .releaseDate(tvShow.getFirstAirDate())
+                        .build());
+            }
+        }
+        return results;
+    }
+
     @GetMapping("/search/movies")
     public ResponseEntity<?> searchMovies(
             @RequestParam String query,
-            @RequestParam(defaultValue = "1") int page) {
-        logger.info("Searching TMDB movies with query: {}, page: {}", query, page);
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "false") boolean lite) {
+        logger.info("Searching TMDB movies with query: {}, page: {}, lite: {}", query, page, lite);
 
         if (!tmdbService.isConfigured()) {
             return emptyOk();
@@ -80,11 +139,15 @@ public class TmdbController {
         }
 
         TmdbSearchResponse<TmdbMovieDto> searchResponse = response.get();
-        List<TmdbConvertedDto> results = new ArrayList<>();
-
-        if (searchResponse.getResults() != null) {
-            for (TmdbMovieDto movie : searchResponse.getResults()) {
-                results.add(TmdbConvertedDto.fromMovie(movie, tmdbService));
+        List<TmdbConvertedDto> results;
+        if (lite) {
+            results = toLiteMovieResults(searchResponse);
+        } else {
+            results = new ArrayList<>();
+            if (searchResponse.getResults() != null) {
+                for (TmdbMovieDto movie : searchResponse.getResults()) {
+                    results.add(TmdbConvertedDto.fromMovie(movie, tmdbService));
+                }
             }
         }
 
@@ -99,7 +162,8 @@ public class TmdbController {
     @GetMapping("/search/shows")
     public ResponseEntity<?> searchTvShows(
             @RequestParam String query,
-            @RequestParam(defaultValue = "1") int page) {
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "false") boolean lite) {
 
         if (!tmdbService.isConfigured()) {
             return emptyOk();
@@ -123,11 +187,15 @@ public class TmdbController {
         }
 
         TmdbSearchResponse<TmdbTvShowDto> searchResponse = response.get();
-        List<TmdbConvertedDto> results = new ArrayList<>();
-
-        if (searchResponse.getResults() != null) {
-            for (TmdbTvShowDto tvShow : searchResponse.getResults()) {
-                results.add(TmdbConvertedDto.fromTvShow(tvShow, tmdbService));
+        List<TmdbConvertedDto> results;
+        if (lite) {
+            results = toLiteTvShowResults(searchResponse);
+        } else {
+            results = new ArrayList<>();
+            if (searchResponse.getResults() != null) {
+                for (TmdbTvShowDto tvShow : searchResponse.getResults()) {
+                    results.add(TmdbConvertedDto.fromTvShow(tvShow, tmdbService));
+                }
             }
         }
 

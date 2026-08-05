@@ -18,7 +18,8 @@ public class CacheConfig {
                 "movies",
                 "movieCategories", "tmdb",
                 "shows",
-                "showCategories"
+                "showCategories",
+                "tmdbSearch"
         );
         manager.setCaffeine(
                 Caffeine.newBuilder()

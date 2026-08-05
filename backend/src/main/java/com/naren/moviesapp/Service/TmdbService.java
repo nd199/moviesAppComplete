@@ -63,6 +63,7 @@ public class TmdbService {
                 .build();
     }
 
+    @Cacheable(value = "tmdbSearch", key = "{#root.methodName, #query, #page}")
     public Optional<TmdbSearchResponse<TmdbMovieDto>> searchMovies(String query, int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
@@ -81,6 +82,7 @@ public class TmdbService {
         }
     }
 
+    @Cacheable(value = "tmdbSearch", key = "{#root.methodName, #query, #page}")
     public Optional<TmdbSearchResponse<TmdbTvShowDto>> searchTvShows(String query, int page) {
         if (apiKey == null || apiKey.isBlank()) {
             logger.warn("TMDB API key not configured");
