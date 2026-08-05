@@ -13,6 +13,10 @@ import { useScrollReveal } from '../Utils/useScrollReveal';
 
 SwiperCore.use([Navigation]);
 
+const MAX_AUTO_RETRIES = 4;
+const AUTO_RETRY_BASE_DELAY = 3000;
+const AUTO_RETRY_MAX_DELAY = 30000;
+
 const fetchMap = {
   'local': null,
   'tmdb-movies': fetchTmdbTrendingMovies,
@@ -40,6 +44,7 @@ const List = ({ title, type = 'local', index = 0 }) => {
 
   useEffect(() => {
     let cancel = false;
+    let retryTimer = null;
     const run = async () => {
       setLoading(true);
       setError(false);
@@ -50,13 +55,16 @@ const List = ({ title, type = 'local', index = 0 }) => {
           const map = { 'tmdb-popular': fetchTmdbPopularMovies, 'tmdb-top-rated': fetchTmdbTopRatedMovies, 'tmdb-now-playing': fetchTmdbNowPlayingMovies, 'tmdb-upcoming': fetchTmdbUpcomingMovies, 'tmdb-popular-shows': fetchTmdbPopularShows, 'tmdb-top-rated-shows': fetchTmdbTopRatedShows };
           if (map[type]) { const r = await map[type](); if (!cancel) setExtra(r || []); }
         }
+        if (!cancel) setLoading(false);
       } catch (err) {
-        if (!cancel) setError(true);
+        if (cancel) return;
+        const delay = Math.min(AUTO_RETRY_MAX_DELAY, AUTO_RETRY_BASE_DELAY * 2 ** attempt);
+        retryTimer = setTimeout(() => { if (!cancel) setAttempt(a => a + 1); }, delay);
+        if (attempt >= MAX_AUTO_RETRIES && !cancel) setError(true);
       }
-      if (!cancel) setLoading(false);
     };
     run();
-    return () => { cancel = true; };
+    return () => { cancel = true; if (retryTimer) clearTimeout(retryTimer); };
   }, [dispatch, type, attempt]);
 
   const items = type === 'local' ? (title === 'Movies' ? movies : shows)
@@ -71,9 +79,9 @@ const List = ({ title, type = 'local', index = 0 }) => {
   if (error) return (
     <section ref={sectionRef} className={`reveal w-full py-20 px-[3.5vw] ${sectionThemes[index % 4].bg}`}>
       <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
-        <h2 className="text-xl font-bold text-white m-0">Can't reach the server</h2>
-        <p className="text-[#8892b0] text-sm m-0">This section couldn't be loaded.</p>
-        <button onClick={() => setAttempt(a => a + 1)} className="btn-secondary rounded-xl cursor-pointer">Retry</button>
+        <h2 className="text-xl font-bold text-white m-0">{title}</h2>
+        <div className="h-8 w-8 rounded-full border-2 border-brand-500 border-t-transparent animate-spin" />
+        <p className="text-[#8892b0] text-sm m-0">Still trying to connect to the server...</p>
       </div>
     </section>
   );
